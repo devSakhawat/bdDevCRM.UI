@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewData["Title"] = "Board";
+    Layout = "~/Views/Shared/_Layout_new.cshtml";
+}
+
+
+
+<script src="~/scripts/coremanagement/Board/Board.js"></script>
+
+<div class="mainDiv">
+    <h3>Board Information</h3>
+
+    <div id="divSummary">
+        @Html.Partial("Board/BoardSummary")
+    </div>
+    <div id="divDetails" style="display: none;">
+        @Html.Partial("Board/BoardDetails")
+    </div>
+
+</div>
+
+
+

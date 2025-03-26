@@ -1,0 +1,604 @@
+﻿/*---------------------------Floating Area--------------------------------------------------*/
+.floatLeft {
+    float: left;
+}
+
+.floatRight {
+    float: right;
+}
+/*---------------------------Start of All Alignment Segment--------------------------------------------------*/
+.leftAlign {
+    text-align: left;
+}
+
+.rightAlign {
+    text-align: right;
+}
+
+.centerAlign {
+    text-align: center;
+}
+
+/*---------------------------All Size Segment Start--------------------------------------------------*/
+.widthSize0_per {
+    width: 0%;
+    *width: 0%;
+    _width: 0%;
+}
+
+.widthSize1_per {
+    width: 1%;
+    *width: 1%;
+    _width: 1%;
+}
+
+.widthSize2_per {
+    width: 2%;
+    *width: 2%;
+    _width: 2%;
+}
+
+.widthSize3_per {
+    width: 3%;
+    *width: 3%;
+    _width: 3%;
+}
+
+.widthSize4_per {
+    width: 4%;
+    *width: 4%;
+    _width: 4%;
+}
+
+.widthSize5_per {
+    width: 5%;
+    *width: 5%;
+    _width: 5%;
+}
+
+.widthSize6_per {
+    width: 6%;
+    *width: 6%;
+    _width: 6%;
+}
+
+.widthSize7_per {
+    width: 7%;
+    *width: 7%;
+    _width: 7%;
+}
+
+.widthSize8_per {
+    width: 8%;
+    *width: 8%;
+    _width: 8%;
+}
+
+.widthSize9_per {
+    width: 9%;
+    *width: 9%;
+    _width: 9%;
+}
+
+.widthSize10_per {
+    width: 10%;
+    *width: 10%;
+    _width: 10%;
+}
+
+.widthSize11_per {
+    width: 11%;
+    *width: 11%;
+    _width: 11%;
+}
+
+.widthSize12_per {
+    width: 12%;
+    *width: 12%;
+    _width: 12%;
+}
+
+.widthSize13_per {
+    width: 13%;
+    *width: 13%;
+    _width: 13%;
+}
+
+.widthSize14_per {
+    width: 14%;
+    *width: 14%;
+    _width: 14%;
+}
+
+.widthSize15_per {
+    width: 15%;
+    *width: 15%;
+    _width: 15%;
+}
+
+.widthSize16_per {
+    width: 16%;
+    *width: 16%;
+    _width: 16%;
+}
+
+.widthSize16Half_per {
+    width: 16.5%;
+    *width: 16.5%;
+    _width: 16.5%;
+}
+
+.widthSize17_per {
+    width: 17%;
+    *width: 17%;
+    _width: 17%;
+}
+
+.widthSize18_per {
+    width: 18%;
+    *width: 18%;
+    _width: 18%;
+}
+
+.widthSize19_per {
+    width: 19%;
+    *width: 19%;
+    _width: 19%;
+}
+
+.widthSize20_per {
+    width: 20%;
+    *width: 20%;
+    _width: 20%;
+}
+
+.widthSize21_per {
+    width: 21%;
+    *width: 21%;
+    _width: 21%;
+}
+
+.widthSize22_per {
+    width: 22%;
+    *width: 22%;
+    _width: 22%;
+}
+
+.widthSize23_per {
+    width: 23%;
+    *width: 23%;
+    _width: 23%;
+}
+
+.widthSize24_per {
+    width: 24%;
+    *width: 24%;
+    _width: 24%;
+}
+
+.widthSize25_per {
+    width: 25%;
+    *width: 25%;
+    _width: 25%;
+}
+
+.widthSize26_per {
+    width: 26%;
+    *width: 26%;
+    _width: 26%;
+}
+
+.widthSize27_per {
+    width: 27%;
+    *width: 27%;
+    _width: 27%;
+}
+
+.widthSize28_per {
+    width: 28%;
+    *width: 28%;
+    _width: 28%;
+}
+
+.widthSize29_per {
+    width: 29%;
+    *width: 29%;
+    _width: 29%;
+}
+
+.widthSize30_per {
+    width: 30%;
+    *width: 30%;
+    _width: 30%;
+}
+
+.widthSize31_per {
+    width: 31%;
+    *width: 31%;
+    _width: 31%;
+}
+
+.widthSize32_per {
+    width: 32%;
+    *width: 32%;
+    _width: 32%;
+}
+
+.widthSize33_per {
+    width: 33%;
+    *width: 33%;
+    _width: 33%;
+}
+
+.widthSize34_per {
+    width: 34%;
+    *width: 34%;
+    _width: 34%;
+}
+
+.widthSize35_per {
+    width: 35%;
+    *width: 35%;
+    _width: 35%;
+}
+
+.widthSize36_per {
+    width: 36%;
+    *width: 36%;
+    _width: 36%;
+}
+
+.widthSize37_per {
+    width: 37%;
+    *width: 37%;
+    _width: 37%;
+}
+
+.widthSize38_per {
+    width: 38%;
+    *width: 38%;
+    _width: 38%;
+}
+
+.widthSize39_per {
+    width: 39%;
+    *width: 39%;
+    _width: 39%;
+}
+
+.widthSize40_per {
+    width: 40%;
+    *width: 40%;
+    _width: 40%;
+}
+
+.widthSize41_per {
+    width: 41%;
+    *width: 41%;
+    _width: 41%;
+}
+
+.widthSize42_per {
+    width: 42%;
+    *width: 42%;
+    _width: 42%;
+}
+
+.widthSize43_per {
+    width: 43%;
+    *width: 43%;
+    _width: 43%;
+}
+
+.widthSize44_per {
+    width: 44%;
+    *width: 44%;
+    _width: 44%;
+}
+
+.widthSize45_per {
+    width: 45%;
+    *width: 45%;
+    _width: 45%;
+}
+
+.widthSize47_per {
+    width: 47%;
+    *width: 47%;
+    _width: 47%;
+}
+
+.widthSize46_per {
+    width: 46%;
+    *width: 46%;
+    _width: 46%;
+}
+
+.widthSize48_per {
+    width: 48%;
+    *width: 48%;
+    _width: 48%;
+}
+
+.widthSize49_per {
+    width: 49%;
+    *width: 49%;
+    _width: 49%;
+}
+
+.widthSize50_per {
+    width: 50%;
+    *width: 50%;
+    _width: 50%;
+}
+
+.widthSize51_per {
+    width: 51%;
+    *width: 51%;
+    _width: 51%;
+}
+
+.widthSize53_per {
+    width: 53%;
+    *width: 51%;
+    _width: 51%;
+}
+
+.widthSize54_per {
+    width: 54%;
+    *width: 51%;
+    _width: 51%;
+}
+
+.widthSize52_per {
+    width: 52%;
+    *width: 51%;
+    _width: 51%;
+}
+
+.widthSize55_per {
+    width: 55%;
+    *width: 55%;
+    _width: 55%;
+}
+
+.widthSize56_per {
+    width: 56%;
+    *width: 56%;
+    _width: 56%;
+}
+
+.widthSize57_per {
+    width: 57%;
+    *width: 57%;
+    _width: 57%;
+}
+
+.widthSize58_per {
+    width: 58%;
+    *width: 58%;
+    _width: 58%;
+}
+
+.widthSize59_per {
+    width: 59%;
+    *width: 59%;
+    _width: 59%;
+}
+
+.widthSize60_per {
+    width: 60%;
+    *width: 60%;
+    _width: 60%;
+}
+
+.widthSize61_per {
+    width: 61%;
+    *width: 61%;
+    _width: 61%;
+}
+
+.widthSize62_per {
+    width: 62%;
+    *width: 61%;
+    _width: 61%;
+}
+
+.widthSize63_per {
+    width: 63%;
+    *width: 61%;
+    _width: 61%;
+}
+
+.widthSize64_per {
+    width: 64%;
+    *width: 64%;
+    _width: 64%;
+}
+
+.widthSize65_per {
+    width: 65%;
+    *width: 65%;
+    _width: 65%;
+}
+
+.widthSize66_per {
+    width: 66%;
+    *width: 66%;
+    _width: 66%;
+}
+
+.widthSize68_per {
+    width: 68%;
+    *width: 68%;
+    _width: 68%;
+}
+
+.widthSize69_per {
+    width: 69%;
+    *width: 69%;
+    _width: 69%;
+}
+
+.widthSize70_per {
+    width: 70%;
+    *width: 70%;
+    _width: 70%;
+}
+
+.widthSize72_per {
+    width: 72%;
+    *width: 72%;
+    _width: 72%;
+}
+
+.widthSize73_per {
+    width: 73%;
+    *width: 73%;
+    _width: 73%;
+}
+
+.widthSize75_per {
+    width: 75%;
+    *width: 75%;
+    _width: 75%;
+}
+
+.widthSize80_per {
+    width: 80%;
+    *width: 80%;
+    _width: 80%;
+}
+
+.widthSize81_per {
+    width: 81%;
+    *width: 81%;
+    _width: 81%;
+}
+
+.widthSize85_per {
+    width: 85%;
+    *width: 85%;
+    _width: 85%;
+}
+
+.widthSize86_per {
+    width: 86%;
+    *width: 86%;
+    _width: 86%;
+}
+
+.widthSize87_per {
+    width: 87%;
+    *width: 87%;
+    _width: 87%;
+}
+
+.widthSize88_per {
+    width: 88%;
+    *width: 88%;
+    _width: 88%;
+}
+
+.widthSize89_per {
+    width: 89%;
+    *width: 89%;
+    _width: 89%;
+}
+
+.widthSize90_per {
+    width: 90%;
+    *width: 90%;
+    _width: 90%;
+}
+
+.widthSize95_per {
+    width: 95%;
+    *width: 95%;
+    _width: 95%;
+}
+
+.widthSize96_per {
+    width: 96%;
+    *width: 96%;
+    _width: 96%;
+}
+
+.widthSize97_per {
+    width: 97%;
+    *width: 97%;
+    _width: 97%;
+}
+
+.widthSize97p9_per {
+    width: 97.9%;
+    *width: 97.9%;
+    _width: 97.9%;
+}
+
+.widthSize98_per {
+    width: 98%;
+    *width: 98%;
+    _width: 98%;
+}
+
+.widthSize99_per {
+    width: 99%;
+    *width: 99%;
+    _width: 99%;
+}
+
+.widthSize100_per {
+    width: 100%;
+    *width: 100%;
+    _width: 100%;
+}
+
+.widthSize15_4_em {
+    width: 15.4em;
+}
+
+
+.m_input {
+    height: 18px;
+    text-indent: .33em;
+    width: 17.4em;
+    border-radius: 0px;
+    box-sizing: border-box;
+    outline: 0;
+    padding: 2px .3em;
+    line-height: 1.6em;
+    display: inline-block;
+    vertical-align: middle;
+    overflow: visible;
+    font-size: 100%;
+    font-family: inherit;
+    /*border-style: solid;*/
+    /*border-width: 1px;*/
+    -webkit-appearance: none;
+    color: #000000;
+    border: none;
+    border-bottom: 2px solid #ffc700;
+}
+
+.m_input_ta {
+    height: 70px;
+    width: 17.4em;
+    border-radius: 0px;
+    box-sizing: border-box;
+    outline: 0;
+    padding: 2px .3em;
+    line-height: 1.6em;
+    display: inline-block;
+    vertical-align: middle;
+    overflow: visible;
+    font-size: 100%;
+    font-family: inherit;
+    /*border-style: solid;*/
+    /*border-width: 1px;*/
+    -webkit-appearance: none;
+    color: #000000;
+    border: none;
+    border-bottom: 2px solid #ffc700;
+    background-color: #fafafa;
+}

@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewData["Title"] = "Thana";
+    Layout = "~/Views/Shared/_Layout_new.cshtml";
+}
+
+
+
+<script src="~/scripts/coremanagement/thana/thana.js"></script>
+
+<div class="mainDiv">
+    <h3>Thana Information</h3>
+
+    <div id="divSummary">
+        @Html.Partial("Thana/ThanaSummary")
+    </div>
+    <div id="divDetails" style="display: none;">
+        @Html.Partial("Thana/ThanaDetails")
+    </div>
+
+</div>
+
+
+

@@ -1,0 +1,56 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+
+<script src="~/scripts/coremanagement/Thana/Thanadetails.js"></script>
+
+
+<div id="divdetailsForDetails" class="container divDetails">
+    <fieldset class="reset">
+        <legend class="reset">Thana Details</legend>
+    
+        <div class="row">
+            <div class="col-md-6">
+                <form>
+                    <div class="form-group">
+                        <input type="text" id="txtCode" name="Code" placeholder="Code*" class="k-textbox mendatory-field" />
+                        <input type="hidden" id="hdnId" />
+                        <input type="hidden" id="hdnCreateBy" />
+                        <input type="hidden" id="hdnCreateDate" />
+                        <input type="hidden" id="hdnUpdateBy" />
+                        <input type="hidden" id="hdnUpdateDate" />
+                             
+                             
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="txtName" name="Name" placeholder="Name*" class="k-textbox mendatory-field" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="txtNameBangla" name="Bangla Name" placeholder="Bangla Name*" class="k-textbox mendatory-field" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="cmbDistrict" name="District" placeholder="District" class="mendatory-field" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="cmbStatus" name="Status" placeholder="Status" class="mendatory-field" />
+                    </div>
+                    <div>
+                        <label class="status"></label>
+                    </div>
+                   
+               
+                </form>
+            </div>
+           
+        </div>
+    </fieldset>
+    <div class="clear"></div>
+    <fieldset>
+        <button type="button" class="btn btn-primary btn-sm" id="btnSave" style="background-color: #207AB0;">Save</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnClose" style="background-color: #207AB0;">Close</button>
+    </fieldset>
+
+</div> 

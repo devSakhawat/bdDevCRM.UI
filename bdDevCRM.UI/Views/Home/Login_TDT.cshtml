@@ -1,0 +1,113 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+
+
+@{
+    ViewData["Title"] = @Localizer["homePage"];
+}
+
+<script src="~/Scripts/Users/Login/Login.js"></script>
+
+<div class="wrapper">
+		<div class="container main">
+			<div class="login-box">
+				<div class="row">
+					<div class="col-md-6 col-sm-12 side-image custom-content-end">
+						<div class="full-width">
+							<h5 class="center-aligned company-By">POWERED BY</h5>
+							<h5 class="center-aligned company-name">TECHNO DEVELOPERS THRILL PVT LTD.</h5>
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-12 content-box">
+						<div class="row">
+							<div class="col-12 header-image">
+								<img src="~/images/2.jpg" alt="Your Image">
+								
+							</div>
+							
+							<div class="col-12">
+								<div class="input-box">
+									<h1 class="header">Welcome Back!</h1>
+									<h4>Don't have an account yet? <a href="#">Sign Up</a></h4>
+									<div class="input-field">
+										<span>Username</span>
+                    <input type="text" class="input" id="txtLoginId" autocomplete="off">
+									</div>
+									<div class="input-field">
+										<span>Password</span>
+                    <input type="password" class="input" id="txtPassword">
+									</div>
+									<div class="Remember">
+										<label>
+                      <input type="checkbox"> Keep me logged in <a href="#">Forgot Password</a>
+                    </label>
+									</div>
+									<div class="Sub">
+                    <input type="button" id="btnLogin" value="Login" class="submit">
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+@* 
+<div class="login-box">
+    <div class="cus-login-body">
+        <div class="row p-4">
+            <div class="col-md-6 col-sm-12">
+                <div class="v-center-parent">
+                    <div class="v-center">
+                        <h2 class="text-cteal text-center">@Localizer["login"]</h2>
+                        <form>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light" id="basic-addon1">
+                                        <i class="bi bi-person-circle"></i>
+                                    </span>
+                                </div>
+                                <input type="text" id="txtLoginId" class="form-control" aria-describedby="basic-addon1" required>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light" id="basic-addon1">
+                                        <i class="bi bi-shield-lock"></i>
+                                    </span>
+                                </div>
+                                <input type="text" id="txtPassword" class="form-control" aria-describedby="basic-addon1" required>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <p><a href="#" class="text-cteal">@Localizer["forgotYourPassword"]</a></p>
+                                </div>
+                                <div>
+                                    <input type="button" id="btnLogin" value=@Localizer["login"] name="" class="btn cbtn-capsul cbtn-teal" />
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12 order-first order-md-last">
+                <div class="v-center-parent">
+                    <div class="v-center">
+                        <div class="img text-center p-0 p-md-5">
+                       
+                            <img src="~/images/ProductLogo.jpg" />
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ *@

@@ -1,0 +1,78 @@
+﻿fieldset, legend {
+    all: revert;
+}
+
+.reset {
+    all: revert;
+    margin-bottom:20px;
+}
+.mainDiv{
+    xpadding:10px;
+}
+.k-autocomplete, .k-colorpicker, .k-combobox, .k-datepicker, .k-datetimepicker, .k-dropdown, .k-dropdowntree, .k-listbox, .k-multiselect, .k-numerictextbox, .k-selectbox, .k-textbox, .k-timepicker, .k-toolbar .k-split-button {
+    width: 17.4em;
+   
+}
+input.k-textbox {
+    height: 2.0em;
+}
+
+textarea::placeholder {
+    margin-left: 8px;
+    padding-left: 8px;
+}
+
+
+textarea.mendatory-field::placeholder {
+    color: red;
+    opacity: 1;
+}
+
+textarea.mendatory-field::-ms-input-placeholder { /* Edge 12-18 */
+    color: red;
+    opacity: 1; /* Firefox */
+}
+
+input.mendatory-field::placeholder {
+    color: red;
+    opacity: 1; /* Firefox */
+}
+
+input.mendatory-field::-ms-input-placeholder { /* Edge 12-18 */
+    color: red;
+    opacity: 1; /* Firefox */
+}
+
+select.mendatory-field::placeholder {
+    color: red;
+    opacity: 1; /* Firefox */
+}
+
+select.mendatory-field::-ms-input-placeholder { /* Edge 12-18 */
+    color: red;
+    opacity: 1; /* Firefox */
+}
+
+.k-invalid {
+    border-color: #f00;
+}
+
+.k-invalid-msg {
+    color: #f00;
+    font-size: 0.8em;
+}
+
+.red-text {
+    color: red;
+}
+
+.k-label {
+    color: red !important;
+}
+
+.k-textbox input::placeholder,
+.k-datetimepicker input::placeholder,
+.k-dropdownlist input::placeholder {
+    color: red;
+}
+

@@ -1,0 +1,26 @@
+﻿@{
+	ViewData["Title"] = "Menu";
+	Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+
+<!-- row -->
+<div class="row">
+	<div class="col-12">
+		<!-- card -->
+		<h3>Menu Information</h3>
+		<div id="divSummary">
+			@Html.Partial("Menu/MenuSummary")
+		</div>
+
+		<div id="divDetails" style="display: none;">
+			@Html.Partial("Menu/MenuDetails")
+		</div>
+	</div>
+</div>
+
+<script src="~/assets/scripts/core/menu/menu.js"></script>
+
+
+
+

@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewData["Title"] = "Users Information";
+    Layout = "~/Views/Shared/_Layout_new.cshtml";
+}
+
+
+
+<script src="~/scripts/coremanagement/UsersInformation/UsersInformation.js"></script>
+
+<div class="mainDiv">
+    <h3>Users Information</h3>
+
+    <div id="divSummary">
+        @Html.Partial("UsersInformation/UsersInformationSummary")
+    </div>
+    <div id="divDetails" style="display: none;">
+        @Html.Partial("UsersInformation/UsersInformationDetails")
+
+    </div>
+
+</div>
+
+
+

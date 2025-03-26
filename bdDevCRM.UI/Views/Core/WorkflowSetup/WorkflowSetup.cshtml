@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewData["Title"] = "Workflow Setup";
+    Layout = "~/Views/Shared/_Layout_new.cshtml";
+}
+
+
+
+<script src="~/scripts/coremanagement/WorkflowSetup/WorkflowSetup.js"></script>
+
+<div class="mainDiv">
+    <h3>Workflow Setup Information</h3>
+
+    <div id="divSummary">
+        @Html.Partial("WorkflowSetup/WorkflowSetupSummary")
+    </div>
+    <div id="divDetails" style="display: none;">
+        @Html.Partial("WorkflowSetup/WorkflowSetupDetails")
+    </div>
+
+</div>
+
+
+

@@ -1,0 +1,25 @@
+﻿<script src="~/assets/scripts/core/module/moduledetails.js"></script>
+
+<div id="divdetailsForDetails">
+  <fieldset class="reset">
+    <legend class="reset">Module Details</legend>
+
+    <form id="moduleForm">
+      <input type="hidden" id="hdModuleId" value="0" />
+
+      <div class="mb-3">
+        <label class="form-label" for="Module-name">Module Name</label>
+        <input type="text" class="form-control" id="Module-name" name="Module-name" placeholder="Enter Module Name" required>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-primary me-2" onclick="moduleDetailsHelper.SaveInformation()" id="btnSave">+ Add Module</button>
+        <button type="button" class="btn btn-secondary me-2" onclick="moduleDetailsHelper.ClearInformation()" id="btnClear">Clear</button>
+        <button type="button" class="btn btn-light me-2" onclick="moduleDetailsHelper.CloseInformation()" id="btnClose">Close</button>
+      </div>
+
+      <div class="status"></div>
+    </form>
+  </fieldset>
+</div>
+

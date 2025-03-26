@@ -1,0 +1,25 @@
+﻿
+@{
+  ViewData["Title"] = "Module";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+<script src="~/assets/scripts/core/module/module.js"></script>
+
+<!-- row -->
+<div class="row">
+  <div class="col-12">
+    <!-- card -->
+    <h3>Module Information</h3>
+    <div id="divSummary">
+      @Html.Partial("Module/ModuleSummary")
+    </div>
+
+    <div id="divDetails" style="display: none;">
+      @Html.Partial("Module/ModuleDetails")
+    </div>
+  </div>
+</div>
+
+
+

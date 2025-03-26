@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewData["Title"] = "District";
+    Layout = "~/Views/Shared/_Layout_new.cshtml";
+}
+
+
+
+<script src="~/scripts/coremanagement/district/district.js"></script>
+
+<div class="mainDiv">
+    <h3>District Information</h3>
+
+    <div id="divSummary">
+        @Html.Partial("District/DistrictSummary")
+    </div>
+    <div id="divDetails" style="display: none;">
+        @Html.Partial("District/DistrictDetails")
+    </div>
+
+</div>
+
+
+

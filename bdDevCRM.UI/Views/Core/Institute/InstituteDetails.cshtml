@@ -1,0 +1,135 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+
+<script src="~/scripts/coremanagement/institute/institutedetails.js"></script>
+
+
+<div id="divdetailsForInstituteDetails" class="container divDetails">
+    <fieldset class="reset">
+        <legend class="reset">Institute Details</legend>
+    
+        <div class="row">
+            <div class="col-md-6">
+                <form>
+                    <div class="form-group">
+                        <input type="text" id="txtCode" name="Code" placeholder="Code*" class="k-textbox mendatory-field" />
+                        <input type="hidden" id="hdnId" />
+                        <input type="hidden" id="hdnCreateBy" />
+                        <input type="hidden" id="hdnCreateDate" />
+                        <input type="hidden" id="hdnUpdateBy" />
+                        <input type="hidden" id="hdnUpdateDate" />
+                             
+                             
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="txtName" name="Name" placeholder="Name*" class="k-textbox mendatory-field" />
+                    </div>
+
+                    <div class="form-group">
+                        <textarea id="txtAreaAddress" placeholder="Address text box" class="k-textbox"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="cmbInstituteType" name="Type" placeholder="Type*" class="mendatory-field" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="cmbBoard" name="Board" placeholder="Board*" class="mendatory-field" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="cmbDistrict" name="District" placeholder="District*" class="mendatory-field" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="cmbThana" name="Thana" placeholder="Thana" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="txtPhone" name="Phone" placeholder="Phone" class="k-textbox" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="txtFax" name="Fax" placeholder="Fax" class="k-textbox" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="txtEmail" name="Email" placeholder="Email" class="k-textbox" />
+                    </div>
+                               
+                   
+                                        
+               
+                </form>
+            </div>
+            <div class="col-md-6 text-right">
+    <form>
+                    
+
+                    <div class="form-group">
+                        <input type="text" id="txtTin" name="Tin" placeholder="TIN No*" class="k-textbox mendatory-field" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="txtBin" name="Bin" placeholder="BIN No*" class="k-textbox mendatory-field" />
+                    </div>
+
+                    <div class="form-group">
+                      
+                        <input type="text" id="txtWebsite" name="Website" placeholder="Website" class="k-textbox" />
+        </div>
+
+                    <div class="form-group">
+                        <input type="text" id="txtRegisterNo" name="RegisterNo" placeholder="Register No*" class="k-textbox mendatory-field" />
+        </div>
+
+                    <div class="form-group">
+                        <input type="text" id="txtShortName" name="ShortName" placeholder="Short Name" class="k-textbox" />
+        </div>
+
+                    <div class="form-group">
+                        <input id="cmbParent" placeholder="Parent Company" />
+                 
+       </div>
+                    <div class="form-group">
+                        <input type="text" id="cmbStatus" name="Status" placeholder="Status*" class="mendatory-field" />
+                    </div>
+
+
+                    <div class="form-group">
+                       
+            <input type="hidden" id="hfFullLogoPath" value="" />
+            <div class="floatLeft widthSize70_per">
+                <input name="files" id="files" title="Logo" value="Logo" type="file" />
+            </div>
+            <div class="clear"></div>
+        </div>
+
+                    <div class="form-group">
+            <input type="hidden" id="hfFullLogoPathForReport" value="" />
+            <div class="floatLeft widthSize70_per">
+                <input name="files" id="filesForReportLogo" type="file" title="Report Logo" value="Report Logo" />
+            </div>
+            <div class="clear"></div>
+        </div>
+                   
+                    
+       <div>
+           <label class="status"></label>
+       </div>
+
+    </form>
+    </div>
+        </div>
+    </fieldset>
+    <div class="clear"></div>
+    <fieldset>
+        <button type="button" class="btn btn-primary btn-sm" id="btnSave" style="background-color: #207AB0;">Save</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnClose" style="background-color: #207AB0;">Close</button>
+    </fieldset>
+
+</div> 

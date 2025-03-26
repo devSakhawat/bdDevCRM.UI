@@ -1,0 +1,19 @@
+﻿<!-- row -->
+<div class="row">
+	<div class="col-4">
+		<!-- card -->
+		<h3>Menu Information</h3>
+		<div id="divSummary">
+			@Html.Partial("Group/MenuSummary")
+		</div>
+	</div>
+
+	<div class="col-8">
+		<div id="divDetails" style="display: none;">
+			@Html.Partial("Menu/MenuDetails")
+		</div>
+	</div>
+
+</div>
+
+<script src="~/scripts/core/group/groupinformation.js"></script>

@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewData["Title"] = "Users Type";
+    Layout = "~/Views/Shared/_Layout_new.cshtml";
+}
+
+
+
+<script src="~/scripts/coremanagement/usersType/usersType.js"></script>
+
+<div class="mainDiv">
+    <h3>Users Type Information</h3>
+
+    <div id="divSummary">
+        @Html.Partial("UsersType/UsersTypeSummary")
+    </div>
+    <div id="divDetails" style="display: none;">
+        @Html.Partial("UsersType/UsersTypeDetails")
+    </div>
+
+</div>
+
+
+

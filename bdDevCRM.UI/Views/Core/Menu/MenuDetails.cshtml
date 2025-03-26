@@ -1,0 +1,50 @@
+﻿
+<script src="~/assets/scripts/core/menu/menudetails.js"></script>
+
+<div id="divdetailsForDetails">
+  <fieldset class="reset">
+    <legend class="reset">Menu Details</legend>
+
+    <form id="menuForm" class="main-form">
+      <input type="hidden" id="hdMenuId" value="0" />
+      <input type="hidden" id="hdSorOrder" value="0" />
+
+      <div class="mb-3">
+        <label class="form-label" for="menu-name">Menu Name</label>
+        <input type="text" class="form-control" id="menu-name" placeholder="Enter Menu Name" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="module-name">Module Name</label>
+        <input id="cmd-module" class="form-control custom-combobox" placeholder="Select Module Name">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="menu-path">Menu Path</label>
+        <input type="text" class="form-control" id="menu-path" placeholder="Enter Menu Path">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="parent-menu-name">Parent Menu Name</label>
+        <input id="cmb-parent-menu" class="form-control custom-combobox" placeholder="Select Parent Menu">
+      </div>
+
+      <div class="mb-3 custom-checkbox">
+        <input type="checkbox" id="chkIsQuickLink" name="IsQuickLink" class="form-check-input" />
+        <label class="form-check-label">Is Quick Link</label>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-primary me-2" onclick="MenuDetailsHelper.SaveInformation()" id="btnSave">+ Add Module</button>
+        <button type="button" class="btn btn-secondary me-2" onclick="MenuDetailsHelper.ClearInformation()" id="btnClear">Clear</button>
+        <button type="button" class="btn btn-light" onclick="MenuDetailsHelper.CloseInformation()" id="btnClose">Close</button>
+      </div>
+
+      <div class="status"></div>
+    </form>
+
+  </fieldset>
+</div>
+
+
+

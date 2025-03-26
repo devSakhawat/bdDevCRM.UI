@@ -1,0 +1,106 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+
+<script src="~/scripts/coremanagement/UsersInformation/UsersInformationdetails.js"></script>
+
+
+
+<div id="divdetailsForDetails" class="container divDetails">
+   
+
+
+    <div id="divUsersDetails">
+
+            <div id="tabstrip">
+                <ul>
+                    <li class="k-state-active">
+                        User Details
+                    </li>
+                    <li>
+                        Groups Mapping
+                    </li>
+                </ul>
+               
+            <div id="userDiv">
+                        <fieldset class="reset">
+                            <legend class="reset">User Details</legend>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form>
+                                        <div class="form-group">
+                                            <input type="text" id="txtLoginId" name="Login ID" placeholder="Login ID*" class="k-textbox mendatory-field" required validationmessage="Please Insert Login ID" />
+                                            <input type="hidden" id="hdnId" />
+                                            <input type="hidden" id="hdnCreateBy" />
+                                            <input type="hidden" id="hdnCreateDate" />
+                                            <input type="hidden" id="hdnUpdateBy" />
+                                            <input type="hidden" id="hdnUpdateDate" />
+
+
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" id="txtFullName" name="FullName" placeholder="Full Name*" class="k-textbox mendatory-field" required validationmessage="Please Insert Full Name" />
+                                        </div>
+                                        <div class="form-group">
+                                        <input id="cmbInstitute" name="Institute" placeholder="Institute" class="mendatory-field" />
+                                        </div>
+                                <div class="form-group">
+                                    <input id="cmbBranch" name="Branch" placeholder="Branch" class="mendatory-field" />
+                                </div>
+                                        <div class="form-group">
+                                        <input id="cmbUsersType" name="Users Type" placeholder="Users Type" class="mendatory-field" />
+                                        </div>
+                                        
+
+                                        <div class="form-group">
+                                        <input type="password" id="txtPassword" name="Password" placeholder="Password" class="k-textbox mendatory-field" />
+                                        </div>
+                                    <div class="form-group">
+                                        <input type="text" id="cmbStatus" name="Status" placeholder="Status" class="mendatory-field" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="cmbIsExpired" name="IsExpired" placeholder="Is Expired?" class="mendatory-field" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="cmbTheme" name="Theme" placeholder="Theme" class="mendatory-field" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="cmbAccessPrentInstitute" name="AccessPrentInstitute" placeholder="Access Prent Institute" class="mendatory-field" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="cmbDefaultDashbaord" name="DefaultDashbaord" placeholder="Default Dashbaord" class="mendatory-field" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="cmbIsFirstLoginEnable" name="IsFirstLoginEnable" placeholder="Is First Login Enable?" class="mendatory-field" />
+                                    </div>
+                                        <div>
+                                            <label class="status"></label>
+                                        </div>
+
+
+                                    </form>
+                                </div>
+
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <button type="button" class="btn btn-primary btn-sm" id="btnSave" style="background-color: #207AB0;">Save</button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btnClose" style="background-color: #207AB0;">Close</button>
+                        </fieldset>
+                    </div>
+              
+            <div id="divUsersGroupMember">
+                @Html.Partial("UsersInformation/UsersInformationGroupMember")
+            </div>
+                
+            </div>
+
+        </div>
+    
+   
+
+</div> 

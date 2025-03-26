@@ -1,0 +1,138 @@
+﻿
+a {
+  cursor: pointer;
+}
+
+input, textarea {
+  cursor: text !important;
+}
+
+input[type="button"] {
+  cursor: pointer !important;
+}
+
+button{
+  cursor: pointer !important;
+}
+
+/*nav.navbar-classic.navbar.navbar-expand-lg {
+  height: 70px;
+}*/
+
+/* Default menu item color */
+.nav-link {
+  color: #333 !important; /* Default text color */
+  text-decoration: none;
+  background-color: transparent; /* Ensure no background by default */
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+  /* Hover effect */
+  .nav-link:hover {
+    color: #2F2C74 !important; 
+    background-color: #f8f9fa; 
+    font-weight: bold; 
+  }
+
+  /* Active menu item */
+  .nav-link.active {
+    color: #2F2C74 !important; 
+    font-weight: bold;
+  }
+
+
+.arrow-icon {
+  margin-right: 5px;
+  font-size: 12px; 
+  font-weight:bold;
+}
+
+.collapse {
+  transition: height 0.3s ease-in-out;
+}
+
+/*Design for kendo combo box */
+.custom-combobox.k-combobox {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.375rem !important;
+  background-color: #fff !important;
+  padding: 0 !important;
+  height: calc(1.5em + 0.75rem + 2px) !important;
+  cursor: pointer;
+  position: relative !important; 
+}
+
+.custom-combobox .k-input-inner {
+  width: 100% !important;
+  border: none !important;
+  background-color: transparent !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 1rem !important;
+  outline: none !important;
+  cursor: pointer;
+}
+
+.custom-combobox .k-input-button {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
+}
+
+.custom-combobox .k-clear-value {
+  background-color: transparent !important;
+  border: none !important;
+  cursor: pointer;
+  position: relative !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
+}
+
+.custom-combobox.k-combobox:focus-within {
+  border: 1px solid #86b7fe !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+  cursor: pointer;
+}
+
+.custom-combobox .k-select {
+  position: relative !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
+}
+
+.custom-combobox .k-input {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+
+/*check box style*/
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.k-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #6200ea;
+  cursor: pointer;
+}
+
+.k-checkbox-label {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.custom-swal-zindex {
+  z-index: 10010 !important; /* Ensure this value is higher than Kendo's z-index */
+}
+

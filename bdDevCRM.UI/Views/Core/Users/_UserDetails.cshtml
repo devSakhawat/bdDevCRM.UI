@@ -1,0 +1,38 @@
+﻿<script src="~/assets/scripts/core/users/userdetails.js"></script>
+
+<div class="rightDiv">
+  <fieldset class="reset">
+    <legend class="reset">User Details</legend>
+
+    <div id="tabstrip">
+      <ul>
+        <li>
+          User Info
+        </li>
+        <li>
+          Group Membership
+        </li>
+      </ul>
+      <div>
+        <partial name="Users/_UserInfo" />
+      </div>
+      <div>
+        <partial name="Users/_GroupMembership" />
+      </div>
+
+
+    </div>
+
+    <div class="divDetails">
+      <ul>
+        <li class="accept">
+          <button id="btnSave" class="k-button" type="submit" onclick="userDetailsManager.SaveUserInfo()">Save</button> &nbsp;&nbsp;
+          <button id="btnClearAll" class="k-button" onclick="userDetailsHelper.clearUserForm()">Clear</button>
+        </li>
+        <li class="status">
+        </li>
+      </ul>
+    </div>
+  
+  </fieldset>
+</div>

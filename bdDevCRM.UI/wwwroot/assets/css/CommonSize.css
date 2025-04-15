@@ -602,3 +602,17 @@
     border-bottom: 2px solid #ffc700;
     background-color: #fafafa;
 }
+
+.me5{
+  margin-right: 5px !important;
+}
+.me4{
+  margin-right: 4px !important;
+}
+.me3{
+  margin-right: 3px !important;
+}
+
+.me2 {
+  margin-right: 2px !important;
+}

@@ -1,7 +1,7 @@
 ﻿
-var moduleDetailsManager = {
+var ModuleDetailsManager = {
 
-  SaveData: function () {
+  SaveDataModule: function () {
     debugger;
 
     var isToUpdateOrCreate = $("#hdModuleId").val();
@@ -21,13 +21,13 @@ var moduleDetailsManager = {
           onClick: function ($noty) {
             debugger;
             $noty.close();
-            var obj = moduleDetailsHelper.CreateNewObject();
+            var obj = ModuleDetailsHelper.CreateObject();
             var jsonObject = JSON.stringify(obj);
             var data = AjaxManager.PostDataForDotnetCore(baseApi, serviceUrl, jsonObject);
             console.log(data);
             if (data != null || data == "") {
               Message.Success(successmsg);
-              moduleDetailsHelper.CloseInformation();
+              ModuleDetailsHelper.CloseInformation();
               $("#gridSummary").data("kendoGrid").dataSource.read();
             } else {
               Message.Warning(msg);
@@ -44,6 +44,51 @@ var moduleDetailsManager = {
       ]
     );
   },
+
+   SaveData: function () {
+      debugger;
+
+      var isToUpdateOrCreate = $("#hdModuleId").val();
+      var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
+      var serviceUrl = isToUpdateOrCreate == 0 ? "/module" : "/module/" + isToUpdateOrCreate;
+      var confmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
+      var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
+
+      AjaxManager.MsgBox(
+         'info',
+         'center',
+         'Confirmation',
+         confmsg,
+         [
+            {
+               addClass: 'btn btn-primary',
+               text: 'Yes',
+               onClick: function ($noty) {
+                  $noty.close();
+                  var obj = ModuleDetailsHelper.CreateObject();
+                  var jsonObject = JSON.stringify(obj);
+                  var responseData = AjaxManager.PostDataForDotnetCoreWithHttp(baseApi, serviceUrl, jsonObject, httpType, onSuccess, onFailed);
+                  function onSuccess(responseData) {
+                     Message.Success(successmsg);
+                     ModuleDetailsHelper.CloseInformation();
+                     $("#gridSummary").data("kendoGrid").dataSource.read();
+                  }
+                  function onFailed(jqXHR, textStatus, errorThrown) {
+                     Message.Warning(textStatus, ": ", errorThrown);
+                  }
+
+               }
+            },
+            {
+               addClass: 'btn',
+               text: 'Cancel',
+               onClick: function ($noty) {
+                  $noty.close();
+               }
+            }
+         ]
+      );
+   },
 
   DeleteData: function (dataFromGrid) {
     debugger;
@@ -96,32 +141,31 @@ var moduleDetailsManager = {
     );
   },
 
-
-
 };
 
-var moduleDetailsHelper = {
+var ModuleDetailsHelper = {
 
-  initiateDetails: function () {
+  initializeDetails: function () {
 
   },
 
   AddNewInformation: function () {
     AjaxManager.PopupWindow("divDetails", "Details Information", "50%");
-    moduleDetailsHelper.ClearInformation();
+    ModuleDetailsHelper.ClearInformation();
 
   },
 
   SaveInformation: function () {
-    if (moduleDetailsHelper.validator()) {
+    if (ModuleDetailsHelper.validator()) {
       
     }
-    moduleDetailsManager.SaveData();
+    ModuleDetailsManager.SaveData();
   },
 
   CloseInformation: function () {
     $("#divDetails").data("kendoWindow").close();
-    moduleDetailsHelper.ClearInformation();
+     ModuleDetailsHelper.ClearInformation();
+     $("#btnSave").text("Save");
   },
 
   ClearInformation: function () {
@@ -129,7 +173,6 @@ var moduleDetailsHelper = {
     $("#hdModuleId").val("0");
     $("#Module-name").val("");
     $('#myInputID').removeAttr('disabled');
-    $("#btnSave").text("Add Module");
   },
 
   validator: function () {
@@ -146,22 +189,33 @@ var moduleDetailsHelper = {
 
   },
 
-  CreateNewObject: function () {
+  CreateObject: function () {
     var obj = new Object();
     obj.ModuleId = $("#hdModuleId").val();
     obj.ModuleName = $("#Module-name").val();
     return obj;
   },
 
-  PopulateNewObject: function (obj) {
-    AjaxManager.PopupWindow("divDetails", "Details Information", "60%");
-    var kendoWindow = $("#divDetails").data("kendoWindow");
+   PopulateObject: function (obj) {
+      ModuleDetailsHelper.ClearInformation();
+      AjaxManager.PopupWindow("divDetails", "Details Information", "60%");
+      var kendoWindow = $("#divDetails").data("kendoWindow");
 
-    kendoWindow.bind("activate", function () {
-      $("#hdModuleId").val(obj.ModuleId);
-      $("#Module-name").val(obj.ModuleName);
-      $("#Module-name").focus();
-    });
-  },
+       kendoWindow.bind("activate", function () {
+         $("#hdModuleId").val(obj.ModuleId);
+         $("#Module-name").val(obj.ModuleName);
+         $("#Module-name").focus();
+       });
+   },
+
+   //PopulateObject: function (obj) {
+   //   MenuDetailsHelper.ClearInformation();
+   //   AjaxManager.PopupWindow("divDetails", "Details Information", "50%");
+
+   //   $("#hdModuleId").val(obj.ModuleId);
+   //   $("#Module-name").val(obj.ModuleName);
+   //   $("#Module-name").focus();
+   //},
+
 
 };

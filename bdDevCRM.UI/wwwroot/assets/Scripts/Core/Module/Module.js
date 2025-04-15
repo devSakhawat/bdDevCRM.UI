@@ -1,17 +1,17 @@
 ﻿$(document).ready(function () {
-    moduleHelper.initiateHelper();
+   ModuleHelper.initializeHelper();
 
 
 });
 
 
 
-var moduleManager = {};
+var ModuleManager = {};
 
-var moduleHelper = {
-    initiateHelper: function () {
-        moduleDetailsHelper.initiateDetails();
-        moduleSummaryHelper.initateSummary();
+var ModuleHelper = {
+   initializeHelper: function () {
+      ModuleDetailsHelper.initializeDetails();
+      ModuleSummaryHelper.initializeSummary();
 
     }
 

@@ -17,8 +17,7 @@
   <link href="~/assets/libs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="~/assets/libs/mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
   <link href="~/assets/libs/simplebar/dist/simplebar.min.css" rel="stylesheet" />
-  <link href="~/assets/libs/noty/noty.min.css" rel="stylesheet" />
-
+  <link href="~/assets/libs/toastr/toastr_2.1.4.min.css" rel="stylesheet" />
 
   <!-- Kendo CSS -->
   <link href="~/assets/kendo_2023_r1/styles/kendo.common.min.css" rel="stylesheet" />
@@ -40,12 +39,6 @@
   @* Kendo 2023_r1 jquery version is jQuery v1.12.4 but we are using jquery v3.7.0 *@
   <script src="~/assets/kendo_2023_r1/js/jszip.min.js"></script>
 
-  <!-- Common JS -->
-@*   <script src="~/scripts/common/common.js"></script> *@
-
-@*   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> *@
-
-
 
 
   <!-- Theme CSS with bootstrap -->
@@ -61,28 +54,28 @@
       // Call the function to populate the menu
       MenuHelper.GetMenuInformation();
 
-      // Initialize feather icons after the menu is populated
-      if (typeof feather !== 'undefined') {
-        feather.replace();
-      }
+      // // Initialize feather icons after the menu is populated
+      // if (typeof feather !== 'undefined') {
+      //   feather.replace();
+      // }
 
-      // Update arrow icon when menu is expanded
-      $('#sideNavbar').on('shown.bs.collapse', '.collapse', function () {
-        const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
-        arrowIcon.attr('data-feather', 'chevron-down'); // Change to down arrow
-        if (typeof feather !== 'undefined') {
-          feather.replace(); // Re-render feather icons
-        }
-      });
+      // // Update arrow icon when menu is expanded
+      // $('#sideNavbar').on('shown.bs.collapse', '.collapse', function () {
+      //   const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
+      //   arrowIcon.attr('data-feather', 'chevron-down'); // Change to down arrow
+      //   if (typeof feather !== 'undefined') {
+      //     feather.replace(); // Re-render feather icons
+      //   }
+      // });
 
-      // Update arrow icon when menu is collapsed
-      $('#sideNavbar').on('hidden.bs.collapse', '.collapse', function () {
-        const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
-        arrowIcon.attr('data-feather', 'chevron-right'); // Change to right arrow
-        if (typeof feather !== 'undefined') {
-          feather.replace(); // Re-render feather icons
-        }
-      });
+      // // Update arrow icon when menu is collapsed
+      // $('#sideNavbar').on('hidden.bs.collapse', '.collapse', function () {
+      //   const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
+      //   arrowIcon.attr('data-feather', 'chevron-right'); // Change to right arrow
+      //   if (typeof feather !== 'undefined') {
+      //     feather.replace(); // Re-render feather icons
+      //   }
+      // });
 
     });
   </script>
@@ -108,7 +101,6 @@
             @* <img src="~/images/logo/sountwels.png" alt="Brand Logo" class="bran-logo" /> *@
             <img alt="Brand Logo" id="bran-logo" />
           </a>
-
           <a id="nav-toggle" href="#!" class="ms-auto ms-md-0 me-0 me-lg-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
                  class="bi bi-text-indent-left text-muted" viewBox="0 0 16 16">
@@ -305,10 +297,6 @@
         </div>
       </div>
 
-      @* <!-- Container fluid -->
-      <div class="container-fluid px-6 py-4">
-         
-      </div> *@
     </div>
 
   </main>
@@ -321,6 +309,7 @@
   <script src="~/assets/libs/popperjs/core/dist/umd/popper.min.js"></script>
   <script src="~/assets/libs/tippy.js/dist/tippy-bundle.umd.min.js"></script>
   <script src="~/assets/libs/sweetalert2/sweetalert2.all.min.js"></script>
+  <script src="~/assets/libs/toastr/toastr_2.1.4.min.js"></script>
   <script src="~/assets/scripts/vendors/tooltip.js"></script>
 
 
@@ -329,6 +318,9 @@
 
   <!-- Kendo js -->
   <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
+   @* <script src="~/assets/kendo_2023_r1/js/kendo.core.min.js"></script> *@
+
+
 
   <!-- Common js -->
   <script src="~/assets/scripts/common/common.js"></script>
@@ -338,7 +330,7 @@
   <script src="~/assets/scripts/common/date.js"></script>
   <script src="~/assets/scripts/common/filebrower.js"></script>
   <script src="~/assets/scripts/common/filesaver.js"></script>
-  <script src="~/assets/scripts/common/postify.js"></script>
+@*   <script src="~/assets/scripts/common/postify.js"></script> *@
   <script src="~/assets/scripts/common/approverrecomendar.js"></script>
   <script src="~/assets/scripts/common/xlsx.full.min.js"></script>
   <script src="~/assets/scripts/common/jquery.cookie.js"></script>

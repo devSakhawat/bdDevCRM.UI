@@ -1,0 +1,24 @@
+﻿@{
+  ViewBag.Title = "Access Control Settings";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+
+<!-- row -->
+<div class="row">
+	<h3 class="k-header text-center">Access Control Settings</h3>
+
+	<div class="col-7">
+		<div id="divSummary ">
+			<partial name="AccessControl/_AccessControlSummary" />
+		</div>
+	</div>
+
+	<div class="col-5">
+		<div id="divDetails">
+			<partial name="AccessControl/_AccessControlDetails" />
+		</div>
+	</div>
+</div>
+
+<script src="~/assets/scripts/core/accesscontrol/accesscontrolsettings.js"></script>

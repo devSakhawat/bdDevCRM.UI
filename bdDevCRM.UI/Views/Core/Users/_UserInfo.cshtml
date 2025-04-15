@@ -1,0 +1,68 @@
+﻿<script src="~/assets/scripts/core/users/userinfo.js"></script>
+
+
+<div id="divUserInfo">
+    <div class="divDetails">
+        <ul>
+            @* <li>
+                    <label class="lbl widthSize20_per">Company:</label>
+                    <input type="hidden" id="hdnUserId" value="0" />
+                    <input id="cmbCompanyName" name="CompanyName" validationmessage="Please Select Company Name" required="required" onchange="userInfoHelper.changeCompanyName();" />
+                </li>*@
+            <li class="">
+                <label for="CompanyNameDetails" class="lbl widthSize30_per">SBU:</label>
+                <input type="text" id="cmbCompanyNameDetails" name="CompanyNameDetails" validationmessage="Please Select Company" />
+                <input type="hidden" id="hdnUserId" value="0" />
+            </li>
+            <li>
+                <label for="BranchNameDetails" class="lbl widthSize30_per">Branch Name:<span class="redstart">*</span></label>
+                <input type="text" id="cmbBranchDetails" name="BranchNameDetails" validationmessage="Please Select Branch Name" required="required" />
+            </li>
+            <li>
+                <label for="DepartmentNameDetails" class="lbl widthSize30_per">Department Name:</label>
+                <input type="text" id="cmbDepartmentNameDetails" name="DepartmentNameDetails" validationmessage="Please Select Department Name" />
+            </li>
+            <li>
+                <label for="LoginId" class="lbl widthSize30_per">Login ID:<span class="redstart">*</span></label>
+                <input type="text" id="txtLoginId" name="LoginId" maxlength="50" class="k-textbox" placeholder="Login ID" validationmessage="Please enter valid Login ID" required="required" />
+            </li>
+            <li>
+                <label for="NewPassword" class="lbl widthSize30_per">New Password:</label>
+                <input type="password" id="txtNewPassword" name="NewPassword" class="k-textbox" />
+            </li>
+            <li>
+                <label for="ConfirmPassword" class="lbl widthSize30_per">Confirm Password:</label>
+                <input type="password" id="txtConfirmPassword" name="ConfirmPassword" class="k-textbox" />
+            </li>
+            <li>
+                <label for="UserName" class="lbl widthSize30_per">User Name:<span class="redstart">*</span></label>
+                <input type="text" id="txtUserName" name="UserName" maxlength="50" class="k-textbox" placeholder="User Name" required validationmessage="Please enter valid User Name" />
+            </li>
+            @*<li>
+                    <label for="txtEmail" class="required lbl widthSize20_per">Email</label>
+                    <input type="email" id="txtEmail" name="Email" class="k-textbox txt" placeholder="e.g. myname@example.net" required data-email-msg="Email format is not valid" />
+                </li>*@
+            <li>
+                <label class="lbl widthSize30_per">Employee:<span class="redstart">*</span></label>
+                <input id="cmbEmployee" name="EmployeeName" validationmessage="Please Select an Employee Name" required="required" />
+            </li>
+            <li>
+                <label class="lbl widthSize30_per">IMEI:</label>
+                <input id="txtIMEI" name="IMEI" class="k-textbox" />
+            </li>
+
+            <li>
+                <label for="AccessAllSbu" class="lbl widthSize30_per">Has Root Privilege:</label>
+                <input type="checkbox" id="chkAccessAllSbu" name="AccessAllSbu" class="chkBox" />
+            </li>
+            <li>
+                <label class="lbl widthSize30_per">Default Dashboard:</label>
+                <input id="ddlDefaultDashboard" />
+            </li>
+            <li>
+                <label for="IsActive" class="lbl widthSize30_per">Is Active:</label>
+                <input type="checkbox" id="chkIsActive" name="IsActive" class="chkBox" />
+            </li>
+        </ul>
+    </div>
+</div>

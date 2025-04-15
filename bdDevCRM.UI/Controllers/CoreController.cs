@@ -4,6 +4,48 @@ namespace EduSolutionWeb_v1.Controllers
 {
   public class CoreController : Controller
   {
+
+    public ActionResult AccessSettings()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+        return View("AccessControl/AccessControlSettings");
+      //}
+      //else
+      //{
+      //  return RedirectToAction("Logoff", "Home");
+      //}
+    }
+
+    public ActionResult UserSettings()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+        return View("Users/UserSettings");
+      //}
+      //else
+      //{
+      //  return RedirectToAction("Logoff", "Home");
+      //}
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public ActionResult InstituteInformation()
     {
       //if (Session["CurrentUser"] != null)
@@ -124,7 +166,7 @@ namespace EduSolutionWeb_v1.Controllers
       //}
     }
    
-    public ActionResult WorkflowSetupInformation()
+    public ActionResult WorkflowSetup()
     {
       //if (Session["CurrentUser"] != null)
       //{
@@ -173,6 +215,23 @@ namespace EduSolutionWeb_v1.Controllers
       //}
     }
 
-    
+    public IActionResult GroupSettings()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+        return View("Group/GroupSettings");
+      //}
+      //else
+      //{
+      //  return RedirectToAction("LogOut", "Home");
+      //}
+
+    }
+
+
+
+
+
+
   }
 }

@@ -15,8 +15,8 @@ var loginHelper = {
 			} else {
 				isEncryptedPass = false;
 			}
-
 		});
+
 		$("#txtPassword").keyup(function (event) {
 			isEncryptedPass = false;
 		});
@@ -70,10 +70,12 @@ var loginHelper = {
 			},
 			success: function (response) {
 				localStorage.setItem("userInfo", JSON.stringify(response));
-				window.location.href = "https://localhost:7145/Home/Index";
+				window.location.href = baseUI + "Home/Index";
 			},
 			error: function (xhr, status, error) {
-				alert("Failed to get user info: " + xhr.responseText);
+				console.log("Failed to get user info: " + xhr.responseText);
+				// null for message delay time
+				Message.ErrorWithHeaderText('Login Failed', xhr.responseJSON?.statusCode + ": " + xhr.responseJSON?.message, null);
 			}
 		});
 	}
@@ -123,6 +125,7 @@ var loginManager = {
 		$.ajax({
 			url: serviceURL,
 			type: "POST",
+			async: false,
 			contentType: "application/json",
 			data: JSON.stringify(obj),
 			success: function (response) {
@@ -131,8 +134,10 @@ var loginManager = {
 				loginHelper.getLoggedInUserInfo();
 			},
 			error: function (xhr, status, error) {
-				alert("Login failed: " + xhr.responseText);
-			}
+				// null for message delay time
+				Message.ErrorWithHeaderText('Login Failed', xhr.responseJSON?.statusCode + ": " + xhr.responseJSON?.message,null);
+			},
+			//}
 		});
 	},
 

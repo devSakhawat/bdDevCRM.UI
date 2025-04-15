@@ -29,9 +29,15 @@ var MenuDetailsManager = {
               $("#gridSummary").data("kendoGrid").dataSource.read();
             }
             function onFailed(jqXHR, textStatus, errorThrown) {
-              Message.Warning(textStatus, ": ", errorThrown);
+              //Message.Warning(textStatus, ": ", errorThrown);
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
+                type: 'error',
+              });
             }
-
           }
         },
         {
@@ -42,6 +48,7 @@ var MenuDetailsManager = {
           }
         }
       ]
+      ,0
     );
   },
 
@@ -74,7 +81,13 @@ var MenuDetailsManager = {
               $("#gridSummary").data("kendoGrid").dataSource.read();
             }
             function onFailed(jqXHR, textStatus, errorThrown) {
-              Message.Warning(textStatus, ": ", errorThrown);
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
+                type: 'error',
+              });
             }
           }
         },
@@ -127,7 +140,13 @@ var MenuDetailsManager = {
       });
     }
     function onFailed(jqXHR, textStatus, errorThrown) {
-      window.alert(errorThrown);
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
+        type: 'error',
+      });
     }
 
     AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
@@ -157,9 +176,14 @@ var MenuDetailsManager = {
       });
     }
     function onFailed(jqXHR, textStatus, errorThrown) {
-      window.alert(errorThrown);
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
+        type: 'error',
+      });
     }
-
 
     AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, false, false, onSuccess, onFailed);
   },
@@ -183,7 +207,7 @@ var MenuDetailsHelper = {
 
   AddNewInformation: function () {
     debugger;
-    $("#btnSave").text("Save Menu");
+     $("#btnSave").text("Save");
     AjaxManager.PopupWindow("divDetails", "Details Information", "50%");
     MenuDetailsHelper.ClearInformation();
   },

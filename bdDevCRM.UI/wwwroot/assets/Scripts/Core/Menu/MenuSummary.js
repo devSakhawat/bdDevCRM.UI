@@ -113,14 +113,32 @@ var MenuSummaryHelper = {
         allPages: true,
         columnInfo: true,
       },
-      pdf: {
-        fileName: "ModuleExport.pdf",
-        allPages: true,
-        paperSize: "a4",
-        landscape: true,
-        margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
-        repeatHeaders: true
-      },
+       pdf: {
+          fileName: "Menu_Information.pdf",
+          allPages: true,
+          paperSize: "A4",
+          landscape: true,
+          margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
+          scale: 0.9, // Slight scaling to prevent overflow
+          repeatHeaders: true,
+          columns: [
+             { field: "Name", width: 150 },
+             { field: "ParentMenu", width: 120 },
+             { field: "ModuleName", width: 150 },
+             { field: "Type", width: 80 },
+             { field: "Status", width: 80 }
+          ],
+          // Custom styles for PDF export
+          styles: [
+             {
+                type: "text",
+                style: {
+                   fontFamily: "Helvetica",
+                   fontSize: 10
+                }
+             }
+          ]
+       },
       dataSource: [],
       pageable: {
         refresh: true,
@@ -158,7 +176,8 @@ var MenuSummaryHelper = {
     if (gridInstance) {
       const dataSource = menuSummaryManager.getSummaryGridDataSource();
       gridInstance.setDataSource(dataSource);
-    }
+     }
+
   },
 
   GenerateColumns: function () {
@@ -170,28 +189,30 @@ var MenuSummaryHelper = {
         { field: "SortOrder", title: "Sort Order", width: 0, hidden: true },
         { field: "IsQuickLink", title: "Quick Link", width: 0, hidden: true },
         { field: "MenuCode", title: "Code", width: 0, hidden: true },
-        { field: "MenuName", title: "Name", width: 140 },
-        { field: "ParentMenuName", title: "Parent Menu", width: 140 },
-        { field: "ModuleName", title: "Module Name", width: 120 },
+         { field: "MenuName", title: "Name", width: 140, headerAttributes: { style: "white-space: normal;" } },
+         { field: "ParentMenuName", title: "Parent Menu", width: 140, headerAttributes: { style: "white-space: normal;" } },
+         { field: "ModuleName", title: "Module Name", width: 120, headerAttributes: {  style: "white-space: normal;" } },
         {
           field: "MenuType",
           title: "Type",
           width: 70,
           hidden: false,
-          template: "#= data.MenuType == 1 ? 'Web' : data.MenuType == 2 ? 'App' : 'Both' #"
+           template: "#= data.MenuType == 1 ? 'Web' : data.MenuType == 2 ? 'App' : 'Both' #",
+           headerAttributes: { style: "white-space: normal;" } 
         },
         {
           field: "IsActive",
           title: "Status",
           width: 80,
           hidden: false,
-          template: "#= data.IsActive == 1 ? 'Active' : 'Inactive' #"
+           template: "#= data.IsActive == 1 ? 'Active' : 'Inactive' #",
+           headerAttributes: { style: "white-space: normal;" } 
         },
         {
           field: "Edit", title: "Actions", filterable: false, width: 200,
           template: `
         <input type="button" class="btn btn-outline-success" style="cursor: pointer;" value="View" id="btnView" onClick="MenuSummaryHelper.clickEventForViewButton(event)"/>
-        <input type="button" class="btn btn-outline-info" style="cursor: pointer; margin-right: 5px;" value="Edit" id="btnEdit" onClick="MenuSummaryHelper.clickEventForEditButton(event)"/>
+        <input type="button" class="btn btn-outline-dark " style="cursor: pointer; margin-right: 5px;" value="Edit" id="btnEdit" onClick="MenuSummaryHelper.clickEventForEditButton(event)"/>
         <input type="button" class="btn btn-outline-danger" style="cursor: pointer; margin-right: 5px;" value="Delete" id="btnDelete" onClick="MenuSummaryHelper.clickEventForDeleteButton(event)"/>`
           , sortable: false, exportable: false 
         }
@@ -226,7 +247,8 @@ var MenuSummaryHelper = {
 
   clickEventForEditButton: function (e) {
     debugger;
-    $("#btnSave").text("Update Menu");
+     $("#btnSave").text("Update");
+     console.log($("#btnSave").text());
 
     // not working
     //var entityGrid = $("#gridMenu").data("kendoGrid");

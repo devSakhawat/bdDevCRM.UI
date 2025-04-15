@@ -1,14 +1,14 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap");
 
-/** {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}*/
+}
 
 html {
-  font-size: 14px; /* Base font size */
+  font-size: 13px;
 }
 
 
@@ -3397,7 +3397,7 @@ progress {
 .form-control-sm {
   border-radius: var(--dashui-border-radius-sm);
   font-size: .765625rem;
-  min-height: calc(1.5em + .5rem + var(--dashui-border-width)*2);
+  /*min-height: calc(1.5em + .5rem + var(--dashui-border-width)*2);*/
   padding: .25rem .5rem
 }
 
@@ -28815,7 +28815,7 @@ textarea.form-control-lg {
 }
 
 #app-content {
-  margin-left: 18.46rem;
+  margin-left: 260px;
   min-height: 100vh;
   min-width: 100vw;
   transition: margin .25s ease-out
@@ -34883,4 +34883,29 @@ img#bran-logo {
 /*=========  Custom CSS    =================*/
 ul.list-unstyled li a {
   cursor: pointer;
+}
+
+ul li {
+  list-style: none;
+  cursor: default !important;
+}
+
+  ul li a {
+    cursor: pointer;
+  }
+
+.divDetails ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+input[type="checkbox" i] {
+  background-color: initial;
+  cursor: default !important;
+  appearance: auto;
+  box-sizing: border-box;
+  margin: 3px 3px 3px 4px;
+  padding: initial;
+  border: initial;
 }

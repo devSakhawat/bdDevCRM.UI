@@ -1,6 +1,8 @@
 ﻿/// <reference path="../../jquery-1.7.1.min.js" />
 //var reportServerAPI = "http://localhost:5724/";
 
+//var baseUI = "https://localhost:7145/"
+
 var customFilterManu = {
   extra: true,
   operators: {
@@ -15,10 +17,12 @@ var customFilterManu = {
 
 var LoggedInUserName = '';
 var serviceRoot = "..";
+// CurrentUser from common.js file > getCurrentUser function
 var CurrentUser = null;
 //var coreManagement = "http://localhost:7290";
 var studentManagement = "http://localhost:7281";
 var baseApi = "https://localhost:7290/bdDevs-crm";
+var baseUI = "https://localhost:7145/"
 var token = null;
 
 var AjaxManager = {
@@ -63,6 +67,211 @@ var AjaxManager = {
     return mergedHeaders;
   },
 
+  // Generic error handler for AJAX requests
+  handleAjaxError: function (xhr, status, error) {
+    // Generate correlation ID for error tracking
+    const correlationId = "err_" + Math.random().toString(36).substr(2, 9);
+    console.error(`Request error: ${correlationId} - ${error}`, xhr);
+
+    // Default error message
+    let message = "An unexpected error occurred.";
+    let details = null;
+    let ErrorType = null;
+    let messageBoxHeaderText = null;
+
+    try {
+      // Parse the response if possible
+      const response = xhr.responseJSON || JSON.parse(xhr.responseText);
+
+      // Use server-provided error message if available
+      if (response && response.message) {
+        message = response.message;
+      }
+
+      // Include details in development mode
+      if (response && response.details) {
+        details = response.details;
+      }
+
+      // Include details in development mode
+      if (response && response.ErrorType) {
+        ErrorType = response.ErrorType;
+      }
+      messageBoxHeaderText = ErrorType|| "Error"
+
+      // Special handling for 401 errors - logout the user
+      if (xhr.status === 401 || xhr.responseJSON?.statusCode) {
+        // Show message to user
+        AjaxManager.MsgBox(
+          'error',
+          'center',
+          messageBoxHeaderText,
+          //'Confirmation',
+          confmsg,
+          [
+            {
+              addClass: 'btn btn-primary',
+              text: 'Yes',
+              onClick: function ($noty) {
+                $noty.close();
+                MenuManager.Logout();
+              }
+            },
+            {
+              addClass: 'btn',
+              text: 'Cancel',
+              onClick: function ($noty) {
+                $noty.close();
+              }
+            },
+          ]
+          , 0
+        );
+        return;
+      }
+
+      // Handle specific status codes
+      switch (xhr.status || xhr.responseJSON?.statusCode) {
+        case 400: // Bad Request
+          //MsgBox.Show({
+          //  title: "Invalid Request",
+          //  message: message,
+          //  icon: "error"
+          //});
+          //break;
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: ErrorType + ": " + message,
+            type: 'error',
+          });
+          break;
+
+        case 403: // Forbidden
+          //MsgBox.Show({
+          //  title: "Access Denied",
+          //  message: message || "You don't have permission to perform this action.",
+          //  icon: "error"
+          //});
+          //break;
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: ErrorType + ": " + message || "You don't have permission to perform this action.",
+            type: 'error',
+          });
+          break;
+
+        case 404: // Not Found
+          //MsgBox.Show({
+          //  title: "Not Found",
+          //  message: message || "The requested resource was not found.",
+          //  icon: "warning"
+          //});
+        //break;
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: ErrorType + ": " + message || "The requested resource was not found.",
+            type: 'error',
+          });
+          break;
+
+        case 409: // Conflict
+          //MsgBox.Show({
+          //  title: "Conflict",
+          //  message: message || "This operation could not be completed due to a conflict.",
+          //  icon: "warning"
+          //});
+          //break;
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: ErrorType + ": " + message || "This operation could not be completed due to a conflict.",
+            type: 'error',
+          });
+          break;
+
+        case 500: // Server Error
+          //MsgBox.Show({
+          //  title: "Server Error",
+          //  message: message || "An unexpected server error occurred. Please try again later.",
+          //  icon: "error",
+          //  details: details ? `Error ID: ${correlationId}\n${details}` : `Error ID: ${correlationId}`
+          //});
+          //break;
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: ErrorType + ": " + message || "An unexpected server error occurred. Please try again later.",
+            type: 'error',
+          });
+          break;
+
+        case 503: // Service Unavailable
+          //MsgBox.Show({
+          //  title: "Service Unavailable",
+          //  message: message || "The service is currently unavailable. Please try again later.",
+          //  icon: "error"
+          //});
+          //break;
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: ErrorType + ": " + message || "The service is currently unavailable. Please try again later.",
+            type: 'error',
+          });
+          break;
+
+        default:
+          //MsgBox.Show({
+          //  title: "Error",
+          //  message: message,
+          //  icon: "error",
+          //  details: `Error ID: ${correlationId}`
+          //});
+          //break;
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: ErrorType + ": " + message || "An unexpected error occurred while processing your request.",
+            type: 'error',
+          });
+          break;
+      }
+    } catch (e) {
+      // Could not parse the response
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: ErrorType + ": " + message || "An unexpected error occurred while processing your request.",
+        type: 'error',
+      });
+      //console.error("Error parsing error response", e);
+      //MsgBox.Show({
+      //  title: "Error",
+      //  message: "An unexpected error occurred while processing your request.",
+      //  icon: "error",
+      //  details: `Status: ${xhr.status}, Error ID: ${correlationId}`
+      //});
+    }
+  },
+
   GenericGridDataSource: function (options) {
     var apiUrl = options.apiUrl;
     var serverPaging = options.serverPaging !== undefined ? options.serverPaging : true;
@@ -70,17 +279,24 @@ var AjaxManager = {
     var serverFiltering = options.serverFiltering !== undefined ? options.serverFiltering : true;
     var pageSize = options.pageSize || 20;
     var modelFields = options.modelFields || {};
+    //var modelFields = options.modelFields || {};
 
-    console.log(token);
+    //console.log(token);
 
     // Create a new Kendo DataSource with dynamic configurations
     var gridDataSource = new kendo.data.DataSource({
-      type: "json",
+      //type: "json",
       serverPaging: serverPaging,
       serverSorting: serverSorting,
       serverFiltering: serverFiltering,
       allowUnsort: options.allowUnsort || false,
       pageSize: pageSize,
+      page: 1,
+      pageable: {
+        buttonCount: options.buttonCount || 5,
+        input: false,
+        numeric: true
+      },
       transport: {
         read: {
           url: apiUrl,
@@ -88,14 +304,19 @@ var AjaxManager = {
           dataType: "json",
           async: options.async !== undefined ? options.async : false,
           contentType: options.contentType || "application/json; charset=utf-8",
-          headers: AjaxManager.getDefaultHeaders()
+          headers: AjaxManager.getDefaultHeaders(),
+          error: function (xhr, status, error) {
+            // Use the generic error handler
+            AjaxManager.handleAjaxError(xhr, status, error);
+
+            //// For datasource error handling
+            //this.success({});
+          },
         },
         //parameterMap: options.parameterMap || function (options) {
         //  return JSON.stringify(options);
         //}
         parameterMap: options.parameterMap || function (options) {
-          console.log("Options passed to parameterMap:", options);
-
           // Create a new object with properly capitalized property names
           var transformedOptions = {
             Skip: options.skip,
@@ -118,7 +339,7 @@ var AjaxManager = {
             transformedOptions.Sort = null;
           }
 
-          console.log("Transformed options:", transformedOptions);
+          //console.log("Transformed options:", transformedOptions);
 
           return JSON.stringify(transformedOptions);
         }
@@ -126,13 +347,106 @@ var AjaxManager = {
       schema: {
         data: options.schemaData || "items",
         total: options.schemaTotal || "totalCount",
+        // when needed
+        parse: function (response) {
+          if (response.items && response.items.length > 0) {
+            var sampleRecord = response.items[0];
+            var inferredFields = {};
+            for (var key in sampleRecord) {
+              if (sampleRecord.hasOwnProperty(key)) {
+                if (typeof sampleRecord[key] === "number") {
+                  inferredFields[key] = { type: "number" };
+                } else if (typeof sampleRecord[key] === "boolean") {
+                  inferredFields[key] = { type: "boolean" };
+                } else if (Object.prototype.toString.call(sampleRecord[key]) === "[object Date]") {
+                  inferredFields[key] = { type: "date" };
+                } else {
+                  inferredFields[key] = { type: "string" };
+                }
+              }
+            }
+            return { items: response.items, totalCount: response.totalCount, inferredFields: inferredFields };
+          }
+          return response;
+        },
         model: {
-          fields: modelFields // Provide dynamic fields based on options
+          fields: modelFields
         }
       }
     });
     return gridDataSource;
   },
+
+  //GenericGridDataSource: function (options) {
+  //  var apiUrl = options.apiUrl;
+  //  var serverPaging = options.serverPaging !== undefined ? options.serverPaging : true;
+  //  var serverSorting = options.serverSorting !== undefined ? options.serverSorting : true;
+  //  var serverFiltering = options.serverFiltering !== undefined ? options.serverFiltering : true;
+  //  var pageSize = options.pageSize || 20;
+  //  var modelFields = options.modelFields || {};
+
+  //  console.log(token);
+
+  //  // Create a new Kendo DataSource with dynamic configurations
+  //  var gridDataSource = new kendo.data.DataSource({
+  //    type: "json",
+  //    serverPaging: serverPaging,
+  //    serverSorting: serverSorting,
+  //    serverFiltering: serverFiltering,
+  //    allowUnsort: options.allowUnsort || false,
+  //    pageSize: pageSize,
+  //    transport: {
+  //      read: {
+  //        url: apiUrl,
+  //        type: options.requestType || "POST", // Fixed to use requestType parameter
+  //        dataType: "json",
+  //        async: options.async !== undefined ? options.async : false,
+  //        contentType: options.contentType || "application/json; charset=utf-8",
+  //        headers: AjaxManager.getDefaultHeaders()
+  //      },
+  //      //parameterMap: options.parameterMap || function (options) {
+  //      //  return JSON.stringify(options);
+  //      //}
+  //      parameterMap: options.parameterMap || function (options) {
+  //        console.log("Options passed to parameterMap:", options);
+
+  //        // Create a new object with properly capitalized property names
+  //        var transformedOptions = {
+  //          Skip: options.skip,
+  //          Take: options.take,
+  //          Page: options.page,
+  //          PageSize: options.pageSize,
+  //          Filter: options.filter
+  //        };
+
+  //        // Handle the sort property separately to make sure it's properly transformed
+  //        if (options.sort && options.sort.length > 0) {
+  //          transformedOptions.Sort = [];
+  //          for (var i = 0; i < options.sort.length; i++) {
+  //            transformedOptions.Sort.push({
+  //              field: options.sort[i].field,
+  //              dir: options.sort[i].dir
+  //            });
+  //          }
+  //        } else {
+  //          transformedOptions.Sort = null;
+  //        }
+
+  //        console.log("Transformed options:", transformedOptions);
+
+  //        return JSON.stringify(transformedOptions);
+  //      }
+  //    },
+  //    schema: {
+  //      data: options.schemaData || "items",
+  //      total: options.schemaTotal || "totalCount",
+  //      model: {
+  //        fields: modelFields // Provide dynamic fields based on options
+  //      }
+  //    }
+  //  });
+  //  return gridDataSource;
+  //},
 
   GenericGridDataSourceNew: function (options) {
     // Default options with fallback values
@@ -573,43 +887,13 @@ var AjaxManager = {
       crossDomain: true,
       contentType: "application/json; charset=utf-8",
       headers: AjaxManager.getDefaultHeaders(),
-      statusCode: {
-        200: function (res) {
-          if (typeof onSuccess === "function") {
-            onSuccess(res);
-          }
-        },
-        400: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 400, statusText: err.statusText });
-          }
-        },
-        401: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 401, statusText: err.statusText });
-          }
-        },
-        403: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 403, statusText: err.statusText });
-          }
-        },
-        404: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 404, statusText: err.statusText });
-          }
-        },
-        500: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 500, statusText: err.statusText });
-          }
-        }
+      success: function (response) {
+        onSuccess(response);
       },
       error: function (xhr, status, error) {
-        console.error("AJAX Error:", status, error);
-        if (typeof onFailed === "function") {
-          onFailed({ status: xhr.status, statusText: xhr.statusText });
-        }
+        console.log("Failed to get user info: " + xhr.responseText);
+        console.log("AJAX Error:", status, error);
+        onFailed(xhr, status, error);
       }
     });
     return res;
@@ -650,55 +934,19 @@ var AjaxManager = {
   GetDataForDotnetCoreAsync: function (baseApi, serviceUrl, jsonParams, isAsync, isCache, onSuccess, onFailed) {
     jQuery.support.cors = true;
 
-    // Perform the AJAX request
     $.ajax({
       url: baseApi + serviceUrl,
-      method: "GET", // Use GET method
-      async: isAsync, // Ensure asynchronous behavior
-      cache: isCache, // Disable caching
-      data: jsonParams, // Pass parameters directly
+      method: "GET",
+      async: isAsync, 
+      cache: isCache,
+      data: jsonParams,
       contentType: "application/json; charset=utf-8",
-      headers: this.getDefaultHeaders(), // Add headers from getDefaultHeaders
-      statusCode: {
-        // Handle successful responses
-        200: function (res) {
-          if (typeof onSuccess === "function") {
-            onSuccess(res); // Call the success callback with the response
-          }
-        },
-        // Handle common HTTP errors
-        400: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 400, statusText: err.statusText });
-          }
-        },
-        401: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 401, statusText: err.statusText });
-          }
-        },
-        403: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 403, statusText: err.statusText });
-          }
-        },
-        404: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 404, statusText: err.statusText });
-          }
-        },
-        500: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 500, statusText: err.statusText });
-          }
-        }
+      headers: this.getDefaultHeaders(),
+      success: function (response) {
+        onSuccess(response);
       },
       error: function (xhr, status, error) {
-        // Generic error handler for other status codes
-        console.error("AJAX Error:", status, error);
-        if (typeof onFailed === "function") {
-          onFailed({ status: xhr.status, statusText: xhr.statusText });
-        }
+        onFailed(xhr, status, error);
       }
     });
   },
@@ -715,46 +963,13 @@ var AjaxManager = {
       data: jsonParams, // Pass parameters directly
       contentType: "application/json; charset=utf-8",
       headers: this.getDefaultHeaders(), // Add headers from getDefaultHeaders
-      statusCode: {
-        // Handle successful responses
-        200: function (res) {
-          if (typeof onSuccess === "function") {
-            onSuccess(res); // Call the success callback with the response
-          }
-        },
-        // Handle common HTTP errors
-        400: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 400, statusText: err.statusText });
-          }
-        },
-        401: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 401, statusText: err.statusText });
-          }
-        },
-        403: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 403, statusText: err.statusText });
-          }
-        },
-        404: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 404, statusText: err.statusText });
-          }
-        },
-        500: function (err) {
-          if (typeof onFailed === "function") {
-            onFailed({ status: 500, statusText: err.statusText });
-          }
-        }
+      success: function (response) {
+        onSuccess(response);
       },
       error: function (xhr, status, error) {
-        // Generic error handler for other status codes
-        console.error("AJAX Error:", status, error);
-        if (typeof onFailed === "function") {
-          onFailed({ status: xhr.status, statusText: xhr.statusText });
-        }
+        console.log("Failed to get user info: " + xhr.responseText);
+        console.log("AJAX Error:", status, error);
+        onFailed(xhr, status, error);
       }
     });
   },
@@ -762,55 +977,30 @@ var AjaxManager = {
   // Updated GetDataForDotnetCore function
   GetDataForDotnetCore3: function (baseUrl, serviceUrl, jsonParams) {
     debugger;
-    var obj = null; // Initialize the response object
+    var obj = null;
     jQuery.support.cors = true;
 
     console.log(this.getDefaultHeaders());
 
-    // Perform the AJAX request
     $.ajax({
       url: baseUrl + serviceUrl,
-      method: "GET", // Use GET method
-      async: false, // Ensure asynchronous behavior
-      cache: false, // Disable caching
-      data: JSON.stringify(jsonParams), // Pass parameters as JSON string
-      contentType: "application/json; charset=utf-8", // Set content type
-      headers: this.getDefaultHeaders(), // Add headers from getDefaultHeaders
-      statusCode: {
-        // Handle successful responses
-        200: function (res) {
-          obj = res; // Assign the response to the object
-        },
-        // Handle common HTTP errors
-        400: function (err) {
-          //console.error("Bad Request:", err.statusText);
-          alert("Error 400: Bad Request. Please check your input. \nBad Request:", err.statusText);
-        },
-        401: function (err) {
-          //console.error("Unauthorized:", err.statusText);
-          alert("Error 401: Unauthorized. Please log in again. \nUnauthorized:", err.statusText);
-        },
-        403: function (err) {
-          //console.error("Forbidden:", err.statusText);
-          alert("Error 403: Forbidden. You do not have permission to access this resource. \n ForbiddenForbidden:", err.statusText);
-        },
-        404: function (err) {
-          //console.error("Not Found:", err.statusText);
-          alert("Error 404: Resource not found. Please check the URL.\nnot Found:", err.statusText);
-        },
-        500: function (err) {
-          //console.error("Internal Server Error:", err.statusText);
-          alert("Error 500: Internal Server Error. Please try again later.\nInternal Server Error:", err.statusText);
-        }
+      method: "GET",
+      async: false,
+      cache: false,
+      data: JSON.stringify(jsonParams), 
+      contentType: "application/json; charset=utf-8",
+      headers: this.getDefaultHeaders(),
+      success: function (response) {
+        onSuccess(response);
       },
       error: function (xhr, status, error) {
-        // Generic error handler for other status codes
-        //console.error("AJAX Error:", status, error);
-        alert("An unexpected error occurred. Please try again later. \nAJAX Error:", status, error);
+        console.log("Failed to get user info: " + xhr.responseText);
+        console.log("AJAX Error:", status, error);
+        onFailed(xhr, status, error);
       }
     });
 
-    return obj; // Return the response object
+    return obj;
   },
 
   GetDataForDotnetCoreAZ: function (baseUrl, serviceUrl, jsonParams) {
@@ -1008,8 +1198,104 @@ var AjaxManager = {
       }
     });
   },
+  // message box with auto hide delay
+  MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
+    try {
+      // Map Noty message types to SweetAlert2 types
+      const typeMap = {
+        'success': 'success',
+        'error': 'error',
+        'warning': 'warning',
+        'info': 'info',
+        'information': 'info',
+        'alert': 'question'
+      };
+      // Get the appropriate icon type
+      const iconType = typeMap[messageBoxType] || 'info';
+      // Set up the SweetAlert2 configuration
+      const swalConfig = {
+        title: messageBoxHeaderText || '',
+        html: messageText || '',
+        icon: iconType,
+        timer: autoHideDelay, // Auto-close after specified delay (default 3000ms)
+        timerProgressBar: true, // Show a progress bar
+        showClass: {
+          popup: 'swal2-show',
+          backdrop: 'swal2-backdrop-show',
+          icon: 'swal2-icon-show'
+        },
+        hideClass: {
+          popup: 'swal2-hide',
+          backdrop: 'swal2-backdrop-hide',
+          icon: 'swal2-icon-hide'
+        },
+        customClass: {
+          container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
+        },
+        showConfirmButton: false,
+        showCancelButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        focusConfirm: false,
+        // Add the didOpen hook here
+        didOpen: () => {
+          document.querySelector('.swal2-container').style.zIndex = '9999'; // Set z-index dynamically
+        }
+      };
 
-  MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray) {
+      // Handle auto-hide delay
+      if (autoHideDelay > 0) {
+        swalConfig.timer = autoHideDelay; // Auto-close after specified delay
+        swalConfig.timerProgressBar = true; // Show a progress bar
+      }
+
+      // Handle positioning
+      if (displayPosition.includes('top')) {
+        swalConfig.position = 'top';
+      } else if (displayPosition.includes('bottom')) {
+        swalConfig.position = 'bottom';
+      } else {
+        swalConfig.position = 'center';
+      }
+      // Process buttons
+      if (Array.isArray(buttonsArray) && buttonsArray.length > 0) {
+        const primaryButton = buttonsArray.find(btn => btn.addClass && btn.addClass.includes('btn-primary'));
+        const cancelButton = buttonsArray.find(btn => btn.text === 'Cancel' || btn.text === 'No');
+        if (primaryButton) {
+          swalConfig.showConfirmButton = true;
+          swalConfig.confirmButtonText = primaryButton.text || 'OK';
+          swalConfig.confirmButtonClass = primaryButton.addClass || 'btn btn-primary';
+          swalConfig.focusConfirm = true;
+        }
+        if (cancelButton) {
+          swalConfig.showCancelButton = true;
+          swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
+          swalConfig.cancelButtonClass = cancelButton.addClass || 'btn';
+        }
+      }
+      // Fire the SweetAlert2 dialog
+      return Swal.fire(swalConfig).then((result) => {
+        // Check if auto-closed by timer
+        if (result.dismiss === Swal.DismissReason.timer) {
+          // Optional: Handle timer-based dismissal if needed
+          console.log('Message box was closed by the timer');
+        } else if (result.isConfirmed && buttonsArray[0] && typeof buttonsArray[0].onClick === 'function') {
+          const notyMock = { close: () => { } };
+          buttonsArray[0].onClick(notyMock);
+        } else if (result.isDismissed && buttonsArray[1] && typeof buttonsArray[1].onClick === 'function') {
+          const notyMock = { close: () => { } };
+          buttonsArray[1].onClick(notyMock);
+        }
+      });
+    } catch (error) {
+      console.error("Error in SweetAlert MsgBox:", error);
+      alert(messageText || "Operation confirmation required");
+      return Promise.resolve();
+    }
+  },
+
+  MsgBoxOldByMe: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray) {
     try {
       // Map Noty message types to SweetAlert2 types
       const typeMap = {
@@ -1029,9 +1315,23 @@ var AjaxManager = {
         title: messageBoxHeaderText || '',
         html: messageText || '',
         icon: iconType,
+
+        showClass: {
+          popup: 'swal2-show',
+          backdrop: 'swal2-backdrop-show',
+          icon: 'swal2-icon-show'
+        },
+        hideClass: {
+          popup: 'swal2-hide',
+          backdrop: 'swal2-backdrop-hide',
+          icon: 'swal2-icon-hide'
+        },
         customClass: {
           container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
         },
+        //customClass: {
+        //  container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
+        //},
         showConfirmButton: false,
         showCancelButton: false,
         allowOutsideClick: false,
@@ -1626,7 +1926,7 @@ var MenuManager = {
       },
       success: function (response) {
         localStorage.setItem("userInfo", response);
-        window.location.href = "https://localhost:44381/Home/Index";
+        window.location.href = baseUI + "Home/Index";
       },
       error: function (xhr, status, error) {
         alert("Failed to get user info: " + xhr.responseText);
@@ -1660,7 +1960,7 @@ var MenuManager = {
     TokenManger.CheckToken();
 
     var currentUserString = JSON.parse(localStorage.getItem("userInfo"));
-    console.log(currentUserString);
+    //console.log(currentUserString);
     CurrentUser = MenuHelper.parseCurrentUser(currentUserString); //JSON.parse(localStorage.getItem("userInfo"));
 
     if (CurrentUser != null) {
@@ -1669,9 +1969,9 @@ var MenuManager = {
       }
     } else {
       if (CurrentUser.Gender == 1) {
-        $("#profilePicture").attr('src', '/Images/male.png');
+        $("#profilePicture").attr('src', '/assets/images/male.png');
       } else {
-        $("#profilePicture").attr('src', '/Images/female.png');
+        $("#profilePicture").attr('src', '/assets/images/female.png');
       }
     }
     $("#userName").text(CurrentUser.UserName.replace(/^"|"$/g, ''));
@@ -1680,7 +1980,7 @@ var MenuManager = {
       $("#bran-logo").attr('src', CurrentUser.FullLogoPath);
     }
     else {
-      $("#bran-logo").attr('src', '/images/logo/sountwels.png');
+      $("#bran-logo").attr('src', '/assets/images/logo/sountwels.png');
     }
   },
 
@@ -1704,7 +2004,7 @@ var MenuManager = {
         // Clear user info from localStorage
         localStorage.removeItem("userInfo");
         // Redirect to the login page
-        window.location.href = "https://localhost:44381/Home/Login";
+        window.location.href = baseUI + "Home/Login";
         console.log("Logged out successfully.");
       },
       error: function (xhr, status, error) {

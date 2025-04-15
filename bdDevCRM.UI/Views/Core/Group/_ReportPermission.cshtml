@@ -1,0 +1,30 @@
+﻿@* @model bdDevCRM.UI.Models.ErrorViewModel
+ *@
+
+
+
+<script src="~/assets/scripts/core/group/reportpermission.js"></script>
+
+<div id="divReportPermission" class="menuPermission widthSize100_per">
+
+  <div class="permissionHeaderDiv k-header">
+    <h4 class="permissionHeader">Customized Report Permission</h4>
+  </div>
+
+  <div id="reportPermissionContent" class="divDetails menuContent">
+    <ul>
+      <li>
+        <div id="checkboxReportPermission" class="groupSettingPermissionStyle">
+        </div>
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+
+@* 
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@

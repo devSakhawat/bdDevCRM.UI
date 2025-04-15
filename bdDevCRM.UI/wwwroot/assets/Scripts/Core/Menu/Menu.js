@@ -1,5 +1,5 @@
 ﻿
-// MenuHelper used for load sidebar menu
+// MenuHelper used for load sidebar menu into common.js file
 
 var menuManager = {};
 

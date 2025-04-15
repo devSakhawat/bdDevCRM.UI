@@ -1,0 +1,47 @@
+﻿@* @model bdDevCRM.UI.Models.ErrorViewModel
+ *@
+
+<script src="~/assets/scripts/core/group/grouppermission.js"></script>
+
+<div id="divGroupPermision">
+  <div class="divDetails">
+    <ul>
+      <li>
+        <label for="ApplicationName" class="lbl widthSize30_per">Application:</label>
+        <input type="text" id="cmbApplicationForModule" name="ApplicationName" maxlength="100" class="form-control-sm k-textbox" placeholder="Application name" />
+      </li>
+    </ul>
+  </div>
+  <br />
+
+  <div class="row">
+    <div class="col-5 me-2">
+      <partial name="Group/_AccessControlPermission" />
+    </div>
+    <div class="col-6">
+      <partial name="Group/_ReportPermission" />
+    </div>
+  </div>
+  
+  <div class="row mt-3">
+    <div class="col-4 me5">
+      <partial name="Group/_MenuPermission" />
+    </div>
+    <div class="col-4 me5 ">
+      <partial name="Group/_StatePermission" />
+    </div>
+    <div class="col-3">
+      <partial name="Group/_ActionPermission" />
+    </div>
+  </div>
+
+
+</div>
+
+
+
+@* 
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@

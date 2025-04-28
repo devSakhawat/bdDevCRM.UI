@@ -3,6 +3,8 @@ var groupArray = [];
 
 var GroupMembershipManager = {
 
+  // in data service don't use companyId
+  //GetGroupByCompanyId: function (companyId) {
   getGroups: function () {
     let groups = [];
     var jsonParams = "";
@@ -31,32 +33,44 @@ var GroupMembershipManager = {
 
   getGroupMemberByUserId: function (userId) {
 
-    var objGroupMemberList = "";
-    var jsonParam = "userId=" + userId;
-    var serviceUrl = "../Users/GetGroupMemberByUserId/";
-    AjaxManager.GetJsonResult(serviceUrl, jsonParam, false, false, onSuccess, onFailed);
+    var jsonParams = $.param({
+      userId: userId
+    });
+    var serviceUrl = "/groups/group-members-by-userId/";
 
-    function onSuccess(jsonData) {
+    return new Promise(function (resolve, reject) {
+      function onSuccess(jsonData) {
+        groups = jsonData;
+        resolve(groups);
+      }
 
-      objGroupMemberList = jsonData;
-    }
-    function onFailed(error) {
+      function onFailed(jqXHR, textStatus, errorThrown) {
+        ToastrMessage.showToastrNotification({
+          preventDuplicates: true,
+          closeButton: true,
+          timeOut: 0,
+          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+          type: 'error',
+        });
+        reject(errorThrown);
+      }
 
-      window.alert(error.statusText);
-    }
-    return objGroupMemberList;
+      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+    });
   }
 
 };
 
 var GroupMembershipHelper = {
-  initGroupMembers: function () {
-    GroupMembershipHelper.getGroups();
+  initGroupMembers: async function () {
+    await GroupMembershipHelper.getGroups();
   },
 
+  //GetGroupByCompanyId
   getGroups: async function (companyId) {
     groupArray = [];
 
+    //GetGroupByCompanyId
     var groups = await GroupMembershipManager.getGroups();
     var link = "";
 
@@ -89,14 +103,14 @@ var GroupMembershipHelper = {
     groupPermisionArray = [];
   },
 
-  CreateGroupMemberForSaveData: function (objUser) {
+  createGroupMemberForSaveData: function (objUser) {
     objUser.GroupMembers = groupPermisionArray;
     return objUser;
   },
 
-  populateGroupMember: function (objUser) {
+  populateGroupMember: async function (selectedItem) {
     groupPermisionArray = [];
-    var memberList = groupMembershipManager.GetGroupMemberByUserId(objUser.UserId);
+    var memberList = await GroupMembershipManager.getGroupMemberByUserId(selectedItem.UserId);
     for (var i = 0; i < memberList.length; i++) {
       $('#chkGroup' + memberList[i].GroupId).attr('checked', true);
       var obj = new Object();

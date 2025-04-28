@@ -73,6 +73,7 @@ var AccessControlHelper = {
     gbModuleId = 0;
     $('.chkBox').prop('checked', false);
   },
+
   PopulateExistingAccessInArray: function (objGroupPermission) {
     accessPermissionArray = [];
     for (var i = 0; i < objGroupPermission.length; i++) {

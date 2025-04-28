@@ -1,4 +1,10 @@
-﻿var UserInfoManager = {
+﻿
+// <reference path="UserDetails.js" />
+/// <reference path="../../Common/common.js" />
+/// <reference path="GroupMembership.js" />
+
+
+var UserInfoManager = {
 
   getEmployeeTypes: function () {
     let groups = [];
@@ -25,22 +31,86 @@
       AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
     });
   },
-
+  
   fetchBranchData: function (companyId) {
-    var objBranch = "";
-    var jsonParam = "companyId=" + companyId;
-    var serviceUrl = "../../Branch/GetBranchByCompanyIdForCombo/";
-    AjaxManager.GetJsonResult(serviceUrl, jsonParam, false, false, onSuccess, onFailed);
+    let branches = [];
+    var jsonParams = "companyId=" + companyId;
+    var serviceUrl = "/branches-by-compnayId-for-combo/companyId/";
 
-    function onSuccess(jsonData) {
-      objBranch = jsonData;
-    }
-    function onFailed(error) {
-      window.alert(error.statusText);
-    }
-    return objBranch;
+    return new Promise(function (resolve, reject) {
+      function onSuccess(jsonData) {
+        branches = jsonData;
+        resolve(branches);
+      }
+
+      function onFailed(jqXHR, textStatus, errorThrown) {
+        ToastrMessage.showToastrNotification({
+          preventDuplicates: true,
+          closeButton: true,
+          timeOut: 0,
+          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+          type: 'error',
+        });
+        reject(errorThrown);
+      }
+
+      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+    });
   },
 
+  fetchDepartmentData: function (companyId) {
+    let departments = [];
+    var jsonParams = "companyId=" + companyId;
+    var serviceUrl = "/departments-by-compnayId-for-combo/companyId/";
+
+    return new Promise(function (resolve, reject) {
+      function onSuccess(jsonData) {
+        departments = jsonData;
+        resolve(departments);
+      }
+
+      function onFailed(jqXHR, textStatus, errorThrown) {
+        ToastrMessage.showToastrNotification({
+          preventDuplicates: true,
+          closeButton: true,
+          timeOut: 0,
+          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+          type: 'error',
+        });
+        reject(errorThrown);
+      }
+
+      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+    });
+  },
+
+  fetchEmployeeByCompanyAndBranchAndDepartment: function (companyId, branchId, departmentId) {
+    let groups = [];
+    var jsonParams = "companyId=" + companyId + "&branchId=" + branchId + "&departmentId=" + departmentId;
+    var serviceUrl = "/employees-by-indentities";
+
+    return new Promise(function (resolve, reject) {
+      function onSuccess(jsonData) {
+        groups = jsonData;
+        resolve(groups);
+      }
+
+      function onFailed(jqXHR, textStatus, errorThrown) {
+        ToastrMessage.showToastrNotification({
+          preventDuplicates: true,
+          closeButton: true,
+          timeOut: 0,
+          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+          type: 'error',
+        });
+        reject(errorThrown);
+      }
+
+      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+    });
+  },
+
+  // will be deleted after emplementation of these alternative function
   GenerateBranchCombo: function (companyId) {
     var objBranch = "";
     var jsonParam = "companyId=" + companyId;
@@ -87,38 +157,223 @@
     }
     return objEmployee;
   },
-
 };
 
 var UserInfoHelper = {
 
-  initUserInfo: function () {
-    UserInfoHelper.populateCompany();
-    UserInfoHelper.employeeTypeCombo();
-    UserInfoHelper.generateDashboardDropdown();
+  initUserInfo: async function () {
+    //UserInfoHelper.employeeTypeCombo(); //// I have to find that what is the reponsibilities of this function
+
+    // load init combo
+    UserInfoHelper.generateCompanyCombo();
     UserInfoHelper.generateBranchCombo();
+    UserInfoHelper.generateDepartmentCombo();
+    // this is static so, need to pupulate datasource
+    UserInfoHelper.generateDashboardDropdown();
+    UserInfoHelper.generateEmployeeCombo();
+
+    // populate dataSource to combo box.
+    await UserInfoHelper.populateUserDetailsBasedOnSummaryCompanyId();
   },
 
-  populateCompany: function () {
-
-    UserSummaryManager.GetMotherCompany().then(function (objCompany) {
-      $("#cmbCompanyNameDetails").kendoComboBox({
-        placeholder: "All",
-        dataTextField: "CompanyName",
-        dataValueField: "CompanyId",
-        dataSource: objCompany
-      });
-
-      if (CurrentUser.CompanyId != null) {
-        var companyData = $("#cmbCompanyNameDetails").data("kendoComboBox");
-        companyData.value(CurrentUser.CompanyId);
-      }
-    }).catch(function (error) {
-      console.log("Error loading company data:", error);
+  // initialize all combo box.
+  generateCompanyCombo: function () {
+    $("#cmbCompanyNameDetails").kendoComboBox({
+      placeholder: "Please Select Company Name",
+      dataTextField: "CompanyName",
+      dataValueField: "CompanyId",
+      dataSource: [],
     });
-
   },
 
+  generateBranchCombo: function () {
+    $("#cmbBranchDetails").kendoComboBox({
+      placeholder: "All",
+      dataTextField: "Branchname",
+      dataValueField: "Branchid",
+      dataSource: []
+    });
+  },
+
+  generateDepartmentCombo: function () {
+    $("#cmbDepartmentNameDetails").kendoComboBox({
+      placeholder: "All",
+      dataTextField: "DepartmentName",
+      dataValueField: "DepartmentId",
+      dataSource: []
+    });
+  },
+
+  generateDashboardDropdown: function () {
+    $("#ddlCommonDashboard").kendoDropDownList({
+      dataTextField: "text",
+      dataValueField: "id",
+      dataSource: [
+        {
+          id: 1,
+          text: "CRM Home"
+        },
+        {
+          id: 2,
+          text: "Common Dashboard"
+        },
+        {
+          id: 3,
+          text: "CRM Dashboard"
+        }
+      ]
+    });
+  },
+
+  generateEmployeeCombo: function () {
+    $("#cmbEmployee").kendoComboBox({
+      placeholder: "All",
+      dataTextField: "FullName",
+      dataValueField: "HRRecordId",
+      dataSource: []
+    });
+  },
+
+  populateUserDetailsBasedOnSummaryCompanyId: async function () {
+    let comboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
+    let companyId = comboBox.value();
+    if (companyId > 0) {
+      await this.populateCompanyCombo();
+      await this.populateBranchCombo(companyId);
+      await this.populateDepartmentCombo(companyId);
+    }
+  },
+
+  // populate datasource to combo box
+  populateCompanyCombo: async function () {
+    try {
+      const companies = await UserSummaryManager.GetMotherCompany();
+
+      let companyComboBox = $("#cmbCompanyNameDetails").data("kendoComboBox");
+      companyComboBox.setDataSource(companies);
+
+    } catch (e) {
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: "Failed to load company data" + ": " + e,
+        type: 'error',
+      });
+    }
+  },
+
+  populateBranchCombo: async function (companyId) {
+    try {
+      const branches = await UserInfoManager.fetchBranchData(companyId);
+
+      let comboBox = $("#cmbBranchDetails").data("kendoComboBox");
+      if (comboBox) {
+        comboBox.setDataSource(branches);
+      }
+    } catch (e) {
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: "Failed to load company data" + ": " + e,
+        type: 'error',
+      });
+    }
+  },
+
+  populateDepartmentCombo: async function (companyId) {
+    try {
+      const department = await UserInfoManager.fetchDepartmentData(companyId);
+
+      let comboBox = $("#cmbDepartmentNameDetails").data("kendoComboBox");
+      if (comboBox) {
+        comboBox.setDataSource(department);
+      }
+    } catch (e) {
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: "Failed to load company data" + ": " + e,
+        type: 'error',
+      });
+    }
+  },
+
+  populateEmployeeByCompanyBranchDepartment: async function (companyId, branchId, departmentId) {
+    try {
+      var objEmp = new Object();
+      if (branchId == 0) {
+        objEmp = null;
+      }
+      else {
+        objEmp = UserInfoManager.fetchEmployeeByCompanyAndBranchAndDepartment(companyId, branchId, departmentId);
+      }
+
+      let comboBox = $("#cmbEmployee").data("kendoComboBox");
+      if (comboBox) {
+        comboBox.setDataSource(objEmp);
+      }
+    } catch (e) {
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: "Failed to load company data" + ": " + e,
+        type: 'error',
+      });
+    }
+  },
+
+  populateUserInformationDetails: async function (selectedItem) {
+    await UserInfoHelper.clearUserInfoForm();
+    $("#btnSave").text("Update");
+
+    $("#hdnUserId").val(selectedItem.UserId);
+
+    var company = $("#cmbCompanyNameDetails").data("kendoComboBox");
+    company.value(selectedItem.CompanyId);
+
+    //var branch = $("#cmbBranchDetails").data("kendoComboBox");
+    //branch.destroy();
+    //await cesCommonManager.generateBranchByCompanyWithHtmlId(selectedItem.CompanyId, "cmbBranchDetails");
+
+    await  UserInfoHelper.populateBranchCombo(selectedItem.CompanyId);
+    branch = $("#cmbBranchDetails").data("kendoComboBox");
+    branch.value(selectedItem.BranchId);
+
+    await  UserInfoHelper.populateDepartmentCombo(selectedItem.CompanyId);
+    department = $("#cmbDepartmentNameDetails").data("kendoComboBox");
+    department.value(selectedItem.DepartmentId);
+
+    if (selectedItem.DepartmentId == 0) {
+      department.value('');
+    }
+
+    
+    await UserInfoHelper.populateEmployeeByCompanyBranchDepartment(selectedItem.CompanyId, selectedItem.BranchId, selectedItem.DepartmentId);
+    combobox = $("#cmbEmployee").data("kendoComboBox");
+    combobox.value(selectedItem.EmployeeId);
+
+    $("#txtLoginId").val(selectedItem.LoginId);
+    $("#txtUserName").val(selectedItem.UserName);
+    $("#txtIMEI").val(selectedItem.IMEI);
+
+    if (selectedItem.AccessParentCompany == 1) {
+      $('#chkAccessAllSbu').attr('checked', true);
+    } else {
+      $('#chkAccessAllSbu').attr('checked', false);
+    }
+
+    $('#chkIsActive').attr('checked', selectedItem.IsActive);
+    $("#ddlCommonDashboard").data('kendoDropDownList').value(selectedItem.DefaultDashboard);
+
+    //GroupMembershipHelper.getGroupByCompanyId(selectedItem.CompanyId);
+    await GroupMembershipHelper.getGroups(selectedItem);
+  },
+
+  // have to work with these method.
   employeeTypeCombo: async function () {
     try {
       const employeeTypes = await UserInfoManager.getEmployeeTypes();
@@ -141,47 +396,6 @@ var UserInfoHelper = {
       });
     }
   },
-
-  generateDashboardDropdown: function (companyId) {
-    $("#ddlDefaultDashboard").kendoDropDownList({
-      dataTextField: "text",
-      dataValueField: "id",
-      dataSource: [
-        {
-          id: 1,
-          text: "CRM Home"
-        },
-        {
-          id: 2,
-          text: "Common Dashboard"
-        },
-        {
-          id: 3,
-          text: "CRM Dashboard"
-        }
-      ]
-    });
-
-  },
-
-  generateBranchCombo: function () {
-    //var objBranch = new Object();
-
-    //objBranch = userInfoManager.GenerateBranchCombo(companyId);
-
-    $("#cmbBranchDetails").kendoComboBox({
-      placeholder: "All",
-      dataTextField: "BranchName",
-      dataValueField: "BranchId",
-      dataSource: []
-      //dataSource: objBranch
-    });
-  },
-
-  fetchBranchData: function (companyId) {
-    objBranch = userInfoManager.GenerateBranchCombo(companyId);
-  },
-
 
   changeDepartmentName: function () {
 
@@ -213,7 +427,6 @@ var UserInfoHelper = {
     UserInfoHelper.GenerateEmployeeByCompanyId(companyId, branchId, departmentId);
   },
 
-
   GetDepartmentByCompanyId: function (companyId) {
     var objDepartment = new Object();
 
@@ -227,31 +440,33 @@ var UserInfoHelper = {
     });
   },
 
-  GenerateEmployeeByCompanyId: function (companyId, branchId, departmentId) {
-    var objEmp = new Object();
-    if (branchId == 0) {
-      objEmp = null;
-    }
-    else {
-      objEmp = userInfoManager.GetEmployeeByCompanyIdAndBranchIdAndDepartmentId(companyId, branchId, departmentId);
-    }
-    $("#cmbEmployee").kendoComboBox({
-      placeholder: "All",
-      dataTextField: "FullName",
-      dataValueField: "HRRecordId",
-      dataSource: objEmp
-    });
-  },
+  //populateEmployeeByCompanyId: function (companyId, branchId, departmentId) {
+  //  var objEmp = new Object();
+  //  if (branchId == 0) {
+  //    objEmp = null;
+  //  }
+  //  else {
+  //    objEmp = userInfoManager.GetEmployeeByCompanyIdAndBranchIdAndDepartmentId(companyId, branchId, departmentId);
+  //  }
+  //  $("#cmbEmployee").kendoComboBox({
+  //    placeholder: "All",
+  //    dataTextField: "FullName",
+  //    dataValueField: "HRRecordId",
+  //    dataSource: objEmp
+  //  });
+  //},
 
   changeCompanyName: function () {
+    debugger;
+    var companyData = $("#cmbCompanyNameDetails").data("kendoComboBox");
+    var companyId = companyData.value();
+    var companyName = companyData.text();
 
     var comboboxbranch = $("#cmbBranchDetails").data("kendoComboBox");
     var comboboxDep = $("#cmbDepartmentNameDetails").data("kendoComboBox");
     var comboboxEmp = $("#cmbEmployee").data("kendoComboBox");
 
-    var companyData = $("#cmbCompanyNameDetails").data("kendoComboBox");
-    var companyId = companyData.value();
-    var companyName = companyData.text();
+
     if (companyId == companyName) {
       companyData.value('');
       comboboxbranch.value('');
@@ -262,10 +477,10 @@ var UserInfoHelper = {
       comboboxEmp.value('');
       comboboxEmp.destroy();
 
-      UserInfoHelper.GenerateBranchCombo(0);
-      UserInfoHelper.GetDepartmentByCompanyId(0);
-      UserInfoHelper.GenerateDesignationCombo(0);
-      UserInfoHelper.GenerateEmployeeByCompanyId(0, 0, 0);
+      UserInfoHelper.generateBranchCombo();
+      UserInfoHelper.getDepartmentByCompanyId();
+      //UserInfoHelper.generateDesignationCombo(0);
+      UserInfoHelper.generateEmployeeCombo();
 
       return false;
     }
@@ -283,10 +498,17 @@ var UserInfoHelper = {
       comboboxEmp.destroy();
     }
 
-    UserInfoHelper.GenerateBranchCombo(companyId);
-    UserInfoHelper.GetDepartmentByCompanyId(companyId);
-    UserInfoHelper.GenerateEmployeeByCompanyId(companyId, 0, 0);
-    groupMembershipHelper.GetGroupByCompanyId(companyId);
+    UserInfoHelper.generateCompanyCombo();
+    UserInfoHelper.generateBranchCombo();
+    UserInfoHelper.generateDepartmentCombo();
+
+    UserInfoHelper.populateBranchCombo(companyId);
+    UserInfoHelper.populateBranchCombo(companyId);
+    UserInfoHelper.generateDepartmentCombo(companyId);
+    UserInfoHelper.populateEmployeeByCompanyBranchDepartment(companyId, 0, 0);
+    GroupMembershipHelper.getGroups();
+    // in .net companyId don't use.
+    //groupMembershipHelper.GetGroupByCompanyId(companyId);
   },
 
   changeBranchName: function () {
@@ -333,12 +555,11 @@ var UserInfoHelper = {
     UserInfoHelper.GenerateEmployeeByCompanyId(companyId, branchId, 0);
   },
 
-  clearUserInfoForm: function () {
+  clearUserInfoForm: async function () {
     $("#btnSave").text("Save");
 
     $("#hdnUserId").val("0");
     $("#cmbCompanyName").val("");
-    UserInfoHelper.populateCompany();
     $("#txtLoginId").val("");
     $("#txtNewPassword").val("");
     $("#txtConfirmPassword").val("");
@@ -347,33 +568,33 @@ var UserInfoHelper = {
     $("#cmbEmployee").val("");
     $("#txtIMEI").val('');
 
+    
+    await UserInfoHelper.populateCompanyCombo();
+
     var branch = $("#cmbBranchDetails").data("kendoComboBox");
     branch.destroy();
-
-    empressCommonHelper.GenerateBranchCombo(CurrentUser.CompanyId, "cmbBranchDetails");
-
+    UserInfoHelper.generateBranchCombo();
 
     var department = $("#cmbDepartmentNameDetails").data("kendoComboBox");
     department.destroy();
-    UserInfoHelper.GetDepartmentByCompanyId(CurrentUser.CompanyId);
+    UserInfoHelper.generateDepartmentCombo();
 
     var combobox = $("#cmbEmployee").data("kendoComboBox");
     combobox.destroy();
-    UserInfoHelper.GenerateEmployeeByCompanyId(CurrentUser.CompanyId, CurrentUser.BranchId, 0);
+    UserInfoHelper.generateEmployeeCombo();
 
     $('.chkBox').attr('checked', false);
 
-    $("#divUserInfo > form").kendoValidator();
-    $("#divUserInfo").find("span.k-tooltip-validation").hide();
-    var status = $(".status");
-
-    status.text("").removeClass("invalid");
+    //$("#divUserInfo > form").kendoValidator();
+    //$("#divUserInfo").find("span.k-tooltip-validation").hide();
+    //var status = $(".status");
+    //status.text("").removeClass("invalid");
 
     $("#ddlDefaultDashboard").val(1);
 
   },
 
-  ValidateUserInfoForm: function () {
+  validateUserInfoForm: function () {
     var data = [];
 
     var validator = $("#divUserInfo").kendoValidator().data("kendoValidator"),
@@ -427,7 +648,8 @@ var UserInfoHelper = {
     }
   },
 
-  CreateUserInformationForSaveData: function () {
+  createUserInformationForSaveData: function () {
+    debugger;
     var objUser = new Object();
     objUser.UserId = $("#hdnUserId").val();
     objUser.CompanyId = $("#cmbCompanyNameDetails").val();
@@ -437,10 +659,13 @@ var UserInfoHelper = {
     objUser.EmployeeId = $("#cmbEmployee").val();
     objUser.Password = $("#txtNewPassword").val();
     objUser.IMEI = $("#txtIMEI").val();
+    //var kendoDataItemFromCombobox = $("#cmbEmployee").data("kendoComboBox").dataItem();
+    //console.log(kendoDataItemFromCombobox);
+    //objUser.Employee_Id = $("#cmbEmployee").data("kendoComboBox").dataItem().EmployeeId;
+    //objUser.DefaultDashboard = $("#ddlDefaultDashboard").val();
 
-    objUser.Employee_Id = $("#cmbEmployee").data("kendoComboBox").dataItem().EmployeeId;
 
-    objUser.DefaultDashboard = $("#ddlDefaultDashboard").data('kendoDropDownList').value();
+    objUser.DefaultDashboard = $("#ddlCommonDashboard").data('kendoDropDownList').value();
     if ($("#chkIsActive").is(':checked') == true) {
       objUser.IsActive = true;
     }
@@ -455,64 +680,6 @@ var UserInfoHelper = {
       objUser.AccessParentCompany = 0;
     }
     return objUser;
-  },
-
-  populateUserInformationDetails: function (objUser) {
-    UserInfoHelper.clearUserInfoForm();
-    $("#btnSave").text("Update");
-
-    $("#hdnUserId").val(objUser.UserId);
-
-    var company = $("#cmbCompanyNameDetails").data("kendoComboBox");
-    company.value(objUser.CompanyId);
-
-    var branch = $("#cmbBranchDetails").data("kendoComboBox");
-    branch.destroy();
-
-    empressCommonHelper.GenerateBranchCombo(objUser.CompanyId, "cmbBranchDetails");
-    branch = $("#cmbBranchDetails").data("kendoComboBox");
-    branch.value(objUser.BranchId);
-
-    var department = $("#cmbDepartmentNameDetails").data("kendoComboBox");
-    department.destroy();
-
-    UserInfoHelper.GetDepartmentByCompanyId(objUser.CompanyId);
-
-
-
-    department = $("#cmbDepartmentNameDetails").data("kendoComboBox");
-    department.value(objUser.DepartmentId);
-
-    if (objUser.DepartmentId == 0) {
-      department.value('');
-
-    }
-
-    var combobox = $("#cmbEmployee").data("kendoComboBox");
-    combobox.destroy();
-    UserInfoHelper.GenerateEmployeeByCompanyId(objUser.CompanyId, objUser.BranchId, objUser.DepartmentId);
-
-    combobox = $("#cmbEmployee").data("kendoComboBox");
-    combobox.value(objUser.EmployeeId);
-
-    $("#txtLoginId").val(objUser.LoginId);
-    $("#txtUserName").val(objUser.UserName);
-    $("#txtIMEI").val(objUser.IMEI);
-    //$("#txtEmail").val(objUser.EmailAddress);
-    //$("#txtNewPassword").val(objUser.Password);
-    //$("#txtConfirmPassword").val(objUser.Password);
-    if (objUser.AccessParentCompany == 1) {
-      $('#chkAccessAllSbu').attr('checked', true);
-    } else {
-      $('#chkAccessAllSbu').attr('checked', false);
-    }
-
-    $('#chkIsActive').attr('checked', objUser.IsActive);
-    $("#ddlDefaultDashboard").data('kendoDropDownList').value(objUser.DefaultDashboard);
-    //var employee = $("#cmbEmployee").data("kendoComboBox");
-    //employee.value(objUser.EmployeeId);
-
-    groupMembershipHelper.GetGroupByCompanyId(objUser.CompanyId);
   },
 
 

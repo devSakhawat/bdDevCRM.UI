@@ -9,7 +9,7 @@ namespace EduSolutionWeb_v1.Controllers
     {
       //if (Session["CurrentUser"] != null)
       //{
-        return View("AccessControl/AccessControlSettings");
+      return View("AccessControl/AccessControlSettings");
       //}
       //else
       //{
@@ -21,11 +21,25 @@ namespace EduSolutionWeb_v1.Controllers
     {
       //if (Session["CurrentUser"] != null)
       //{
-        return View("Users/UserSettings");
+      return View("Users/UserSettings");
       //}
       //else
       //{
       //  return RedirectToAction("Logoff", "Home");
+      //}
+    }
+
+
+
+    public ActionResult WorkFlowStatus()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("Status/WorkFlowStatus");
+      //}
+      //else
+      //{
+      //  return RedirectToAction("Login", "Home");
       //}
     }
 
@@ -165,7 +179,7 @@ namespace EduSolutionWeb_v1.Controllers
       //    return RedirectToAction("Logoff", "Home");
       //}
     }
-   
+
     public ActionResult WorkflowSetup()
     {
       //if (Session["CurrentUser"] != null)
@@ -189,7 +203,7 @@ namespace EduSolutionWeb_v1.Controllers
       //    return RedirectToAction("Logoff", "Home");
       //}
     }
-    
+
     public ActionResult UsersGroupsInformation()
     {
       //if (Session["CurrentUser"] != null)
@@ -201,7 +215,7 @@ namespace EduSolutionWeb_v1.Controllers
       //    return RedirectToAction("Logoff", "Home");
       //}
     }
-    
+
 
     public ActionResult GroupInformation()
     {
@@ -219,7 +233,7 @@ namespace EduSolutionWeb_v1.Controllers
     {
       //if (Session["CurrentUser"] != null)
       //{
-        return View("Group/GroupSettings");
+      return View("Group/GroupSettings");
       //}
       //else
       //{

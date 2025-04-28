@@ -1,4 +1,5 @@
-﻿///// <reference path="UserInfo.js" />
+﻿/// <reference path="UserDetails.js" />
+/// <reference path="UserInfo.js" />
 
 
 var UserSummaryManager = {
@@ -23,14 +24,14 @@ var UserSummaryManager = {
   },
 
   GetMotherCompany: function () {
-    var objCompany = "";
+    var companies = [];
     var jsonParams = "";
     var serviceUrl = "/mother-companies";
 
     return new Promise(function (resolve, reject) {
       function onSuccess(jsonData) {
-        objCompany = jsonData;
-        resolve(objCompany);
+        companies = jsonData;
+        resolve(companies);
       }
 
       function onFailed(jqXHR, textStatus, errorThrown) {
@@ -73,11 +74,12 @@ var UserSummaryManager = {
 
 var UserSummaryHelper = {
 
-  initSummary: function () {
-    UserSummaryHelper.populateCompany();
+  initSummary: async function () {
+    // I am use this code into settings file directly because Userinfo file code has dependancy on populateCompany.
+    // So I need to load populateCompany data first and then grid data
+    //await UserSummaryHelper.populateCompany();
     UserSummaryHelper.initializeSummaryGrid();
   },
-
 
   initializeSummaryGrid: function () {
     const gridOptions = {
@@ -145,27 +147,27 @@ var UserSummaryHelper = {
     const gridInstance = $("#gridSummary").data("kendoGrid");
     if (gridInstance) {
       const dataSource = UserSummaryManager.getSummaryGridDataSource();
+      //console.log(dataSource);
       gridInstance.setDataSource(dataSource);
     }
 
   },
 
-
   GenerateColumns: function () {
     return columns = [
 
-      { field: "UserId", hidden: true },
-      { field: "UserName", title: "User Name", hidden: true },
-      { field: "AccessParentCompany", hidden: true },
-      { field: "EmployeeId", hidden: true },//HrRecordId
-      { field: "CompanyId", hidden: true },
-      { field: "Password", hidden: true },
-      { field: "FailedLoginNo", hidden: true },
-      { field: "IsExpired", hidden: true },
-      { field: "LastLoginDate", hidden: true },
-      { field: "CreatedDate", hidden: true },
-      { field: "BranchId", hidden: true },
-      { field: "DepartmentId", hidden: true },
+      { field: "UserId", hidden: true, width: "250" },
+      { field: "UserName", title: "User Name", hidden: true, width: "250" },
+      { field: "AccessParentCompany", hidden: true, width: "250" },
+      { field: "EmployeeId", hidden: true, width: "250" },//HrRecordId
+      { field: "CompanyId", hidden: true, width: "250" },
+      { field: "Password", hidden: true, width: "250" },
+      { field: "FailedLoginNo", hidden: true, width: "250" },
+      { field: "IsExpired", hidden: true, width: "250" },
+      { field: "LastLoginDate", hidden: true, width: "250" },
+      { field: "CreatedDate", hidden: true, width: "250" },
+      { field: "BranchId", hidden: true, width: "250" },
+      { field: "DepartmentId", hidden: true, width: "250" },
       { field: "Employee_Id", title: "Employee Id", width: "250" },//EmployeeId in Employement
       { field: "LoginId", title: "Login ID", width: "200" },
       { field: "DepartmentName", title: "Department", width: "350" },
@@ -178,32 +180,63 @@ var UserSummaryHelper = {
       },
       {
         field: "Edit", title: "Edit", filterable: false, width: "60",
-        template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="UserSummaryHelper.clickEventForEditButton()"  />', sortable: false, exportable: false
+        template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="UserSummaryHelper.clickEventForEditButton(event)"  />', sortable: false, exportable: false
       }
     ];
   },
 
-  populateCompany: function () {
-    var objCompany = new Object();
-    UserSummaryManager.GetMotherCompany().then(function (objCompany) {
-      $("#cmbCompanyNameForSummary").kendoComboBox({
-        placeholder: "All",
-        dataTextField: "CompanyName",
-        dataValueField: "CompanyId",
-        dataSource: objCompany
-      });
-
-      if (CurrentUser.CompanyId != null) {
-        var companyData = $("#cmbCompanyNameForSummary").data("kendoComboBox");
-        companyData.value(CurrentUser.CompanyId);
-        //UserInfoHelper.changeCompanyName();
-      }
-    }).catch(function (error) {
-      console.log("Error loading company data:" , error);
+  generateCompany: function () {
+    $("#cmbCompanyNameForSummary").kendoComboBox({
+      placeHolder: "All",
+      dataTextField: "CompanyName",
+      dataValueField: "CompanyId",
+      dataSource: [],
     });
-    
   },
 
+  populateCompany: async function () {
+    
+    try {
+      let companies = await UserSummaryManager.GetMotherCompany();
+      $("#cmbCompanyNameForSummary").kendoComboBox({
+        placeHolder: "All",
+        dataTextField: "CompanyName",
+        dataValueField: "CompanyId",
+        dataSource: companies,
+      });
+      if (CurrentUser.CompanyId != null) {
+        var companyComboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
+        companyComboBox.value(CurrentUser.CompanyId);
+      }
+    } catch (e) {
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: "Failed to load company data" + ": " + e,
+        type: 'error',
+      });
+    }
+  },
+
+  clickEventForEditButton: async function (e) {
+    debugger;
+
+    //var entityGrid = $("#gridSummary").data("kendoGrid");
+
+    //var selectedItem = entityGrid.dataItem(entityGrid.select());
+
+    var grid = $("#gridSummary").data("kendoGrid");
+    var row = $(e.target).closest("tr");
+    var selectedItem = grid.dataItem(row);
+
+    if (selectedItem) {
+      await UserInfoHelper.populateUserInformationDetails(selectedItem);
+      GroupMembershipHelper.populateGroupMember(selectedItem);
+    }
+
+
+  },
 
 //  GenerateMotherCompanyCombo: function () {
 //    var objCompany = new Object();
@@ -232,16 +265,6 @@ var UserSummaryHelper = {
 //    });
 //  },
 
-//  clickEventForEditButton: function () {
-
-//    var entityGrid = $("#gridUser").data("kendoGrid");
-
-//    var selectedItem = entityGrid.dataItem(entityGrid.select());
-
-//    userInfoHelper.populateUserInformationDetails(selectedItem);
-
-//    groupMembershipHelper.populateGroupMember(selectedItem);
-//  },
 
 //  resetPassword: function (items) {
 //    userSummaryManager.ResetPasswordByCompanyIdAndUserId(items.CompanyId, items.UserId);

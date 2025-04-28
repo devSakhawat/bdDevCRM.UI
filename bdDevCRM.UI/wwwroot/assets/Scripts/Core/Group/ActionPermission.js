@@ -86,6 +86,7 @@ var ActionHelper = {
     actionPermissionArray = [];
     $('.chkBox').prop('checked', false);
   },
+
   populateExistingActionInArray: function (objGroupPermission) {
     actionPermissionArray = [];
 

@@ -104,6 +104,61 @@ var cesCommonManager = {
 
 	},
 
+
+	//GenerateBranchCombo: function (companyId) {
+		//var objBranch = "";
+		//var jsonParam = "companyId=" + companyId;
+		//var serviceUrl = "../../Branch/GetBranchByCompanyIdForCombo/";
+		//AjaxManager.GetJsonResult(serviceUrl, jsonParam, false, false, onSuccess, onFailed);
+
+		//function onSuccess(jsonData) {
+		//	objBranch = jsonData;
+		//}
+		//function onFailed(error) {
+		//	window.alert(error.statusText);
+		//}
+		//return objBranch;
+
+
+	generateBranchByCompany: function (companyId) {
+		var jsonParams = $.param({
+			companyId: companyId
+		});
+		var serviceUrl = "/branches-by-compnayId-for-combo/companyId/";
+
+		return new Promise(function (resolve, reject) {
+			function onSuccess(jsonData) {
+				groups = jsonData;
+				resolve(groups);
+			}
+
+			function onFailed(jqXHR, textStatus, errorThrown) {
+				ToastrMessage.showToastrNotification({
+					preventDuplicates: true,
+					closeButton: true,
+					timeOut: 0,
+					message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+					type: 'error',
+				});
+				reject(errorThrown);
+			}
+
+			AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+		});
+	},
+
+	//GenerateBranchCombo: function (companyId, identity) {
+	generateBranchByCompanyWithHtmlId: async function (companyId, identity) {
+		//var branches = new Object();
+
+		var branches = await cesCommonManager.generateBranchByCompany(companyId);
+		$("#" + identity).kendoComboBox({
+			placeholder: "Select Location",
+			dataTextField: "BranchName",
+			dataValueField: "BranchId",
+			dataSource: branches
+		});
+	},
 	
 
 

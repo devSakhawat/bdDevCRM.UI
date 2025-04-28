@@ -13,8 +13,12 @@
     width: 17.4em;
    
 }
-input.k-textbox {
-    height: 2.0em;
+
+.k-textbox {
+  padding: 4px 8px;
+  border: 1px solid #bbb;
+  outline: 0;
+  border-radius: 3px;
 }
 
 textarea::placeholder {

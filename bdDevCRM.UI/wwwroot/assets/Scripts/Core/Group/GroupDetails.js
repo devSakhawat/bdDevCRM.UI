@@ -273,10 +273,6 @@ var GroupDetailsHelper = {
     ReportPermissionHelper.clearReportPermission();
   },
 
-
-
-
-
   SaveInformation: function () {
     //if (groupDetailsHelper.validateGroupForm()) {
 
@@ -284,8 +280,6 @@ var GroupDetailsHelper = {
     //}
     GroupDetailsManager.SaveData();
   },
-
-
 
   validateGroupForm: function () {
     var mess = false;

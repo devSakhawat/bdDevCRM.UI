@@ -1,6 +1,6 @@
-﻿/// <reference path="../../jquery-1.7.1.min.js" />
-//var reportServerAPI = "http://localhost:5724/";
+﻿/// <reference path="../../libs/jquery/dist/jquery.js" />
 
+//var reportServerAPI = "http://localhost:5724/";
 //var baseUI = "https://localhost:7145/"
 
 var customFilterManu = {
@@ -376,77 +376,6 @@ var AjaxManager = {
     });
     return gridDataSource;
   },
-
-  //GenericGridDataSource: function (options) {
-  //  var apiUrl = options.apiUrl;
-  //  var serverPaging = options.serverPaging !== undefined ? options.serverPaging : true;
-  //  var serverSorting = options.serverSorting !== undefined ? options.serverSorting : true;
-  //  var serverFiltering = options.serverFiltering !== undefined ? options.serverFiltering : true;
-  //  var pageSize = options.pageSize || 20;
-  //  var modelFields = options.modelFields || {};
-
-  //  console.log(token);
-
-  //  // Create a new Kendo DataSource with dynamic configurations
-  //  var gridDataSource = new kendo.data.DataSource({
-  //    type: "json",
-  //    serverPaging: serverPaging,
-  //    serverSorting: serverSorting,
-  //    serverFiltering: serverFiltering,
-  //    allowUnsort: options.allowUnsort || false,
-  //    pageSize: pageSize,
-  //    transport: {
-  //      read: {
-  //        url: apiUrl,
-  //        type: options.requestType || "POST", // Fixed to use requestType parameter
-  //        dataType: "json",
-  //        async: options.async !== undefined ? options.async : false,
-  //        contentType: options.contentType || "application/json; charset=utf-8",
-  //        headers: AjaxManager.getDefaultHeaders()
-  //      },
-  //      //parameterMap: options.parameterMap || function (options) {
-  //      //  return JSON.stringify(options);
-  //      //}
-  //      parameterMap: options.parameterMap || function (options) {
-  //        console.log("Options passed to parameterMap:", options);
-
-  //        // Create a new object with properly capitalized property names
-  //        var transformedOptions = {
-  //          Skip: options.skip,
-  //          Take: options.take,
-  //          Page: options.page,
-  //          PageSize: options.pageSize,
-  //          Filter: options.filter
-  //        };
-
-  //        // Handle the sort property separately to make sure it's properly transformed
-  //        if (options.sort && options.sort.length > 0) {
-  //          transformedOptions.Sort = [];
-  //          for (var i = 0; i < options.sort.length; i++) {
-  //            transformedOptions.Sort.push({
-  //              field: options.sort[i].field,
-  //              dir: options.sort[i].dir
-  //            });
-  //          }
-  //        } else {
-  //          transformedOptions.Sort = null;
-  //        }
-
-  //        console.log("Transformed options:", transformedOptions);
-
-  //        return JSON.stringify(transformedOptions);
-  //      }
-  //    },
-  //    schema: {
-  //      data: options.schemaData || "items",
-  //      total: options.schemaTotal || "totalCount",
-  //      model: {
-  //        fields: modelFields // Provide dynamic fields based on options
-  //      }
-  //    }
-  //  });
-  //  return gridDataSource;
-  //},
 
   GenericGridDataSourceNew: function (options) {
     // Default options with fallback values
@@ -2527,7 +2456,7 @@ var FileManager = {
 var DistrictManager = {
   GetDistrictInformation: function () {
     var items = [["Barguna"],
-    ["Barisal"],
+    ["Barishal"],
     ["Bhola"],
     ["Jhalokati"],
     ["Patuakhali"],
@@ -2864,14 +2793,17 @@ function addExtensionClass(extension) {
   Date.prototype.getMonthName = function () {
     return months[this.getMonth()];
   };
+
   Date.prototype.getDayName = function () {
     return days[this.getDay()];
   };
+
   Date.prototype.FirstDateOfMonth = function () {
 
     return new Date(this.getFullYear(), this.getMonth(), 1);
 
   };
+
   Date.prototype.getDatesByWeekName = function (weekName) {
     var weekDates = [];
     var totalDays = this.getTotalDays();
@@ -2886,11 +2818,13 @@ function addExtensionClass(extension) {
 
 
   };
+
   Date.prototype.getTotalDays = function () {
 
     return daysInMonth(this.getFullYear(), this.getMonth(), 0);
 
   };
+
   function daysInMonth(year, month, day) {
 
     var d = new Date(year, month + 1, day);
@@ -2910,6 +2844,7 @@ function addExtensionClass(extension) {
     }
     return this.push(obj);
   };
+
   Array.prototype.remove = function (obj) {
 
     if (this.length < 1) {

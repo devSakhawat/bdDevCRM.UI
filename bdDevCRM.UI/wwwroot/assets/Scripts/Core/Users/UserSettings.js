@@ -4,15 +4,15 @@
 /// <reference path="UserUpload.js" />
 
 
-$(document).ready(function () {
-
+$(document).ready(async function () {
+  await UserSummaryHelper.populateCompany();
+  await UserInfoHelper.initUserInfo();
   UserSummaryHelper.initSummary();
   UserDetailsHelper.initDetails();
-  GroupMembershipHelper.initGroupMembers();
-  UserInfoHelper.initUserInfo();
+  await GroupMembershipHelper.initGroupMembers();
 
   $("#cmbDepartmentNameDetails").change(function () {
-    UserInfoHelper.changeDepartmentName();
+    UserInfoHelper.changeDepartmentNamechangeDepartmentNamechangeDepartmentName();
   });
   //userInfoHelper.populateCompany();
 
@@ -27,7 +27,7 @@ $(document).ready(function () {
   // userUploadManager.userUpload();
 
   $("#cmbCompanyNameDetails").change(function () {
-    userInfoHelper.changeCompanyName();
+    UserInfoHelper.changeCompanyName();
   });
   $("#cmbCompanyNameDetails").focus();
 });

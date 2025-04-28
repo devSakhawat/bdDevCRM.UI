@@ -23,13 +23,11 @@
 
     </div>
 
-    <div class="divDetails">
+    <div class="btnDiv mt-2">
       <ul>
-        <li class="accept">
-          <button id="btnSave" class="k-button" type="submit" onclick="userDetailsManager.SaveUserInfo()">Save</button> &nbsp;&nbsp;
-          <button id="btnClearAll" class="k-button" onclick="userDetailsHelper.clearUserForm()">Clear</button>
-        </li>
-        <li class="status">
+        <li class="d-flex justify-content-end">
+          <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="UserDetailsManager.saveUserInfo()">+ Add Menu</button>
+          <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="UserDetailsHelper.clearUserForm()">Clear</button>
         </li>
       </ul>
     </div>

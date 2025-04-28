@@ -1,0 +1,101 @@
+﻿
+
+<script src="~/assets/scripts/core/users/userdetails.js"></script>
+
+<div class="rightDiv">
+  <fieldset class="reset">
+    <legend class="reset">User Details</legend>
+
+    <div id="tabstrip">
+      <ul>
+        <li>
+          State Details
+        </li>
+        <li>
+          Action Details
+        </li>
+      </ul>
+      <div id="divUserInfo">
+        <div class="divDetails">
+          <ul>
+            <li class="mb-2">
+              <label for="CompanyNameDetails" class="lbl widthSize100_per">SBU:</label>
+              <input type="hidden" id="hdnUserId" value="0" />
+              <input type="text" class="width_100_Per_Important " id="cmbCompanyNameDetails" name="CompanyNameDetails" validationmessage="Please Select Company" />
+            </li>
+
+            <li class="mb-2">
+              <label for="BranchNameDetails" class="lbl widthSize100_per">Branch Name:<span class="redstart">*</span></label>
+              <input type="text" class="width_100_Per_Important" id="cmbBranchDetails" name="BranchNameDetails" validationmessage="Please Select Branch Name" />
+            </li>
+
+            <li class="mb-2">
+              <label for="DepartmentNameDetails" class="lbl widthSize100_per">Department Name:</label>
+              <input type="text" class="width_100_Per_Important " id="cmbDepartmentNameDetails" name="DepartmentNameDetails" validationmessage="Please Select Department Name" />
+            </li>
+
+            <li class="mb-2">
+              <label for="LoginId" class="lbl widthSize100_per">Login ID:<span class="redstart">*</span></label>
+              <input type="text" class="width_100_Per_Important k-textbox" id="txtLoginId" name="LoginId" placeholder="Login ID" validationmessage="Please enter valid Login ID" />
+            </li>
+
+            <li class="mb-2">
+              <label for="NewPassword" class="lbl widthSize100_per">New Password:</label>
+              <input type="password" class="width_100_Per_Important k-textbox" id="txtNewPassword" name="NewPassword" />
+            </li>
+
+            <li class="mb-2">
+              <label for="ConfirmPassword" class="lbl widthSize100_per">Confirm Password:</label>
+              <input type="password" class="width_100_Per_Important k-textbox" id="txtConfirmPassword" name="ConfirmPassword" />
+            </li>
+
+            <li class="mb-2">
+              <label for="UserName" class="lbl widthSize100_per">User Name:<span class="redstart">*</span></label>
+              <input type="text" class="width_100_Per_Important k-textbox" id="txtUserName" name="UserName" maxlength="50" placeholder="User Name" required validationmessage="Please enter valid User Name" />
+            </li>
+
+            <li class="mb-2">
+              <label class="lbl widthSize100_per">Employee:<span class="redstart">*</span></label>
+              <input class="width_100_Per_Important" id="cmbEmployee" name="EmployeeName" validationmessage="Please Select an Employee Name" required="required" />
+            </li>
+
+            <li class="mb-2">
+              <label class="lbl widthSize100_per">IMEI:</label>
+              <input class="width_100_Per_Important k-textbox" id="txtIMEI" name="IMEI" />
+            </li>
+
+            <li class="mb-2 custom-checkbox">
+              <label for="AccessAllSbu" class="lbl ">Has Root Privilege:</label>
+              <input type="checkbox" id="chkAccessAllSbu" name="AccessAllSbu" class="chkBox" />
+            </li>
+
+            <li class="mb-2">
+              <label class="lbl widthSize100_per">Default Dashboard:</label>
+              <input class="width_100_Per_Important" id="ddlCommonDashboard" />
+            </li>
+
+            <li class="mb-2 custom-checkbox">
+              <label for="IsActive" class="lbl">Is Active:</label>
+              <input type="checkbox" id="chkIsActive" name="IsActive" class="chkBox " />
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <partial name="Users/_GroupMembership" />
+      </div>
+
+
+    </div>
+
+    <div class="btnDiv mt-2">
+      <ul>
+        <li class="d-flex justify-content-end">
+          <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="UserDetailsManager.saveUserInfo()">+ Add Menu</button>
+          <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="UserDetailsHelper.clearUserForm()">Clear</button>
+        </li>
+      </ul>
+    </div>
+
+  </fieldset>
+</div>

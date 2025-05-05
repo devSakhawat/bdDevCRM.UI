@@ -35,7 +35,7 @@ namespace EduSolutionWeb_v1.Controllers
     {
       //if (Session["CurrentUser"] != null)
       //{
-      return View("Status/WorkFlowStatus");
+      return View("Workflow/WorkFlowState");
       //}
       //else
       //{

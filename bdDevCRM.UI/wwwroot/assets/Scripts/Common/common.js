@@ -816,12 +816,18 @@ var AjaxManager = {
       crossDomain: true,
       contentType: "application/json; charset=utf-8",
       headers: AjaxManager.getDefaultHeaders(),
-      success: function (response) {
-        onSuccess(response);
+      //success: function (response) {
+      //  onSuccess(response);
+      //},
+      success: function () {
+        // Pass all original arguments: response, textStatus, xhr
+        if (typeof onSuccess === "function") {
+          onSuccess.apply(null, arguments); // 👈 Important
+        }
       },
       error: function (xhr, status, error) {
-        console.log("Failed to get user info: " + xhr.responseText);
-        console.log("AJAX Error:", status, error);
+        console.log("Failed to get info: " + xhr.responseText);
+        console.log("AJAX Error:", xhr, status, error);
         onFailed(xhr, status, error);
       }
     });

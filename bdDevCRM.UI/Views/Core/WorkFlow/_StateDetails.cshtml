@@ -1,0 +1,47 @@
+﻿
+@* input field pattern type, id, class, name, validationmessage and others *@
+
+<script src="~/assets/scripts/core/workflow/statedetails.js"></script>
+
+<div id="divStateDetails">
+  <div class="divDetails">
+    <ul>
+      <li class="mb-2">
+        <input type="hidden" id="stateID" value="0" />
+        <input type="hidden" id="actionID" value="0" />
+
+        <label for="MenuName" class="lbl widthSize100_per">Menu: <span class="redstart">*</span></label>
+        <input id="cmbMenu" class="width_100_Per_Important " name="MenuName" validationMessage="Please Select Menu" required="required" />
+      </li>
+
+      <li class="mb-2">
+        <label for="StateName" class="lbl widthSize100_per">State Name:<span class="redstart">*</span></label>
+        <input type="text" id="txtStateName" class="k-textbox width_100_Per_Important" name="StateName" maxlength="50" pattern="[a-zA-Z0-9 ]+" validationMessage="Please input valid State Name" required="required" />
+      </li>
+
+      <li class="mb-2">
+        <label for="IsClose" class="lbl widthSize100_per">Is Close:<span class="redstart">*</span></label>
+        <input id="cmbIsClose" class="width_100_Per_Important " name="IsClose" validationMessage="Please Select" required="required" />
+      </li>
+
+      <li class="mb-2 custom-checkbox">
+        <label for="IsActive" class="lbl">Is Default:</label>
+        <input type="checkbox" id="chkIsDefault" name="IsActive" class="chkBox " />
+      </li>
+    </ul>
+  </div>
+
+  <div class="btnDiv mt-2">
+    <ul>
+      <li class="d-flex justify-content-end">
+        <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Menu</button>
+        <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsManager.clearForm()">Clear</button>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+
+
+

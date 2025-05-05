@@ -1,0 +1,24 @@
+﻿@{
+	ViewBag.Title = "Workflow Status";
+	Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+
+<!-- row -->
+<div class="row gx-1 gy-2">
+	<h3 class="k-header text-center">Workflow Status</h3>
+
+	<div class="col-7">
+		<div id="divSummary">
+			<partial name="WorkFlow/_WorkFlowSummery" />
+		</div>
+	</div>
+
+	<div class="col-5">
+		<div>
+			<partial name="WorkFlow/_WorkFlowDetail" />
+		</div>
+	</div>
+</div>
+
+<script src="~/assets/scripts/core/workflow/workflowsettings.js"></script>

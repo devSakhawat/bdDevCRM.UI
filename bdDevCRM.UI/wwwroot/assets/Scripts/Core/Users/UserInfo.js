@@ -282,6 +282,8 @@ var UserInfoHelper = {
     }
   },
 
+
+
   populateDepartmentCombo: async function (companyId) {
     try {
       const department = await UserInfoManager.fetchDepartmentData(companyId);

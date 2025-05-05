@@ -189,58 +189,60 @@ div.groupSettingPermissionStyle {
 
 /************************ /////////////////////////////////////////////////////////// */
 /* Responsive Grid Styling */
-#divSummaryInfo {
+
+
+/*#divSummaryInfo {
   width: 100%;
-  overflow-x: auto; /* Enable horizontal scrolling for the container */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS devices */
-}
+  overflow-x: auto;*/ /* Enable horizontal scrolling for the container */
+  /*-webkit-overflow-scrolling: touch;*/ /* Smooth scrolling on iOS devices */
+/*}
 
 .k-grid {
   width: 100% !important;
-  min-width: 1200px; /* Increased minimum width to prevent column compression */
-  table-layout: fixed; /* Maintain column widths */
-}
+  min-width: 1200px;*/ /* Increased minimum width to prevent column compression */
+  /*table-layout: fixed;*/ /* Maintain column widths */
+/*}
 
 .k-grid-content {
   overflow-x: auto !important;
   overflow-y: auto !important;
   min-height: 200px;
-  max-height: 600px; /* Add max-height to ensure vertical scrolling works properly */
-}
+  max-height: 600px;*/ /* Add max-height to ensure vertical scrolling works properly */
+/*}
 
 .k-grid-header {
-  padding-right: 0 !important; /* To fix scrollbar alignment */
-  overflow: hidden; /* Keep header from scrolling horizontally independently */
-}
+  padding-right: 0 !important;*/ /* To fix scrollbar alignment */
+  /*overflow: hidden;*/ /* Keep header from scrolling horizontally independently */
+/*}*/
 
 /* Header styling - keep widths consistent */
-.k-grid .k-grid-header th {
+/*.k-grid .k-grid-header th {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  position: relative; /* For potential tooltip positioning */
-}
+  position: relative;*/ /* For potential tooltip positioning */
+/*}
 
   .k-grid .k-grid-header th:hover {
     white-space: normal;
     overflow: visible;
     word-break: break-all;
     background-color: #f0f0f0;
-    z-index: 1; /* Ensure the expanded header shows above other content */
-  }
+    z-index: 1;*/ /* Ensure the expanded header shows above other content */
+  /*}*/
 
 /* Cell styling - maintain width consistency */
-.k-grid .k-grid-content tr td {
+/*.k-grid .k-grid-content tr td {
   white-space: normal;
   text-overflow: ellipsis;
   overflow: hidden;
   vertical-align: top;
   word-wrap: break-word !important;
-  padding: 6px 8px; /* Consistent padding for better spacing */
-}
+  padding: 6px 8px;*/ /* Consistent padding for better spacing */
+/*}*/
 
 /* Ensure consistent scrollbar appearance across browsers */
-.k-grid-content::-webkit-scrollbar {
+/*.k-grid-content::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
@@ -252,31 +254,31 @@ div.groupSettingPermissionStyle {
 
 .k-grid-content::-webkit-scrollbar-track {
   background: #f1f1f1;
-}
+}*/
 
 /* Ensure grid container is responsive */
-#gridSummary {
+/*#gridSummary {
   width: 100%;
   min-width: 100%;
-}
+}*/
 
 /* Responsive adjustments */
-@media screen and (max-width: 1024px) {
+/*@media screen and (max-width: 1024px) {
   #divSummaryInfo {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-  }
+  }*/
 
   /* Don't change the column widths, just ensure scrolling works */
-  .k-grid {
-    min-width: 1200px; /* Keep this the same as above to maintain column widths */
-  }
-}
+  /*.k-grid {
+    min-width: 1200px;*/ /* Keep this the same as above to maintain column widths */
+  /*}
+}*/
 
 /* For very small screens, ensure proper scrolling */
-@media screen and (max-width: 480px) {
+/*@media screen and (max-width: 480px) {
   .k-grid-content {
-    max-height: 400px; /* Slightly reduced max height for smaller screens */
-  }
-}
+    max-height: 400px;*/ /* Slightly reduced max height for smaller screens */
+  /*}
+}*/
 

@@ -8,7 +8,7 @@
     <ul>
       <li class="mb-2">
         <input type="hidden" id="stateID" value="0" />
-        <input type="hidden" id="actionID" value="0" />
+        @* <input type="hidden" id="actionID" value="0" /> *@
 
         <label for="MenuName" class="lbl widthSize100_per">Menu: <span class="redstart">*</span></label>
         <input id="cmbMenu" class="width_100_Per_Important " name="MenuName" validationMessage="Please Select Menu" required="required" />
@@ -34,8 +34,8 @@
   <div class="btnDiv mt-2">
     <ul>
       <li class="d-flex justify-content-end">
-        <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Menu</button>
-        <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsManager.clearForm()">Clear</button>
+        <button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
+        <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearStateForm()">Clear</button>
       </li>
     </ul>
   </div>

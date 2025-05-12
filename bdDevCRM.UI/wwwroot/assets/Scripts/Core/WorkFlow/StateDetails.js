@@ -21,7 +21,8 @@ var StateDetailsManager = {
           preventDuplicates: true,
           closeButton: true,
           timeOut: 0,
-          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+          //message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+          message: jqXHR.status + " : " + jqXHR.responseText,
           type: 'error',
         });
         reject(errorThrown);
@@ -30,80 +31,6 @@ var StateDetailsManager = {
       AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
     });
   },
-
-
-  saveInfo2: function () {
-    //if (stateDetailHelper.StateDetailsValidator()) {
-
-    //var stateID = $("#stateID").val();
-    //alert(stateID);
-
-    var state = new Object();
-    state.MenuID = $("#cmbMenu").data("kendoComboBox").value() == '' ? '0' : $("#cmbMenu").data("kendoComboBox").value();
-    state.MenuName = $("#cmbMenu").data("kendoComboBox").text();
-    //// using jQuery
-    //state.MenuID = $("#cmbMenu").val() == '' ? '0' : $("#cmbMenu").val();
-
-    state.StateName = $("#txtStateName").val() == '' ? '0' : $("#stateID").val();
-    state.StateName = $("#txtStateName").val();
-    state.IsClosed = $("#cmbIsClose").data("kendoComboBox").value() == '' ? '0' : $("#cmbIsClose").data("kendoComboBox").value();
-
-    //state.WFStateId = $("#stateID").val() == '' ? '0' : $("#stateID").val();
-
-    if ($("#chkIsDefault").is(':checked') == true) {
-      state.IsDefaultStart = true;
-    } else {
-      state.IsDefaultStart = false;
-    }
-
-
-    var stateObj = JSON.stringify(state).replace(/&/g, "^");
-    var jsonParam = 'stateObj=' + stateObj;
-    var serviceUrl = "../Status/SaveState/";
-    AjaxManager.SendJson(serviceUrl, jsonParam, onSuccess, onFailed);
-
-    //}
-
-    function onSuccess(jsonData) {
-      //var js = jsonData.split('"');
-      if (jsonData == "Success") {
-
-        AjaxManager.MsgBox('success', 'center', 'Success:', 'Operation Successfully',
-          [{
-            addClass: 'btn btn-primary', text: 'Ok', onClick: function ($noty) {
-              $noty.close();
-              stateDetailManager.clearForm();
-              $("#gridworkFlow").data("kendoGrid").dataSource.read();
-              $("#cmbMenu").focus();
-
-            }
-          }]);
-
-      }
-      else {
-        AjaxManager.MsgBox('error', 'center', 'Operation Failed', jsonData,
-          [{
-            addClass: 'btn btn-primary', text: 'Ok', onClick: function ($noty) {
-              $noty.close();
-            }
-          }]);
-      }
-    }
-
-    function onFailed(error) {
-      AjaxManager.MsgBox('error', 'center', 'Operation Failed', error.statusText,
-        [{
-          addClass: 'btn btn-primary', text: 'Ok', onClick: function ($noty) {
-            $noty.close();
-          }
-        }]);
-    }
-
-
-
-  },
-
-
 
   saveOrUpdate: function () {
     //if (UserDetailsHelper.validateUserDetaisForm()) {
@@ -144,6 +71,7 @@ var StateDetailsManager = {
               });
               $("#gridSummary").data("kendoGrid").dataSource.read();
             }
+
             function onFailed(jqXHR, textStatus, errorThrown) {
               ToastrMessage.showToastrNotification({
                 preventDuplicates: true,
@@ -280,13 +208,21 @@ var StateDetailsHelper = {
   },
 
   clearStateForm: function () {
+    $("#btnSaveOrUpdate").text('Add Item');
+    $("#stateID").val(0);
     $("#cmbMenu").val('');
     $("#cmbMenu").data("kendoComboBox").text('');
-    $("#stateID").val(0);
     $("#txtStateName").val('');
     $("#cmbIsClose").data("kendoComboBox").value(0);
     $("#chkIsDefault").prop("checked", false);
+
+    $("#gridSummaryAction").empty();
+    $("#gridSummaryAction").kendoGrid();
+
+    //ActionDetailHelper.clearActionForm();
   }
+
+
 }
 
 

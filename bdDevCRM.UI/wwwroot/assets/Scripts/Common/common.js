@@ -886,6 +886,28 @@ var AjaxManager = {
     });
   },
 
+  GetDataAsyncOrSyncronous: function (baseApi, serviceUrl, jsonParams, isAsync, isCache) {
+    jQuery.support.cors = true;
+
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        url: baseApi + serviceUrl,
+        method: "GET",
+        async: isAsync,
+        cache: isCache,
+        data: jsonParams,
+        contentType: "application/json; charset=utf-8",
+        headers: AjaxManager.getDefaultHeaders(),
+        success: function (response) {
+          resolve(response);
+        },
+        error: function (xhr, status, error) {
+          reject(xhr); // এখানে xhr টা catch ব্লকে যাবে
+        }
+      });
+    });
+  },
+
   GetDataForDotnetCore: function (baseUrl, serviceUrl, jsonParams, onSuccess, onFailed) {
     jQuery.support.cors = true;
 

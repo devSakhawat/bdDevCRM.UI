@@ -14,9 +14,13 @@
 
 <div class="row gy-2 gx-1">
   <div id="divActionDetails">
+
     <div class="divDetails">
       <ul>
         <li class="mb-2">
+          <input type="hidden" id="actionID" value="0" />
+
+
           <label for="StateName" class="lbl widthSize100_per">State Name:<span class="redstart">*</span></label>
           <input id="txtStateName_Action" class="width_100_Per_Important k-textbox" name="StateName" validationMessage="Please input valid State Name" required="required" disabled="disabled" />
         </li>
@@ -51,7 +55,7 @@
     <div class="btnDiv mt-2">
       <ul>
         <li class="d-flex justify-content-end">
-          <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="ActionDetailHelper.SaveActionInfo()">+ Add Menu</button>
+          <button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="ActionDetailsManager.saveOrUpdate()">+ Add Item</button>
           <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="ActionDetailHelper.clearActionForm()">Clear</button>
         </li>
       </ul>

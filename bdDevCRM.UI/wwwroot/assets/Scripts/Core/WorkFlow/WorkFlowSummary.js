@@ -25,6 +25,7 @@ var WrokFlowSummaryManager = {
   },
 
 
+
 };
 
 
@@ -83,7 +84,7 @@ var WorkFlowSummaryHelper = {
           }
         ]
       },
-      columns: WorkFlowSummaryHelper.GenerateColumns(),
+      columns: WorkFlowSummaryHelper.generateColumns(),
       editable: false,
       selectable: "row",
     };
@@ -95,10 +96,9 @@ var WorkFlowSummaryHelper = {
       const dataSource = WrokFlowSummaryManager.getSummaryGridDataSource();
       gridInstance.setDataSource(dataSource);
     }
-
   },
 
-  GenerateColumns: function () {
+  generateColumns: function () {
     return columns = [
 
       { field: "WFStateId", hidden: true },
@@ -113,6 +113,38 @@ var WorkFlowSummaryHelper = {
         template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="WorkFlowSummaryHelper.clickEventForEditButton(event)" />', sortable: false, exportable: false
       }
     ];
+  },
+
+  clickEventForEditButton: function (event) {
+    const gridInstance = $("#gridSummary").data("kendoGrid");
+    const gridRow = $(event.target).closest("tr");
+    var selectedItem = gridInstance.dataItem(gridRow);
+    if (gridInstance) {
+      WorkFlowSummaryHelper.editItem(selectedItem);
+    }
+  },
+
+  editItem: async function (item) {
+    StateDetailsHelper.clearStateForm();
+    $("#btnSaveOrUpdate").text("Update Item");
+
+    $("#stateID").val(item.WFStateId);
+    var menuComboBoxInstance = $("#cmbMenu").data("kendoComboBox");
+    menuComboBoxInstance.value(item.MenuID);
+    $("#txtStateName").val(item.StateName);
+    $("#cmbIsClose").data("kendoComboBox").value(item.IsClosed);
+    $("#chkIsDefault").prop('checked', item.IsDefaultStart);
+    $("#txtStateName_Action").val(item.StateName);
+
+    var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
+    if (nextStateComboBox) {
+      var nextStateComboBoxDataSource = await ActionDetailHelper.loadNextStateCombo(item.MenuID);
+      console.log(nextStateComboBoxDataSource);
+      nextStateComboBox.setDataSource(nextStateComboBoxDataSource);
+    }
+
+    //ActionDetailHelper.generateActionGrid(item.WFStateId);
+    //ActionDetailHelper.clearActionForm();
   },
 
 }

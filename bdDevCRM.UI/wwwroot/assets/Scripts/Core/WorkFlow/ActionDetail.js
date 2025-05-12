@@ -1,4 +1,4 @@
-﻿// <reference path="workflowsummary.js" />
+// <reference path="workflowsummary.js" />
 // <reference path="workflowdetail.js" />
 // <reference path="statedetails.js" />
 
@@ -8,6 +8,32 @@
 
 
 var ActionDetailManager = {
+  fetchNextStateComboBoxData: async function (menuId) {
+    const jsonParams = $.param({ menuId });
+    const serviceUrl = "/next-states-by-menu";
+
+    try {
+      const result = await AjaxManager.GetDataAsyncOrSyncronous(
+        baseApi,
+        serviceUrl,
+        jsonParams,
+        true,
+        false
+      );
+      return result;
+    } catch (jqXHR) {
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 0,
+        message: jqXHR.status + " : " + jqXHR.responseText,
+        type: 'error',
+      });
+      throw jqXHR;
+    }
+  }
+
+
 
 }
 
@@ -124,12 +150,55 @@ var ActionDetailHelper = {
   // initialize all combo box.
   generateNextStateCombo: function () {
     $("#cmbNextState").kendoComboBox({
-      placeholder: "Select Next State...",
+      /*placeholder: "Select Next State...",*/
+      optionLabel: "-- Select Next State --",
       dataTextField: "StateName",
-      dataValueField: "WFStateId",
+      dataValueField: "WfstateId",
+      filter: "contains",
+      suggest: true,
       dataSource: []
     });
   },
+
+  clearActionForm: function () {
+
+    $("#txtStateName_Action").val('');
+    $("#txtActionName").val('');
+    var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
+    if (nextStateComboBox) {
+
+    }
+
+    $("#numSortOrder").data("kendoNumericTextBox").value("0");
+    $('#chkIsEmail').prop('checked', false);
+    $('#chkIsSms').prop('checked', false);
+
+    //$("#stateID").val('');
+    $("#actionID").val('');
+
+    //actionDetailManager.clearActionValidatorMsg();
+  },
+
+
+  loadNextStateCombo: async function (menuId) {
+    var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
+    if (nextStateComboBox) {
+      try {
+        const nextStateComboDataSource = await ActionDetailManager.fetchNextStateComboBoxData(menuId);
+        return nextStateComboDataSource;
+        //nextStateComboBox.setDataSource(nextStateComboDataSource);
+      } catch (error) {
+        ToastrMessage.showToastrNotification({
+          preventDuplicates: true,
+          closeButton: true,
+          timeOut: 0,
+          message: "Failed to load data" + ": " + error,
+          type: 'error',
+        });
+      }
+    }
+  },
+
 
 }
 

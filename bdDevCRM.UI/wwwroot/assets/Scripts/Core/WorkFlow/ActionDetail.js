@@ -5,9 +5,8 @@
 
 
 
-
-
 var ActionDetailManager = {
+
   fetchNextStateComboBoxData: async function (menuId) {
     const jsonParams = $.param({ menuId });
     const serviceUrl = "/next-states-by-menu";
@@ -31,9 +30,143 @@ var ActionDetailManager = {
       });
       throw jqXHR;
     }
-  }
+  },
 
+  getSummaryGridDataSource: function (stateId) {
+    return AjaxManager.GenericGridDataSource({
+      apiUrl: baseApi + "/get-action-summary-by-statusId?stateId=" + encodeURIComponent(stateId),
+      requestType: "POST",
+      async: true,
+      modelFields: {
+        createdDate: { type: "date" }
+      },
+      pageSize: 13,
+      serverPaging: true,
+      serverSorting: true,
+      serverFiltering: true,
+      allowUnsort: true,
+      schemaData: "Items",
+      schemaTotal: "TotalCount"
+    });
+  },
 
+  saveOrUpdate: async function () {
+    //if (UserDetailsHelper.validateUserDetaisForm()) {
+
+    // default
+    var isToUpdateOrCreate = $("#actionID").val();
+    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
+    var serviceUrl = isToUpdateOrCreate == 0 ? "/wf-action" : "/wf-action/" + isToUpdateOrCreate;
+    var confirmmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
+    var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
+
+    AjaxManager.MsgBox(
+      'info',
+      'center',
+      'Confirmation',
+      confirmmsg,
+      [
+        {
+          addClass: 'btn btn-primary',
+          text: 'Yes',
+          onClick: async function ($noty) {
+            $noty.close();
+            var action = ActionDetailHelper.createActionData();
+            console.log(action);
+            var jsonObject = JSON.stringify(action);
+            try {
+              const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
+              ActionDetailHelper.clearActionForm();
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 3000,
+                message: responseData === "Success" ? successmsg : responseData,
+                type: 'success',
+              });
+              $("#gridSummaryAction").data("kendoGrid").dataSource.read();
+            } catch (error) {
+              let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: `${error.status} : ${errorMessage}`,
+                type: 'error'
+              });
+            }
+          }
+        },
+        {
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function ($noty) {
+            $noty.close();
+          }
+        },
+      ]
+      , 0
+    );
+  },
+
+  deleteData: function (actionGridData) {
+    // default
+    console.log(actionGridData);
+    if (actionGridData == null || actionGridData == undefined) return false;
+   
+    var successmsg = "Data Deleted Successfully.";
+    var serviceUrl = "/wf-action/" + actionGridData.WfactionId;
+    var confirmmsg = "Are you sure to Delete this action?";
+    var httpType = "DELETE";
+
+    AjaxManager.MsgBox(
+      'info',
+      'center',
+      'Confirmation',
+      confirmmsg,
+      [
+        {
+          addClass: 'btn btn-primary',
+          text: 'Yes',
+          onClick: async function ($noty) {
+            $noty.close();
+            var jsonObject = JSON.stringify(actionGridData);
+            try {
+              const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
+              ActionDetailHelper.clearActionForm();
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 3000,
+                message: responseData === "Success" ? successmsg : responseData,
+                type: 'success',
+              });
+
+              $("#gridSummaryAction").data("kendoGrid").dataSource.read();
+            } catch (error) {
+              let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: `${error.status} : ${errorMessage}`,
+                type: 'error'
+              });
+            }
+          }
+        },
+        {
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function ($noty) {
+            $noty.close();
+          }
+        },
+      ]
+      , 0
+    );
+
+  },
 
 }
 
@@ -45,7 +178,7 @@ var ActionDetailHelper = {
     ActionDetailHelper.generateNextStateCombo();
   },
 
-  initializeSummaryGrid: function () {
+  generateActionGrid: function (stateId) {
     const gridOptions = {
       dataSource: [],
       autoBind: true,
@@ -56,52 +189,6 @@ var ActionDetailHelper = {
       resizable: false,
       filterable: false,
       sortable: false,
-      pageable: {
-        //pageSizes: [5, 10, 20, 100],
-        buttonCount: 5,
-        //refresh: true,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      }, pageable: {
-        pageSizes: [10, 20, 50, 100],
-        buttonCount: 3, // This sets exactly 3 buttons as required
-        //refresh: true,
-        input: false,
-        numeric: false,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      },
-      //toolbar: [
-      //  { name: "excel" },
-      //  { name: "pdf" },
-      //  { template: '<button type="button" id="btnExportCsv" onClick="AjaxManager.GenerateCSVFileAllPages(\'gridSummary\', \'UserListCSV\', \'Actions\');" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
-      //],
-      //excel: {
-      //  fileName: "UsersInformation.xlsx",
-      //  filterable: true,
-      //  allPages: true,
-      //  columnInfo: true,
-      //},
-      //pdf: {
-      //  fileName: "UsersInformation.pdf",
-      //  allPages: true,
-      //  paperSize: "A4",
-      //  landscape: true,
-      //  margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
-      //  scale: 0.9,
-      //  repeatHeaders: true,
-      //  styles: [
-      //    {
-      //      type: "text",
-      //      style: {
-      //        fontFamily: "Helvetica",
-      //        fontSize: 10
-      //      }
-      //    }
-      //  ]
-      //},
       columns: ActionDetailHelper.GenerateColumns(),
       editable: false,
       selectable: "row",
@@ -111,9 +198,14 @@ var ActionDetailHelper = {
 
     const gridInstance = $("#gridSummaryAction").data("kendoGrid");
     if (gridInstance) {
-      //const dataSource = ActionDetailManager.getSummaryGridDataSource();
-      ////console.log(dataSource);
-      //gridInstance.setDataSource(dataSource);
+      const dataSource = ActionDetailManager.getSummaryGridDataSource(stateId);
+      gridInstance.setDataSource(dataSource);
+
+      // Wait for data to load
+      // After setting dataSource
+      dataSource.fetch(function () {
+        //console.log(dataSource.data());
+      });
     }
 
   },
@@ -121,37 +213,26 @@ var ActionDetailHelper = {
   GenerateColumns: function () {
     return columns = [
 
-      { field: "WFActionId", hidden: true },
-      { field: "ActionName", title: "Action Name", width: 80 },
-      { field: "WFStateId", hidden: true },
-      //{ field: "StateName", title: "State Name", width: 60 },
-      { field: "StateName", hidden: true },
-
+      { field: "WfactionId", hidden: true },
+      { field: "WfstateId", hidden: true },
+      /*      { field: "StateName", hidden: true },*/
       { field: "NextStateId", hidden: true },
       { field: "AcSortOrder", hidden: true },
-      { field: "NextStateName", title: "Next State", width: 80 },
-
-      { field: "EmailNotification", title: "Email", width: 60, template: "#= EmailNotification == 1 ? 'Yes' : 'No' #" },
-      { field: "SMSNotification", title: "SMS", width: 60, template: "#= SMSNotification == 1 ? 'Yes' : 'No' #" },
-      //{ field: "EmailNotification", title: "Email", width: 60 },
-      //{ field: "SMSNotification", title: "SMS", width: 60 },
-
       { field: "IsDefaultStart", hidden: true },
       { field: "IsClosed", hidden: true },
-      { field: "Edit", title: "#", filterable: false, width: 110, template: '<input type="button" class="k-button" value="Edit" id="btnEditAction" onClick="actionDetailHelper.clickEventForEditActionButton()"  /><input type="button" class="k-button" value="Delete" id="btnDeleteAction" onClick="actionDetailHelper.clickEventForDeleteActionButton()"  />' },
-      //{ field: "Edit", title: "#", filterable: false, width: 110, template: '<input type="button" class="k-button" value="Edit" id="btnEditAction" onClick="actionDetailHelper.clickEventForEditActionButton()"  /><input type="button" class="k-button" value="Delete" id="btnDeleteAction" onClick="actionDetailHelper.clickEventForDeleteActionButton()"  />' },
-      //{
-      //  field: "Edit", title: "Edit", filterable: false, width: "60",
-      //  template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="UserSummaryHelper.clickEventForEditButton(event)"  />', sortable: false, exportable: false
-      //}
+      { field: "ActionName", title: "Action Name", width: 70 },
+      { field: "NextStateName", title: "Next State", width: 80 },
+      { field: "EmailAlert", title: "Email", width: 40, template: "#= EmailAlert == 1 ? 'Yes' : 'No' #" },
+      { field: "SmsAlert", title: "SMS", width: 40, template: "#= SmsAlert == 1 ? 'Yes' : 'No' #" },
+      { field: "Edit", title: "#", filterable: false, width: 120, template: '<input type="button" class="k-button btn btn-outline-dark me-1" value="Edit" id="btnEditAction" onClick="ActionDetailHelper.clickEventForEditButton(event)"  /><input type="button" class="k-button btn btn-outline-danger" value="Delete" id="btnDeleteAction" onClick="ActionDetailHelper.clickEventForDeleteButton(event)"  />' },
     ];
   },
 
   // initialize all combo box.
   generateNextStateCombo: function () {
     $("#cmbNextState").kendoComboBox({
-      /*placeholder: "Select Next State...",*/
-      optionLabel: "-- Select Next State --",
+      placeholder: "Select Next State...",
+      //optionLabel: "-- Select Next State --",
       dataTextField: "StateName",
       dataValueField: "WfstateId",
       filter: "contains",
@@ -166,25 +247,25 @@ var ActionDetailHelper = {
     $("#txtActionName").val('');
     var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
     if (nextStateComboBox) {
-
+      nextStateComboBox.text('');
     }
 
-    $("#numSortOrder").data("kendoNumericTextBox").value("0");
+    $("#numSortOrder").val("0");
     $('#chkIsEmail').prop('checked', false);
     $('#chkIsSms').prop('checked', false);
 
     //$("#stateID").val('');
     $("#actionID").val('');
-
     //actionDetailManager.clearActionValidatorMsg();
+    $("#btnActionSaveOrUpdate").text("+ Add Item");
   },
-
 
   loadNextStateCombo: async function (menuId) {
     var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
     if (nextStateComboBox) {
       try {
         const nextStateComboDataSource = await ActionDetailManager.fetchNextStateComboBoxData(menuId);
+        console.log(nextStateComboDataSource);
         return nextStateComboDataSource;
         //nextStateComboBox.setDataSource(nextStateComboDataSource);
       } catch (error) {
@@ -199,246 +280,67 @@ var ActionDetailHelper = {
     }
   },
 
+  createActionData: function () {
+    var action = new Object();
+
+    action.WfactionId = $("#actionID").val() == '' ? '0' : $("#actionID").val();
+    action.WfstateId = $("#stateID").val() == '' ? '0' : $("#stateID").val();
+    action.ActionName = $("#txtActionName").val();
+    action.StateName = "";
+    //action.NextStateId = $("#cmbNextState").val() == '' ? '0' : $("#cmbNextState").val();
+    action.NextStateId = parseInt($("#cmbNextState").val()) || null;
+    action.NextStateName = "";
+    action.AcSortOrder = $("#numSortOrder").val();
+    if (action.AcSortOrder == "") {
+      action.AcSortOrder = 0;
+    }
+
+    if ($("#chkIsEmail").is(':checked') == true) {
+      action.EmailAlert = 1;
+    } else {
+      action.EmailAlert = 0;
+    }
+    if ($("#chkIsSms").is(':checked') == true) {
+      action.SmsAlert = 1;
+    } else {
+      action.SmsAlert = 0;
+    }
+
+    action.IsDefaultStart = "0";
+    action.IsClosed = "0";
+    return action;
+  },
+
+  editItem: async function (item) {
+    $("#btnActionSaveOrUpdate").text("Update Item");
+    var nextState = $("#cmbNextState").data("kendoComboBox");
+    nextState.value(item.NextStateId);
+    $("#txtStateName_Action").val(item.StateName);
+    $("#txtActionName").val(item.ActionName);
+    $("#numSortOrder").val(item.AcSortOrder);
+    $('#chkIsEmail').attr('checked', item.EmailAlert == 1 ? true : false);
+    $('#chkIsSms').attr('checked', item.SmsAlert == 1 ? true : false);
+
+    $("#actionID").val(item.WfactionId);
+  },
+
+  clickEventForEditButton: function (event) {
+    const gridInstance = $("#gridSummaryAction").data("kendoGrid");
+    const gridRow = $(event.target).closest("tr");
+    var selectedItem = gridInstance.dataItem(gridRow);
+    if (gridInstance) {
+      ActionDetailHelper.editItem(selectedItem);
+    }
+  },
+
+  clickEventForDeleteButton: function (event) {
+    const gridInstance = $("#gridSummaryAction").data("kendoGrid");
+    const gridRow = $(event.target).closest("tr");
+    var selectedItem = gridInstance.dataItem(gridRow);
+    if (gridInstance) {
+      ActionDetailManager.deleteData(selectedItem);
+    }
+  },
 
 }
 
-
-
-var UserSummaryManager = {
-
-  ResetPasswordByCompanyIdAndUserId: function (companyId, userId) {
-    var jsonParam = 'companyId=' + companyId + "&userId=" + userId;
-    var serviceUrl = "../Users/ResetPassword/";
-    AjaxManager.SendJson(serviceUrl, jsonParam, onSuccess, onFailed);
-    function onSuccess(jsonData) {
-
-      if (jsonData == "Success") {
-        alert("Password reset Successfully");
-      }
-      else {
-        alert(jsonData);
-      }
-    }
-
-    function onFailed(error) {
-      window.alert(error.statusText);
-    }
-  },
-
-  GetMotherCompany: function () {
-    var companies = [];
-    var jsonParams = "";
-    var serviceUrl = "/mother-companies";
-
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        companies = jsonData;
-        resolve(companies);
-      }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-    });
-
-
-  },
-
-  getSummaryGridDataSource: function () {
-    return AjaxManager.GenericGridDataSource({
-      apiUrl: baseApi + "/user-summary",
-      requestType: "POST",
-      async: true,
-      modelFields: {
-        //createdDate: { type: "date" }
-      },
-      pageSize: 15,
-      serverPaging: true,
-      serverSorting: true,
-      serverFiltering: true,
-      allowUnsort: true,
-      schemaData: "Items",
-      schemaTotal: "TotalCount",
-      buttonCount: 3  // Add this explicitly
-    });
-  },
-
-};
-
-var UserSummaryHelper = {
-
-  initSummary: async function () {
-    // I am use this code into settings file directly because Userinfo file code has dependancy on populateCompany.
-    // So I need to load populateCompany data first and then grid data
-    //await UserSummaryHelper.populateCompany();
-    UserSummaryHelper.initializeSummaryGrid();
-  },
-
-  initializeSummaryGrid: function () {
-    const gridOptions = {
-      dataSource: [],
-      navigatable: true,
-      height: 700,
-      width: "100%",
-      scrollable: true, // Enable both horizontal and vertical scrolling
-      resizable: true,
-      filterable: true,
-      sortable: true,
-      pageable: {
-        //pageSizes: [5, 10, 20, 100],
-        buttonCount: 5,
-        refresh: true,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      }, pageable: {
-        pageSizes: [10, 20, 50, 100],
-        buttonCount: 3, // This sets exactly 3 buttons as required
-        refresh: true,
-        input: false,
-        numeric: true,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      },
-      toolbar: [
-        { name: "excel" },
-        { name: "pdf" },
-        { template: '<button type="button" id="btnExportCsv" onClick="AjaxManager.GenerateCSVFileAllPages(\'gridSummary\', \'UserListCSV\', \'Actions\');" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
-      ],
-      excel: {
-        fileName: "UsersInformation.xlsx",
-        filterable: true,
-        allPages: true,
-        columnInfo: true,
-      },
-      pdf: {
-        fileName: "UsersInformation.pdf",
-        allPages: true,
-        paperSize: "A4",
-        landscape: true,
-        margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
-        scale: 0.9,
-        repeatHeaders: true,
-        styles: [
-          {
-            type: "text",
-            style: {
-              fontFamily: "Helvetica",
-              fontSize: 10
-            }
-          }
-        ]
-      },
-      columns: UserSummaryHelper.GenerateColumns(),
-      editable: false,
-      selectable: "row",
-    };
-
-    $("#gridSummary").kendoGrid(gridOptions);
-
-    const gridInstance = $("#gridSummary").data("kendoGrid");
-    if (gridInstance) {
-      const dataSource = UserSummaryManager.getSummaryGridDataSource();
-      //console.log(dataSource);
-      gridInstance.setDataSource(dataSource);
-    }
-
-  },
-
-  GenerateColumns: function () {
-    return columns = [
-
-      { field: "UserId", hidden: true, width: "250" },
-      { field: "UserName", title: "User Name", hidden: true, width: "250" },
-      { field: "AccessParentCompany", hidden: true, width: "250" },
-      { field: "EmployeeId", hidden: true, width: "250" },//HrRecordId
-      { field: "CompanyId", hidden: true, width: "250" },
-      { field: "Password", hidden: true, width: "250" },
-      { field: "FailedLoginNo", hidden: true, width: "250" },
-      { field: "IsExpired", hidden: true, width: "250" },
-      { field: "LastLoginDate", hidden: true, width: "250" },
-      { field: "CreatedDate", hidden: true, width: "250" },
-      { field: "BranchId", hidden: true, width: "250" },
-      { field: "DepartmentId", hidden: true, width: "250" },
-      { field: "Employee_Id", title: "Employee Id", width: "250" },//EmployeeId in Employement
-      { field: "LoginId", title: "Login ID", width: "200" },
-      { field: "DepartmentName", title: "Department", width: "350" },
-      { field: "DESIGNATIONNAME", title: "Designation", width: "350" },
-      { field: "ShortName", title: "Short Name", width: "300" },//EmployeeId in Employement
-      { field: "IsActive", title: "Is Active", width: "80", template: "#= IsActive ? 'Active' : 'Inactive' #" },
-      {
-        field: "ResetPassword", title: "Reset Password", filterable: false, width: "400",
-        template: '<input type="button" class="k-button btn btn-outline-warning" value="Reset Password" id="btnResetPassword" />', sortable: false, exportable: false
-      },
-      {
-        field: "Edit", title: "Edit", filterable: false, width: "60",
-        template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="UserSummaryHelper.clickEventForEditButton(event)"  />', sortable: false, exportable: false
-      }
-    ];
-  },
-
-  generateCompany: function () {
-    $("#cmbCompanyNameForSummary").kendoComboBox({
-      placeHolder: "All",
-      dataTextField: "CompanyName",
-      dataValueField: "CompanyId",
-      dataSource: [],
-    });
-  },
-
-  populateCompany: async function () {
-
-    try {
-      let companies = await UserSummaryManager.GetMotherCompany();
-      $("#cmbCompanyNameForSummary").kendoComboBox({
-        placeHolder: "All",
-        dataTextField: "CompanyName",
-        dataValueField: "CompanyId",
-        dataSource: companies,
-      });
-      if (CurrentUser.CompanyId != null) {
-        var companyComboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
-        companyComboBox.value(CurrentUser.CompanyId);
-      }
-    } catch (e) {
-      ToastrMessage.showToastrNotification({
-        preventDuplicates: true,
-        closeButton: true,
-        timeOut: 0,
-        message: "Failed to load company data" + ": " + e,
-        type: 'error',
-      });
-    }
-  },
-
-  clickEventForEditButton: async function (e) {
-    debugger;
-
-    //var entityGrid = $("#gridSummary").data("kendoGrid");
-
-    //var selectedItem = entityGrid.dataItem(entityGrid.select());
-
-    var grid = $("#gridSummary").data("kendoGrid");
-    var row = $(e.target).closest("tr");
-    var selectedItem = grid.dataItem(row);
-
-    if (selectedItem) {
-      await UserInfoHelper.populateUserInformationDetails(selectedItem);
-      GroupMembershipHelper.populateGroupMember(selectedItem);
-    }
-
-
-  },
-
-
-};

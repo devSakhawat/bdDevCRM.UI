@@ -313,9 +313,6 @@ var AjaxManager = {
             //this.success({});
           },
         },
-        //parameterMap: options.parameterMap || function (options) {
-        //  return JSON.stringify(options);
-        //}
         parameterMap: options.parameterMap || function (options) {
           // Create a new object with properly capitalized property names
           var transformedOptions = {
@@ -801,11 +798,56 @@ var AjaxManager = {
     return obj;
   },
 
+  PostDataAjax: async function (baseApi, serviceUrl, jsonParams, httpType) {
+    var token = localStorage.getItem("jwtToken");
+    if (!token) {
+      AjaxManager.MsgBox(
+        'error',
+        'center',
+        'Authentication Failed!',
+        "Please log in first!",
+        [
+          { addClass: 'btn btn-primary', text: 'Yes', onClick: ($noty) => $noty.close() },
+          { addClass: 'btn', text: 'Cancel', onClick: ($noty) => $noty.close() }
+        ],
+        0
+      );
+      return Promise.reject("No token found");
+    }
+
+    try {
+      const response = await $.ajax({
+        type: httpType,
+        url: baseApi + serviceUrl,
+        data: jsonParams,
+        crossDomain: true,
+        contentType: "application/json; charset=utf-8",
+        headers: AjaxManager.getDefaultHeaders()
+      });
+
+      return Promise.resolve(response);
+
+    } catch (xhr) {
+      return Promise.reject(xhr);
+    }
+  },
+  
   PostDataForDotnetCoreWithHttp: function (baseApi, serviceUrl, jsonParams, httpType, onSuccess, onFailed) {
     var token = localStorage.getItem("jwtToken");
     if (!token) {
-      alert("Please log in first!");
-      return;
+      //alert("Please log in first!");
+      AjaxManager.MsgBox(
+        'error',
+        'center',
+        'Authentication Failed!',
+        "Please log in first!",
+        [
+          { addClass: 'btn btn-primary', text: 'Yes', onClick: function ($noty) { $noty.close(); } },
+          { addClass: 'btn', text: 'Cancel', onClick: function ($noty) { $noty.close(); } },
+        ]
+        , 0
+      );
+      return false;
     }
     var res = null;
     $.ajax({
@@ -838,8 +880,19 @@ var AjaxManager = {
     debugger;
     var token = localStorage.getItem("jwtToken");
     if (!token) {
-      alert("Please log in first!");
-      return;
+      //alert("Please log in first!");
+      AjaxManager.MsgBox(
+        'error',
+        'center',
+        'Authentication Failed!',
+        "Please log in first!",
+        [
+          {addClass: 'btn btn-primary', text: 'Yes', onClick: function ($noty) {  $noty.close(); } },
+          { addClass: 'btn', text: 'Cancel', onClick: function ($noty) { $noty.close(); } },
+        ]
+        , 0
+      );
+      return false;
     }
     var res = "";
     $.ajax({

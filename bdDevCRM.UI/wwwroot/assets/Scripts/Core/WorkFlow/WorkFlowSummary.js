@@ -105,14 +105,15 @@ var WorkFlowSummaryHelper = {
       { field: "MenuID", hidden: true },
       { field: "IsClosed", hidden: true },
 
-      { field: "StateName", title: "State Name", width: "100" },
-      { field: "MenuName", title: "Menu Name", width: "150" },
-      { field: "IsDefaultStart", title: "Is Default", width: '50', template: "#= IsDefaultStart ? 'Yes' : 'No' #" },
+      { field: "StateName", title: "State Name", width: 100 },
+      { field: "MenuName", title: "Menu Name", width: 100 },
+      { field: "IsDefaultStart", title: "Is Default", width: 50, template: "#= IsDefaultStart ? 'Yes' : 'No' #" },
       {
-        field: "Edit", title: "Edit", filterable: false, width: "50",
+        field: "Edit", title: "Edit", filterable: false, width: 40,
         template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="WorkFlowSummaryHelper.clickEventForEditButton(event)" />', sortable: false, exportable: false
       }
     ];
+
   },
 
   clickEventForEditButton: function (event) {
@@ -125,26 +126,28 @@ var WorkFlowSummaryHelper = {
   },
 
   editItem: async function (item) {
+    console.log(item);
     StateDetailsHelper.clearStateForm();
     $("#btnSaveOrUpdate").text("Update Item");
 
-    $("#stateID").val(item.WFStateId);
+    $("#stateID").val(item.WfstateId);
     var menuComboBoxInstance = $("#cmbMenu").data("kendoComboBox");
-    menuComboBoxInstance.value(item.MenuID);
+    menuComboBoxInstance.value(item.MenuId);
     $("#txtStateName").val(item.StateName);
     $("#cmbIsClose").data("kendoComboBox").value(item.IsClosed);
     $("#chkIsDefault").prop('checked', item.IsDefaultStart);
-    $("#txtStateName_Action").val(item.StateName);
+    ActionDetailHelper.clearActionForm();
+
 
     var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
     if (nextStateComboBox) {
-      var nextStateComboBoxDataSource = await ActionDetailHelper.loadNextStateCombo(item.MenuID);
-      console.log(nextStateComboBoxDataSource);
+      var nextStateComboBoxDataSource = await ActionDetailHelper.loadNextStateCombo(item.MenuId);
+      /*//console.log(nextStateComboBoxDataSource);*/
       nextStateComboBox.setDataSource(nextStateComboBoxDataSource);
     }
 
-    //ActionDetailHelper.generateActionGrid(item.WFStateId);
-    //ActionDetailHelper.clearActionForm();
+    ActionDetailHelper.generateActionGrid(item.WfstateId);
+    $("#txtStateName_Action").val(item.StateName);
   },
 
 }

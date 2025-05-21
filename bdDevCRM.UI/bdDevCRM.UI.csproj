@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\CRM\" />
     <Folder Include="wwwroot\assets\Scripts\CRMSolution\Core\Login\" />
   </ItemGroup>
 

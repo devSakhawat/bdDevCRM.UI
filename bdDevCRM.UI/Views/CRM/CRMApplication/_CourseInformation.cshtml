@@ -1,0 +1,496 @@
+﻿
+<script src="~/assets/scripts/crm/crmapplication/crmcourseinformation.js"></script>
+
+
+<div id="">
+	<!-- Course Details -->
+	<fieldset class="reset">
+		<legend class="reset">Course Details</legend>
+		<div class="row">
+			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnCountryId" value="0" />
+
+			<!-- Country with Add Icon -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="CountryForCourse" class="lbl widthSize100_per">Country <span class="redstart">*</span> </label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="d-flex align-items-start icon-wrapper">
+					<input id="cmbCountryForCourse" name="CountryForCourse" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCountryPopUp();">
+						<span class="k-icon k-i-plus"></span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Institute with Add Icon -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="Institute" class="lbl widthSize100_per">Institute</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="d-flex align-items-start icon-wrapper">
+					<input id="cmbInstituteForCourse" name="Institute" required validationMessage="Please Select Institute" class="flex-grow-1 border-right-strait" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateInstitutePopUp();">
+						<span class="k-icon k-i-plus"></span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Course with Add Icon -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="Course" class="lbl widthSize100_per">Course</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="d-flex align-items-start icon-wrapper">
+					<input id="cmbCourseForCourse" name="Institute" required validationMessage="Please Select Course" class="flex-grow-1 border-right-strait" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCoursePopUp();">
+						<span class="k-icon k-i-plus"></span>
+					</button>
+				</div>
+			</div>
+
+
+			<!-- Intake Month -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="IntakeMonth" class="lbl widthSize100_per">Intake Month</label>
+				<div class="">
+					<input id="cmbIntakeMonthForCourse" name="IntakeMonth" required validationMessage="Please Select Intake Month" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- Intake Year  -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="IntakeYear" class="lbl widthSize100_per">Intake Year</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="">
+					<input id="cmbIntakeYearForCourse" name="IntakeYear" required validationMessage="Please Select Intake Year" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- Application Fee -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="ApplicationFee" class="lbl widthSize100_per">Application Fee (if applicable)</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="">
+					<input type="text" id="txtApplicationFeeForCourse" name="ApplicationFee" required validationMessage="Please Select Application Fee" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- Currency -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="Currency" class="lbl widthSize100_per">Currency</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="">
+					<input id="cmbCurrencyForCourse" name="Currency" required validationMessage="Please Select Currency" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- Payment Method -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PaymentMethod" class="lbl widthSize100_per">Payment Method</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="">
+					<input id="cmbPaymentMethodForCourse" name="PaymentMethod" required validationMessage="Please Select Payment Method" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- Payment Reference Number -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PaymentReferenceNumber" class="lbl widthSize100_per">Payment Reference Number</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="">
+					<input type="text" id="txtPaymentReferenceNumberCourse" name="PaymentReferenceNumber" validationMessage="Please Select Payment Reference Number" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- Payment Date -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PaymentDate" class="lbl widthSize100_per">Payment Date</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="">
+					<input id="datePickerPaymentDate" name="PaymentDate" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- Remarks -->
+			<div class="col-12 mb-2">
+				<label for="Remarks" class="lbl widthSize100_per">Remarks</label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="">
+					<textarea id="txtareaRemarks" name="Remarks" class="w-100" rows="4"></textarea>
+				</div>
+			</div>
+
+		</div>
+	</fieldset>
+
+
+	<!-- Personal Details -->
+	<fieldset class="reset">
+		<legend class="reset">Personal Details</legend>
+		<div class="row">
+			<!-- Hidden Fields -->
+			<!-- Gender -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="Gender" class="lbl widthSize100_per">Gender <span class="redstart">*</span> </label>
+				<div class="">
+					<input id="cmbGenderForCourse" name="Gender" required validationMessage="Please Select Gender" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Title -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="Title" class="lbl widthSize100_per">Title <span class="redstart">*</span> </label>
+				<div class="">
+					<input id="cmbTitleForCourse" name="Gender" required validationMessage="Title" class="w-100" />
+				</div>
+			</div>
+
+			<!-- First Name -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="FirstName" class="lbl widthSize100_per">First Name <span class="redstart">*</span> </label>
+				<div class="">
+					<input id="txtFirstName" name="FirstName" validationMessage="First Name" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Last Name -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="LastName" class="lbl widthSize100_per">Last Name <span class="redstart">*</span> </label>
+				<div class="">
+					<input id="txtLastName" name="LastName" validationMessage="Last Name" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Date of Birth -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="DateOfBirth" class="lbl widthSize100_per">Date of Birth <span class="redstart">*</span> </label>
+				<div class="">
+					<input id="datePickerDateOfBirth" name="DateOfBirth" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Marital Status with Add Icon -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="cmbMaritalStatusForCourse" class="lbl widthSize100_per">Marital Status <span class="redstart">*</span> </label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="d-flex align-items-start icon-wrapper">
+					<input id="cmbMaritalStatusForCourse" name="MaritalStatus" required validationMessage="Marital Status" class="flex-grow-1 border-right-strait" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCountryPopUp();">
+						<span class="k-icon k-i-plus"></span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Nationality -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="Nationality" class="lbl widthSize100_per">Nationality <span class="redstart">*</span> </label>
+				<div class="">
+					<input id="txtNationality" name="Nationality" validationMessage="Nationality" class="w-100" />
+				</div>
+			</div>
+
+
+			<!-- valid passport -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2 custom-checkbox">
+				<span class="me-5">Do you have a valid passport</span>
+
+				<input id="radioIsPassportYes" name="validPassport" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl">Yes</label>
+
+				<input id="radioIsPassportNo" name="validPassport" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl">No</label>
+			</div>
+
+			<!-- Passport Number -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="PassportNumber" class="lbl widthSize100_per">Passport Number</label>
+				<div class="">
+					<input type="text" id="txtPassportNumberForCourse" name="PassportNumber" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Phone Country code -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PhoneCountrycode" class="lbl widthSize100_per">Phone Country code</label>
+				<div class="">
+					<input type="text" id="txtPhoneCountrycodeForCourse" name="PhoneCountrycode" placeholder="Phone Country code" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Phone Area code -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PhoneAreacode" class="lbl widthSize100_per">Phone Area code</label>
+				<div class="">
+					<input type="text" id="txtPhoneAreacodeForCourse" name="PhoneAreacode" placeholder="Phone Area code" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Phone Number -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="Phone Number" class="lbl widthSize100_per">Phone Number</label>
+				<div class="">
+					<input type="text" id="txtPhoneNumberForCourse" name="Phone Number" placeholder="Phone Number" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Mobile -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="Phone Number" class="lbl widthSize100_per">Mobile</label>
+				<div class="">
+					<input type="text" id="txtMobileForCourse" name="Phone Number" placeholder="Mobile Number" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Email Address -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="Phone Number" class="lbl widthSize100_per">Email Address</label>
+				<div class="">
+					<input type="email" id="txtEmailAddressForCourse" name="Phone Number" placeholder="Email Address Number" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Email hints -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+
+			</div>
+
+			<!-- Skype ID -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="SkypeID" class="lbl widthSize100_per">Email Address</label>
+				<div class="">
+					<input type="text" id="txtSkypeIDForCourse" name="SkypeID" placeholder="Skype ID" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Applicant Image -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="ApplicantImage" class="lbl widthSize100_per">Applicant Image</label>
+				<div class="">
+					<input type="text" id="txtApplicantImageForCourse" name="ApplicantImage" placeholder="Applicant Image" class="w-100" />
+				</div>
+			</div>
+
+		</div>
+	</fieldset>
+
+
+	<!-- Address -->
+	<fieldset class="reset">
+		<legend class="reset">Applicant Address</legend>
+
+		<div class="row mb-3">
+			<h4 class="k-header mb-3" >Permanent Address</h4>
+			<!-- Hidden Fields -->
+
+			<!-- Permanent Address -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="PermanentAddress" class="lbl widthSize100_per"> Permanent Address</label>
+				<div class="">
+					<input id="txtPermanentAddress" name="PermanentAddress" placeholder="Permanent Address" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Permanent City -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PermanentCity" class="lbl widthSize100_per">City</label>
+				<div class="">
+					<input id="txtPermanentCity" name="PermanentCity" placeholder="Permanent City" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Permanent State -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PermanentState" class="lbl widthSize100_per">State</label>
+				<div class="">
+					<input id="txtPermanentState" name="PermanentState" placeholder="Permanent State" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Country with Add Icon -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="cmbCountryForPermanentAddress" class="lbl widthSize100_per">Country <span class="redstart">*</span> </label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="d-flex align-items-start icon-wrapper">
+					<input id="cmbCountryForPermanentAddress" name="CountryForPermanentAddress" class="flex-grow-1 border-right-strait" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCountryForPermanentAddressPopUp();">
+						<span class="k-icon k-i-plus"></span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Pin/Zip/Postal Code -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PostalCode" class="lbl widthSize100_per">Pin/Zip/Postal Code</label>
+				<div class="">
+					<input id="txtPostalCode" name="PostalCode" placeholder="Pin/Zip/Postal Code" class="w-100" />
+				</div>
+			</div>
+		</div>
+
+		<div class="row mb-3">
+			<h4 class="k-header mb-3">Present Address </h4>
+			<!-- Hidden Fields -->
+			<!-- Present Address -->
+			<div class="col-xl-12 col-lg-12 col-md-6 col-12 mb-2 custom-checkbox">
+				<label for="DoPermanentAddress" class="form-check-label">Same as Permanent Address:</label>
+				<div class="">
+					<input type="checkbox" id="chkDoPermanentAddress" name="DoPermanentAddress" class="form-check-input" />
+				</div>
+			</div>
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="PresentAddress" class="lbl widthSize100_per"> Present Address</label>
+				<div class="">
+					<input id="txtPresentAddress" name="PresentAddress" placeholder="Present Address" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Present City -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PresentCity" class="lbl widthSize100_per">City</label>
+				<div class="">
+					<input id="txtPresentCity" name="PresentCity" placeholder="Present City" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Present State -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PresentState" class="lbl widthSize100_per">State</label>
+				<div class="">
+					<input id="txtPresentState" name="PresentState" placeholder="Present State" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Present Country with Add Icon -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="CountryForPresentAddress" class="lbl widthSize100_per">Country <span class="redstart">*</span> </label>
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="d-flex align-items-start icon-wrapper">
+					<input id="cmbCountryForAddress" name="CountryForPresentAddress" class="flex-grow-1 border-right-strait" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCountryForAddressPopUp();">
+						<span class="k-icon k-i-plus"></span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Pin/Zip/Postal Code -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PostalCode" class="lbl widthSize100_per">Pin/Zip/Postal Code</label>
+				<div class="">
+					<input id="txtPostalCode" name="PostalCode" placeholder="Pin/Zip/Postal Code" class="w-100" />
+				</div>
+			</div>
+
+		</div>
+	</fieldset>
+
+
+
+
+
+	<!-- Buttons -->
+	<div class="btnDiv mt-2">
+		<ul>
+			<li class="d-flex justify-content-end">
+				<button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
+				<button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearStateForm()">Clear</button>
+			</li>
+		</ul>
+	</div>
+
+
+
+
+
+	@* <div style="display:none" id="MaritalStatusPopupWindow" class="divDetails"> *@
+	<div style="display:none" id="CouuntryPopUp" class="">
+		<div class="row">
+
+			<div class="col-lg-6 col-md-6 col-sm-12">
+				<fieldset class="k-content">
+					<legend class="k-fontSize[15]">Country Details</legend>
+
+					@* <div id="countryDetails" class="divDetails"> *@
+					<form action="/" method="post">
+						<div class="row">
+
+							<input type="hidden" id="hdnCountryId" value="0" />
+
+							<div class="col-12">
+								<label for="CountryName" class="lbl widthSize33_per">Country Name:</label>
+								<input type="text" id="txtCountryName" name="CountryName" maxlength="100" pattern="[a-zA-Z0-9 ]+" class="k-textbox" placeholder="Country Name" required validationmessage="Please Enter Country Name" />
+							</div>
+
+							<div class="col-12">
+								<label for="IsActive" class="lbl widthSize33_per">Is Active:</label>
+								<input type="checkbox" id="chkIsActiveCountry" name="IsActive" class="k-checkbox" checked="checked" />
+							</div>
+						</div>
+
+						<div class="btnDiv mt-2">
+							<ul>
+								<li class="d-flex justify-content-end">
+									<button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="NationalityDetailsManager.SaveNationalityInformation();">+ Add Item</button>
+									<button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="NationalityDetailsHelper.clearNationalityInfo()">Clear</button>
+									<button type="button" class="btn btn-light me-2" onclick="NationalityDetailsHelper.CloseWindow()">Close</button>
+								</li>
+							</ul>
+						</div>
+
+					</form>
+
+					@* <div id="countryDetails" class="divDetails">
+						<ul>
+							<li>
+								<input type="hidden" id="hdnCountryId" value="0" />
+								<label for="CountryName" class="lbl widthSize33_per">Country Name:</label>
+								<input type="text" id="txtCountryName" name="CountryName" maxlength="100" pattern="[a-zA-Z0-9 ]+" class="k-textbox" placeholder="Country Name" required validationmessage="Please Enter Country Name" />
+							</li>
+
+							<li>
+								<label for="IsActive" class="lbl widthSize33_per">Is Active:</label>
+								<input type="checkbox" id="chkIsActiveCountry" name="IsActive" class="k-checkbox" checked="checked" />
+							</li>
+
+
+							<li class="accept">
+								<button id="btnSaveNationality" class="k-button btns" type="submit" onclick="NationalityDetailsManager.SaveNationalityInformation();">Save</button>
+								&nbsp;&nbsp;
+								<button id="btnClearNationality" class="k-button btns" onclick="NationalityDetailsHelper.clearNationalityInfo()">Clear</button>
+								&nbsp;&nbsp;
+								<button type="button" class="btn btn-light me-2" onclick="ModuleDetailsHelper.CloseWindow()" id="btnClose">Close</button>
+							</li>
+							<li class="status"></li>
+						</ul>
+					</div> *@
+
+				</fieldset>
+			</div>
+
+			<div class="col-lg-6 col-md-6 col-sm-12">
+				<fieldset class="k-content">
+					<legend class="k-fontSize[15]">Country Summary</legend>
+
+					<div id="gridSummaryCountry"></div>
+					<div class="clear"></div>
+				</fieldset>
+			</div>
+		</div>
+
+
+
+
+	</div>
+
+
+</div>
+
+
+<style>
+
+
+</style>

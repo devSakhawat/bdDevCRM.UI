@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace EduSolutionWeb_v1.Controllers
+namespace bdDevCRM.UI.Controllers
 {
   public class CoreController : Controller
   {

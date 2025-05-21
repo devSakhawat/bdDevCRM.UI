@@ -1,4 +1,7 @@
-﻿
+﻿html {
+  font-size: 14px;
+}
+
 a {
   cursor: pointer;
 }
@@ -48,66 +51,6 @@ button{
   transition: height 0.3s ease-in-out;
 }
 
-/*Design for kendo combo box */
-/*.custom-combobox.k-combobox {
-  width: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  border: 1px solid #ced4da !important;
-  border-radius: 0.375rem !important;
-  background-color: #fff !important;
-  padding: 0 !important;
-  height: calc(1.5em + 0.75rem + 2px) !important;
-  cursor: pointer;
-  position: relative !important; 
-}
-*/
-/*.custom-combobox .k-input-inner {
-  width: 100% !important;
-  border: none !important;
-  background-color: transparent !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 1rem !important;
-  outline: none !important;
-  cursor: pointer;
-}
-*/
-/*.custom-combobox .k-input-button {
-  background-color: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  cursor: pointer !important;
-  position: relative !important;
-  z-index: 2 !important;
-  pointer-events: auto !important;
-}*/
-
-/*.custom-combobox .k-clear-value {
-  background-color: transparent !important;
-  border: none !important;
-  cursor: pointer;
-  position: relative !important;
-  z-index: 2 !important;
-  pointer-events: auto !important;
-}
-*/
-/*.custom-combobox.k-combobox:focus-within {
-  border: 1px solid #86b7fe !important;
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
-  cursor: pointer;
-}*/
-
-/*.custom-combobox .k-select {
-  position: relative !important;
-  z-index: 2 !important;
-  pointer-events: auto !important;
-}*/
-/*
-.custom-combobox .k-input {
-  position: relative !important;
-  z-index: 1 !important;
-}
-*/
 
 /*check box style*/
 .custom-checkbox {
@@ -181,104 +124,98 @@ div.groupSettingPermissionStyle {
   padding: 0.16666em 0.3333em 0.16666em 0.25em;
 }
 
-/*div#menuContent ul li {
-  font-size: 12px;
+.k-widget * {
+  box-sizing: border-box;
+}
+
+.redstart {
+  color: red;
+}
+
+.k-input.k-combobox {
+  height: 32px;
+}
+
+.k-input-button, .k-input-button.k-button {
+  height: 32px;
+}
+
+/* Drop down border radius with add drop down item btn */
+.icon-wrapper .k-combobox,
+.icon-wrapper .k-combobox .k-input-inner {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/*input fiel form = 32px*/
+input{
+  min-height: 32px;
+  height: 100%;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #bbb;
+  outline: 0;
+  border-radius: 3px;
+}
+
+  input[type="radio"] {
+    cursor: pointer !important;
+    min-width: 15px;
+    min-height: 15px;
+    width: 18px;
+    height: 18px;
+  }
+
+textarea {
+  box-sizing: border-box;
+  padding: 4px 8px;
+  border: 1px solid #bbb;
+  outline: 0;
+  border-radius: 3px;
+}
+
+/* Drop down border radius with add drop down item btn */
+.add-new-ddl-item-btn {
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #bbb;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+
+#tabstrip ul li {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.reset legend {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/************************ Responsive kendo grid with scroll bar *************************************/
+.gridParrentDivOverflowHidden {
+  overflow-x: hidden;
+}
+
+.min-width_100{
+  min-width: 100%;
+}
+
+/*.k-grid-header,
+.k-grid-content {
+  min-width: max-content;
 }*/
-
-
 
 /************************ /////////////////////////////////////////////////////////// */
 /* Responsive Grid Styling */
 
-
-/*#divSummaryInfo {
-  width: 100%;
-  overflow-x: auto;*/ /* Enable horizontal scrolling for the container */
-  /*-webkit-overflow-scrolling: touch;*/ /* Smooth scrolling on iOS devices */
-/*}
-
-.k-grid {
-  width: 100% !important;
-  min-width: 1200px;*/ /* Increased minimum width to prevent column compression */
-  /*table-layout: fixed;*/ /* Maintain column widths */
-/*}
-
-.k-grid-content {
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  min-height: 200px;
-  max-height: 600px;*/ /* Add max-height to ensure vertical scrolling works properly */
-/*}
-
-.k-grid-header {
-  padding-right: 0 !important;*/ /* To fix scrollbar alignment */
-  /*overflow: hidden;*/ /* Keep header from scrolling horizontally independently */
-/*}*/
-
-/* Header styling - keep widths consistent */
-/*.k-grid .k-grid-header th {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  position: relative;*/ /* For potential tooltip positioning */
-/*}
-
-  .k-grid .k-grid-header th:hover {
-    white-space: normal;
-    overflow: visible;
-    word-break: break-all;
-    background-color: #f0f0f0;
-    z-index: 1;*/ /* Ensure the expanded header shows above other content */
-  /*}*/
-
-/* Cell styling - maintain width consistency */
-/*.k-grid .k-grid-content tr td {
-  white-space: normal;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  vertical-align: top;
-  word-wrap: break-word !important;
-  padding: 6px 8px;*/ /* Consistent padding for better spacing */
-/*}*/
-
-/* Ensure consistent scrollbar appearance across browsers */
-/*.k-grid-content::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.k-grid-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 5px;
-}
-
-.k-grid-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}*/
-
-/* Ensure grid container is responsive */
-/*#gridSummary {
-  width: 100%;
-  min-width: 100%;
-}*/
-
-/* Responsive adjustments */
-/*@media screen and (max-width: 1024px) {
-  #divSummaryInfo {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }*/
-
-  /* Don't change the column widths, just ensure scrolling works */
-  /*.k-grid {
-    min-width: 1200px;*/ /* Keep this the same as above to maintain column widths */
-  /*}
-}*/
-
-/* For very small screens, ensure proper scrolling */
-/*@media screen and (max-width: 480px) {
-  .k-grid-content {
-    max-height: 400px;*/ /* Slightly reduced max height for smaller screens */
-  /*}
-}*/
 

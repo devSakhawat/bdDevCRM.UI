@@ -952,10 +952,81 @@ var AjaxManager = {
         contentType: "application/json; charset=utf-8",
         headers: AjaxManager.getDefaultHeaders(),
         success: function (response) {
+          console.log(response);
           resolve(response);
         },
         error: function (xhr, status, error) {
+          console.log(xhr);
+          let response = xhr.responseJSON || {};
+
+          let customMessage = "";
+          let responseMessage = "";
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            responseMessage = xhr.reponseJson.message;
+          } else if (xhr.responseText) {
+            try {
+              const json = JSON.parse(xhr.responseText);
+              responseMessage = json.message || xhr.responseText;
+            } catch {
+              responseMessage = xhr.responseText;
+            }
+          }
+
+          if (xhr.status === 404) {
+            if (responseMessage) {
+              customMessage = `404 Not Found\n ${responseMessage}`;
+            } else {
+              customMessage = `API URL Not Found: [${baseApi + serviceUrl}]\n Please check if the serviceUrl is correct.`;
+            }
+          } else if (xhr.status === 0) {
+            customMessage = `Request could not reach server. Check network or baseApi: [${baseApi}]`;
+          } else if (xhr.status === 405) {
+            customMessage = `Method Not Allowed. Check the method: [${serviceUrl}]`;
+          } else if (xhr.status === 500) {
+            customMessage = `Internal Server Error from API: [${baseApi + serviceUrl}]\n ${responseMessage}`;
+          } else {
+            customMessage = `Error ${xhr.status}: ${xhr.statusText}\n ${responseMessage}`;
+          }
+
+          // Developer Info (Optional)
+          if (response.correlationId) {
+            customMessage += `\n Correlation ID: ${response.correlationId}`;
+          }
+
+          ToastrMessage.showToastrNotification({
+            preventDuplicates: true,
+            closeButton: true,
+            timeOut: 0,
+            message: customMessage,
+            type: 'error',
+          });
+
           reject(xhr); // এখানে xhr টা catch ব্লকে যাবে
+
+
+          //switch (xhr.status) {
+          //  case 400:
+          //    customMessage = `Bad Request\n${responseMessage}`;
+          //    break;
+          //  case 401:
+          //    customMessage = `Unauthorized\n${responseMessage}`;
+          //    break;
+          //  case 403:
+          //    customMessage = `Forbidden\n${responseMessage}`;
+          //    break;
+          //  case 404:
+          //    customMessage = `Not Found\n${responseMessage}`;
+          //    break;
+          //  case 409:
+          //    customMessage = `Conflict\n${responseMessage}`;
+          //    break;
+          //  case 500:
+          //    customMessage = `Internal Server Error\n${responseMessage}`;
+          //    break;
+          //  default:
+          //    customMessage = `Error ${xhr.status}: ${xhr.statusText}\n${responseMessage}`;
+          //    break;
+          //}
         }
       });
     });

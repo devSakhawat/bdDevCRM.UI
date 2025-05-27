@@ -15,12 +15,13 @@
 				<label for="CountryForCourse" class="lbl widthSize100_per">Country <span class="redstart">*</span> </label>
 				<!-- icon-wrapper class for add-new-ddl-item-btn -->
 				<div class="d-flex align-items-start icon-wrapper">
-					<input id="cmbCountryForCourse" name="CountryForCourse" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
-					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCountryPopUp();">
+					<input id="cmbCountryForCourse" name="CountryForCourse" required validationMessage="Please Select Country" class="w-100" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateInstitutePopUp();">
 						<span class="k-icon k-i-plus"></span>
 					</button>
 				</div>
 			</div>
+
 
 			<!-- Institute with Add Icon -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
@@ -49,9 +50,13 @@
 
 			<!-- Intake Month -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
-				<label for="IntakeMonth" class="lbl widthSize100_per">Intake Month</label>
-				<div class="">
-					<input id="cmbIntakeMonthForCourse" name="IntakeMonth" required validationMessage="Please Select Intake Month" class="w-100" />
+				<label for="IntakeMonth" class="lbl widthSize100_per">Intake Month</label>				
+				<!-- icon-wrapper class for add-new-ddl-item-btn -->
+				<div class="d-flex align-items-start icon-wrapper">
+					<input id="cmbIntakeMonthForCourse" name="IntakeMonth" required validationMessage="Please Select Intake Month" class="flex-grow-1 border-right-strait" />
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCoursePopUp();">
+						<span class="k-icon k-i-preview"></span>
+					</button>
 				</div>
 			</div>
 
@@ -127,8 +132,7 @@
 
 		</div>
 	</fieldset>
-
-
+	
 	<!-- Personal Details -->
 	<fieldset class="reset">
 		<legend class="reset">Personal Details</legend>
@@ -261,7 +265,7 @@
 
 			<!-- Skype ID -->
 			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
-				<label for="SkypeID" class="lbl widthSize100_per">Email Address</label>
+				<label for="SkypeID" class="lbl widthSize100_per">Skype ID</label>
 				<div class="">
 					<input type="text" id="txtSkypeIDForCourse" name="SkypeID" placeholder="Skype ID" class="w-100" />
 				</div>
@@ -277,7 +281,6 @@
 
 		</div>
 	</fieldset>
-
 
 	<!-- Address -->
 	<fieldset class="reset">
@@ -388,10 +391,6 @@
 		</div>
 	</fieldset>
 
-
-
-
-
 	<!-- Buttons -->
 	<div class="btnDiv mt-2">
 		<ul>
@@ -401,96 +400,9 @@
 			</li>
 		</ul>
 	</div>
-
-
-
-
-
-	@* <div style="display:none" id="MaritalStatusPopupWindow" class="divDetails"> *@
-	<div style="display:none" id="CouuntryPopUp" class="">
-		<div class="row">
-
-			<div class="col-lg-6 col-md-6 col-sm-12">
-				<fieldset class="k-content">
-					<legend class="k-fontSize[15]">Country Details</legend>
-
-					@* <div id="countryDetails" class="divDetails"> *@
-					<form action="/" method="post">
-						<div class="row">
-
-							<input type="hidden" id="hdnCountryId" value="0" />
-
-							<div class="col-12">
-								<label for="CountryName" class="lbl widthSize33_per">Country Name:</label>
-								<input type="text" id="txtCountryName" name="CountryName" maxlength="100" pattern="[a-zA-Z0-9 ]+" class="k-textbox" placeholder="Country Name" required validationmessage="Please Enter Country Name" />
-							</div>
-
-							<div class="col-12">
-								<label for="IsActive" class="lbl widthSize33_per">Is Active:</label>
-								<input type="checkbox" id="chkIsActiveCountry" name="IsActive" class="k-checkbox" checked="checked" />
-							</div>
-						</div>
-
-						<div class="btnDiv mt-2">
-							<ul>
-								<li class="d-flex justify-content-end">
-									<button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="NationalityDetailsManager.SaveNationalityInformation();">+ Add Item</button>
-									<button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="NationalityDetailsHelper.clearNationalityInfo()">Clear</button>
-									<button type="button" class="btn btn-light me-2" onclick="NationalityDetailsHelper.CloseWindow()">Close</button>
-								</li>
-							</ul>
-						</div>
-
-					</form>
-
-					@* <div id="countryDetails" class="divDetails">
-						<ul>
-							<li>
-								<input type="hidden" id="hdnCountryId" value="0" />
-								<label for="CountryName" class="lbl widthSize33_per">Country Name:</label>
-								<input type="text" id="txtCountryName" name="CountryName" maxlength="100" pattern="[a-zA-Z0-9 ]+" class="k-textbox" placeholder="Country Name" required validationmessage="Please Enter Country Name" />
-							</li>
-
-							<li>
-								<label for="IsActive" class="lbl widthSize33_per">Is Active:</label>
-								<input type="checkbox" id="chkIsActiveCountry" name="IsActive" class="k-checkbox" checked="checked" />
-							</li>
-
-
-							<li class="accept">
-								<button id="btnSaveNationality" class="k-button btns" type="submit" onclick="NationalityDetailsManager.SaveNationalityInformation();">Save</button>
-								&nbsp;&nbsp;
-								<button id="btnClearNationality" class="k-button btns" onclick="NationalityDetailsHelper.clearNationalityInfo()">Clear</button>
-								&nbsp;&nbsp;
-								<button type="button" class="btn btn-light me-2" onclick="ModuleDetailsHelper.CloseWindow()" id="btnClose">Close</button>
-							</li>
-							<li class="status"></li>
-						</ul>
-					</div> *@
-
-				</fieldset>
-			</div>
-
-			<div class="col-lg-6 col-md-6 col-sm-12">
-				<fieldset class="k-content">
-					<legend class="k-fontSize[15]">Country Summary</legend>
-
-					<div id="gridSummaryCountry"></div>
-					<div class="clear"></div>
-				</fieldset>
-			</div>
-		</div>
-
-
-
-
-	</div>
-
-
 </div>
 
 
 <style>
-
 
 </style>

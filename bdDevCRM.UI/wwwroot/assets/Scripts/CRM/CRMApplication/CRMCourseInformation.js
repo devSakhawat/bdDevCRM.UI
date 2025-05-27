@@ -3,34 +3,84 @@
 // <reference path="CRMAdditionalInformation.js" />
 // <reference path="CRMEducationNEnglishLanguage.js" />
 // <reference path="CRMApplicationSettings.js" />
-
+// <reference path=""
 
 
 var CRMCourseInformationManager = {
-  fetchCountryComboBoxData: async function (menuId) {
-    const jsonParams = $.param({ menuId });
-    const serviceUrl = "/next-states-by-menu";
 
-    try {
-      const result = await AjaxManager.GetDataAsyncOrSyncronous(
-        baseApi,
-        serviceUrl,
-        jsonParams,
-        true,
-        false
-      );
-      return result;
-    } catch (jqXHR) {
-      ToastrMessage.showToastrNotification({
-        preventDuplicates: true,
-        closeButton: true,
-        timeOut: 0,
-        message: jqXHR.status + " : " + jqXHR.responseText,
-        type: 'error',
-      });
-      throw jqXHR;
-    }
+  fetchCountryComboBoxData: function () {
+    const jsonParams = "";
+    const serviceUrl = "/crm-countryddl";
+
+    return AjaxManager.GetDataAsyncOrSyncronous(
+      baseApi,
+      serviceUrl,
+      jsonParams,
+      true,
+      false
+    );
   },
+
+  fetchInstituteComboBoxData: async function (countryId) {
+    const jsonParams = $.param({ countryId });
+    const serviceUrl = "/crm-institute-country";
+    return AjaxManager.GetDataAsyncOrSyncronous(
+      baseApi,
+      serviceUrl,
+      jsonParams,
+      true,
+      false
+    );
+
+    //try {
+    //  const result = await AjaxManager.GetDataAsyncOrSyncronous(
+    //    baseApi,
+    //    serviceUrl,
+    //    jsonParams,
+    //    true,
+    //    false
+    //  );
+    //  return result;
+    //} catch (jqXHR) {
+    //  ToastrMessage.showToastrNotification({
+    //    preventDuplicates: true,
+    //    closeButton: true,
+    //    timeOut: 0,
+    //    message: jqXHR.status + " : " + jqXHR.responseText,
+    //    type: 'error',
+    //  });
+    //  throw jqXHR;
+    //}
+  },
+
+  //fetchCountryComboBoxData: function () {
+  //  let branches = [];
+  //  var jsonParams = "";
+  //  //var serviceUrl = "/menus-4-ddl";
+  //  var serviceUrl = "/crm-countryddl";;
+
+  //  return new Promise(function (resolve, reject) {
+  //    function onSuccess(jsonData) {
+  //      branches = jsonData;
+  //      resolve(branches);
+  //    }
+
+  //    function onFailed(jqXHR, textStatus, errorThrown) {
+  //      ToastrMessage.showToastrNotification({
+  //        preventDuplicates: true,
+  //        closeButton: true,
+  //        timeOut: 0,
+  //        //message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+  //        message: jqXHR.status + " : " + jqXHR.responseText,
+  //        type: 'error',
+  //      });
+  //      reject(errorThrown);
+  //    }
+
+  //    AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+  //  });
+  //},
+
 
 }
 
@@ -49,8 +99,8 @@ var CRMCourseInformationHelper = {
   },
 
   countryPopUpInit: function () {
-    $("#CouuntryPopUp").kendoWindow({
-      title: "Marital Status",
+    $("#CountryPopUp").kendoWindow({
+      title: "Country Information",
       resizeable: false,
       width: "60%",
       actions: ["Pin", "Refresh", "Maximize", "Close"],
@@ -61,19 +111,46 @@ var CRMCourseInformationHelper = {
   },
 
   generateCountryPopUp: function () {
-    $("#CouuntryPopUp").data("kendoWindow").open().center();
+    var countryPopUp = $("#CountryPopUp").data("kendoWidow");
+    if (countryPopUp) {
+      countryPopUp.open().center();
+    }
   },
+
+  //loadCountryCombo: async function (menuId) {
+  //  try {
+  //    const nextStateComboDataSource = await CRMCourseInformationManager.fetchCountryComboBoxData();
+  //    console.log(nextStateComboDataSource);
+  //    return nextStateComboDataSource;
+  //    //nextStateComboBox.setDataSource(nextStateComboDataSource);
+  //  } catch (error) {
+  //    console.log(error);
+  //    //ToastrMessage.showToastrNotification({
+  //    //  preventDuplicates: true,
+  //    //  closeButton: true,
+  //    //  timeOut: 0,
+  //    //  message: "Failed to load data" + ": " + error,
+  //    //  type: 'error',
+  //    //});
+  //  }
+  //},
 
   generateCountryCombo: function () {
     $("#cmbCountryForCourse").kendoComboBox({
       placeholder: "Select Country...",
-      //optionLabel: "-- Select Next State --",
       dataTextField: "CountryName",
       dataValueField: "CountryId",
       filter: "contains",
       suggest: true,
       dataSource: []
     });
+
+    var countryComboBoxInstant = $("#cmbCountryForCourse").data("kendoComboBox");
+    if (countryComboBoxInstant) {
+      CRMCourseInformationManager.fetchCountryComboBoxData().then(data => {
+        countryComboBoxInstant.setDataSource(data);
+        });
+    }
   },
 
   generateInstituteCombo: function () {
@@ -83,7 +160,7 @@ var CRMCourseInformationHelper = {
       dataValueField: "InstituteId",
       filter: "contains",
       suggest: true,
-      dataSource: []
+      dataSource: [], change: CRMCourseInformationHelper.onCountryChange
     });
   },
 
@@ -168,5 +245,11 @@ var CRMCourseInformationHelper = {
     });
   },
 
+  onCountryChange: function () {
+    var countryCombo = $("cmbCountryForCourse").data("kendoComboBox");
+    var selectedCountryValue = countryCombo.value();
+    var selectedCountryText = countryCombo.text();
 
+
+  }
 }

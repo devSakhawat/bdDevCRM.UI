@@ -3,6 +3,9 @@
 /// <reference path="CRMAdditionalInformation.js" />
 /// <reference path="CRMEducationNEnglishLanguage.js" />
 /// <reference path="CRMApplicationSettings.js" />
+
+/*const { debug } = require("console");*/
+
 /// <reference path=""
 
 
@@ -65,6 +68,18 @@ var CRMCourseInformationManager = {
     );
   },
 
+  fetchCurrencyComboBoxData: async function () {
+    const jsonParams = "";
+    const serviceUrl = "/currencyddl";
+    return AjaxManager.GetDataAsyncOrSyncronous(
+      baseApi,
+      serviceUrl,
+      jsonParams,
+      true,
+      false
+    );
+  },
+
 
 
 }
@@ -76,6 +91,8 @@ var CRMCourseInformationHelper = {
     CommonManager.initializeKendoWindow("#CountryPopUp", "Country Details", "80%");
     CommonManager.initializeKendoWindow("#course_InstitutePopUp", "Inistitute Details", "80%");
     CommonManager.initializeKendoWindow("#course_CoursePopUp", "Course Details", "80%");
+
+    this.generateCountryCombo_Institute();
     this.generateCountryCombo();
     this.generateInstituteCombo();
     this.generateCourseCombo();
@@ -86,20 +103,9 @@ var CRMCourseInformationHelper = {
     this.initializePaymentDate();
 
     // Insistitute Form code 
-    this.generateCountryCombo_Institute();
-  },                           
-
-  //countryPopUpInit: function () {
-  //  $("#CountryPopUp").kendoWindow({
-  //    title: "Country Information",
-  //    resizeable: false,
-  //    width: "60%",
-  //    actions: ["Pin", "Refresh", "Maximize", "Close"],
-  //    modal: true,
-  //    visible: false,
-  //    //content: "../country/countryInfo"
-  //  });
-  //},
+    this.generateInstituteTypeCombo();
+    this.generateCurrencyCombo_Institute();
+  },
 
   generateCountryPopUp: function () {
     var countryPopUp = $("#CountryPopUp").data("kendoWindow");
@@ -122,6 +128,7 @@ var CRMCourseInformationHelper = {
     }
   },
 
+
   generateCountryCombo: function () {
     $("#cmbCountryForCourse").kendoComboBox({
       placeholder: "Select Country...",
@@ -134,10 +141,14 @@ var CRMCourseInformationHelper = {
     });
 
     var countryComboBoxInstant = $("#cmbCountryForCourse").data("kendoComboBox");
+    var countryComboBoxInstant_Institute = $("#cmbInstituteCountryId").data("kendoComboBox");
     if (countryComboBoxInstant) {
       CRMCourseInformationManager.fetchCountryComboBoxData().then(data => {
         countryComboBoxInstant.setDataSource(data);
-        });
+        if (countryComboBoxInstant_Institute) {
+          countryComboBoxInstant_Institute.setDataSource(data);
+        }
+      });
     }
   },
 
@@ -252,12 +263,12 @@ var CRMCourseInformationHelper = {
       dataSource: [],
     });
 
-    var countryComboBoxInstant = $("#cmbInstituteCountryId").data("kendoComboBox");
-    if (countryComboBoxInstant) {
-      CRMCourseInformationManager.fetchCountryComboBoxData().then(data => {
-        countryComboBoxInstant.setDataSource(data);
-      });
-    }
+    //var countryComboBoxInstant = $("#cmbInstituteCountryId").data("kendoComboBox");
+    //if (countryComboBoxInstant) {
+    //  CRMCourseInformationManager.fetchCountryComboBoxData().then(data => {
+    //    countryComboBoxInstant.setDataSource(data);
+    //  });
+    //}
   },
 
   generateInstituteTypeCombo: function () {
@@ -270,14 +281,35 @@ var CRMCourseInformationHelper = {
       dataSource: []
     });
 
-    var instituteTypComboInstant = $("cmbInstituteType").data("kendoComboBox");
+    var instituteTypComboInstant = $("#cmbInstituteType").data("kendoComboBox");
+
     if (instituteTypComboInstant) {
-      CRMCourseInformationManager.fetchInstituteTypeComboBoxData().then(data => { instituteTypComboInstant.setDataSource(data); });
+      CRMCourseInformationManager.fetchInstituteTypeComboBoxData().then(function (data) {
+        var newDataSource = new kendo.data.DataSource({
+          data: data
+        });
+        instituteTypComboInstant.setDataSource(newDataSource);
+      });
     }
-    
   },
 
+  generateCurrencyCombo_Institute: function () {
+    $("#cmbCurrencyId_Institute").kendoComboBox({
+      placeholder: "Select Currency...",
+      dataTextField: "CurrencyName",
+      dataValueField: "CurrencyId",
+      filter: "contains",
+      suggest: true,
+      dataSource: [],
+    });
 
+    var currencyComboBoxInstant = $("#cmbCurrencyId_Institute").data("kendoComboBox");
+    if (currencyComboBoxInstant) {
+      CRMCourseInformationManager.fetchCurrencyComboBoxData().then(data => {
+        countryComboBoxInstant.setDataSource(data);
+      });
+    }
+  },
   
 
   onCountryChange_Institute: function () {

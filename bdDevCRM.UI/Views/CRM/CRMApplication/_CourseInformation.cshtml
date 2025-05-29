@@ -499,7 +499,7 @@
 							<!-- Institute Email -->
 							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
 								<label for="txtInstituteEmail" class="lbl widthSize100_per">Institute Email</label>
-								<input id="txtInstituteEmail" name="InstituteEmail" class="w-100" placeholder="Institute Email" />
+								<input id="txtInstituteEmail" type="email" name="InstituteEmail" class="w-100" placeholder="Institute Email" />
 							</div>
 
 							<!-- Institute Address -->
@@ -529,7 +529,7 @@
 							<!-- Website -->
 							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
 								<label for="txtWebsite" class="lbl widthSize100_per">Website</label>
-								<input id="txtWebsite" name="Website" class="w-100" placeholder="Website URL" />
+								<input id="txtWebsite" type="url" name="Website" class="w-100" placeholder="Website URL" />
 							</div>
 
 							<!-- Monthly Living Cost -->
@@ -552,9 +552,15 @@
 
 							<!-- Currency -->
 							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="cmbCurrencyId" class="lbl widthSize100_per">Currency</label>
-								<input id="cmbCurrencyId" name="CurrencyId" class="w-100" />
+								<label for="CurrencyId" class="lbl widthSize100_per">Currency <span class="redstart">*</span></label>
+								<div class="d-flex align-items-start icon-wrapper">
+									<input id="cmbCurrencyId_Institute" name="CurrencyId" required validationMessage="Please Select CurrencyId" class="flex-grow-1 border-right-strait" />
+									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCurrencyPopUp();">
+										<span class="k-icon k-i-plus"></span>
+									</button>
+								</div>
 							</div>
+
 
 							<!-- Is Language Mandatory -->
 							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
@@ -633,6 +639,54 @@
 					<legend class="reset">Institute Information</legend>
 
 					<div id="gridSummaryInstitute"></div>
+					<div class="clear"></div>
+				</fieldset>
+			</div>
+		
+		</div>
+	</div>
+
+	@* Currency PopUp *@
+	<div style="display:none" id="course_CurrencyPopUp" class="">
+		<div class="row">
+			<!-- Currency -->
+			<div class="col-12">
+				<fieldset class="reset">
+					<legend class="reset">Currency Information</legend>
+
+					<div class="row mb-2">
+            <input id="currentyId_InstitutePopUp" type="hidden" value="" />
+
+						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+							<label for="CurrencyName">Currency Name</label>
+							<input type="text" class="form-control" id="currencyName_CurrencyPopUp" name="CurrencyName" placeholder="Write Currency Name" />
+						</div>
+
+						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+							<label for="CurrencyCode">Currency Code</label>
+							<input type="text" class="form-control" id="currencyCode_CurrencyPopUp" name="CurrencyCode" placeholder="Write Currency Code" />
+						</div>
+					</div>
+
+					<div class="btnDiv mt-2">
+						<ul>
+							<li class="d-flex justify-content-end">
+								<button type="button" class="btn btn-primary me-2" onclick="CrmInstituteHelper.SaveCurrencyForm();">+ Add Institute</button>
+								<button type="button" class="btn btn-secondary me-2" onclick="CrmInstituteHelper.clearCurrecyForm();">Clear</button>
+								<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#course_CurrencyPopUp")'>Close</button>
+							</li>
+						</ul>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+		<div class="row">
+
+      <div class="col-lg-12 col-md-12 col-sm-12">
+				<fieldset class="reset">
+					<legend class="reset">Currency Information</legend>
+
+					<div id="gridSummaryCurrency"></div>
 					<div class="clear"></div>
 				</fieldset>
 			</div>

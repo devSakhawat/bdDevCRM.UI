@@ -70,6 +70,7 @@ var AjaxManager = {
   // Generic error handler for AJAX requests
   handleAjaxError: function (xhr, status, error) {
     // Generate correlation ID for error tracking
+    debugger;
     const correlationId = "err_" + Math.random().toString(36).substr(2, 9);
     console.error(`Request error: ${correlationId} - ${error}`, xhr);
 
@@ -490,239 +491,6 @@ var AjaxManager = {
     });
 
     return objResult;
-  },
-
-  MakeFormReadOnly: function (containerSelector) {
-    debugger;
-
-    const $container = $(containerSelector);
-    if ($container.length === 0) {
-      console.error("Container with selector '" + containerSelector + "' not found.");
-      return;
-    }
-
-    $container.find(":input").each(function () {
-      const $element = $(this);
-
-      if ($element.is("input[type='text'], input[type='password'], textarea")) {
-        $element.attr("readonly", true);
-      } else if ($element.is("select")) {
-        $element.attr("disabled", true);
-      } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
-        $element.attr("disabled", true);
-        $element.css("pointer-events", "none");
-      }
-    });
-
-
-    $container.find(".custom-combobox").each(function () {
-      const comboBox = $(this).data("kendoComboBox");
-      if (comboBox) {
-        comboBox.enable(false);
-      }
-    });
-
-    $container.find("#btnSave, #btnClear").hide();
-  },
-
-  MakeFormEditable: function (containerSelector) {
-    const $container = $(containerSelector);
-    if ($container.length === 0) {
-      console.error("Container with selector '" + containerSelector + "' not found.");
-      return;
-    }
-
-    $container.find(":input").each(function () {
-      const $element = $(this);
-
-      if ($element.is("input[type='text'], input[type='password'], textarea")) {
-        $element.removeAttr("readonly");
-      } else if ($element.is("select")) {
-        $element.removeAttr("disabled");
-      } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
-        $element.removeAttr("disabled");
-        $element.css("pointer-events", "");
-      }
-    });
-
-
-    $container.find(".custom-combobox").each(function () {
-      const comboBox = $(this).data("kendoComboBox");
-      if (comboBox) {
-        comboBox.enable(true);
-      }
-    });
-
-    $container.find("#btnSave, #btnClear").show();
-  },
-
-  // three parameters need, (gridId, filename and actions column name to remove from file)
-  GenerateCSVFileAllPages: function (htmlId, fileName, actionsColumnName) {
-    debugger;
-    var grid = $("#" + htmlId).data("kendoGrid");
-
-    if (!grid) {
-      console.error("Grid not initialized");
-      return;
-    }
-
-    if (!grid.dataSource) {
-      console.error("DataSource not found");
-      return;
-    }
-
-    var deferred = $.Deferred();
-
-    function generateCSV(allData) {
-      var csv = "";
-
-      var columns = grid.columns;
-      var headers = [];
-
-      for (var i = 0; i < columns.length; i++) {
-        if (columns[i].field && columns[i].title !== actionsColumnName) {
-          headers.push('"' + (columns[i].title || columns[i].field) + '"');
-        }
-      }
-
-      csv += headers.join(",") + "\n";
-
-      for (var i = 0; i < allData.length; i++) {
-        var row = [];
-        for (var j = 0; j < columns.length; j++) {
-          if (columns[j].field && columns[j].title !== actionsColumnName) {
-            var value = allData[i][columns[j].field] || "";
-            value = String(value).replace(/"/g, '""');
-            row.push('"' + value + '"');
-          }
-        }
-        csv += row.join(",") + "\n";
-      }
-
-      // Create download
-      var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      var link = document.createElement("a");
-      var url = URL.createObjectURL(blob);
-
-      link.setAttribute("href", url);
-      link.setAttribute("download", fileName + ".csv");
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-
-    if (grid.dataSource.options.serverPaging) {
-
-      var dataSource = grid.dataSource;
-      var originalPageSize = dataSource.pageSize();
-      var originalPage = dataSource.page();
-      var allData = [];
-
-
-      dataSource.pageSize(9999);
-      dataSource.page(1);
-
-      // Request the data
-      dataSource.fetch(function () {
-        allData = dataSource.data();
-
-        dataSource.pageSize(originalPageSize);
-        dataSource.page(originalPage);
-
-        generateCSV(allData);
-      });
-    } else {
-      var allData = grid.dataSource.data();
-      generateCSV(allData);
-    }
-  },
-
-  // three parameters need, (gridId, filename and actions column name to remove from file)
-  GenerateCSVFileCurrentPage: function (gridHtmlId, fileName, action) {
-
-    var grid = $("#" + gridHtmlId).data("kendoGrid");
-
-    if (!grid) {
-      console.error("Grid not initialized");
-      return;
-    }
-    console.log(grid);
-
-    if (!grid.dataSource) {
-      console.error("DataSource not found");
-      return;
-    }
-    //console.log(grid.dataSource);
-
-    var data = grid.dataSource.view();
-    var csv = "";
-
-    var columns = grid.columns;
-    var headers = [];
-
-    for (var i = 0; i < columns.length; i++) {
-      if (columns[i].field && columns[i].title !== actionsColumnName) {
-        headers.push('"' + (columns[i].title || columns[i].field) + '"');
-      }
-    }
-
-    csv += headers.join(",") + "\n";
-
-    for (var i = 0; i < data.length; i++) {
-      var row = [];
-      for (var j = 0; j < columns.length; j++) {
-        if (columns[j].field && columns[j].title !== actionsColumnName) {
-          var value = data[i][columns[j].field] || "";
-          value = value.toString().replace(/"/g, '""');
-          row.push('"' + value + '"');
-        }
-      }
-      csv += row.join(",") + "\n";
-    }
-
-    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    var link = document.createElement("a");
-    var url = URL.createObjectURL(blob);
-
-    link.setAttribute("href", url);
-    link.setAttribute("download", fileName + ".csv");
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  },
-
-  getMultiDateFormat: function () {
-    return ['dd.MM.yyyy', 'dd.MM.yy', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'MM-dd-yyyy', 'yyyy-MM-dd', 'dd/MM/yy', 'ddMMyyyy', 'ddMMyy', 'MMddyyyy'];
-
-  },
-
-  getMultiMonthFormat: function () {
-    return ['MM.yyyy', 'MMM yyyy', 'MMM yy', 'MMyyyy', 'MMMyyyy', 'MMyy', 'MMMyy'];
-
-  },
-
-  isValidDate: function (ctrlId) {
-    var res = false;
-    var dateTo = $("#" + ctrlId).val();
-    if (!AjaxManager.isDate(dateTo)) {
-      AjaxManager.MsgBox('warning', 'center', 'Invalid Date', 'Invalid Date. e.g.: MM/dd/yyyy', [{
-        addClass: 'btn btn-primary',
-        text: 'Ok',
-        onClick: function ($noty) {
-          $noty.close();
-          $("#" + ctrlId).val('');
-          $("#" + ctrlId).focus();
-        }
-      }
-      ]);
-      res = false;
-    } else {
-      res = true;
-    }
-    return res;
   },
 
   //MVC call
@@ -2904,9 +2672,364 @@ var CountryManager = {
     ];
 
     return states;
+  },
+
+  getCountryArray: function () {
+    var countryList = [
+      "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antarctica", "Antigua and Barbuda",
+      "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
+      "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia",
+      "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burma",
+      "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad",
+      "Chile", "China", "Colombia", "Comoros", "Congo", "Democratic Republic", "Republic of the Congo",
+      "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
+      "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
+      "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
+      "Ghana", "Greece", "Greenland", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti",
+      "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
+      "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea North", "Korea South",
+      "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
+      "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+      "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Mongolia", "Morocco",
+      "Monaco", "Mozambique", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger",
+      "Nigeria", "Norway", "Oman", "Pakistan", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
+      "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Samoa", "San Marino", "Sao Tome",
+      "Saudi Arabia", "Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
+      "Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan", "Suriname",
+      "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo",
+      "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine",
+      "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu",
+      "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+    ];
+
+    let countryDictionary = {};
+
+    countryList.forEach((country, index) => {
+      countryDictionary[index + 1] = country;
+    });
+
+    return countryDictionary;
+  },
+
+  getCountryData: function () {
+    debugger;
+    var countries = CountryManager.getCountryArray();
+
+    var countryArray = Object.entries(countries).map(([key, value]) => {
+      return {
+        CountryId: parseInt(key),
+        CountryName: value
+      };
+    });
   }
+};
+
+
+var CommonManager = {
+
+  MakeFormReadOnly: function (containerSelector) {
+    debugger;
+
+    const $container = $(containerSelector);
+    if ($container.length === 0) {
+      console.error("Container with selector '" + containerSelector + "' not found.");
+      return;
+    }
+
+    $container.find(":input").each(function () {
+      const $element = $(this);
+
+      if ($element.is("input[type='text'], input[type='password'], textarea")) {
+        $element.attr("readonly", true);
+      } else if ($element.is("select")) {
+        $element.attr("disabled", true);
+      } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
+        $element.attr("disabled", true);
+        $element.css("pointer-events", "none");
+      }
+    });
+
+
+    $container.find(".custom-combobox").each(function () {
+      const comboBox = $(this).data("kendoComboBox");
+      if (comboBox) {
+        comboBox.enable(false);
+      }
+    });
+
+    $container.find("#btnSave, #btnClear").hide();
+  },
+
+  MakeFormEditable: function (containerSelector) {
+    const $container = $(containerSelector);
+    if ($container.length === 0) {
+      console.error("Container with selector '" + containerSelector + "' not found.");
+      return;
+    }
+
+    $container.find(":input").each(function () {
+      const $element = $(this);
+
+      if ($element.is("input[type='text'], input[type='password'], textarea")) {
+        $element.removeAttr("readonly");
+      } else if ($element.is("select")) {
+        $element.removeAttr("disabled");
+      } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
+        $element.removeAttr("disabled");
+        $element.css("pointer-events", "");
+      }
+    });
+
+
+    $container.find(".custom-combobox").each(function () {
+      const comboBox = $(this).data("kendoComboBox");
+      if (comboBox) {
+        comboBox.enable(true);
+      }
+    });
+
+    $container.find("#btnSave, #btnClear").show();
+  },
+
+  initializeKendoWindow: function (windowSelector, kemdowWindowTitle, kendowWindowWidth) {
+    $(windowSelector).kendoWindow({
+      title: kemdowWindowTitle,
+      resizeable: false,
+      width: kendowWindowWidth,
+      actions: ["Pin", "Refresh", "Maximize", "Close"],
+      modal: true,
+      visible: false,
+    });
+  },
+
+  clearFormFields: function (formSelector) {
+    var $Container = $(formSelector);
+
+    // Clear text, password, number, hidden, tel, email, url inputs
+    $Container.find('input[type="text"], input[type="password"], input[type="number"], input[type="hidden"], input[type="tel"], input[type="email"], input[type="url"]').val('');
+
+    // Clear checkbox and radio
+    $Container.find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
+
+    // Clear textarea
+    $Container.find('textarea').val('');
+
+    // Reset selects
+    $Container.find('select').each(function () {
+      $(this).val('');
+      if ($(this).data('kendoDropDownList')) {
+        $(this).data('kendoDropDownList').value('');
+      } else if ($(this).data('kendoComboBox')) {
+        $(this).data('kendoComboBox').value('');
+      } else if ($(this).data('kendoMultiSelect')) {
+        $(this).data('kendoMultiSelect').value([]);
+      }
+    });
+
+    // Clear Kendo DatePickers and DateTimePickers
+    $Container.find("input[data-role='datepicker'], input[data-role='datetimepicker']").each(function () {
+      var datePicker = $(this).data("kendoDatePicker") || $(this).data("kendoDateTimePicker");
+      if (datePicker) {
+        datePicker.value(null);
+      }
+    });
+
+    // Clear Kendo Uploads (file input)
+    $Container.find("input[type='file']").each(function () {
+      var kendoUpload = $(this).data("kendoUpload");
+      if (kendoUpload) {
+        kendoUpload.clearAllFiles();
+      } else {
+        // fallback for non-Kendo file input
+        $(this).val('');
+      }
+    });
+
+    // Remove validation messages
+    $Container.find(".hint").text('');
+  },
+
+  closeKendoWindow: function (windowSelector) {
+    var window = $(windowSelector).data("kendoWindow");
+    if (window) {
+      window.close();
+    }
+  },
+
+  // three parameters need, (gridId, filename and actions column name to remove from file)
+  GenerateCSVFileAllPages: function (htmlId, fileName, actionsColumnName) {
+    debugger;
+    var grid = $("#" + htmlId).data("kendoGrid");
+
+    if (!grid) {
+      console.error("Grid not initialized");
+      return;
+    }
+
+    if (!grid.dataSource) {
+      console.error("DataSource not found");
+      return;
+    }
+
+    var deferred = $.Deferred();
+
+    function generateCSV(allData) {
+      var csv = "";
+
+      var columns = grid.columns;
+      var headers = [];
+
+      for (var i = 0; i < columns.length; i++) {
+        if (columns[i].field && columns[i].title !== actionsColumnName) {
+          headers.push('"' + (columns[i].title || columns[i].field) + '"');
+        }
+      }
+
+      csv += headers.join(",") + "\n";
+
+      for (var i = 0; i < allData.length; i++) {
+        var row = [];
+        for (var j = 0; j < columns.length; j++) {
+          if (columns[j].field && columns[j].title !== actionsColumnName) {
+            var value = allData[i][columns[j].field] || "";
+            value = String(value).replace(/"/g, '""');
+            row.push('"' + value + '"');
+          }
+        }
+        csv += row.join(",") + "\n";
+      }
+
+      // Create download
+      var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      var link = document.createElement("a");
+      var url = URL.createObjectURL(blob);
+
+      link.setAttribute("href", url);
+      link.setAttribute("download", fileName + ".csv");
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+
+    if (grid.dataSource.options.serverPaging) {
+
+      var dataSource = grid.dataSource;
+      var originalPageSize = dataSource.pageSize();
+      var originalPage = dataSource.page();
+      var allData = [];
+
+
+      dataSource.pageSize(9999);
+      dataSource.page(1);
+
+      // Request the data
+      dataSource.fetch(function () {
+        allData = dataSource.data();
+
+        dataSource.pageSize(originalPageSize);
+        dataSource.page(originalPage);
+
+        generateCSV(allData);
+      });
+    } else {
+      var allData = grid.dataSource.data();
+      generateCSV(allData);
+    }
+  },
+
+  // three parameters need, (gridId, filename and actions column name to remove from file)
+  GenerateCSVFileCurrentPage: function (gridHtmlId, fileName, action) {
+
+    var grid = $("#" + gridHtmlId).data("kendoGrid");
+
+    if (!grid) {
+      console.error("Grid not initialized");
+      return;
+    }
+    console.log(grid);
+
+    if (!grid.dataSource) {
+      console.error("DataSource not found");
+      return;
+    }
+    //console.log(grid.dataSource);
+
+    var data = grid.dataSource.view();
+    var csv = "";
+
+    var columns = grid.columns;
+    var headers = [];
+
+    for (var i = 0; i < columns.length; i++) {
+      if (columns[i].field && columns[i].title !== actionsColumnName) {
+        headers.push('"' + (columns[i].title || columns[i].field) + '"');
+      }
+    }
+
+    csv += headers.join(",") + "\n";
+
+    for (var i = 0; i < data.length; i++) {
+      var row = [];
+      for (var j = 0; j < columns.length; j++) {
+        if (columns[j].field && columns[j].title !== actionsColumnName) {
+          var value = data[i][columns[j].field] || "";
+          value = value.toString().replace(/"/g, '""');
+          row.push('"' + value + '"');
+        }
+      }
+      csv += row.join(",") + "\n";
+    }
+
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    var link = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName + ".csv");
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
+
+  getMultiDateFormat: function () {
+    return ['dd.MM.yyyy', 'dd.MM.yy', 'dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'MM-dd-yyyy', 'yyyy-MM-dd', 'dd/MM/yy', 'ddMMyyyy', 'ddMMyy', 'MMddyyyy'];
+
+  },
+
+  getMultiMonthFormat: function () {
+    return ['MM.yyyy', 'MMM yyyy', 'MMM yy', 'MMyyyy', 'MMMyyyy', 'MMyy', 'MMMyy'];
+
+  },
+
+  isValidDate: function (ctrlId) {
+    var res = false;
+    var dateTo = $("#" + ctrlId).val();
+    if (!AjaxManager.isDate(dateTo)) {
+      AjaxManager.MsgBox('warning', 'center', 'Invalid Date', 'Invalid Date. e.g.: MM/dd/yyyy', [{
+        addClass: 'btn btn-primary',
+        text: 'Ok',
+        onClick: function ($noty) {
+          $noty.close();
+          $("#" + ctrlId).val('');
+          $("#" + ctrlId).focus();
+        }
+      }
+      ]);
+      res = false;
+    } else {
+      res = true;
+    }
+    return res;
+  },
+
 
 };
+
+
+
 
 function addExtensionClass(extension) {
   switch (extension) {
@@ -2930,9 +3053,6 @@ function addExtensionClass(extension) {
       return "default-file";
   }
 }
-
-
-
 
 
 

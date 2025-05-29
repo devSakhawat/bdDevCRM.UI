@@ -1,9 +1,9 @@
 ﻿
-
-// <reference path="CRMAdditionalInformation.js" />
-// <reference path="CRMEducationNEnglishLanguage.js" />
-// <reference path="CRMApplicationSettings.js" />
-// <reference path=""
+/// <reference path="../../common/common.js" />
+/// <reference path="CRMAdditionalInformation.js" />
+/// <reference path="CRMEducationNEnglishLanguage.js" />
+/// <reference path="CRMApplicationSettings.js" />
+/// <reference path=""
 
 
 var CRMCourseInformationManager = {
@@ -53,33 +53,18 @@ var CRMCourseInformationManager = {
     //}
   },
 
-  //fetchCountryComboBoxData: function () {
-  //  let branches = [];
-  //  var jsonParams = "";
-  //  //var serviceUrl = "/menus-4-ddl";
-  //  var serviceUrl = "/crm-countryddl";;
+  fetchInstituteTypeComboBoxData: async function () {
+    const jsonParams = "";
+    const serviceUrl = "/crm-institute-type";
+    return AjaxManager.GetDataAsyncOrSyncronous(
+      baseApi,
+      serviceUrl,
+      jsonParams,
+      true,
+      false
+    );
+  },
 
-  //  return new Promise(function (resolve, reject) {
-  //    function onSuccess(jsonData) {
-  //      branches = jsonData;
-  //      resolve(branches);
-  //    }
-
-  //    function onFailed(jqXHR, textStatus, errorThrown) {
-  //      ToastrMessage.showToastrNotification({
-  //        preventDuplicates: true,
-  //        closeButton: true,
-  //        timeOut: 0,
-  //        //message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
-  //        message: jqXHR.status + " : " + jqXHR.responseText,
-  //        type: 'error',
-  //      });
-  //      reject(errorThrown);
-  //    }
-
-  //    AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-  //  });
-  //},
 
 
 }
@@ -87,53 +72,55 @@ var CRMCourseInformationManager = {
 var CRMCourseInformationHelper = {
 
   courseInit: function () {
-    CRMCourseInformationHelper.countryPopUpInit();
-    CRMCourseInformationHelper.generateCountryCombo();
-    CRMCourseInformationHelper.generateInstituteCombo();
-    CRMCourseInformationHelper.generateCourseCombo();
-    CRMCourseInformationHelper.generateIntakeMonthCombo();
-    CRMCourseInformationHelper.generateIntakeYearCombo();
-    CRMCourseInformationHelper.generateCurrencyCombo();
-    CRMCourseInformationHelper.generatePaymentMethodCombo();
-    CRMCourseInformationHelper.initializePaymentDate();
-  },
+    //CRMCourseInformationHelper.countryPopUpInit();
+    CommonManager.initializeKendoWindow("#CountryPopUp", "Country Details", "80%");
+    CommonManager.initializeKendoWindow("#course_InstitutePopUp", "Inistitute Details", "80%");
+    CommonManager.initializeKendoWindow("#course_CoursePopUp", "Course Details", "80%");
+    this.generateCountryCombo();
+    this.generateInstituteCombo();
+    this.generateCourseCombo();
+    this.generateIntakeMonthCombo();
+    this.generateIntakeYearCombo();
+    this.generateCurrencyCombo();
+    this.generatePaymentMethodCombo();
+    this.initializePaymentDate();
 
-  countryPopUpInit: function () {
-    $("#CountryPopUp").kendoWindow({
-      title: "Country Information",
-      resizeable: false,
-      width: "60%",
-      actions: ["Pin", "Refresh", "Maximize", "Close"],
-      modal: true,
-      visible: false,
-      //content: "../country/countryInfo"
-    });
-  },
+    // Insistitute Form code 
+    this.generateCountryCombo_Institute();
+  },                           
+
+  //countryPopUpInit: function () {
+  //  $("#CountryPopUp").kendoWindow({
+  //    title: "Country Information",
+  //    resizeable: false,
+  //    width: "60%",
+  //    actions: ["Pin", "Refresh", "Maximize", "Close"],
+  //    modal: true,
+  //    visible: false,
+  //    //content: "../country/countryInfo"
+  //  });
+  //},
 
   generateCountryPopUp: function () {
-    var countryPopUp = $("#CountryPopUp").data("kendoWidow");
+    var countryPopUp = $("#CountryPopUp").data("kendoWindow");
     if (countryPopUp) {
       countryPopUp.open().center();
     }
   },
 
-  //loadCountryCombo: async function (menuId) {
-  //  try {
-  //    const nextStateComboDataSource = await CRMCourseInformationManager.fetchCountryComboBoxData();
-  //    console.log(nextStateComboDataSource);
-  //    return nextStateComboDataSource;
-  //    //nextStateComboBox.setDataSource(nextStateComboDataSource);
-  //  } catch (error) {
-  //    console.log(error);
-  //    //ToastrMessage.showToastrNotification({
-  //    //  preventDuplicates: true,
-  //    //  closeButton: true,
-  //    //  timeOut: 0,
-  //    //  message: "Failed to load data" + ": " + error,
-  //    //  type: 'error',
-  //    //});
-  //  }
-  //},
+  generateInistitutePopUp: function () {
+    var institutePopUp = $("#course_InstitutePopUp").data("kendoWindow");
+    if (institutePopUp) {
+      institutePopUp.open().center();
+    }
+  },
+
+  generateCoursePopUp: function () {
+    var couresePopUp = $("#course_CoursePopUp").data("kendoWindow");
+    if (couresePopUp) {
+      couresePopUp.open().center();
+    }
+  },
 
   generateCountryCombo: function () {
     $("#cmbCountryForCourse").kendoComboBox({
@@ -142,7 +129,8 @@ var CRMCourseInformationHelper = {
       dataValueField: "CountryId",
       filter: "contains",
       suggest: true,
-      dataSource: []
+      dataSource: [],
+      change: CRMCourseInformationHelper.onCountryChange
     });
 
     var countryComboBoxInstant = $("#cmbCountryForCourse").data("kendoComboBox");
@@ -160,7 +148,8 @@ var CRMCourseInformationHelper = {
       dataValueField: "InstituteId",
       filter: "contains",
       suggest: true,
-      dataSource: [], change: CRMCourseInformationHelper.onCountryChange
+      dataSource: [],
+      change: CRMCourseInformationHelper.onCountryChange
     });
   },
 
@@ -221,7 +210,7 @@ var CRMCourseInformationHelper = {
 
   initializePaymentDate: function () {
     $("#datePickerPaymentDate").kendoDatePicker({
-      parseFormats: AjaxManager.getMultiDateFormat(),
+      parseFormats: CommonManager.getMultiDateFormat(),
       format: "dd-MMM-yyyy"
     });
   },
@@ -249,7 +238,51 @@ var CRMCourseInformationHelper = {
     var countryCombo = $("cmbCountryForCourse").data("kendoComboBox");
     var selectedCountryValue = countryCombo.value();
     var selectedCountryText = countryCombo.text();
+  },
+
+  // Insistitute Form code 
+  
+  generateCountryCombo_Institute: function () {
+    $("#cmbInstituteCountryId").kendoComboBox({
+      placeholder: "Select Country...",
+      dataTextField: "CountryName",
+      dataValueField: "CountryId",
+      filter: "contains",
+      suggest: true,
+      dataSource: [],
+    });
+
+    var countryComboBoxInstant = $("#cmbInstituteCountryId").data("kendoComboBox");
+    if (countryComboBoxInstant) {
+      CRMCourseInformationManager.fetchCountryComboBoxData().then(data => {
+        countryComboBoxInstant.setDataSource(data);
+      });
+    }
+  },
+
+  generateInstituteTypeCombo: function () {
+    $("#cmbInstituteType").kendoComboBox({
+      placeholder: "Select  ...",
+      dataTextField: "InstituteTypeName",
+      dataValueField: "InstituteTypeId",
+      filter: "contains",
+      suggest: true,
+      dataSource: []
+    });
+
+    var instituteTypComboInstant = $("cmbInstituteType").data("kendoComboBox");
+    if (instituteTypComboInstant) {
+      CRMCourseInformationManager.fetchInstituteTypeComboBoxData().then(data => { instituteTypComboInstant.setDataSource(data); });
+    }
+    
+  },
 
 
-  }
+  
+
+  onCountryChange_Institute: function () {
+    var countryCombo = $("cmbInstituteCountryId").data("kendoComboBox");
+    var countryId = countryCombo.value();
+    var countryName = countryCombo.text();
+  },
 }

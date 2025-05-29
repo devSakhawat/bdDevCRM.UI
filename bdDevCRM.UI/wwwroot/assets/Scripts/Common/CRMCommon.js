@@ -630,6 +630,8 @@ var AjaxManager = {
     $(el).html(cellval);
     //return 'style="white-space: normal;'
   },
+
+
   disablePopup: function (popupDivName, backgroundDivName) {
     $(popupDivName).fadeOut("slow");
     $(backgroundDivName).fadeOut("slow");

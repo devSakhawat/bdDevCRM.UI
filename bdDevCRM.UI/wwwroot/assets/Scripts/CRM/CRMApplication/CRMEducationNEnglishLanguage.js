@@ -7,8 +7,6 @@
 
 var CRMEducationNEnglishLanguagManager = {
 
-
-
   fileUpload: function (docuid) {
     debugger;
     $("#uploadDocumentPhoto").kendoUpload({

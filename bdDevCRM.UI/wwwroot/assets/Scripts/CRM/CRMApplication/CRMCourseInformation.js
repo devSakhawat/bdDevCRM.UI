@@ -3,9 +3,6 @@
 /// <reference path="CRMAdditionalInformation.js" />
 /// <reference path="CRMEducationNEnglishLanguage.js" />
 /// <reference path="CRMApplicationSettings.js" />
-
-/*const { debug } = require("console");*/
-
 /// <reference path=""
 
 
@@ -80,6 +77,149 @@ var CRMCourseInformationManager = {
     );
   },
 
+  // grid code section
+  getSummaryCurrencyGridDataSource: function () {
+    return AjaxManager.GenericGridDataSource({
+      //apiUrl: baseApi + "/get-action-summary-by-statusId?stateId=" + encodeURIComponent(stateId),
+      apiUrl: baseApi + "/currency-summary",
+      requestType: "POST",
+      async: true,
+      modelFields: {
+        createdDate: { type: "date" }
+      },
+      pageSize: 20,
+      serverPaging: true,
+      serverSorting: true,
+      serverFiltering: true,
+      allowUnsort: true,
+      schemaData: "Items",
+      schemaTotal: "TotalCount"
+    });
+  },
+
+
+  // SaveOrUpdateOrDelete
+
+  saveOrUpdateCurrency: async function () {
+    debugger;
+    //if (UserDetailsHelper.validateUserDetaisForm()) {
+
+    // default
+    var isToUpdateOrCreate = $("#currentyId_CurrencyPopUp").val();
+    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
+    //var serviceUrl = isToUpdateOrCreate == 0 ? "/currency" : "/currency/" + isToUpdateOrCreate;
+    var serviceUrl = "/currency/" + isToUpdateOrCreate;
+    var confirmmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
+    var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
+
+    AjaxManager.MsgBox(
+      'info',
+      'center',
+      'Confirmation',
+      confirmmsg,
+      [
+        {
+          addClass: 'btn btn-primary',
+          text: 'Yes',
+          onClick: async function ($noty) {
+            $noty.close();
+            var currency = CRMCourseInformationHelper.createCurrencyData();
+            console.log(currency);
+            var jsonObject = JSON.stringify(currency);
+            try {
+              const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 3000,
+                message: responseData === "Success" ? successmsg : responseData,
+                type: 'success',
+              });
+
+              CRMCourseInformationHelper.clearCurrecyForm();
+              $("#gridSummaryCurrency").data("kendoGrid").dataSource.read();
+            } catch (error) {
+              console.log(error);
+              let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: `${error.status} : ${errorMessage}`,
+                type: 'error'
+              });
+            }
+          }
+        },
+        {
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function ($noty) {
+            $noty.close();
+          }
+        },
+      ]
+      , 0
+    );
+  },
+
+  deleteData: function (actionGridData) {
+    // default
+    console.log(actionGridData);
+    if (actionGridData == null || actionGridData == undefined) return false;
+
+    var successmsg = "Data Deleted Successfully.";
+    var serviceUrl = "/currency/" + actionGridData.CurrencyId;
+    var confirmmsg = "Are you sure to Delete this action?";
+    var httpType = "DELETE";
+
+    AjaxManager.MsgBox(
+      'info',
+      'center',
+      'Confirmation',
+      confirmmsg,
+      [
+        {
+          addClass: 'btn btn-primary',
+          text: 'Yes',
+          onClick: async function ($noty) {
+            $noty.close();
+            var jsonObject = JSON.stringify(actionGridData);
+            try {
+              const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
+              CRMCourseInformationHelper.clearCurrecyForm();
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 3000,
+                message: responseData === "Success" ? successmsg : responseData,
+                type: 'success',
+              });
+
+              $("#gridSummaryCurrency").data("kendoGrid").dataSource.read();
+            } catch (error) {
+              let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: `${error.status} : ${errorMessage}`,
+                type: 'error'
+              });
+            }
+          }
+        },
+        {
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function ($noty) {
+            $noty.close();
+          }
+        },
+      ]
+      , 0
+    );
+  },
 
 
 }
@@ -91,6 +231,7 @@ var CRMCourseInformationHelper = {
     CommonManager.initializeKendoWindow("#CountryPopUp", "Country Details", "80%");
     CommonManager.initializeKendoWindow("#course_InstitutePopUp", "Inistitute Details", "80%");
     CommonManager.initializeKendoWindow("#course_CoursePopUp", "Course Details", "80%");
+    CommonManager.initializeKendoWindow("#CurrencyPopUp_Course", "Currency Details", "80%");
 
     this.generateCountryCombo_Institute();
     this.generateCountryCombo();
@@ -102,9 +243,12 @@ var CRMCourseInformationHelper = {
     this.generatePaymentMethodCombo();
     this.initializePaymentDate();
 
-    // Insistitute Form code 
+    // Institute PopUp code 
     this.generateInstituteTypeCombo();
     this.generateCurrencyCombo_Institute();
+
+    // Curreny PopUp Code
+    this.generateCurrencyGrid();
   },
 
   generateCountryPopUp: function () {
@@ -127,7 +271,6 @@ var CRMCourseInformationHelper = {
       couresePopUp.open().center();
     }
   },
-
 
   generateCountryCombo: function () {
     $("#cmbCountryForCourse").kendoComboBox({
@@ -251,8 +394,10 @@ var CRMCourseInformationHelper = {
     var selectedCountryText = countryCombo.text();
   },
 
+ 
+
+
   // Insistitute Form code 
-  
   generateCountryCombo_Institute: function () {
     $("#cmbInstituteCountryId").kendoComboBox({
       placeholder: "Select Country...",
@@ -306,15 +451,136 @@ var CRMCourseInformationHelper = {
     var currencyComboBoxInstant = $("#cmbCurrencyId_Institute").data("kendoComboBox");
     if (currencyComboBoxInstant) {
       CRMCourseInformationManager.fetchCurrencyComboBoxData().then(data => {
-        countryComboBoxInstant.setDataSource(data);
+        currencyComboBoxInstant.setDataSource(data);
       });
     }
   },
-  
+
+  generateCurrencyPopUp: function () {
+    this.clearCurrecyForm();
+
+    var currencyPopUp = $("#CurrencyPopUp_Course").data("kendoWindow");
+    if (currencyPopUp) {
+      currencyPopUp.open().center();
+    }
+  },
 
   onCountryChange_Institute: function () {
     var countryCombo = $("cmbInstituteCountryId").data("kendoComboBox");
     var countryId = countryCombo.value();
     var countryName = countryCombo.text();
+  },
+
+  // clear form
+  clearCRMApplicationForm: function () {
+    CommonManager.clearFormFields();
+  },
+
+  clearInstituteForm: function () {
+    CommonManager.clearFormFields();
+  },
+
+  // currency popup section
+  // Grid code section
+  generateCurrencyGrid: function () {
+    const gridOptions = {
+      dataSource: [],
+      autoBind: true,
+      navigatable: true,
+      width: "100%",
+      scrollable: false,
+      resizable: false,
+      filterable: false,
+      sortable: false,
+      columns: this.GenerateCurrencyColumns(),
+      editable: false,
+      selectable: "row",
+
+      //dataBound: function () {
+      //  var grid = this;
+      //  var items = grid.items();
+      //  var rowNumber = 0;
+
+      //  $(items).each(function () {
+      //    var dataItem = grid.dataItem(this);
+      //    var row = $(this);
+      //    row.find("td:eq(0)").html(++rowNumber);
+      //  });
+      //}
+    };
+
+    $("#gridSummaryCurrency").kendoGrid(gridOptions);
+
+    const gridInstance = $("#gridSummaryCurrency").data("kendoGrid");
+    if (gridInstance) {
+      const dataSource = CRMCourseInformationManager.getSummaryCurrencyGridDataSource();
+      gridInstance.setDataSource(dataSource);
+    }
+  }
+,
+
+  GenerateCurrencyColumns: function () {
+    return columns = [
+      /*{ field: "SlNo", title: "Sl No", width: 40, template: "#= ++rowNumber #" },*/
+      { field: "CurrencyId", hidden: true },
+      { field: "CurrencyName", title: "Currency Name", width: 70 },
+      { field: "IsDefault", title: "Is Default", width: 50, template: "#= IsDefault == 1 ? 'Yes' : 'No' #" },
+      { field: "IsActive", title: "Is Active", width: 50, template: "#= IsActive == 1 ? 'Yes' : 'No' #" },
+      { field: "Action", title: "#", filterable: false, width: 120, template: '<input type="button" class="btn btn-outline-dark me-1 widthSize40_per" value="Edit" id="" onClick="CRMCourseInformationHelper.clickEventForCurrencyEditButton(event)"  /><input type="button" class="btn btn-outline-danger widthSize50_per" value="Delete" id="" onClick="CRMCourseInformationHelper.clickEventForCurrencyDeleteButton(event)"  />' },
+    ];
+  },
+
+  clearCurrecyForm: function () {
+    debugger;
+    CommonManager.clearFormFields("#CurrencyPopUp_Course");
+    $("#btnCurrencySaveOrUpdate").text("+ Add Currency");
+  },
+
+  // CUD = Creat, Update, Delete
+  createCurrencyData: function () {
+    var currency = new Object();
+
+    currency.CurrencyId = $("#currentyId_CurrencyPopUp").val() == '' ? '0' : $("#currentyId_CurrencyPopUp").val();
+    currency.CurrencyName = $("#currencyName_CurrencyPopUp").val();   
+    if ($("#chkIsDefault_Currency").is(':checked') == true) {
+      currency.IsDefault = 1;
+    } else {
+      currency.IsDefault = 0;
+    }
+    if ($("#chkIsActive_Currency").is(':checked') == true) {
+      currency.IsActive = 1;
+    } else {
+      currency.IsActive = 0;
+    }
+
+    return currency;
+  },
+
+  clickEventForCurrencyEditButton: function (event) {
+    const gridInstance = $("#gridSummaryCurrency").data("kendoGrid");
+    const gridRow = $(event.target).closest("tr");
+    var selectedItem = gridInstance.dataItem(gridRow);
+    if (gridInstance) {
+      this.editItem(selectedItem);
+    }
+  },
+
+  editItem: async function (item) {
+    $("#btnCurrencySaveOrUpdate").text("Update Currency");
+    $("#currencyName_CurrencyPopUp").val(item.CurrencyName);
+    $("#currencyCode_CurrencyPopUp").val(item.CurrencyCode);
+    $('#chkIsDefault_Currency').prop('checked', item.IsDefault == 1 ? true : false);
+    $('#chkIsActive_Currency').prop('checked', item.IsActive == 1 ? true : false);
+
+    $("#currentyId_CurrencyPopUp").val(item.CurrencyId);
+  },
+
+  clickEventForCurrencyDeleteButton: function (event) {
+    const gridInstance = $("#gridSummaryCurrency").data("kendoGrid");
+    const gridRow = $(event.target).closest("tr");
+    var selectedItem = gridInstance.dataItem(gridRow);
+    if (gridInstance) {
+      CRMCourseInformationManager.deleteData(selectedItem);
+    }
   },
 }

@@ -1,7 +1,7 @@
 ﻿
 var MenuDetailsManager = {
 
-  SaveData: function () {
+  SaveDataOld: function () {
     debugger;
     var isToUpdateOrCreate = $("#hdMenuId").val();
     var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
@@ -51,6 +51,68 @@ var MenuDetailsManager = {
       ,0
     );
   },
+
+  SaveData: async function () {
+    debugger;
+    // default
+    var isToUpdateOrCreate = $("#hdMenuId").val();
+    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
+    var serviceUrl = isToUpdateOrCreate == 0 ? "/menu" : "/menu/" + isToUpdateOrCreate;
+    var confirmmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
+    var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
+
+    AjaxManager.MsgBox(
+      'info',
+      'center',
+      'Confirmation',
+      confirmmsg,
+      [
+        {
+          addClass: 'btn btn-primary',
+          text: 'Yes',
+          onClick: async function ($noty) {
+            $noty.close();
+            var obj = MenuDetailsHelper.CreateObject();
+            console.log(obj);
+            var jsonObject = JSON.stringify(obj);
+            try {
+              const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 3000,
+                message: responseData === "Success" ? successmsg : responseData,
+                type: 'success',
+              });
+
+              MenuDetailsHelper.CloseInformation();
+              $("#gridSummaryCurrency").data("kendoGrid").dataSource.read();
+            } catch (error) {
+              console.log(error);
+              let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: `${error.status} : ${errorMessage}`,
+                type: 'error'
+              });
+            }
+          }
+        },
+        {
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function ($noty) {
+            $noty.close();
+          }
+        },
+      ]
+      , 0
+    );
+  },
+
+
 
   DeleteData: function (dataFromGrid) {
     debugger;
@@ -210,13 +272,6 @@ var MenuDetailsHelper = {
      $("#btnSave").text("Save");
     AjaxManager.PopupWindow("divDetails", "Details Information", "50%");
     MenuDetailsHelper.ClearInformation();
-  },
-
-  SaveInformation: function () {
-    if (MenuDetailsHelper.validator()) {
-      MenuDetailsManager.SaveData();
-    }
-
   },
 
   CloseInformation: function () {

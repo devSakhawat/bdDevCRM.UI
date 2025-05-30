@@ -42,6 +42,17 @@ namespace bdDevCRM.UI.Controllers
       //  return RedirectToAction("Login", "Home");
       //}
     }
+    public ActionResult Currency()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("Currency/Currency");
+      //}
+      //else
+      //{
+      //  return RedirectToAction("Login", "Home");
+      //}
+    }
 
 
 

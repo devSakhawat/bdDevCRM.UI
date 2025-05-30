@@ -1,0 +1,42 @@
+﻿
+
+<script src="~/assets/scripts/core/currency/currencydetail.js"></script>
+
+<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+	<fieldset class="reset">
+		<legend class="reset">Currency Form</legend>
+
+		<div class="row mb-2">
+			<input id="currencyId" type="hidden" value="0" />
+
+			<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+				<label for="CurrencyName">Currency Name <span class="redstart">*</span></label>
+				<input type="text" class="form-control" id="currencyName" name="CurrencyName" placeholder="Currency name" required validationMessage="Currency anem is required" />
+			</div>
+
+			<!-- IsDefaultCurrency -->
+			<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
+				<label for="IsDefaultCurrency" class="form-check-label">Is Default</label>
+				<input type="checkbox" id="chkIsDefaultCurrency" name="IsDefaultCurrency" class="form-check-input" />
+			</div>
+
+			<!-- IsActiveCurrency -->
+			<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
+				<label for="IsActiveCurrency" class="form-check-label">Is Active</label>
+				<input type="checkbox" id="chkIsActiveCurrency" name="IsActiveCurrency" class="form-check-input" />
+			</div>
+		</div>
+
+		<div class="btnDiv mt-2">
+			<ul>
+				<li class="d-flex justify-content-end">
+					<button type="button" class="btn btn-primary me-2" id="btnCurrencySaveOrUpdate" onclick="CurrencyDetailsManager.saveOrUpdateCurrency();">+ Add Currency</button>
+					<button type="button" class="btn btn-secondary me-2" onclick="CurrencyDetailsHelper.clearForm();">Clear</button>
+					<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#CurrencyPopUp_Course")'>Close</button>
+				</li>
+			</ul>
+		</div>
+	</fieldset>
+</div>
+
+

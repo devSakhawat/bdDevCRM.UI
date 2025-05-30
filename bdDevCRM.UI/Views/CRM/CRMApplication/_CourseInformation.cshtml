@@ -650,6 +650,7 @@
 
 	@* Course PopUp *@
 	<div style="display:none" id="course_CoursePopUp" class="">
+
 		<div class="row">
 			<!-- Institute -->
 			<div class="col-12">
@@ -820,55 +821,16 @@
 
 	@* Currency PopUp *@
 	<div style="display:none" id="CurrencyPopUp_Course" class="">
+
 		<div class="row">
-			<!-- Currency -->
-			<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
-				<fieldset class="reset">
-					<legend class="reset">Currency Form</legend>
 
-					<div class="row mb-2">
-						<input id="currentyId_CurrencyPopUp" type="hidden" value="0" />
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CurrencyName">Currency Name <span class="redstart">*</span></label>
-							<input type="text" class="form-control" id="currencyName_CurrencyPopUp" name="CurrencyName" placeholder="Currency name" required validationMessage="Currency anem is required"  />
-						</div>
-
-						<!-- IsDefault -->
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
-							<label for="IsDefault_Currency" class="form-check-label">Is Default</label>
-							<input type="checkbox" id="chkIsDefault_Currency" name="IsDefault_Currency" class="form-check-input" />
-						</div>
-
-						<!-- IsActive -->
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
-							<label for="IsActive_Currency" class="form-check-label">Is Active</label>
-							<input type="checkbox" id="chkIsActive_Currency" name="IsActive_Currency" class="form-check-input" />
-						</div>
-					</div>
-
-					<div class="btnDiv mt-2">
-						<ul>
-							<li class="d-flex justify-content-end">
-								<button type="button" class="btn btn-primary me-2" id="btnCurrencySaveOrUpdate" onclick="CRMCourseInformationManager.saveOrUpdateCurrency();">+ Add Currency</button>
-								<button type="button" class="btn btn-secondary me-2" onclick="CRMCourseInformationHelper.clearCurrecyForm();">Clear</button>
-								<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#CurrencyPopUp_Course")'>Close</button>
-							</li>
-						</ul>
-					</div>
-				</fieldset>
-			</div>
-
-			<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
-				<fieldset class="reset">
-					<legend class="reset">Currency Grid</legend>
-
-					<div id="gridSummaryCurrency"></div>
-					<div class="clear"></div>
-				</fieldset>
-			</div>
+			<!-- Currency Form -->
+			<partial name="Currency/_CurrencyDetail" />
+			<!-- Currency Summary -->
+			<partial name="Currency/_CurrencySummery" />
 
 		</div>
+	
 	</div>
 
 

@@ -211,9 +211,9 @@ var MenuSummaryHelper = {
         {
           field: "Edit", title: "Actions", filterable: false, width: 200,
           template: `
-        <input type="button" class="btn btn-outline-success" style="cursor: pointer;" value="View" id="btnView" onClick="MenuSummaryHelper.clickEventForViewButton(event)"/>
-        <input type="button" class="btn btn-outline-dark " style="cursor: pointer; margin-right: 5px;" value="Edit" id="btnEdit" onClick="MenuSummaryHelper.clickEventForEditButton(event)"/>
-        <input type="button" class="btn btn-outline-danger" style="cursor: pointer; margin-right: 5px;" value="Delete" id="btnDelete" onClick="MenuSummaryHelper.clickEventForDeleteButton(event)"/>`
+        <input type="button" class="btn btn-outline-success widthSize30_per" style="cursor: pointer;" value="View" id="btnView" onClick="MenuSummaryHelper.clickEventForViewButton(event)"/>
+        <input type="button" class="btn btn-outline-dark widthSize30_per" style="cursor: pointer;" value="Edit" id="btnEdit" onClick="MenuSummaryHelper.clickEventForEditButton(event)"/>
+        <input type="button" class="btn btn-outline-danger widthSize33_per" style="cursor: pointer;" value="Delete" id="btnDelete" onClick="MenuSummaryHelper.clickEventForDeleteButton(event)"/>`
           , sortable: false, exportable: false 
         }
       ];
@@ -228,7 +228,7 @@ var MenuSummaryHelper = {
 
     if (dataItem) {
       MenuDetailsHelper.PopulateObject(dataItem);
-      AjaxManager.MakeFormReadOnly("#divdetailsForDetails");
+      CommonManager.MakeFormReadOnly("#divdetailsForDetails");
     }
 
   },
@@ -259,7 +259,7 @@ var MenuSummaryHelper = {
     var dataItem = grid.dataItem(row);
 
     if (dataItem) {
-      AjaxManager.MakeFormEditable("#divdetailsForDetails");
+      CommonManager.MakeFormEditable("#divdetailsForDetails");
       MenuDetailsHelper.PopulateObject(dataItem);
     }
   },

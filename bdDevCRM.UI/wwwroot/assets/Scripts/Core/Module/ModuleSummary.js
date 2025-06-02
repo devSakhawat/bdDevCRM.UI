@@ -230,9 +230,9 @@ var ModuleSummaryHelper = {
          {
             field: "edit", title: "Edit", filterable: false, width: 40,
             template: `
-        <input type="button" class="btn btn-outline-success" style="cursor: pointer;" value="View" id="btnView" onClick="ModuleSummaryHelper.clickEventForViewButton(event)"/>
-        <input type="button" class="btn btn-outline-dark " style="cursor: pointer; margin-right: 5px;" value="Edit" id="btnEdit" onClick="ModuleSummaryHelper.clickEventForEditButton(event)"/>
-        <input type="button" class="btn btn-outline-danger" style="cursor: pointer; margin-right: 5px;" value="Delete" id="btnDelete" onClick="ModuleSummaryHelper.clickEventForDeleteButton(event)"/>`
+        <input type="button" class="btn btn-outline-success  widthSize30_per" style="cursor: pointer;" value="View" id="btnView" onClick="ModuleSummaryHelper.clickEventForViewButton(event)"/>
+        <input type="button" class="btn btn-outline-dark widthSize30_per" style="cursor: pointer; ;" value="Edit" id="btnEdit" onClick="ModuleSummaryHelper.clickEventForEditButton(event)"/>
+        <input type="button" class="btn btn-outline-danger widthSize33_per" style="cursor: pointer;;" value="Delete" id="btnDelete" onClick="ModuleSummaryHelper.clickEventForDeleteButton(event)"/>`
             , sortable: false, exportable: false
          }
       ];

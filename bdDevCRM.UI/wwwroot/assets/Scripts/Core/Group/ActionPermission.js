@@ -44,8 +44,6 @@ var ActionHelper = {
 
     for (var i = 0; i < objActionList.length; i++) {
 
-     /* link += "<div class='actionCheck'><input type=\"checkbox\" class=\"chkBox\" id=\"chkAction" + objActionList[i].WfactionId + "\" onclick=\"ActionHelper.populateActionArray(" + objActionList[i].WfactionId + ", '" + objActionList[i].WfstateId + "', this.id)\"/> " + objActionList[i].ActionName + "</div>";*/
-
       link += `
             <div class="col-12 mb-1">
               <div class="d-flex justify-content-between align-items-center">

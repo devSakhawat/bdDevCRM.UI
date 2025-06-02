@@ -218,24 +218,26 @@ var MenuDetailsManager = {
     var jsonParams = "moduleId=" + moduleId;
     var serviceUrl = "/menus-by-moduleId/";
     function onSuccess(jsonData) {
-      var objMenuuData = new Object();
-      objMenuuData = jsonData;
-      $("#cmb-parent-menu").kendoComboBox({
-        placeholder: "Select Parent Menu...",
-        dataTextField: "MenuName",
-        dataValueField: "MenuId",
-        dataSource: objMenuuData,
-        change: function () {
-          if (this.value() == this.text()) {
-            this.value('');
-          }
-        },
-        //dataBound: function () {
-        //  if (callback && typeof callback === "function") {
-        //    callback();
-        //  }
-        //}
-      });
+      //var objMenuuData = new Object();
+      //objMenuuData = jsonData;
+      var comboBox = $("#cmb-parent-menu").data("kendoComboBox");
+      comboBox.setDataSource(jsonData);
+      //$("#cmb-parent-menu").kendoComboBox({
+      //  placeholder: "Select Parent Menu...",
+      //  dataTextField: "MenuName",
+      //  dataValueField: "MenuId",
+      //  dataSource: objMenuuData,
+      //  change: function () {
+      //    //if (this.value() == this.text()) {
+      //    //  this.value('');
+      //    //}
+      //  },
+      //  //dataBound: function () {
+      //  //  if (callback && typeof callback === "function") {
+      //  //    callback();
+      //  //  }
+      //  //}
+      //});
     }
     function onFailed(jqXHR, textStatus, errorThrown) {
       ToastrMessage.showToastrNotification({
@@ -296,9 +298,9 @@ var MenuDetailsHelper = {
       cmbParentMenu.value("");
       cmbParentMenu.text("");
     }
-    cmbParentMenu.destroy();
+    //cmbParentMenu.destroy();
 
-    MenuDetailsHelper.InitMenuByModuleId();
+    //MenuDetailsHelper.InitMenuByModuleId();
 
     $('#chkIsQuickLink').prop('checked', false); // Use prop() for checkboxes
   },
@@ -322,17 +324,13 @@ var MenuDetailsHelper = {
     obj.MenuId = $("#hdMenuId").val();
     obj.MenuName = $("#menu-name").val();
     obj.ModuleId = $("#cmd-module").data("kendoComboBox").value() == "" ? 0 : $("#cmd-module").data("kendoComboBox").value();
-    obj.ModuleName = $("#cmd-module").data("kendoComboBox").text();
     obj.MenuPath = $("#menu-path").val();
 
     obj.ParentMenu = $("#cmb-parent-menu").data("kendoComboBox").value() == "" ? 0 : $("#cmb-parent-menu").data("kendoComboBox").value();
     obj.ParentMenuName = $("#cmb-parent-menu").data("kendoComboBox").text();
+    //obj.ParentMenuName = $("#cmb-parent-menu").data("kendoComboBox").text();
 
-    //var cmbParentMenu = $("#cmb-parent-menu").data('kendoComboBox');
-    //obj.ParentMenu = cmbParentMenu.value();
-    //obj.ParentMenuName = cmbParentMenu.text();
     obj.SortOrder = $("#hdSorOrder").val();
-
     if ($("#chkIsQuickLink").is(':checked') == true) { obj.ToDo = 1; }
     else { obj.ToDo = 0; }
 
@@ -354,6 +352,7 @@ var MenuDetailsHelper = {
       $('#chkIsQuickLink').attr('checked', false);
     }
 
+    debugger;
     // Populate combo box value
     var cmbModule = $("#cmd-module").data("kendoComboBox");
     if (obj.ModuleId != 0) {

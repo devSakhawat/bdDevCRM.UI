@@ -37,7 +37,16 @@ var AccessControlHelper = {
     var link = "";
 
     for (var i = 0; i < objAccessList.length; i++) {
-      link += "<div><input type=\"checkbox\" class=\"chkBox\" id=\"chkAccess" + objAccessList[i].AccessId + "\" onclick=\"AccessControlHelper.populateAccessPermissionArray(" + objAccessList[i].AccessId + ", '" + objAccessList[i].AccessName + "', this.id)\"/> " + objAccessList[i].AccessName + "</div>";
+
+      link += `
+                <div class="col-12">
+                  <div class="d-flex justify-content-start align-items-center">
+                   <input type="checkbox" class="form-check-input" id="chkAccess${objAccessList[i].AccessId}" onclick="AccessControlHelper.populateAccessPermissionArray(${objAccessList[i].AccessId}, '${objAccessList[i].AccessName}', this.id)" /><span class = "">${objAccessList[i].AccessName}</span>
+                   
+                  </div>
+                </div>
+                `;
+
       accessArray.push(objAccessList[i]);
     }
     $("#checkboxAccess").html(link);

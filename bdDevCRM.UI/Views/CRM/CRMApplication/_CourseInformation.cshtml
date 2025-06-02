@@ -1,7 +1,6 @@
 ﻿
 <script src="~/assets/scripts/crm/crmapplication/crmcourseinformation.js"></script>
 
-
 <div id="">
 	<!-- Course Details -->
 	<fieldset class="reset">
@@ -822,12 +821,12 @@
 	@* Currency PopUp *@
 	<div style="display:none" id="CurrencyPopUp_Course" class="">
 
-		<div class="row">
-
+    <div class="row">
 			<!-- Currency Form -->
-			<partial name="Currency/_CurrencyDetail" />
+			<partial name="~/Views/Core/Currency/_CurrencyDetail.cshtml" />
+
 			<!-- Currency Summary -->
-			<partial name="Currency/_CurrencySummery" />
+			<partial name="~/Views/Core/Currency/_CurrencySummery.cshtml" />
 
 		</div>
 	

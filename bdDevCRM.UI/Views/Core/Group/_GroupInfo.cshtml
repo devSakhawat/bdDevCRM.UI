@@ -5,23 +5,24 @@
 
 <div id="divGroupId">
   <div class="divDetails">
-    <ul>
-      <li class="mb-4">
-        <input type="hidden" id="hdnGroupId" value="0" />
-        <label for="GroupName" class="lbl widthSize30_per">Group Name:<span class="redstart">*</span></label>
-        <input type="text" id="txtGroupName" name="GroupName" maxlength="100" class="form-control-sm k-textbox" placeholder="Group name" required validationMessage="Please enter valid Group Name" />
-      </li>
+    <div class="mb-4">
+      <input type="hidden" id="hdnGroupId" value="0" />
+      <label for="GroupName" class="lbl widthSize30_per">Group Name:<span class="redstart">*</span></label>
+      <input type="text" id="txtGroupName" name="GroupName" maxlength="100" class="form-control-sm k-textbox" placeholder="Group name" required validationMessage="Please enter valid Group Name" />
+    </div>
 
-      <li class="mb-4">
-        <label for="IsDefult" class="lbl widthSize30_per">Is Default:</label>
-        <input type="checkbox" id="chkIsDefault" name="IsDefult" class="chkBox" />
-      </li>
 
-      <li class="mb-2">
-        <label for="Application" class="lbl mb-2">Application:</label>
-        <div id="dynamicCheckBoxForModule" class="mb-2"> </div>
-      </li>
-    </ul>
+    <div class="col-12 mb-1">
+      <div class="d-flex justify-content-start align-items-center  pb-01">
+        <span class="widthSize40_per">Is Default:</span>
+        <input type="checkbox" class="form-check-input" id="chkIsDefault" />
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <h4 for="Application" class="k-header mb-3 mb-2">Application:</h4>
+      <div id="dynamicCheckBoxForModule" class="mb-2"> </div>
+    </div>
   </div>
 </div>
 

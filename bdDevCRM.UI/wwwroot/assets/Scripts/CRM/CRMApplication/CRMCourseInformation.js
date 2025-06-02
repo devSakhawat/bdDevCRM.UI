@@ -1,4 +1,6 @@
 ﻿
+/// <reference path="../../core/currency/currencydetail.js" />
+
 /// <reference path="../../common/common.js" />
 /// <reference path="CRMAdditionalInformation.js" />
 /// <reference path="CRMEducationNEnglishLanguage.js" />
@@ -77,8 +79,6 @@ var CRMCourseInformationManager = {
     );
   },
 
-
-
 }
 
 var CRMCourseInformationHelper = {
@@ -103,9 +103,6 @@ var CRMCourseInformationHelper = {
     // Institute PopUp code 
     this.generateInstituteTypeCombo();
     this.generateCurrencyCombo_Institute();
-
-    // Curreny PopUp Code
-    this.generateCurrencyGrid();
   },
 
   generateCountryPopUp: function () {
@@ -314,7 +311,7 @@ var CRMCourseInformationHelper = {
   },
 
   generateCurrencyPopUp: function () {
-    this.clearCurrecyForm();
+    CurrencyDetailsHelper.clearForm();
 
     var currencyPopUp = $("#CurrencyPopUp_Course").data("kendoWindow");
     if (currencyPopUp) {

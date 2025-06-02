@@ -43,7 +43,24 @@ var ActionHelper = {
     var link = "";
 
     for (var i = 0; i < objActionList.length; i++) {
-      link += "<div class='actionCheck'><input type=\"checkbox\" class=\"chkBox\" id=\"chkAction" + objActionList[i].WfactionId + "\" onclick=\"ActionHelper.populateActionArray(" + objActionList[i].WfactionId + ", '" + objActionList[i].WfstateId + "', this.id)\"/> " + objActionList[i].ActionName + "</div>";
+
+     /* link += "<div class='actionCheck'><input type=\"checkbox\" class=\"chkBox\" id=\"chkAction" + objActionList[i].WfactionId + "\" onclick=\"ActionHelper.populateActionArray(" + objActionList[i].WfactionId + ", '" + objActionList[i].WfstateId + "', this.id)\"/> " + objActionList[i].ActionName + "</div>";*/
+
+      link += `
+            <div class="col-12 mb-1">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <input type="checkbox" class="form-check-input me-2"
+                         id="chkAction${objActionList[i].WfactionId}"
+                         onclick="ActionHelper.populateActionArray(${objActionList[i].WfactionId}, '${objActionList[i].WfstateId}', this.id)" />
+                  <span>${objActionList[i].ActionName}</span>
+                </div>
+              </div>
+            </div>
+          `;
+
+
+
       stateArray.push(objActionList[i]);
     }
     $("#checkboxActionPermission").html(link);

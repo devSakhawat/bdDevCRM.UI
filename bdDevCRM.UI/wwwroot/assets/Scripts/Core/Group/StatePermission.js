@@ -39,8 +39,25 @@ var StateHelper = {
     var link = "";
 
     for (var i = 0; i < objStatusList.length; i++) {
-      link += "<div><input type=\"checkbox\" class=\"chkBox\" id=\"chkStatus" + objStatusList[i].WFStateId + "\" onclick=\"StateHelper.populateStateArray(" + objStatusList[i].WFStateId + ", '" + objStatusList[i].MenuID + "', this.id)\"/>" +
-        "<a class=\"alinkGroup \" title=\"View Action Permission\"  id=\"astatus" + objStatusList[i].WFStateId + "\" onclick=\"StateHelper.populateStateArray(" + objStatusList[i].WFStateId + ", '" + objStatusList[i].MenuID + "', this.id)\">" + objStatusList[i].StateName + "</a></div>";
+
+      //link += "<div><input type=\"checkbox\" class=\"form-check-input me-2\" id=\"chkStatus" + objStatusList[i].WfstateId + "\" onclick=\"StateHelper.populateStateArray(" + objStatusList[i].WfstateId + ", '" + objStatusList[i].MenuId + "', this.id)\"/>" +
+      //  "<a class=\"alinkGroup \" title=\"View Action Permission\"  id=\"astatus" + objStatusList[i].WfstateId + "\" onclick=\"StateHelper.populateStateArray(" + objStatusList[i].WfstateId + ", '" + objStatusList[i].MenuId + "', this.id)\">" + objStatusList[i].StateName + "</a></div>";
+
+
+      link += `
+              <div class="col-12 mb-1">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <input type="checkbox" class="form-check-input me-2" id="chkStatus${objStatusList[i].WfstateId}"
+                           onclick="StateHelper.populateStateArray(${objStatusList[i].WfstateId}, '${objStatusList[i].MenuId}', this.id)" />
+                    <a class="alinkGroup" title="View Action Permission" id="astatus${objStatusList[i].WfstateId}"
+                       onclick="StateHelper.populateStateArray(${objStatusList[i].WfstateId}, '${objStatusList[i].MenuId}', this.id)"> ${objStatusList[i].StateName}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+
       stateArray.push(objStatusList[i]);
 
     }

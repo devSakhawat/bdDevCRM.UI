@@ -33,6 +33,15 @@ var GroupPermissionManager = {
 
 var GroupPermissionHelper = {
 
+  initModuleCombo: function () {
+    $("#cmbApplicationForModule").kendoComboBox({
+      placeholder: "Select a module",
+      dataTextField: "ModuleName",
+      dataValueField: "ReferenceID",
+      dataSource: []
+    });
+  },
+
   populateModuleCombo: function (moduleId, moduleName, controlId) {
     var obj = new Object();
     obj.ReferenceID = moduleId;

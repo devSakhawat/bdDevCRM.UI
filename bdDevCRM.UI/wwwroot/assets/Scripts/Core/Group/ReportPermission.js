@@ -42,8 +42,27 @@ var ReportPermissionHelper = {
       var link = "";
 
       for (var i = 0; i < objReportList.length; i++) {
-        link += "<div><input type=\"checkbox\" class=\"chkBox\" id=\"chkReport" + objReportList[i].ReportHeaderId + "\" onclick=\"ReportPermissionHelper.populateCustmizedReportArray(" + objReportList[i].ReportHeaderId + ", this.id)\"/>" +
-          "<a class=\"alinkGroup \" title=\"View Report Permission\"  id=\"areport" + objReportList[i].ReportHeaderId + "\" onclick=\"ReportPermissionHelper.populateCustmizedReportArray(" + objReportList[i].ReportHeaderId + "', this.id)\">" + objReportList[i].ReportHeader + "</a></div>";
+
+        //link += "<div><input type=\"checkbox\" class=\"chkBox\" id=\"chkReport" + objReportList[i].ReportHeaderId + "\" onclick=\"ReportPermissionHelper.populateCustmizedReportArray(" + objReportList[i].ReportHeaderId + ", this.id)\"/>" +
+        //  "<a class=\"alinkGroup \" title=\"View Report Permission\"  id=\"areport" + objReportList[i].ReportHeaderId + "\" onclick=\"ReportPermissionHelper.populateCustmizedReportArray(" + objReportList[i].ReportHeaderId + "', this.id)\">" + objReportList[i].ReportHeader + "</a></div>";
+
+
+        link += `
+                <div class="col-12 mb-1">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <input type="checkbox" class="form-check-input me-2"  id="chkReport${objReportList[i].ReportHeaderId}"
+                             onclick="ReportPermissionHelper.populateCustmizedReportArray(${objReportList[i].ReportHeaderId}, this.id)" />
+                      <a class="alinkGroup" title="View Report Permission" id="areport${objReportList[i].ReportHeaderId}"
+                         onclick="ReportPermissionHelper.populateCustmizedReportArray(${objReportList[i].ReportHeaderId}, this.id)">
+                         ${objReportList[i].ReportHeader}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              `;
+
+
 
         reportArray.push(objReportList[i]);
       }

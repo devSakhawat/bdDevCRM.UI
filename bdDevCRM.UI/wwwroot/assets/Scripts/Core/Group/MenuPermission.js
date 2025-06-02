@@ -52,8 +52,8 @@ var MenuPermissionHelper = {
     var treeview = $("#treeview").kendoTreeView({
       checkboxes: {
         checkChildren: true,
-        //template: "<input type='checkbox' name='checkedFiles#= item.id #' id='chkMenu#= item.id #' onclick='menuPermissionHelper.onSelect(#= item.id #,Event)' />"
         template: "<input type='checkbox' id='chkMenu#= item.id #' onclick='MenuPermissionHelper.onSelect(#= item.id #,event)' />"
+
       },
       select: MenuPermissionHelper.changeMenu,
       dataSource: {},
@@ -105,6 +105,7 @@ var MenuPermissionHelper = {
     $("#treeview").data("kendoTreeView").setDataSource(dataSource);
     MenuPermissionHelper.autoSelectExistingMenu();
   },
+
   onSelect: function (menuId, e) {
 
     debugger;

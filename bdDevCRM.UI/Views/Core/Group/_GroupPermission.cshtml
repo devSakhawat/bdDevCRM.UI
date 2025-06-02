@@ -4,15 +4,14 @@
 <script src="~/assets/scripts/core/group/grouppermission.js"></script>
 
 <div id="divGroupPermision">
-  <div class="divDetails">
-    <ul>
-      <li>
-        <label for="ApplicationName" class="lbl widthSize30_per">Application:</label>
-        <input type="text" id="cmbApplicationForModule" name="ApplicationName" maxlength="100" class="form-control-sm k-textbox" placeholder="Application name" />
-      </li>
-    </ul>
+
+  <!-- Application DDL  -->
+  <div class="col-12 mb-1">
+    <div class="d-flex justify-content-start align-items-center  pb-01">
+      <span for="ApplicationName" class="w-40">Application</span>
+      <input id="cmbApplicationForModule" name="ApplicationName" placeholder="Application name" class="w-60" />
+    </div>
   </div>
-  <br />
 
   <div class="row">
     <div class="col-5 me-2">
@@ -34,7 +33,6 @@
       <partial name="Group/_ActionPermission" />
     </div>
   </div>
-
 
 </div>
 

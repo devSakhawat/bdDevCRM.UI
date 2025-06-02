@@ -17,4 +17,5 @@ var GroupHelper = {
 
 $(document).ready(function () {
   GroupHelper.initGroupHelper();
+  GroupPermissionHelper.initModuleCombo();
 });

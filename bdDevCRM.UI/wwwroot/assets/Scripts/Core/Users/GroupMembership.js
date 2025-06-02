@@ -72,12 +72,30 @@ var GroupMembershipHelper = {
 
     //GetGroupByCompanyId
     var groups = await GroupMembershipManager.getGroups();
-    var link = "";
+    //var link = "<div class=\"row\">";
+
+    //for (var i = 0; i < groups.length; i++) {
+    //  link += "<div><input type=\"checkbox\" class=\"form-check-input\" id=\"chkGroup" + groups[i].GroupId + "\" onclick=\"GroupMembershipHelper.populateGroupPermisionArray(" + groups[i].GroupId + ", '" + groups[i].GroupName + "', this.id)\"/> " + groups[i].GroupName + "</div>";
+    //  groupArray.push(groups[i]);
+    //}
+
+    var link = "<div class='row'>";
 
     for (var i = 0; i < groups.length; i++) {
-      link += "<div><input type=\"checkbox\" class=\"chkBox\" id=\"chkGroup" + groups[i].GroupId + "\" onclick=\"GroupMembershipHelper.populateGroupPermisionArray(" + groups[i].GroupId + ", '" + groups[i].GroupName + "', this.id)\"/> " + groups[i].GroupName + "</div>";
+      link += `
+      <div class="col-12 mb-2">
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-1">
+          <span>${groups[i].GroupName}</span>
+          <input type="checkbox" class="form-check-input"
+                 id="chkGroup${groups[i].GroupId}"
+                 onclick="GroupMembershipHelper.populateGroupPermisionArray(${groups[i].GroupId}, '${groups[i].GroupName}', this.id)" />
+        </div>
+      </div>
+    `;
       groupArray.push(groups[i]);
     }
+
+    link += "</div>";
     $("#checkboxGroup").html(link);
   },
 

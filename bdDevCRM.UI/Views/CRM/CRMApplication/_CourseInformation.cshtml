@@ -405,53 +405,16 @@
 
 	@* Country PopUP *@
 	<div style="display:none" id="CountryPopUp" class="">
+		
 		<div class="row">
+			<!-- Country Form -->
+			<partial name="~/Views/Core/Country/_CountryDetail.cshtml" />
 
-			<div class="col-lg-6 col-md-6 col-sm-12">
-				<fieldset class="k-content">
-					<legend class="k-fontSize[15]">Country Details</legend>
-
-					@* <div id="countryDetails" class="divDetails"> *@
-					<form action="/" method="post">
-						<div class="row">
-
-							<input type="hidden" id="hdnCountryId_CountryPopUp" value="0" />
-
-							<div class="col-12">
-								<label for="CountryName" class="lbl widthSize33_per">Country Name:</label>
-								<input type="text" id="txtCountryName_CountryPopUP" name="CountryName" maxlength="100" pattern="[a-zA-Z0-9 ]+" class="k-textbox" placeholder="Country Name" required validationmessage="Please Enter Country Name" />
-							</div>
-
-							<div class="col-12">
-								<label for="IsActive" class="lbl widthSize33_per">Is Active:</label>
-								<input type="checkbox" id="chkIsActiveCountry_CountryPopUp" name="IsActive" class="k-checkbox" checked="checked" />
-							</div>
-						</div>
-
-						<div class="btnDiv mt-2">
-							<ul>
-								<li class="d-flex justify-content-end">
-									<button type="button" class="btn btn-primary me-2" onclick="NationalityDetailsManager.SaveNationalityInformation();">+ Add Item</button>
-									<button type="button" class="btn btn-secondary me-2" onclick="NationalityDetailsHelper.clearNationalityInfo()">Clear</button>
-									<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#CountryPopUp")'>Close</button>
-								</li>
-							</ul>
-						</div>
-
-					</form>
-
-				</fieldset>
-			</div>
-
-			<div class="col-lg-6 col-md-6 col-sm-12">
-				<fieldset class="k-content">
-					<legend class="k-fontSize[15]">Country Summary</legend>
-
-					<div id="gridSummaryCountry"></div>
-					<div class="clear"></div>
-				</fieldset>
-			</div>
+			<!-- Country Summary -->
+			<partial name="~/Views/Core/Country/_CountrySummery.cshtml" />
+		
 		</div>
+	
 	</div>
 
 	@* Institute PopUp *@
@@ -466,34 +429,27 @@
 						<div class="row mb-2">
 							<input id="institutePopUp_InstituteId" type="hidden" value="" />
 
-							<!-- Country -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="InstituteCountry" class="lbl widthSize100_per">Country <span class="redstart">*</span></label>
-								<div class="d-flex align-items-start icon-wrapper">
-									@* <input id="cmbInstituteCountryId" name="InstituteCountry" required validationMessage="Please Select Country" class="w-100" /> *@
-									<input id="cmbInstituteCountryId" name="InstituteCountry" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
-									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCountryPopUp();">
-										<span class="k-icon k-i-plus"></span>
-									</button>
-								</div>
-							</div>
-
 							<!-- Institute Name -->
 							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
 								<label for="InstituteInstituteName" class="lbl widthSize100_per">Institute Name <span class="redstart">*</span></label>
 								<input id="txtInstituteInstituteName" name="InstituteInstituteName" class="w-100" placeholder="Institute Name" />
 							</div>
 
-							<!-- Institute Type -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtInstituteType" class="lbl widthSize100_per">Institute Type</label>
-								<input id="cmbInstituteType" name="InstituteType" class="w-100" placeholder="Institute Type" />
-							</div>
-
 							<!-- Institute Code -->
 							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
 								<label for="txtInstituteCode" class="lbl widthSize100_per">Institute Code</label>
 								<input id="txtInstituteCode" name="InstituteCode" class="w-100" placeholder="Institute Code" />
+							</div>
+
+							<!-- Institute Type -->
+							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+								<label for="InstituteType" class="lbl widthSize100_per">Institute Type</label>
+								<div class="d-flex align-items-start icon-wrapper">
+									<input id="cmbInstituteTypeId" name="InstituteType" class="flex-grow-1 border-right-strait" />
+									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openInstituteTypePopup();">
+										<span class="k-icon k-i-plus"></span>
+									</button>
+								</div>
 							</div>
 
 							<!-- Institute Email -->
@@ -550,16 +506,29 @@
 								<input id="txtApplicationFee" name="ApplicationFee" class="w-100" placeholder="0.00" />
 							</div>
 
-							<!-- Currency -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="CurrencyId" class="lbl widthSize100_per">Currency <span class="redstart">*</span></label>
+							<!-- Country -->
+							<div class="col-xl-4 col-lg-4 col-md-6 col-12 mb-2">
+								<label for="InstituteCountry" class="lbl widthSize100_per">Country <span class="redstart">*</span></label>
 								<div class="d-flex align-items-start icon-wrapper">
-									<input id="cmbCurrencyId_Institute" name="CurrencyId" required validationMessage="Please Select CurrencyId" class="flex-grow-1 border-right-strait" />
-									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCurrencyPopUp();">
+									<input id="cmbInstituteCountryId" name="InstituteCountry" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
+									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCountryPopup();">
 										<span class="k-icon k-i-plus"></span>
 									</button>
 								</div>
 							</div>
+
+							<!-- Currency -->
+							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+								<label for="InstituteCurrency" class="lbl widthSize100_per">Currency</label>
+								<div class="d-flex align-items-start icon-wrapper">
+									<input id="cmbInstituteCurrencyId" name="InstituteCurrency" class="flex-grow-1 border-right-strait" />
+									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCurrencyPopup();">
+										<span class="k-icon k-i-plus"></span>
+									</button>
+								</div>
+							</div>
+
+
 
 
 							<!-- Is Language Mandatory -->
@@ -829,7 +798,7 @@
 			<partial name="~/Views/Core/Currency/_CurrencySummery.cshtml" />
 
 		</div>
-	
+
 	</div>
 
 

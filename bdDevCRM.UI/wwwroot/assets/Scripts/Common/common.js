@@ -1114,14 +1114,28 @@ var AjaxManager = {
         if (primaryButton) {
           swalConfig.showConfirmButton = true;
           swalConfig.confirmButtonText = primaryButton.text || 'OK';
-          swalConfig.confirmButtonClass = primaryButton.addClass || 'btn btn-primary';
-          swalConfig.focusConfirm = true;
+          swalConfig.customClass = swalConfig.customClass || {};
+          swalConfig.customClass.confirmButton = primaryButton.addClass || 'btn btn-primary';
         }
+
         if (cancelButton) {
           swalConfig.showCancelButton = true;
           swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
-          swalConfig.cancelButtonClass = cancelButton.addClass || 'btn';
+          swalConfig.customClass = swalConfig.customClass || {};
+          swalConfig.customClass.cancelButton = cancelButton.addClass || 'btn';
         }
+
+        //if (primaryButton) {
+        //  swalConfig.showConfirmButton = true;
+        //  swalConfig.confirmButtonText = primaryButton.text || 'OK';
+        //  swalConfig.confirmButtonClass = primaryButton.addClass || 'btn btn-primary';
+        //  swalConfig.focusConfirm = true;
+        //}
+        //if (cancelButton) {
+        //  swalConfig.showCancelButton = true;
+        //  swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
+        //  swalConfig.cancelButtonClass = cancelButton.addClass || 'btn';
+        //}
       }
       // Fire the SweetAlert2 dialog
       return Swal.fire(swalConfig).then((result) => {
@@ -1185,12 +1199,17 @@ var AjaxManager = {
         showCancelButton: false,
         allowOutsideClick: false,
         allowEscapeKey: false,
-        allowEnterKey: false,
+        //allowEnterKey: false,
         focusConfirm: false,
 
         // Add the didOpen hook here
         didOpen: () => {
           document.querySelector('.swal2-container').style.zIndex = '9999'; // Set z-index dynamically
+          Swal.getPopup().addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault(); // prevent Enter from submitting
+            }
+          });
         }
       };
 
@@ -2727,82 +2746,154 @@ var CountryManager = {
 
 var CommonManager = {
 
-  MakeFormReadOnly: function (containerSelector) {
-    debugger;
+  //MakeFormReadOnly: function (containerSelector) {
+  //  debugger;
 
-    const $container = $(containerSelector);
-    if ($container.length === 0) {
-      console.error("Container with selector '" + containerSelector + "' not found.");
+  //  const $container = $(containerSelector);
+  //  if ($container.length === 0) {
+  //    console.error("Container with selector '" + containerSelector + "' not found.");
+  //    return;
+  //  }
+
+  //  $container.find(":input").each(function () {
+  //    const $element = $(this);
+
+  //    if ($element.is("input[type='text'], input[type='password'], textarea")) {
+  //      $element.attr("readonly", true);
+  //    } else if ($element.is("select")) {
+  //      $element.attr("disabled", true);
+  //    } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
+  //      $element.attr("disabled", true);
+  //      $element.css("pointer-events", "none");
+  //    }
+  //  });
+
+
+  //  $container.find(".custom-combobox").each(function () {
+  //    const comboBox = $(this).data("kendoComboBox");
+  //    if (comboBox) {
+  //      comboBox.enable(false);
+  //    }
+  //  });
+
+  //  $container.find("#btnSave, #btnClear").hide();
+  //},
+
+
+  //MakeFormEditable: function (containerSelector) {
+  //  const $container = $(containerSelector);
+  //  if ($container.length === 0) {
+  //    console.error("Container with selector '" + containerSelector + "' not found.");
+  //    return;
+  //  }
+
+  //  $container.find(":input").each(function () {
+  //    const $element = $(this);
+
+  //    if ($element.is("input[type='text'], input[type='password'], textarea")) {
+  //      $element.removeAttr("readonly");
+  //    } else if ($element.is("select")) {
+  //      $element.removeAttr("disabled");
+  //    } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
+  //      $element.removeAttr("disabled");
+  //      $element.css("pointer-events", "");
+  //    }
+  //  });
+
+
+  //  $container.find(".custom-combobox").each(function () {
+  //    const comboBox = $(this).data("kendoComboBox");
+  //    if (comboBox) {
+  //      comboBox.enable(true);
+  //    }
+  //  });
+
+  //  $container.find("#btnSave, #btnClear").show();
+  //},
+
+  MakeFormReadOnly: function (containerSelector) {
+    const $c = $(containerSelector);
+    if ($c.length === 0) {
+      console.error("Container '" + containerSelector + "' not found.");
       return;
     }
 
-    $container.find(":input").each(function () {
-      const $element = $(this);
+    $c.find('input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="url"], textarea')
+      .attr("readonly", true);
 
-      if ($element.is("input[type='text'], input[type='password'], textarea")) {
-        $element.attr("readonly", true);
-      } else if ($element.is("select")) {
-        $element.attr("disabled", true);
-      } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
-        $element.attr("disabled", true);
-        $element.css("pointer-events", "none");
-      }
+    $c.find('input[type="checkbox"], input[type="radio"]')
+      .prop("disabled", true)
+      .css("pointer-events", "none");
+
+    $c.find('select, input[type="file"]').prop("disabled", true);
+
+    $c.find('[data-role="dropdownlist"], [data-role="combobox"], [data-role="multiselect"]').each(function () {
+      const widget = $(this).data("kendoDropDownList") || $(this).data("kendoComboBox") || $(this).data("kendoMultiSelect");
+      if (widget) widget.enable(false);
+    });
+
+    $c.find('[data-role="datepicker"], [data-role="datetimepicker"]').each(function () {
+      const dp = $(this).data("kendoDatePicker") || $(this).data("kendoDateTimePicker");
+      if (dp) dp.enable(false);
+    });
+
+    $c.find('[data-role="numerictextbox"], [data-role="maskedtextbox"]').each(function () {
+      const nt = $(this).data("kendoNumericTextBox") || $(this).data("kendoMaskedTextBox");
+      if (nt) nt.enable(false);
+    });
+
+    $c.find('[data-role="upload"]').each(function () {
+      const up = $(this).data("kendoUpload");
+      if (up) up.enable(false);
     });
 
 
-    $container.find(".custom-combobox").each(function () {
-      const comboBox = $(this).data("kendoComboBox");
-      if (comboBox) {
-        comboBox.enable(false);
-      }
-    });
-
-    $container.find("#btnSave, #btnClear").hide();
+    $c.find("#btnSave, #btnClear").hide();
   },
 
   MakeFormEditable: function (containerSelector) {
-    const $container = $(containerSelector);
-    if ($container.length === 0) {
-      console.error("Container with selector '" + containerSelector + "' not found.");
+    const $c = $(containerSelector);
+    if ($c.length === 0) {
+      console.error("Container '" + containerSelector + "' not found.");
       return;
     }
 
-    $container.find(":input").each(function () {
-      const $element = $(this);
 
-      if ($element.is("input[type='text'], input[type='password'], textarea")) {
-        $element.removeAttr("readonly");
-      } else if ($element.is("select")) {
-        $element.removeAttr("disabled");
-      } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
-        $element.removeAttr("disabled");
-        $element.css("pointer-events", "");
-      }
+    $c.find('input[type="text"], input[type="password"], input[type="number"], input[type="tel"], input[type="email"], input[type="url"], textarea')
+      .removeAttr("readonly");
+
+    $c.find('input[type="checkbox"], input[type="radio"]')
+      .prop("disabled", false)
+      .css("pointer-events", "");
+
+    $c.find('select, input[type="file"]').prop("disabled", false);
+
+
+    $c.find('[data-role="dropdownlist"], [data-role="combobox"], [data-role="multiselect"]').each(function () {
+      const widget = $(this).data("kendoDropDownList") || $(this).data("kendoComboBox") || $(this).data("kendoMultiSelect");
+      if (widget) widget.enable(true);
     });
 
-
-    $container.find(".custom-combobox").each(function () {
-      const comboBox = $(this).data("kendoComboBox");
-      if (comboBox) {
-        comboBox.enable(true);
-      }
+    $c.find('[data-role="datepicker"], [data-role="datetimepicker"]').each(function () {
+      const dp = $(this).data("kendoDatePicker") || $(this).data("kendoDateTimePicker");
+      if (dp) dp.enable(true);
     });
 
-    $container.find("#btnSave, #btnClear").show();
+    $c.find('[data-role="numerictextbox"], [data-role="maskedtextbox"]').each(function () {
+      const nt = $(this).data("kendoNumericTextBox") || $(this).data("kendoMaskedTextBox");
+      if (nt) nt.enable(true);
+    });
+
+    $c.find('[data-role="upload"]').each(function () {
+      const up = $(this).data("kendoUpload");
+      if (up) up.enable(true);
+    });
+
+    $c.find("#btnSave, #btnClear").show();
   },
 
-  initializeKendoWindow: function (windowSelector, kemdowWindowTitle, kendowWindowWidth) {
-    $(windowSelector).kendoWindow({
-      title: kemdowWindowTitle,
-      resizeable: false,
-      width: kendowWindowWidth,
-      actions: ["Pin", "Refresh", "Maximize", "Close"],
-      modal: true,
-      visible: false,
-    });
-  },
-
-  clearFormFields: function (formSelector) {
+  clearFormFields: function (formSelectorId) {
+    const formSelector = formSelectorId.startsWith('#') ? formSelectorId : '#' + formSelectorId;
     var $Container = $(formSelector);
 
     // Clear text, password, number, hidden, tel, email, url inputs
@@ -2849,12 +2940,40 @@ var CommonManager = {
     $Container.find(".hint").text('');
   },
 
+  initializeKendoWindow: function (windowSelector, kendowWindowTitle = "", kendowWindowWidth = "50%") {
+    const gridSelector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+    $(gridSelector).kendoWindow({
+      title: kendowWindowTitle,
+      resizeable: false,
+      width: kendowWindowWidth,
+      actions: ["Pin", "Refresh", "Maximize", "Close"],
+      modal: true,
+      visible: false,
+    });
+  },
+
+  openKendoWindow: function (windowSelector, kendowWindowTitle, kendowWindowWidth = "50%") {
+    const gridSelector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+    var popUp = $(gridSelector).data("kendoWindow");
+    if (!popUp) {
+      this.initializeKendoWindow(windowSelector, kendowWindowTitle, kendowWindowWidth);
+    }
+    if (kendowWindowTitle && kendowWindowTitle != "") {
+      popUp = $(gridSelector).data("kendoWindow");
+      popUp.title = kendowWindowTitle;
+    }
+    popUp.center().open();
+  },
+
   closeKendoWindow: function (windowSelector) {
     var window = $(windowSelector).data("kendoWindow");
     if (window) {
       window.close();
     }
   },
+
+
+
 
   // three parameters need, (gridId, filename and actions column name to remove from file)
   GenerateCSVFileAllPages: function (htmlId, fileName, actionsColumnName) {
@@ -3024,6 +3143,190 @@ var CommonManager = {
     }
     return res;
   },
+
+  /// all about kendo gird.
+  // Grid responsive করার জন্য common functions
+
+  // Store active resize handlers for cleanup
+  _activeResizeHandlers: {},
+
+  calculateTotalColumnsWidth: function (columns) {
+    let totalWidthOfTheGrid = 0;
+    columns.forEach(column => {
+      if (column.width != undefined && column.width && !column.hidden ) {
+        const widthValue = parseInt(column.width.toString().replace(/px|%/g, ''));
+        if (!isNaN(widthValue)) {
+          totalWidthOfTheGrid += widthValue;
+        }
+      }
+      else if (!column.hidden && !column.width) {
+        totalWidthOfTheGrid != 120;
+      }
+
+    });
+    return totalWidthOfTheGrid;
+  },
+
+  /**
+    * Grid এর responsive width calculate করার জন্য generic method
+    * @param {string} gridId - Grid এর ID (যেমন: "gridSummaryInstitute")
+    * @param {Array} columnsArray - Grid এর columns array
+    * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
+    * @returns {string} - Calculated width in pixels
+    */
+  calculateGridResponsiveWidth: function (gridId, columnsArray, marginOffset = 323) {
+    const containerElement = $("#" + gridId).parent();
+    let availableWidth;
+
+    // Container এর actual width নিন (zoom এর সাথে adjust হবে)
+    if (containerElement.length > 0) {
+      availableWidth = containerElement.width() - 40; // 40px padding জন্য
+    } else {
+      // Fallback: viewport এর effective width
+      availableWidth = Math.floor(window.innerWidth / window.devicePixelRatio) - marginOffset;
+    }
+
+    const totalColumnsWidth = this.calculateTotalColumnsWidth(columnsArray);
+
+    // যদি columns এর width বেশি হয় তাহলে available width ব্যবহার করুন
+    return totalColumnsWidth > availableWidth ? availableWidth + "px" : totalColumnsWidth + "px";
+  },
+
+
+  /**
+    * Grid এর জন্য zoom এবং resize handlers attach করার generic method
+    * @param {string} gridId - Grid এর ID
+    * @param {Array} columnsArray - Grid এর columns array
+    * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
+    */
+  attachGridZoomAndResizeHandlers: function (gridId, columnsArray, marginOffset = 323) {
+    let resizeTimeout;
+    const self = this;
+
+    // Unique namespace তৈরি করুন প্রতিটি grid এর জন্য
+    const eventNamespace = 'resize.kendoGrid_' + gridId;
+
+    // আগের event listener remove করুন (যদি থাকে)
+    $(window).off(eventNamespace);
+
+    // Window resize handler
+    $(window).on(eventNamespace, function () {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function () {
+        self.adjustGridWidth(gridId, columnsArray, marginOffset);
+      }, 250); // 250ms delay
+    });
+
+    // Zoom detection এর জন্য interval clear করুন (যদি আগে set করা থাকে)
+    if (window.gridZoomIntervals && window.gridZoomIntervals[gridId]) {
+      clearInterval(window.gridZoomIntervals[gridId]);
+    }
+
+    // Initialize zoom intervals object যদি না থাকে
+    if (!window.gridZoomIntervals) {
+      window.gridZoomIntervals = {};
+    }
+
+    // Zoom detection interval set করুন
+    let currentZoom = window.devicePixelRatio;
+    window.gridZoomIntervals[gridId] = setInterval(function () {
+      if (window.devicePixelRatio !== currentZoom) {
+        currentZoom = window.devicePixelRatio;
+        self.adjustGridWidth(gridId, columnsArray, marginOffset);
+      }
+    }, 500); // প্রতি 500ms এ check করুন
+  },
+
+  /**
+   * Grid width adjust করার generic method
+   * @param {string} gridId - Grid এর ID
+   * @param {Array} columnsArray - Grid এর columns array
+   * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
+   */
+  adjustGridWidth: function (gridId, columnsArray, marginOffset = 323) {
+    const grid = $("#" + gridId).data("kendoGrid");
+    if (grid) {
+      const newWidth = this.calculateGridResponsiveWidth(gridId, columnsArray, marginOffset);
+
+      // Grid এর wrapper element এর width update করুন
+      grid.wrapper.width(newWidth);
+
+      // Grid এর table element এর width update করুন
+      grid.table.width("100%");
+
+      // Optional: Grid header এর width ও update করুন
+      if (grid.thead) {
+        grid.thead.width("100%");
+      }
+
+      // Grid কে refresh করুন layout এর জন্য (কিন্তু data reload না করে)
+      setTimeout(function () {
+        grid.resize();
+      }, 50);
+    }
+  },
+
+  /**
+   * Grid এর সব event listeners এবং intervals cleanup করার method
+   * @param {string} gridId - Grid এর ID
+   */
+  destroyGridHandlers: function (gridId) {
+    // Event listeners remove করুন
+    const eventNamespace = 'resize.kendoGrid_' + gridId;
+    $(window).off(eventNamespace);
+
+    // Zoom detection interval clear করুন
+    if (window.gridZoomIntervals && window.gridZoomIntervals[gridId]) {
+      clearInterval(window.gridZoomIntervals[gridId]);
+      delete window.gridZoomIntervals[gridId];
+    }
+
+    // Grid destroy করুন (optional)
+    const grid = $("#" + gridId).data("kendoGrid");
+    if (grid) {
+      grid.destroy();
+    }
+  },
+
+  /**
+   * Multiple grids এর জন্য bulk cleanup
+   * @param {Array} gridIds - Grid IDs এর array
+   */
+  destroyMultipleGridHandlers: function (gridIds) {
+    const self = this;
+    gridIds.forEach(function (gridId) {
+      self.destroyGridHandlers(gridId);
+    });
+  },
+
+  /**
+   * Grid initialize করার সময় responsive setup করার helper method
+   * @param {string} gridId - Grid এর ID
+   * @param {Object} gridOptions - Kendo Grid options
+   * @param {Array} columnsArray - Grid এর columns array
+   * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
+   * @returns {Object} - Updated grid options with responsive width
+   */
+  setupResponsiveGrid: function (gridId, gridOptions, columnsArray, marginOffset = 323) {
+    // Grid options এর width set করুন
+    gridOptions.width = this.calculateGridResponsiveWidth(gridId, columnsArray, marginOffset);
+
+    // Grid initialize করুন
+    $("#" + gridId).kendoGrid(gridOptions);
+
+    // Responsive handlers attach করুন
+    this.attachGridZoomAndResizeHandlers(gridId, columnsArray, marginOffset);
+
+    return gridOptions;
+  },
+
+  // Grid destroy করার সময় cleanup করুন
+  cleanup: function() {
+    CommonManager.destroyGridHandlers("gridSummaryInstitute");
+  },
+
+
+
 
 
 };

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace bdDevCRM.UI.Controllers
+namespace bdDevCRM.UI.Controllers.SystemAdmin
 {
   public class CoreController : Controller
   {
@@ -54,28 +54,23 @@ namespace bdDevCRM.UI.Controllers
       //}
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public ActionResult InstituteInformation()
+    public ActionResult Country()
     {
       //if (Session["CurrentUser"] != null)
       //{
-      return View("Institute/Institute");
+      return View("Country/Country");
+      //}
+      //else
+      //{
+      //  return RedirectToAction("Login", "Home");
+      //}
+    }
+
+    public ActionResult CRMInstitute()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("CRMInstitute/Institute");
       //}
       //else
       //{
@@ -83,11 +78,11 @@ namespace bdDevCRM.UI.Controllers
       //}
     }
 
-    public ActionResult InstituteTypeInformation()
+    public ActionResult CRMInstituteType()
     {
       //if (Session["CurrentUser"] != null)
       //{
-      return View("InstituteType/InstituteType");
+      return View("CRMInstituteType/InstituteType");
       //}
       //else
       //{

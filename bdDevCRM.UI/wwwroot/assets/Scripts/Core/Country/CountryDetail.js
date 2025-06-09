@@ -1,22 +1,22 @@
 ﻿/// <reference path="../../common/common.js" />
-/// <reference path="Currency.js" />
-/// <reference path="CurrencySummary.js" />
+/// <reference path="country.js" />
+/// <reference path="countrysummary.js" />
 /// <reference path=""
 
-var CurrencyDetailsManager = {
+var CountryDetailsManager = {
   // SaveOrUpdateOrDelete
   saveOrUpdateItem: async function () {
     debugger;
     //if (UserDetailsHelper.validateUserDetaisForm()) {
 
     // default
-    var isToUpdateOrCreate = $("#currencyId").val();
-    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
-    //var serviceUrl = isToUpdateOrCreate == 0 ? "/currency" : "/currency/" + isToUpdateOrCreate;
-    var serviceUrl = "/currency/" + isToUpdateOrCreate;
+    var isToUpdateOrCreate = $("#countryId").val();
+    var serviceUrl = isToUpdateOrCreate == 0 ? "/country" : "/country/" + isToUpdateOrCreate;
+    var serviceUrl = "/country/" + isToUpdateOrCreate;
     var confirmmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
-    //var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
-    var httpType = "POST";
+    var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
+    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
+    //var httpType = "POST";
 
     AjaxManager.MsgBox(
       'info',
@@ -29,9 +29,9 @@ var CurrencyDetailsManager = {
           text: 'Yes',
           onClick: async function ($noty) {
             $noty.close();
-            var currency = CurrencyDetailsHelper.createItem();
-            console.log(currency);
-            var jsonObject = JSON.stringify(currency);
+            var country = CountryDetailsHelper.createItem();
+            console.log(country);
+            var jsonObject = JSON.stringify(country);
             try {
               const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
               ToastrMessage.showToastrNotification({
@@ -42,8 +42,8 @@ var CurrencyDetailsManager = {
                 type: 'success',
               });
 
-              CurrencyDetailsHelper.clearForm();
-              var gridInstance = $("#gridSummaryCurrency").data("kendoGrid");
+              CountryDetailsHelper.clearForm();
+              var gridInstance = $("#gridSummaryCountry").data("kendoGrid");
               if (gridInstance) {
                 gridInstance.dataSource.read();
               }
@@ -78,7 +78,7 @@ var CurrencyDetailsManager = {
     if (actionGridData == null || actionGridData == undefined) return false;
 
     var successmsg = "Data Deleted Successfully.";
-    var serviceUrl = "/currency/" + actionGridData.CurrencyId;
+    var serviceUrl = "/country/" + actionGridData.CountryId;
     var confirmmsg = "Are you sure to Delete this action?";
     var httpType = "DELETE";
 
@@ -96,7 +96,7 @@ var CurrencyDetailsManager = {
             var jsonObject = JSON.stringify(actionGridData);
             try {
               const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
-              CurrencyDetailsHelper.clearForm();
+              CountryDetailsHelper.clearForm();
               ToastrMessage.showToastrNotification({
                 preventDuplicates: true,
                 closeButton: true,
@@ -105,7 +105,7 @@ var CurrencyDetailsManager = {
                 type: 'success',
               });
 
-              $("#gridSummaryCurrency").data("kendoGrid").dataSource.read();
+              $("#gridSummaryCountry").data("kendoGrid").dataSource.read();
             } catch (error) {
               let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
               ToastrMessage.showToastrNotification({
@@ -130,42 +130,52 @@ var CurrencyDetailsManager = {
     );
   },
 
+
 }
 
-var CurrencyDetailsHelper = {
+var CountryDetailsHelper = {
 
   clearForm: function () {
     debugger;
-    CommonManager.clearFormFields("#CurrencyFrom");
-    $("#btnCurrencySaveOrUpdate").text("+ Add Currency");
+    CommonManager.clearFormFields("#CountryFrom");
+    $("#btnCountrySaveOrUpdate").text("+ Add Country");
   },
 
   createItem: function () {
-    var currency = new Object();
+    var country = new Object();
 
-    currency.CurrencyId = $("#currencyId").val() == '' ? '0' : $("#currencyId").val();
-    currency.CurrencyName = $("#currencyName").val();
-    if ($("#chkIsDefaultCurrency").is(':checked') == true) {
-      currency.IsDefault = 1;
+    country.CountryId = $("#countryId").val() == '' ? '0' : $("#countryId").val();
+    country.CountryName = $("#countryName").val();
+    country.CountryCode = $("#countryCode").val();
+   
+    if ($("#chkStatusCountry").is(':checked') == true) {
+      country.Status = 1;
     } else {
-      currency.IsDefault = 0;
-    }
-    if ($("#chkIsActiveCurrency").is(':checked') == true) {
-      currency.IsActive = 1;
-    } else {
-      currency.IsActive = 0;
+      country.Status = 0;
     }
 
-    return currency;
+    return country;
   },
 
-  editItem: async function (item) {
-    $("#btnCurrencySaveOrUpdate").text("Update Currency");
-    $("#currencyName").val(item.CurrencyName);
-    $('#chkIsDefaultCurrency').prop('checked', item.IsDefault == 1 ? true : false);
-    $('#chkIsActiveCurrency').prop('checked', item.IsActive == 1 ? true : false);
+  //editItem: async function (item) {
+  //  $("#btnCountrySaveOrUpdate").text("Update Country");
+  //  $("#countryName").val(item.CountryName);
+  //  $("#countryCode").val(item.CountryCode);
+  //  $('#chkStatusCountry').prop('checked', item.Status == 1 ? true : false);
 
-    $("#currencyId").val(item.CurrencyId);
+  //  $("#countryId").val(item.CountryId);
+  //},
+
+  populateObject: function (item) {
+    CountryDetailsHelper.clearForm();
+
+    $("#btnCountrySaveOrUpdate").text("Update Country");
+    $("#countryName").val(item.CountryName);
+    $("#countryCode").val(item.CountryCode);
+    $('#chkStatusCountry').prop('checked', item.Status == 1 ? true : false);
+
+    $("#countryId").val(item.CountryId);
   },
 
+  
 }

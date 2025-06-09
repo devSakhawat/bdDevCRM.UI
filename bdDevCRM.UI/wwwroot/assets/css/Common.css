@@ -3,12 +3,15 @@
 }
 
 .reset {
-    all: revert;
-    margin-bottom:20px;
+  all: revert;
+  margin-bottom: 20px;
+  border-color: #CCC;
 }
+
 .mainDiv{
     xpadding:10px;
 }
+
 .k-autocomplete, .k-colorpicker, .k-combobox, .k-datepicker, .k-datetimepicker, .k-dropdown, .k-dropdowntree, .k-listbox, .k-multiselect, .k-numerictextbox, .k-selectbox, .k-textbox, .k-timepicker, .k-toolbar .k-split-button {
     width: 17.4em;
    

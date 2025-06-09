@@ -1,18 +1,20 @@
 ﻿/// <reference path="../../common/common.js" />
-/// <reference path="CurrencyDetail.js" />
-/// <reference path="CurrencySummary.js" />
+/// <reference path="countrydetail.js" />
+/// <reference path="countrysummary.js" />
 /// <reference path=""
 
 
 $(document).ready(function () {
-  CurrencySummaryHelper.initCurrencySummary();
+  CountrySummaryHelper.initCountrySummary();
 });
 
-var CurrencyManager = {
+var CountryManager = {
+
+
 
 }
 
-var CurrencyHelper = {
+var CountryHelper = {
 
   //createImageBitmap: function (image) {
   //  var canvas = document.createElement("canvas");

@@ -16,7 +16,6 @@
 		</div>
 	</fieldset>
 
-
 	<!-- English Language and other Entry Exam Details -->
 	<h3 class="k-header mb-2">English Language and other Entry Exam.</h3>
 	<h4 class="k-header mb-3">Please list your five Qualification taken with most recent first.</h4>
@@ -102,7 +101,6 @@
 		</div>
 	</fieldset>
 
-
 	<!-- TOEFL Information -->
 	<fieldset class="reset">
 		<legend class="reset">TOEFL Information</legend>
@@ -183,7 +181,6 @@
 		</div>
 	</fieldset>
 	
-
 	<!-- PTE Information -->
 	<fieldset class="reset">
 		<legend class="reset">PTE Information</legend>
@@ -263,7 +260,6 @@
 
 		</div>
 	</fieldset>
-	
 
 	<!-- GMAT Information -->
 	<fieldset class="reset">
@@ -371,10 +367,6 @@
 		</div>
 	</fieldset>
 
-
-
-
-
 	<!-- Buttons -->
 	<div class="btnDiv mt-2">
 		<ul>
@@ -389,60 +381,6 @@
 
 
 
-	@* <div style="display:none" id="MaritalStatusPopupWindow" class="divDetails"> *@
-	<div style="display:none" id="CouuntryPopUp" class="">
-		<div class="row">
-
-			<div class="col-lg-6 col-md-6 col-sm-12">
-				<fieldset class="k-content">
-					<legend class="k-fontSize[15]">Country Details</legend>
-
-					@* <div id="countryDetails" class="divDetails"> *@
-					<form action="/" method="post">
-						<div class="row">
-
-							<input type="hidden" id="hdnCountryId" value="0" />
-
-							<div class="col-12">
-								<label for="CountryName" class="lbl widthSize33_per">Country Name:</label>
-								<input type="text" id="txtCountryName" name="CountryName" maxlength="100" pattern="[a-zA-Z0-9 ]+" class="k-textbox" placeholder="Country Name" required validationmessage="Please Enter Country Name" />
-							</div>
-
-							<div class="col-12">
-								<label for="IsActive" class="lbl widthSize33_per">Is Active:</label>
-								<input type="checkbox" id="chkIsActiveCountry" name="IsActive" class="k-checkbox" checked="checked" />
-							</div>
-						</div>
-
-						<div class="btnDiv mt-2">
-							<ul>
-								<li class="d-flex justify-content-end">
-									<button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="NationalityDetailsManager.SaveNationalityInformation();">+ Add Item</button>
-									<button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="NationalityDetailsHelper.clearNationalityInfo()">Clear</button>
-									<button type="button" class="btn btn-light me-2" onclick="NationalityDetailsHelper.CloseWindow()">Close</button>
-								</li>
-							</ul>
-						</div>
-
-					</form>
-
-				</fieldset>
-			</div>
-
-			<div class="col-lg-6 col-md-6 col-sm-12">
-				<fieldset class="k-content">
-					<legend class="k-fontSize[15]">Country Summary</legend>
-
-					<div id="gridSummaryCountry"></div>
-					<div class="clear"></div>
-				</fieldset>
-			</div>
-		</div>
-
-
-
-
-	</div>
 
 
 </div>

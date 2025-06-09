@@ -218,9 +218,14 @@ var MenuDetailsManager = {
     var jsonParams = "moduleId=" + moduleId;
     var serviceUrl = "/menus-by-moduleId/";
     function onSuccess(jsonData) {
+      console.log(jsonData);
       //var objMenuuData = new Object();
       //objMenuuData = jsonData;
       var comboBox = $("#cmb-parent-menu").data("kendoComboBox");
+      if (!comboBox) {
+        MenuDetailsHelper.InitMenuByModuleId();
+        comboBox = $("#cmb-parent-menu").data("kendoComboBox");
+      }
       comboBox.setDataSource(jsonData);
       //$("#cmb-parent-menu").kendoComboBox({
       //  placeholder: "Select Parent Menu...",

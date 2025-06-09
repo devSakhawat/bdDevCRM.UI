@@ -1,0 +1,24 @@
+﻿@{
+	ViewBag.Title = "Institute Info";
+	Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+<!-- row -->
+<div class="row">
+	<!-- Institute Summary -->
+	@* <div class="row"> *@
+		<partial name="CRMInstitute/_InstituteSummary" />
+	@* </div> *@
+
+	<!-- Institute Form -->
+  <div class="row">
+		<div id="InstitutePopUp" style="display: none">
+			<partial name="CRMInstitute/_InstituteDetails" />
+		</div>
+	</div>
+	
+</div>
+
+<script src="~/assets/scripts/core/crminstitute/institute.js"></script>
+
+

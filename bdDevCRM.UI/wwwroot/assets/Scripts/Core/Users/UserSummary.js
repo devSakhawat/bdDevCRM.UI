@@ -91,14 +91,15 @@ var UserSummaryHelper = {
       resizable: true,
       filterable: true,
       sortable: true,
+      //pageable: {
+      //  //pageSizes: [5, 10, 20, 100],
+      //  buttonCount: 5,
+      //  refresh: true,
+      //  serverPaging: true,
+      //  serverFiltering: true,
+      //  serverSorting: true
+      //},
       pageable: {
-        //pageSizes: [5, 10, 20, 100],
-        buttonCount: 5,
-        refresh: true,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      }, pageable: {
         pageSizes: [10, 20, 50, 100],
         buttonCount: 3, // This sets exactly 3 buttons as required
         refresh: true,

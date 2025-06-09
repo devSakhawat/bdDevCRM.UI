@@ -160,11 +160,14 @@ input{
 }
 
   input[type="radio"] {
-    cursor: pointer !important;
     min-width: 15px;
     min-height: 15px;
     width: 18px;
     height: 18px;
+  }
+
+  input[type="file"], input[type="checkbox"], input[type="radio"] {
+    cursor: pointer !important;
   }
 
 textarea {
@@ -191,6 +194,7 @@ textarea {
 }
 
 
+
 #tabstrip ul li {
 /*  font-size: 15px;
   font-weight: 600;*/
@@ -209,6 +213,23 @@ textarea {
 .min-width_100{
   min-width: 100%;
 }
+
+
+.min-width_96{
+  min-width: 96%;
+}
+
+.max-vh-80 {
+  max-height: 80vh !important;
+}
+
+.grid-background {
+  background-color: #F1F5F9;
+}
+
+/*.overflow-auto {
+  overflow-y: auto !important;
+}*/
 
 /*.k-grid-header,
 .k-grid-content {

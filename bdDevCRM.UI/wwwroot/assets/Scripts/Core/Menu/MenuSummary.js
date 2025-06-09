@@ -113,7 +113,7 @@ var MenuSummaryHelper = {
         allPages: true,
         columnInfo: true,
       },
-       pdf: {
+      pdf: {
           fileName: "Menu_Information.pdf",
           allPages: true,
           paperSize: "A4",
@@ -181,42 +181,42 @@ var MenuSummaryHelper = {
   },
 
   GenerateColumns: function () {
-      return columns = [
-        { field: "MenuId", title: "Menu Id", width: 0, hidden: true },
-        { field: "ModuleId", title: "Module Id", width: 0, hidden: true },
-        { field: "MenuPath", title: "Menu Path", width: 0, hidden: true },
-        { field: "ParentMenu", title: "Parent Menu Id", width: 0, hidden: true },
-        { field: "SortOrder", title: "Sort Order", width: 0, hidden: true },
-        { field: "IsQuickLink", title: "Quick Link", width: 0, hidden: true },
-        { field: "MenuCode", title: "Code", width: 0, hidden: true },
-         { field: "MenuName", title: "Name", width: 140, headerAttributes: { style: "white-space: normal;" } },
-         { field: "ParentMenuName", title: "Parent Menu", width: 140, headerAttributes: { style: "white-space: normal;" } },
-         { field: "ModuleName", title: "Module Name", width: 120, headerAttributes: {  style: "white-space: normal;" } },
-        {
-          field: "MenuType",
-          title: "Type",
-          width: 70,
-          hidden: false,
-           template: "#= data.MenuType == 1 ? 'Web' : data.MenuType == 2 ? 'App' : 'Both' #",
-           headerAttributes: { style: "white-space: normal;" } 
-        },
-        {
-          field: "IsActive",
-          title: "Status",
-          width: 80,
-          hidden: false,
-           template: "#= data.IsActive == 1 ? 'Active' : 'Inactive' #",
-           headerAttributes: { style: "white-space: normal;" } 
-        },
-        {
-          field: "Edit", title: "Actions", filterable: false, width: 200,
-          template: `
+    return columns = [
+      { field: "MenuId", title: "Menu Id", width: 0, hidden: true },
+      { field: "ModuleId", title: "Module Id", width: 0, hidden: true },
+      { field: "MenuPath", title: "Menu Path", width: 0, hidden: true },
+      { field: "ParentMenu", title: "Parent Menu Id", width: 0, hidden: true },
+      { field: "SortOrder", title: "Sort Order", width: 0, hidden: true },
+      { field: "IsQuickLink", title: "Quick Link", width: 0, hidden: true },
+      { field: "MenuCode", title: "Code", width: 0, hidden: true },
+      { field: "MenuName", title: "Name", width: 140, headerAttributes: { style: "white-space: normal;" } },
+      { field: "ParentMenuName", title: "Parent Menu", width: 140, headerAttributes: { style: "white-space: normal;" } },
+      { field: "ModuleName", title: "Module Name", width: 120, headerAttributes: { style: "white-space: normal;" } },
+      {
+        field: "MenuType",
+        title: "Type",
+        width: 70,
+        hidden: false,
+        template: "#= data.MenuType == 1 ? 'Web' : data.MenuType == 2 ? 'App' : 'Both' #",
+        headerAttributes: { style: "white-space: normal;" }
+      },
+      {
+        field: "IsActive",
+        title: "Status",
+        width: 80,
+        hidden: false,
+        template: "#= data.IsActive == 1 ? 'Active' : 'Inactive' #",
+        headerAttributes: { style: "white-space: normal;" }
+      },
+      {
+        field: "Edit", title: "Actions", filterable: false, width: 200,
+        template: `
         <input type="button" class="btn btn-outline-success widthSize30_per" style="cursor: pointer;" value="View" id="btnView" onClick="MenuSummaryHelper.clickEventForViewButton(event)"/>
         <input type="button" class="btn btn-outline-dark widthSize30_per" style="cursor: pointer;" value="Edit" id="btnEdit" onClick="MenuSummaryHelper.clickEventForEditButton(event)"/>
         <input type="button" class="btn btn-outline-danger widthSize33_per" style="cursor: pointer;" value="Delete" id="btnDelete" onClick="MenuSummaryHelper.clickEventForDeleteButton(event)"/>`
-          , sortable: false, exportable: false 
-        }
-      ];
+        , sortable: false, exportable: false
+      }
+    ];
   },
 
   clickEventForViewButton: function (e) {

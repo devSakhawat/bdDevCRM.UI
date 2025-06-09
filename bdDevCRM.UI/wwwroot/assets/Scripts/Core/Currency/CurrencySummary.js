@@ -39,7 +39,7 @@ var CurrencySummaryHelper = {
       dataSource: [],
       autoBind: true,
       navigatable: true,
-      width: "100%",
+      width: "400px",
       scrollable: false,
       resizable: false,
       filterable: false,
@@ -54,6 +54,9 @@ var CurrencySummaryHelper = {
     const gridInstance = $("#gridSummaryCurrency").data("kendoGrid");
     if (gridInstance) {
       const dataSource = CurrencySummaryManager.getSummaryCurrencyGridDataSource();
+      console.log(dataSource.data());
+      console.log(dataSource.view());
+      dataSource.fetch().then(() => gridInstance.setDataSource(dataSource));
       gridInstance.setDataSource(dataSource);
     }
   },

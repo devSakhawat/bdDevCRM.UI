@@ -1,0 +1,45 @@
+﻿
+<script src="~/assets/scripts/core/country/countrydetail.js"></script>
+
+
+<div class="col-xl-5 col-lg-5 col-md-6 col-sm-12 col-12" id="CountryFrom">
+	<fieldset class="reset">
+		<legend class="reset">Country Form</legend>
+
+		<div class="row mb-2">
+			<input id="countryId" type="hidden" value="0" />
+
+			<!-- CountryName -->
+			<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+				<label for="CountryName">Country Name <span class="redstart">*</span></label>
+				<input type="text" class="form-control" id="countryName" name="CountryName" placeholder="Country name" required validationMessage="Country name is required" />
+			</div>
+
+			<!-- CountryCode -->
+			<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+				<label for="CountryCode">Country Code</label>
+				<input type="text" class="form-control" id="countryCode" name="CountryCode" placeholder="Country Code" />
+			</div>
+
+			<!-- Status -->
+			<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
+				<label for="StatusCountry" class="form-check-label">Status</label>
+				<input type="checkbox" id="chkStatusCountry" name="StatusCountry" class="form-check-input" />
+			</div>
+		</div>
+
+		<div class="btnDiv mt-2">
+			<ul>
+				<li class="d-flex justify-content-end">
+					<button type="button" class="btn btn-primary me-2" id="btnCountrySaveOrUpdate" onclick="CountryDetailsManager.saveOrUpdateItem();">+ Add Country</button>
+					<button type="button" class="btn btn-secondary me-2" onclick="CountryDetailsHelper.clearForm();">Clear</button>
+					<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#CountryPopUp")'>Close</button>
+				</li>
+			</ul>
+		</div>
+	</fieldset>
+</div>
+
+
+
+

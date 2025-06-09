@@ -10,7 +10,7 @@ $(document).ready(function () {
 
   CRMApplicationSettingsHelper.createTabstrip();
   CRMCourseInformationHelper.courseInit();
-  CRMEducationNEnglishLanguagHelper.initEducationNEnglishtLanguage();
+/*  CRMEducationNEnglishLanguagHelper.initEducationNEnglishtLanguage();*/
 
 
 

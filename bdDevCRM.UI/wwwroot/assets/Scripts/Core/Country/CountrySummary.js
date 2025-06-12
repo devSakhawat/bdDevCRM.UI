@@ -108,6 +108,7 @@ var CountrySummaryHelper = {
     if (selectedItem) {
       CountryDetailsHelper.populateObject(selectedItem);
       CommonManager.MakeFormReadOnly("#CountryFrom");
+      $("#btnCountrySaveOrUpdate").prop("disabled", "disabled");
     }
   },
 

@@ -160,7 +160,7 @@ var InstituteTypeSummaryHelper = {
     if (item) {
       InstituteTypeDetailsHelper.populateObject(item);
       CommonManager.MakeFormReadOnly("#InstituteTypeFrom");
-      //CommonManager.openKendoWindow("#InstituteTypePopUp", "View InstituteType");
+      $("#btnInstituteTypeSaveOrUpdate").prop("disabled", "disabled");
     }
   },
 
@@ -169,7 +169,6 @@ var InstituteTypeSummaryHelper = {
     if (item) {
       InstituteTypeDetailsHelper.populateObject(item);
       CommonManager.MakeFormEditable("#InstituteTypeFrom");
-      //CommonManager.openKendoWindow("#InstituteTypePopUp", "Edit InstituteType");
     }
   },
 

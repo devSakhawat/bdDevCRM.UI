@@ -1,7 +1,11 @@
-﻿
-<script src="~/assets/scripts/core/crminstitute/institutedetails.js"></script>
+﻿@* 
+<script src="~/assets/libs/pdfviewer/pdf.2.10.377.min.js"></script> *@
 
-<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
+<script src="~/assets/scripts/core/crminstitute/institutedetails.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+
+
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12" id="InstituteForm">
   <fieldset class="reset">
     <legend class="reset">Institute Form</legend>
 
@@ -143,13 +147,30 @@
       </div>
 
       <!-- ===== File Uploads ===== -->
+      <!-- Logo (image) -->
       <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
         <label for="institutionLogoFile">Institution Logo</label>
-        <input type="file" class="form-control" id="institutionLogoFile" name="InstitutionLogo" accept="image/*" />
+        <input type="file" class="form-control" id="institutionLogoFile" name="InstitutionLogoFile" accept="image/*" />
+        <!-- 200X200 perview thumb -->
+        <img id="logoThumb" class="d-none border mt-1" style="height:200px;width:200px;object-fit:contain;cursor:pointer" onclick="openPreview('logo')" />
       </div>
+
+      <!-- Prospectus (PDF) -->
       <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
         <label for="prospectusFile">Institution Prospectus (PDF)</label>
-        <input type="file" class="form-control" id="prospectusFile" name="InstitutionProspectus" accept="application/pdf" />
+        <input type="file" class="form-control" id="prospectusFile" name="InstitutionProspectusFile" accept="application/pdf" />
+        <div class="mt-1">
+          <span id="pdfName" class="text-muted"></span>
+          <button type="button" class="btn btn-outline-primary btn-sm d-none" id="pdfPreviewBtn" onclick="InstituteDetailsHelper.openPreview('pdf')"> Preview </button>
+          <!-- 200X200 perview thumb -->
+          <img id="pdfThumbnail" class="d-none mt-2 border" style="width:200px;height:200px;object-fit:cover;cursor:pointer" onclick="InstituteDetailsHelper.openPreview('pdf')" />
+
+        </div>
+      </div>
+
+      <!-- to show pdf view with kendo Window -->
+      <div id="pdfViewerWindow" style="display:none;">
+        <div id="pdfViewer" style="height: 80vh;"></div>
       </div>
 
     </div>
@@ -160,7 +181,6 @@
         <li class="d-flex justify-content-end">
           <button type="button" class="btn btn-primary me-2" id="btnInstituteSaveOrUpdate" onclick="InstituteDetailsManager.saveOrUpdateItem();"> + Add Institute </button>
           <button type="button" class="btn btn-secondary me-2" onclick="InstituteDetailsHelper.clearForm();"> Clear </button>
-          <button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#InstitutePopUp")'> Close </button>
         </li>
       </ul>
     </div>
@@ -186,7 +206,6 @@
         <partial name="~/Views/Core/Country/_CountrySummery.cshtml" />
       </div>
     </div>
-
 
     @* Currency PopUp *@
     <div style="display:none" id="CurrencyPopUp_Institute" class="">

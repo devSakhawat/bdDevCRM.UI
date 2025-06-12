@@ -139,6 +139,9 @@ var CountryDetailsHelper = {
     debugger;
     CommonManager.clearFormFields("#CountryFrom");
     $("#btnCountrySaveOrUpdate").text("+ Add Country");
+    $("#countryId").val(0);
+
+    $("#btnCountrySaveOrUpdate").prop("disabled", false);
   },
 
   createItem: function () {
@@ -157,18 +160,8 @@ var CountryDetailsHelper = {
     return country;
   },
 
-  //editItem: async function (item) {
-  //  $("#btnCountrySaveOrUpdate").text("Update Country");
-  //  $("#countryName").val(item.CountryName);
-  //  $("#countryCode").val(item.CountryCode);
-  //  $('#chkStatusCountry').prop('checked', item.Status == 1 ? true : false);
-
-  //  $("#countryId").val(item.CountryId);
-  //},
-
   populateObject: function (item) {
-    CountryDetailsHelper.clearForm();
-
+    this.clearForm();
     $("#btnCountrySaveOrUpdate").text("Update Country");
     $("#countryName").val(item.CountryName);
     $("#countryCode").val(item.CountryCode);

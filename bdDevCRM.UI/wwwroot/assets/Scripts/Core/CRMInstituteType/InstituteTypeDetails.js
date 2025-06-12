@@ -106,6 +106,8 @@ var InstituteTypeDetailsHelper = {
     CommonManager.clearFormFields("#InstituteTypeFrom");
     $("#btnInstituteTypeSaveOrUpdate").text("+ Add InstituteType");
     $("#InstituteTypeId").val(0);
+
+    $("#btnInstituteTypeSaveOrUpdate").prop("disabled", false);
   },
 
   /* ------ Create DTO Object ------ */
@@ -126,6 +128,8 @@ var InstituteTypeDetailsHelper = {
 
     $("#InstituteTypeId").val(item.InstituteTypeId);
     $("#InstituteTypeName").val(item.InstituteTypeName);
+
+    $("#btnInstituteTypeSaveOrUpdate").prop("disabled", false);
   },
 
 };

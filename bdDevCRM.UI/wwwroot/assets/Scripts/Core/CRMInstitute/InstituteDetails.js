@@ -5,10 +5,16 @@
 /// <reference path="institutesummary.js" />
 
 /* =========================================================
-   InstituteDetailsManager : Save / Update / Delete
+   Global variable
+=========================================================*/
+let prospectusFileData = null;
+
+
+/* =========================================================
+   InstituteDetailsManager : Fetch / Save / Update / Delete
 =========================================================*/
 
-var InitiateDetailsManager = {
+var InstituteDetailsManager = {
   /* -------- DataSource:  DDL -------- */
   fetchInstituteTypeComboBoxData: function () {
     const jsonParams = "";
@@ -48,22 +54,30 @@ var InitiateDetailsManager = {
     );
   },
 
-
   /* -------- Save ⬌ Update -------- */
   saveOrUpdateItem: async function () {
+    debugger
     const id = $("#instituteId").val() || 0;
     const isCreate = id == 0;
-    /* ⬇️ শুধুই আলাদা এন্ডপয়েন্ট ব্যবহার করছি */
-    const serviceUrl = isCreate
-      ? "/crm-institute/create"
-      : `/crm-institute/update/${id}`;
+    const serviceUrl = isCreate ? "/crm-institute" : `/crm-institute/${id}`;
     const httpType = isCreate ? "POST" : "PUT";
-    const confirmMsg = isCreate
-      ? "Do you want to save information?"
-      : "Do you want to update information?";
-    const successMsg = isCreate
-      ? "New data saved successfully."
-      : "Information updated successfully.";
+    const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+    const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
+
+    // object without file and image
+    const dto = InstituteDetailsHelper.createItem();
+    const formData = new FormData();  
+
+    for (const [propertyName, propertyValue] of Object.entries(dto)) {
+      if (propertyValue !== undefined && propertyValue !== null) {
+        formData.append(propertyName, propertyValue);
+      }
+    }
+
+    const logo = $("#institutionLogoFile")[0].files[0];
+    if (logo) formData.append("InstitutionLogoFile", logo);
+    const pdf = $("#prospectusFile")[0].files[0];
+    if (pdf) formData.append("InstitutionProspectusFile", pdf);
 
     AjaxManager.MsgBox(
       "info",
@@ -75,14 +89,17 @@ var InitiateDetailsManager = {
         text: "Yes",
         onClick: async function ($noty) {
           $noty.close();
-          const dto = InstituteDetailsHelper.createItem();
+          //const dto = InstituteDetailsHelper.createItem();
           try {
-            await AjaxManager.PostDataAjax(
-              baseApi, serviceUrl, JSON.stringify(dto), httpType);
+            debugger;
+            await AjaxManager.SendRequestAjax(baseApi, serviceUrl, formData, httpType );
 
             ToastrMessage.showToastrNotification({
-              preventDuplicates: true, closeButton: true,
-              timeOut: 3000, message: successMsg, type: "success"
+              preventDuplicates: true,
+              closeButton: true,
+              timeOut: 3000,
+              message: successMsg,
+              type: "success"
             });
 
             InstituteDetailsHelper.clearForm();
@@ -105,7 +122,7 @@ var InitiateDetailsManager = {
   deleteItem: function (gridItem) {
     if (!gridItem) return;
 
-    const serviceUrl = `/crm-institute/delete/${gridItem.InstituteId}`;
+    const serviceUrl = `/crm-institute/${gridItem.InstituteId}`;
     AjaxManager.MsgBox(
       "info",
       "center",
@@ -149,33 +166,26 @@ var InstituteDetailsHelper = {
 
   instituteInit: function () {
     CommonManager.initializeKendoWindow("#InstitutePopUp", "Institute Details", "80%");
-    //CommonManager.initializeKendoWindow("InstituteTypePopUp_Institute", "Institute Type Info", "80%");
-    //CommonManager.initializeKendoWindow("CountryPopUp_Institute", "Country Info", "80%");
-    //CommonManager.initializeKendoWindow("CurrencyPopUp_Institute", "Currency Info", "80%");
+    CommonManager.initializeKendoWindow("#FilePreviewWin", "Preview", "70%");
+
     this.generateInstituteTypeCombo();
     this.generateCountryCombo();
     this.generateCurrencyCombo();
 
-    //CommonManager.initializeKendoWindow("#CountryPopUp", "Country Details", "80%");
-    //CommonManager.initializeKendoWindow("#course_InstitutePopUp", "Inistitute Details", "80%");
-    //CommonManager.initializeKendoWindow("#course_CoursePopUp", "Course Details", "80%");
-    //CommonManager.initializeKendoWindow("#CurrencyPopUp_Course", "Currency Details", "80%");
-
-    //this.generateCountryCombo_Institute();
-    //this.generateCountryCombo();
-    //this.generateInstituteCombo();
-    //this.generateCourseCombo();
-    //this.generateIntakeMonthCombo();
-    //this.generateIntakeYearCombo();
-    //this.generateCurrencyCombo();
-    //this.generatePaymentMethodCombo();
-    //this.initializePaymentDate();
-
+    // initialize perview handler to document ready
+    this.initLogoPreviewHandler();
+    this.initProspectusPreviewHandler();
   },
 
   /* ------ PopUp UI ------ */
   openInistitutePopUp: function () {
-    CommonManager.openKendoWindow("#InstitutePopUp", "Institute Details", "80%");
+    debugger;
+    InstituteDetailsHelper.clearForm();
+    const windowId = "InstitutePopUp";
+    CommonManager.openKendoWindow(windowId, "Institute Details", "80%");
+
+    // Append Close button dynamically if not already added
+    CommonManager.appandCloseButton(windowId);
   },
 
   openInstituteTypePopup: function () {
@@ -192,14 +202,29 @@ var InstituteDetailsHelper = {
   },
 
   openCountryPopup: function () {
-    CommonManager.openKendoWindow("CountryPopUp_Institute", "Country Info", "80%");
+    const windowId = "CountryPopUp_Institute";
+    CommonManager.openKendoWindow(windowId, "Country Info", "80%");
     CountrySummaryHelper.initCountrySummary();
+
+    // Append Close button dynamically if not already added
+    const buttonContainer = $(".btnDiv ul li");
+    buttonContainer.find(".btn-close-generic").remove();
+    const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
+    buttonContainer.append(closeBtn);
   },
 
   openCurrencyPopup: function () {
-    CommonManager.openKendoWindow("CurrencyPopUp_Institute", "Currency Info", "80%");
+    const windowId = "CurrencyPopUp_Institute";
+    CommonManager.openKendoWindow(windowId, "Currency Info", "80%");
     CurrencySummaryHelper.initCurrencySummary();
+
+    // Append Close button dynamically if not already added
+    const buttonContainer = $(".btnDiv ul li");
+    buttonContainer.find(".btn-close-generic").remove();
+    const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
+    buttonContainer.append(closeBtn);
   },
+
 
   /* ------ ComboBox ------ */
   generateInstituteTypeCombo: function () {
@@ -214,7 +239,7 @@ var InstituteDetailsHelper = {
 
     var instituteComboBoxInstant = $("#cmbInstituteType").data("kendoComboBox");
     if (instituteComboBoxInstant) {
-      InitiateDetailsManager.fetchInstituteTypeComboBoxData().then(data => {
+      InstituteDetailsManager.fetchInstituteTypeComboBoxData().then(data => {
         instituteComboBoxInstant.setDataSource(data);
       });
     }
@@ -232,7 +257,7 @@ var InstituteDetailsHelper = {
 
     var countryComboBoxInstant = $("#cmbCountry_Institute").data("kendoComboBox");
     if (countryComboBoxInstant) {
-      InitiateDetailsManager.fetchCountryComboBoxData().then(data => {
+      InstituteDetailsManager.fetchCountryComboBoxData().then(data => {
         countryComboBoxInstant.setDataSource(data);
       });
     }
@@ -250,31 +275,32 @@ var InstituteDetailsHelper = {
 
     var currencyComboBoxInstant = $("#cmbCurrency_Institute").data("kendoComboBox");
     if (currencyComboBoxInstant) {
-      InitiateDetailsManager.fetchCurrencyComboBoxData().then(data => {
+      InstituteDetailsManager.fetchCurrencyComboBoxData().then(data => {
         currencyComboBoxInstant.setDataSource(data);
       });
     }
   },
 
 
-
-
-
-
   /* ------ Clear Form ------ */
   clearForm: function () {
+    debugger;
     CommonManager.clearFormFields("#InstituteForm");
     $("#btnInstituteSaveOrUpdate").text("+ Add Institute");
     $("#instituteId").val(0);
+    $("#btnInstituteSaveOrUpdate").prop("disabled", false);
+    $("#logoThumb").val("");
+    $("#pdfThumbnail").val("");
   },
 
   /* ------ Create DTO Object ------ */
   createItem: function () {
+    debugger
 
     // ComboBox Instance
-    const countryCbo = $("#cmbInstituteCountryId").data("kendoComboBox");
-    const currencyCbo = $("#cmbInstituteCurrencyId").data("kendoComboBox");
-    const typeCbo = $("#cmbInstituteTypeId").data("kendoComboBox");
+    const countryCbo = $("#cmbInstituteCountry").data("kendoComboBox");
+    const currencyCbo = $("#cmbInstituteCurrency").data("kendoComboBox");
+    const typeCbo = $("#cmbInstituteType").data("kendoComboBox");
 
     // selected text/valus
     const countryId = countryCbo?.value() || null;
@@ -373,41 +399,100 @@ var InstituteDetailsHelper = {
     $("#chkStatusInstitute").prop("checked", item.Status);
   },
 
+  openPreview: function (type) {
+    if (!prospectusFileData) return;
 
-  /* ------ PopUP ------ */
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const blob = new Blob([e.target.result], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
 
-
-  generateCountryPopUp: function () {
-    debugger;
-    var countryPopUp = $("#CountryPopUp").data("kendoWindow");
-    if (!countryPopUp) return;
-    countryPopUp.center().open();
-
-    if (countryPopUp) {
-      var countryGridInstance = $("#gridSummaryCountry").data("kendoGrid")
-
-      const grid = $("#gridSummaryCountry").data("kendoGrid");
-      if (!grid) {
-        CountrySummaryHelper.initCountrySummary();
-        if (grid?.dataSource) {
-          isCountryDataLoaded = true;
-        }
-      } else {
-        grid.resize();
-        if (!isCountryDataLoaded) {
-          grid.dataSource.read();
-          isCountryDataLoaded = true;
-        }
+      if (!$("#pdfViewerWindow").data("kendoWindow")) {
+        $("#pdfViewerWindow").kendoWindow({
+          width: "80%",
+          height: "80vh",
+          title: "Prospectus Preview",
+          modal: true,
+          visible: false,
+          close: function () {
+            $("#pdfViewer").empty();
+          }
+        });
       }
-    }
-  },
-  generateCoursePopUp: function () {
-    var couresePopUp = $("#course_CoursePopUp").data("kendoWindow");
-    if (couresePopUp) {
-      couresePopUp.open().center();
-    }
+
+      $("#pdfViewerWindow").data("kendoWindow").center().open();
+
+      $("#pdfViewer").kendoPDFViewer({
+        pdfjsProcessing: { file: url },
+        width: "100%",
+        height: "100%",
+        toolbar: {
+          items: [ "pager", "spacer", "zoomIn", "zoomOut", "toggleSelection", "download" ]
+        }
+      });
+    };
+
+    reader.readAsArrayBuffer(prospectusFileData);
   },
 
+  /* ---------- Preview Handler ---------- */
+  initLogoPreviewHandler: function () {
+    $("#institutionLogoFile").on("change", function () {
+      const file = this.files[0];
+      if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = e =>
+          $("#logoThumb").attr("src", e.target.result).removeClass("d-none");
+        reader.readAsDataURL(file);
+      } else {
+        $("#logoThumb").addClass("d-none").attr("src", "#");
+      }
+    });
+  },
+
+  // pdf viewer
+  initProspectusPreviewHandler: function () {
+    debugger;
+    $("#prospectusFile").on("change", function () {
+      const file = this.files[0];
+      if (!file || file.type !== "application/pdf") {
+        $("#pdfThumbnail").addClass("d-none").attr("src", "#");
+        $("#pdfName").text("");
+        prospectusFileData = null;
+        return;
+      }
+
+      prospectusFileData = file;
+      $("#pdfName").text(file.name);
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const typedArray = new Uint8Array(this.result);
+
+        pdfjsLib.getDocument(typedArray).promise.then(pdf => {
+          pdf.getPage(1).then(page => {
+            /* rander first page in canvas → dataURL */
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            const scale = 200 / page.getViewport({ scale: 1 }).width;
+            const viewport = page.getViewport({ scale });
+
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            page.render({ canvasContext: context, viewport })
+              .promise.then(() => {
+                const imgUrl = canvas.toDataURL("image/png");
+                $("#pdfThumbnail")
+                  .attr("src", imgUrl)
+                  .removeClass("d-none");
+              });
+          });
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  },
 
 
 };

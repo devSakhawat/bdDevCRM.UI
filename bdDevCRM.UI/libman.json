@@ -1,0 +1,18 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "pdf.js@5.0.375",
+      "destination": "wwwroot/assets/libs/pdf.js/",
+      "files": [
+        "pdf.min.mjs",
+        "pdf.mjs",
+        "pdf.worker.mjs",
+        "pdf.worker.min.mjs",
+        "pdf_viewer.mjs",
+        "pdf_viewer.css"
+      ]
+    }
+  ]
+}

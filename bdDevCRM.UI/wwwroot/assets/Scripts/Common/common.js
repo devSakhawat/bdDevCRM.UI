@@ -584,12 +584,53 @@ var AjaxManager = {
     }
 
     try {
+      const isFormData = jsonParams instanceof FormData;
+
       const response = await $.ajax({
         type: httpType,
         url: baseApi + serviceUrl,
         data: jsonParams,
         crossDomain: true,
-        contentType: "application/json; charset=utf-8",
+        processData: !isFormData ? true : false,
+        contentType: !isFormData ? "application/json; charset=utf-8" : false,
+        headers: AjaxManager.getDefaultHeaders()
+      });
+
+      return Promise.resolve(response);
+
+    } catch (xhr) {
+      return Promise.reject(xhr);
+    }
+  },
+
+  // send json params without stringify.
+  SendRequestAjax: async function (baseApi, serviceUrl, jsonParams, httpType) {
+    var token = localStorage.getItem("jwtToken");
+    if (!token) {
+      AjaxManager.MsgBox(
+        'error',
+        'center',
+        'Authentication Failed!',
+        "Please log in first!",
+        [
+          { addClass: 'btn btn-primary', text: 'Yes', onClick: ($noty) => $noty.close() },
+          { addClass: 'btn', text: 'Cancel', onClick: ($noty) => $noty.close() }
+        ],
+        0
+      );
+      return Promise.reject("No token found");
+    }
+
+    try {
+      const isFormData = jsonParams instanceof FormData;
+
+      const response = await $.ajax({
+        type: httpType,
+        url: baseApi + serviceUrl,
+        data: !isFormData ? JSON.stringify(jsonParams) : jsonParams,
+        crossDomain: true,
+        processData: !isFormData ? true : false,
+        contentType: !isFormData ? "application/json; charset=utf-8" : false,
         headers: AjaxManager.getDefaultHeaders()
       });
 
@@ -2811,7 +2852,8 @@ var CommonManager = {
   //  $container.find("#btnSave, #btnClear").show();
   //},
 
-  MakeFormReadOnly: function (containerSelector) {
+  MakeFormReadOnly: function (formSelector) {
+    const containerSelector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
     const $c = $(containerSelector);
     if ($c.length === 0) {
       console.error("Container '" + containerSelector + "' not found.");
@@ -2851,7 +2893,8 @@ var CommonManager = {
     $c.find("#btnSave, #btnClear").hide();
   },
 
-  MakeFormEditable: function (containerSelector) {
+  MakeFormEditable: function (formSelector) {
+    const containerSelector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
     const $c = $(containerSelector);
     if ($c.length === 0) {
       console.error("Container '" + containerSelector + "' not found.");
@@ -2892,8 +2935,8 @@ var CommonManager = {
     $c.find("#btnSave, #btnClear").show();
   },
 
-  clearFormFields: function (formSelectorId) {
-    const formSelector = formSelectorId.startsWith('#') ? formSelectorId : '#' + formSelectorId;
+  clearFormFields: function (formContainer) {
+    const formSelector = formContainer.startsWith('#') ? formContainer : '#' + formContainer;
     var $Container = $(formSelector);
 
     // Clear text, password, number, hidden, tel, email, url inputs
@@ -2972,8 +3015,16 @@ var CommonManager = {
     }
   },
 
-
-
+  appandCloseButton: function (windowSelector) {
+    const windowId = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+    // Append Close button dynamically if not already added
+    const buttonContainer = $(".btnDiv ul li");
+    if (buttonContainer.find(".btn-close-generic")) {
+      buttonContainer.find(".btn-close-generic").remove();
+    }
+    const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('${windowId}')">Close</button>`;
+    buttonContainer.append(closeBtn);
+  },
 
   // three parameters need, (gridId, filename and actions column name to remove from file)
   GenerateCSVFileAllPages: function (htmlId, fileName, actionsColumnName) {

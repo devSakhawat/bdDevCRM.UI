@@ -138,6 +138,9 @@ var CurrencyDetailsHelper = {
     debugger;
     CommonManager.clearFormFields("#CurrencyFrom");
     $("#btnCurrencySaveOrUpdate").text("+ Add Currency");
+    $("#currencyId").val(0)
+
+    $("#btnCurrencySaveOrUpdate").prop("disabled", false);
   },
 
   createItem: function () {
@@ -159,13 +162,15 @@ var CurrencyDetailsHelper = {
     return currency;
   },
 
-  editItem: async function (item) {
-    $("#btnCurrencySaveOrUpdate").text("Update Currency");
+  /* ------ Populate Grid Item ------ */
+  populateObject: function (item) {
+    this.clearForm();
+
+    $("#currencyId").val(item.CurrencyId);
     $("#currencyName").val(item.CurrencyName);
     $('#chkIsDefaultCurrency').prop('checked', item.IsDefault == 1 ? true : false);
     $('#chkIsActiveCurrency').prop('checked', item.IsActive == 1 ? true : false);
-
-    $("#currencyId").val(item.CurrencyId);
+    $("#btnCurrencySaveOrUpdate").text("Update Currency");
   },
 
 }

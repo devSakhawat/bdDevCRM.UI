@@ -6,13 +6,13 @@
 /// <reference path=""
 
 /* -------------------------------------------------
-   InstituteSummaryManager : গ্রিডের DataSource
+   InstituteSummaryManager : grid DataSource
 --------------------------------------------------*/
 var InstituteSummaryManager = {
 
   getSummaryInstituteGridDataSource: function () {
     return AjaxManager.GenericGridDataSource({
-      apiUrl: baseApi + "/institute-summary",
+      apiUrl: baseApi + "/crm-institute-summary",
       requestType: "POST",
       async: true,
       modelFields: { createdDate: { type: "date" } },
@@ -38,41 +38,6 @@ var InstituteSummaryHelper = {
   initInstituteSummary: function () {
     this.initializeSummaryGrid();
   },
-
-  //generateInstituteGrid: function () {
-  //  const gridOptions = {
-  //    dataSource: [],
-  //    autoBind: true,
-  //    navigatable: true,
-  //    scrollable: true,
-  //    resizable: true,
-  //    width: "400px",
-  //    filterable: true,
-  //    sortable: false,
-  //    pageable: {
-  //      pageSizes: [10, 20, 50, 100],
-  //      buttonCount: 3,
-  //      refresh: true,
-  //      input: false,
-  //      numeric: true,
-  //      serverPaging: true,
-  //      serverFiltering: true,
-  //      serverSorting: true
-  //    },
-  //    columns: this.generateInstituteColumns(),
-  //    editable: false,
-  //    selectable: "row"
-  //  };
-
-  //  $("#gridSummaryInstitute").kendoGrid(gridOptions);
-
-  //  const grid = $("#gridSummaryInstitute").data("kendoGrid");
-  //  if (grid) {
-  //    const ds = InstituteSummaryManager.getSummaryInstituteGridDataSource();
-  //    ds.fetch().then(() => grid.setDataSource(ds));
-  //    grid.setDataSource(ds);
-  //  }
-  //},
 
   initializeSummaryGrid: function () {
     var Columns = this.generateColumns();
@@ -232,18 +197,30 @@ var InstituteSummaryHelper = {
     const item = this._getGridItem(event);
     console.log(item);
     if (item) {
+      InstituteDetailsHelper.clearForm();
+      const windowId = "InstitutePopUp";
+      CommonManager.openKendoWindow(windowId, "View Institute", "80%");
+      // Append Close button dynamically if not already added
+      CommonManager.appandCloseButton(windowId);
+
+
       InstituteDetailsHelper.populateObject(item);
       CommonManager.MakeFormReadOnly("#InstituteForm");
-      CommonManager.openKendoWindow("#InstitutePopUp", "View Institute");
+      $("#btnInstituteSaveOrUpdate").prop("disabled", "disabled");
     }
   },
 
   clickEventForEditButton: function (event) {
     const item = this._getGridItem(event);
     if (item) {
+      InstituteDetailsHelper.clearForm();
+      const windowId = "InstitutePopUp";
+      CommonManager.openKendoWindow(windowId, "View Institute", "80%");
+      // Append Close button dynamically if not already added
+      CommonManager.appandCloseButton(windowId);
+
       InstituteDetailsHelper.populateObject(item);
       CommonManager.MakeFormEditable("#InstituteForm");
-      CommonManager.openKendoWindow("#InstitutePopUp", "Edit Institute");
     }
   },
 

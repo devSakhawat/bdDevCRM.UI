@@ -98,7 +98,7 @@ var AjaxManager = {
       if (response && response.ErrorType) {
         ErrorType = response.ErrorType;
       }
-      messageBoxHeaderText = ErrorType|| "Error"
+      messageBoxHeaderText = ErrorType || "Error"
 
       // Special handling for 401 errors - logout the user
       if (xhr.status === 401 || xhr.responseJSON?.statusCode) {
@@ -173,7 +173,7 @@ var AjaxManager = {
           //  message: message || "The requested resource was not found.",
           //  icon: "warning"
           //});
-        //break;
+          //break;
 
           ToastrMessage.showToastrNotification({
             preventDuplicates: true,
@@ -566,6 +566,44 @@ var AjaxManager = {
     return obj;
   },
 
+  PostFormDataAjax: async function (baseApi, serviceUrl, jsonParams, httpType) {
+    var token = localStorage.getItem("jwtToken");
+    if (!token) {
+      AjaxManager.MsgBox(
+        'error',
+        'center',
+        'Authentication Failed!',
+        "Please log in first!",
+        [
+          { addClass: 'btn btn-primary', text: 'Yes', onClick: ($noty) => $noty.close() },
+          { addClass: 'btn', text: 'Cancel', onClick: ($noty) => $noty.close() }
+        ],
+        0
+      );
+      return Promise.reject("No token found");
+    }
+
+    try {
+
+      const response = await $.ajax({
+        type: httpType,
+        url: baseApi + serviceUrl,
+        data: jsonParams,
+        crossDomain: true,
+        processData: false,
+        contentType: false,
+        enctype: "multipart/form-data",
+        headers: AjaxManager.getDefaultHeaders()
+      });
+
+      return Promise.resolve(response);
+
+    } catch (xhr) {
+      return Promise.reject(xhr);
+    }
+  },
+
+
   PostDataAjax: async function (baseApi, serviceUrl, jsonParams, httpType) {
     var token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -608,6 +646,48 @@ var AjaxManager = {
     var token = localStorage.getItem("jwtToken");
     if (!token) {
       AjaxManager.MsgBox(
+        'error', 'center', 'Authentication Failed!',
+        "Please log in first!",
+        [{ addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }],
+        0
+      );
+      return Promise.reject("No token found");
+    }
+
+    try {
+      const isFormData = jsonParams instanceof FormData;
+
+      const ajaxSettings = {
+        type: httpType,
+        url: baseApi + serviceUrl,
+        data: jsonParams,
+        crossDomain: true,
+        headers: AjaxManager.getDefaultHeaders()
+      };
+
+      // special settings For FormData
+      if (isFormData) {
+        ajaxSettings.processData = false;
+        ajaxSettings.contentType = false;
+      } else {
+        ajaxSettings.data = JSON.stringify(jsonParams);
+        ajaxSettings.contentType = "application/json; charset=utf-8";
+        ajaxSettings.processData = true;
+      }
+
+      const response = await $.ajax(ajaxSettings);
+      return Promise.resolve(response);
+
+    } catch (xhr) {
+      console.error("Ajax Error:", xhr);
+      return Promise.reject(xhr);
+    }
+  },
+
+  SendRequestAjaxOld: async function (baseApi, serviceUrl, jsonParams, httpType) {
+    var token = localStorage.getItem("jwtToken");
+    if (!token) {
+      AjaxManager.MsgBox(
         'error',
         'center',
         'Authentication Failed!',
@@ -640,7 +720,7 @@ var AjaxManager = {
       return Promise.reject(xhr);
     }
   },
-  
+
   PostDataForDotnetCoreWithHttp: function (baseApi, serviceUrl, jsonParams, httpType, onSuccess, onFailed) {
     var token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -696,7 +776,7 @@ var AjaxManager = {
         'Authentication Failed!',
         "Please log in first!",
         [
-          {addClass: 'btn btn-primary', text: 'Yes', onClick: function ($noty) {  $noty.close(); } },
+          { addClass: 'btn btn-primary', text: 'Yes', onClick: function ($noty) { $noty.close(); } },
           { addClass: 'btn', text: 'Cancel', onClick: function ($noty) { $noty.close(); } },
         ]
         , 0
@@ -734,7 +814,7 @@ var AjaxManager = {
     $.ajax({
       url: baseApi + serviceUrl,
       method: "GET",
-      async: isAsync, 
+      async: isAsync,
       cache: isCache,
       data: jsonParams,
       contentType: "application/json; charset=utf-8",
@@ -877,7 +957,7 @@ var AjaxManager = {
       method: "GET",
       async: false,
       cache: false,
-      data: JSON.stringify(jsonParams), 
+      data: JSON.stringify(jsonParams),
       contentType: "application/json; charset=utf-8",
       headers: this.getDefaultHeaders(),
       success: function (response) {
@@ -3204,7 +3284,7 @@ var CommonManager = {
   calculateTotalColumnsWidth: function (columns) {
     let totalWidthOfTheGrid = 0;
     columns.forEach(column => {
-      if (column.width != undefined && column.width && !column.hidden ) {
+      if (column.width != undefined && column.width && !column.hidden) {
         const widthValue = parseInt(column.width.toString().replace(/px|%/g, ''));
         if (!isNaN(widthValue)) {
           totalWidthOfTheGrid += widthValue;
@@ -3372,15 +3452,439 @@ var CommonManager = {
   },
 
   // Grid destroy করার সময় cleanup করুন
-  cleanup: function() {
+  cleanup: function () {
     CommonManager.destroyGridHandlers("gridSummaryInstitute");
   },
 
 
+  // Helper function to get combobox values safely
+  getComboValue: function (combo, defaultValue = null) {
+    if (!combo) return defaultValue;
+    const value = combo.value();
+    return (value !== "" && value !== null && value !== undefined) ? parseInt(value) : defaultValue;
+  },
 
+  getComboText: function (combo, defaultValue = "") {
+    if (!combo) return defaultValue;
+    const text = combo.text();
+    return text || defaultValue;
+  },
 
+  // Helper function to get input values safely
+  getInputValue: function (selector, defaultValue = "") {
+    const element = $(selector);
+    if (!element.length) return defaultValue;
+    const value = element.val();
+    return (value !== null && value !== undefined) ? value.toString().trim() : defaultValue;
+  },
+
+  getNumericValue: function (selector, defaultValue = null) {
+    const value = getInputValue(selector);
+    if (value === "" || value === null) return defaultValue;
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+  },
+
+  getBooleanValue: function (selector, defaultValue = false) {
+    const element = $(selector);
+    return element.length ? element.is(":checked") : defaultValue;
+  }
+
+  // how to call above helper function
+  // ComboBox Instance
+  //const countryCbo = $("#cmbInstituteCountry").data("kendoComboBox");
+  //const currencyCbo = $("#cmbInstituteCurrency").data("kendoComboBox");
+  //const typeCbo = $("#cmbInstituteType").data("kendoComboBox");
+  //// Get combobox values
+  //const countryId = getComboValue(countryCbo);
+  //const currencyId = getComboValue(currencyCbo);
+  //const typeId = getComboValue(typeCbo);
+  //InstituteId: parseInt(getInputValue("#instituteId", "0")),
+  //InstituteName: getInputValue("#instituteName"),
+  //MonthlyLivingCost: getNumericValue("#monthlyLivingCost"),
+  //IsLanguageMandatory: getBooleanValue("#chkIsLanguageMandatory"),
+  //CountryName: getComboText(countryCbo),
 
 };
+
+// Universal FormData Helper - Works with any object
+const UniversalFormDataHelper = {
+
+  // Default options that can be overridden
+  defaultOptions: {
+    skipNull: true,              // Skip null/undefined values
+    skipEmptyStrings: true,      // Skip empty strings
+    trimStrings: true,           // Trim string values
+    booleanAsString: true,       // Convert boolean to string
+    excludeFields: [],           // Fields to exclude completely
+    includeEmptyFields: [],      // Fields to include even if empty
+    requiredFields: [],          // Fields that must have values
+    customHandlers: {}           // Custom handlers for specific fields
+  },
+
+  /**
+   * Append a single key-value pair to FormData
+   * @param {string} key - The field name
+   * @param {any} value - The field value
+   * @param {FormData} formData - The FormData object to append to
+   * @param {Object} options - Options for processing
+   * @returns {boolean} - Whether the value was appended
+   */
+  appendToFormData: function (key, value, formData, options = {}) {
+    // Merge with default options
+    const opts = { ...this.defaultOptions, ...options };
+
+    // Check if field should be excluded
+    if (opts.excludeFields.includes(key)) {
+      return false;
+    }
+
+    // Check for custom handler
+    if (opts.customHandlers[key]) {
+      return opts.customHandlers[key](key, value, formData, opts);
+    }
+
+    // Handle null/undefined values
+    if (value === null || value === undefined) {
+      if (opts.includeEmptyFields.includes(key)) {
+        formData.append(key, '');
+        return true;
+      }
+      if (opts.skipNull) {
+        return false;
+      }
+      formData.append(key, '');
+      return true;
+    }
+
+    // Handle different data types
+    if (typeof value === 'boolean') {
+      const boolValue = opts.booleanAsString ? value.toString().toLowerCase() : value;
+      formData.append(key, boolValue);
+      return true;
+    }
+
+    if (typeof value === 'number') {
+      // Handle NaN
+      if (isNaN(value)) {
+        if (opts.includeEmptyFields.includes(key)) {
+          formData.append(key, '');
+          return true;
+        }
+        return false;
+      }
+      formData.append(key, value.toString());
+      return true;
+    }
+
+    if (typeof value === 'string') {
+      let processedValue = opts.trimStrings ? value.trim() : value;
+
+      // Check if empty string should be skipped
+      if (processedValue === '') {
+        if (opts.includeEmptyFields.includes(key)) {
+          formData.append(key, processedValue);
+          return true;
+        }
+        if (opts.skipEmptyStrings) {
+          return false;
+        }
+      }
+
+      formData.append(key, processedValue);
+      return true;
+    }
+
+    // Handle arrays
+    if (Array.isArray(value)) {
+      if (value.length === 0 && opts.skipEmptyStrings && !opts.includeEmptyFields.includes(key)) {
+        return false;
+      }
+      // Append array as JSON string or individual items
+      formData.append(key, JSON.stringify(value));
+      return true;
+    }
+
+    // Handle objects
+    if (typeof value === 'object') {
+      formData.append(key, JSON.stringify(value));
+      return true;
+    }
+
+    // Handle other types
+    formData.append(key, value.toString());
+    return true;
+  },
+
+  /**
+   * Convert entire object to FormData
+   * @param {Object} obj - Object to convert
+   * @param {Object} options - Options for processing
+   * @returns {Object} - Result with FormData and metadata
+   */
+  objectToFormData: function (obj, options = {}) {
+    const opts = { ...this.defaultOptions, ...options };
+    const formData = new FormData();
+    const result = {
+      formData: formData,
+      appendedFields: [],
+      skippedFields: [],
+      errors: [],
+      success: true
+    };
+
+    // Validate required fields first
+    if (opts.requiredFields.length > 0) {
+      const missingFields = opts.requiredFields.filter(field => {
+        const value = obj[field];
+        return value === null || value === undefined ||
+          (typeof value === 'string' && value.trim() === '');
+      });
+
+      if (missingFields.length > 0) {
+        result.errors.push({
+          type: 'validation',
+          message: `Missing required fields: ${missingFields.join(', ')}`
+        });
+        result.success = false;
+      }
+    }
+
+    // Process each field
+    for (const [key, value] of Object.entries(obj)) {
+      try {
+        const wasAppended = this.appendToFormData(key, value, formData, opts);
+
+        if (wasAppended) {
+          result.appendedFields.push(key);
+        } else {
+          result.skippedFields.push(key);
+        }
+      } catch (error) {
+        result.errors.push({
+          type: 'processing',
+          field: key,
+          message: error.message
+        });
+        result.success = false;
+      }
+    }
+
+    return result;
+  },
+
+  /**
+   * Quick conversion for simple cases
+   * @param {Object} obj - Object to convert
+   * @param {Array} excludeFields - Fields to exclude
+   * @param {Array} includeEmptyFields - Fields to include even if empty
+   * @returns {FormData} - The FormData object
+   */
+  simpleConvert: function (obj, excludeFields = [], includeEmptyFields = []) {
+    const options = {
+      excludeFields: excludeFields,
+      includeEmptyFields: includeEmptyFields
+    };
+
+    const result = this.objectToFormData(obj, options);
+
+    if (!result.success) {
+      console.warn('FormData conversion had issues:', result.errors);
+    }
+
+    return result.formData;
+  },
+
+  /**
+   * Advanced conversion with full customization
+   * @param {Object} obj - Object to convert
+   * @param {Object} config - Full configuration object
+   * @returns {Object} - Complete result with metadata
+   */
+  advancedConvert: function (obj, config = {}) {
+    return this.objectToFormData(obj, config);
+  }
+};
+
+// Example usage for your Institute form:
+const InstituteFormDataHelper = {
+
+  // Institute-specific configuration
+  getInstituteConfig: function () {
+    return {
+      excludeFields: ['CountryName', 'InstituteType', 'CurrencyName'],
+      includeEmptyFields: [
+        'InstituteCode', 'InstituteEmail', 'InstituteAddress',
+        'Campus', 'Website', 'FundsRequirementforVisa',
+        'LanguagesRequirement', 'InstitutionalBenefits',
+        'PartTimeWorkDetails', 'ScholarshipsPolicy',
+        'InstitutionStatusNotes', 'InstitutionLogo', 'InstitutionProspectus'
+      ],
+      requiredFields: ['InstituteName', 'CountryId'],
+      customHandlers: {
+        // Custom handler for specific fields if needed
+        'ApplicationFee': function (key, value, formData, opts) {
+          // Custom logic for ApplicationFee
+          if (value === 0 || value === '0') {
+            formData.append(key, '0');
+            return true;
+          }
+          return UniversalFormDataHelper.appendToFormData(key, value, formData, opts);
+        }
+      }
+    };
+  },
+
+  // Convert Institute DTO to FormData
+  convertInstituteToFormData: function (dto) {
+    const config = this.getInstituteConfig();
+    return UniversalFormDataHelper.advancedConvert(dto, config);
+  }
+};
+
+// Updated saveOrUpdateItem function using the universal helper
+const UpdatedInstituteHelper = {
+  saveOrUpdateItem: async function () {
+    debugger;
+
+    try {
+      const id = $("#instituteId").val() || 0;
+      const isCreate = id == 0;
+      const serviceUrl = isCreate ? "/crm-institute" : `/crm-institute/${id}`;
+      const httpType = isCreate ? "POST" : "PUT";
+      const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+      const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
+
+      // Create DTO object
+      const dto = InstituteDetailsHelper.createItem();
+
+      if (!dto) {
+        throw new Error("Failed to create DTO object");
+      }
+
+      // Convert to FormData using universal helper
+      const result = InstituteFormDataHelper.convertInstituteToFormData(dto);
+
+      if (!result.success) {
+        const errorMessage = result.errors.map(e => e.message).join('; ');
+        throw new Error(`Validation failed: ${errorMessage}`);
+      }
+
+      const formData = result.formData;
+
+      // Add file uploads
+      const logoFile = $("#institutionLogoFile")[0]?.files[0];
+      if (logoFile) {
+        formData.append("InstitutionLogoFile", logoFile);
+      }
+
+      const prospectusFile = $("#prospectusFile")[0]?.files[0];
+      if (prospectusFile) {
+        formData.append("InstitutionProspectusFile", prospectusFile);
+      }
+
+      // Debug information
+      console.log("=== FormData Conversion Result ===");
+      console.log("Appended fields:", result.appendedFields);
+      console.log("Skipped fields:", result.skippedFields);
+      console.log("Errors:", result.errors);
+
+      console.log("=== FormData Contents ===");
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
+      // Show confirmation and proceed with save
+      AjaxManager.MsgBox(
+        "info", "center", "Confirmation", confirmMsg,
+        [{
+          addClass: "btn btn-primary",
+          text: "Yes",
+          onClick: async function ($noty) {
+            $noty.close();
+
+            try {
+              await AjaxManager.SendRequestAjax(baseApi, serviceUrl, formData, httpType);
+
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 3000,
+                message: successMsg,
+                type: "success"
+              });
+
+              InstituteDetailsHelper.clearForm();
+              $("#gridSummaryInstitute").data("kendoGrid").dataSource.read();
+
+            } catch (err) {
+              console.error("Save/Update Error:", err);
+
+              let errorMessage = "Unknown error occurred";
+              if (err.responseJSON?.ValidationErrors) {
+                const validationErrors = err.responseJSON.ValidationErrors;
+                errorMessage = "Validation errors: " +
+                  Object.keys(validationErrors).map(field =>
+                    `${field}: ${validationErrors[field].join(', ')}`
+                  ).join('; ');
+              } else if (err.responseText) {
+                errorMessage = err.responseText;
+              } else if (err.statusText) {
+                errorMessage = err.statusText;
+              }
+
+              ToastrMessage.showToastrNotification({
+                preventDuplicates: true,
+                closeButton: true,
+                timeOut: 0,
+                message: `Error ${err.status || ''}: ${errorMessage}`,
+                type: "error"
+              });
+            }
+          }
+        }, {
+          addClass: "btn",
+          text: "Cancel",
+          onClick: ($noty) => $noty.close()
+        }],
+        0
+      );
+
+    } catch (error) {
+      console.error("Function Error:", error);
+      ToastrMessage.showToastrNotification({
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 5000,
+        message: "An unexpected error occurred: " + error.message,
+        type: "error"
+      });
+    }
+  }
+};
+
+// Example of using the universal helper for different objects:
+
+// For a simple User object
+const userObj = { name: "John", email: "", age: 25, active: true };
+const userFormData = UniversalFormDataHelper.simpleConvert(userObj, ['id'], ['email']);
+
+// For a complex Product object with full customization
+const productObj = { name: "Product", price: 0, category: null, tags: ['new', 'sale'] };
+const productResult = UniversalFormDataHelper.advancedConvert(productObj, {
+  includeEmptyFields: ['price'],
+  skipNull: true,
+  customHandlers: {
+    'tags': (key, value, formData) => {
+      value.forEach((tag, index) => {
+        formData.append(`${key}[${index}]`, tag);
+      });
+      return true;
+    }
+  }
+});
+
+console.log("Universal FormData Helper is ready to use with any object!");
 
 
 

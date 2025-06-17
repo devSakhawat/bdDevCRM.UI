@@ -11,7 +11,7 @@
 
     <div class="row mb-2">
       <!-- Institute Id -->
-      <input id="instituteId" type="hidden" value="0" />
+      <input id="instituteId" name="InstituteId" type="hidden" value="0" />
 
       <!-- =====  Name, Code, Type ===== -->
       <!-- Institute Name -->
@@ -28,9 +28,9 @@
 
       <!-- Institute Type -->
       <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteType" class="lbl widthSize100_per">Institute Type</label>
+        <label for="InstituteTypeId" class="lbl widthSize100_per">Institute Type</label>
         <div class="d-flex align-items-start icon-wrapper">
-          <input id="cmbInstituteType" name="InstituteType" class="flex-grow-1 border-right-strait" />
+          <input id="cmbInstituteType" name="InstituteTypeId" class="flex-grow-1 border-right-strait" />
           <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openInstituteTypePopup();">
             <span class="k-icon k-i-plus"></span>
           </button>
@@ -40,9 +40,9 @@
       <!-- ===== Country, Currency, Campus ===== -->
       <!-- Country -->
       <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteCountry" class="lbl widthSize100_per">Country <span class="redstart">*</span></label>
+        <label for="CountryId" class="lbl widthSize100_per">Country <span class="redstart">*</span></label>
         <div class="d-flex align-items-start icon-wrapper">
-          <input id="cmbCountry_Institute" name="InstituteCountry" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
+          <input id="cmbCountry_Institute" name="CountryId" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
           <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCountryPopup();">
             <span class="k-icon k-i-plus"></span>
           </button>
@@ -51,9 +51,9 @@
 
       <!-- Currency -->
       <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteCurrency" class="lbl widthSize100_per">Currency</label>
+        <label for="CurrencyId" class="lbl widthSize100_per">Currency</label>
         <div class="d-flex align-items-start icon-wrapper">
-          <input id="cmbCurrency_Institute" name="InstituteCurrency" class="flex-grow-1 border-right-strait" />
+          <input id="cmbCurrency_Institute" name="CurrencyId" class="flex-grow-1 border-right-strait" />
           <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCurrencyPopup();">
             <span class="k-icon k-i-plus"></span>
           </button>
@@ -113,13 +113,13 @@
 
       <!-- ===== Status Checkbox ===== -->
       <div class="col-xl-2 col-lg-2 col-md-2 col-sm-12 mb-2 custom-checkbox">
-        <label class="form-check-label" for="chkStatusInstitute">Status</label>
-        <input type="checkbox" id="chkStatusInstitute" name="StatusInstitute" class="form-check-input" />
+        <label class="form-check-label" for="Status">Status</label>
+        <input type="checkbox" id="chkStatusInstitute" name="Status" class="form-check-input" />
       </div>
 
       <!-- ===== Language Mandatory & Requirement ===== -->
       <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2 custom-checkbox">
-        <label class="form-check-label" for="chkIsLanguageMandatory">Is Language Mandatory? (Eg: IELTS or TOEFL)  </label>
+        <label class="form-check-label" for="IsLanguageMandatory">Is Language Mandatory? (Eg: IELTS or TOEFL)  </label>
         <input type="checkbox" id="chkIsLanguageMandatory" name="IsLanguageMandatory" class="form-check-input" />
       </div>
       <div class="col-sm-12 mb-2">
@@ -149,7 +149,7 @@
       <!-- ===== File Uploads ===== -->
       <!-- Logo (image) -->
       <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
-        <label for="institutionLogoFile">Institution Logo</label>
+        <label for="InstitutionLogoFile">Institution Logo</label>
         <input type="file" class="form-control" id="institutionLogoFile" name="InstitutionLogoFile" accept="image/*" />
         <!-- 200X200 perview thumb -->
         <img id="logoThumb" class="d-none border mt-1" style="height:200px;width:200px;object-fit:contain;cursor:pointer" onclick="openPreview('logo')" />
@@ -157,7 +157,7 @@
 
       <!-- Prospectus (PDF) -->
       <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
-        <label for="prospectusFile">Institution Prospectus (PDF)</label>
+        <label for="InstitutionProspectusFile">Institution Prospectus (PDF)</label>
         <input type="file" class="form-control" id="prospectusFile" name="InstitutionProspectusFile" accept="application/pdf" />
         <div class="mt-1">
           <span id="pdfName" class="text-muted"></span>

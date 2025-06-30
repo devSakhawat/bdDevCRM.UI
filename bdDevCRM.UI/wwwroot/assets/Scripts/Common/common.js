@@ -20,7 +20,7 @@ var serviceRoot = "..";
 // CurrentUser from common.js file > getCurrentUser function
 var CurrentUser = null;
 //var coreManagement = "http://localhost:7290";
-var studentManagement = "http://localhost:7281";
+var baseApiFilePath = "https://localhost:7290"
 var baseApi = "https://localhost:7290/bdDevs-crm";
 var baseUI = "https://localhost:7145/"
 var token = null;
@@ -305,7 +305,7 @@ var AjaxManager = {
           dataType: "json",
           async: options.async !== undefined ? options.async : false,
           contentType: options.contentType || "application/json; charset=utf-8",
-          headers: AjaxManager.getDefaultHeaders(),
+          headers: TokenManger.getDefaultApplicationJsonHeaders(),
           error: function (xhr, status, error) {
             // Use the generic error handler
             AjaxManager.handleAjaxError(xhr, status, error);
@@ -566,7 +566,7 @@ var AjaxManager = {
     return obj;
   },
 
-  PostFormDataAjax: async function (baseApi, serviceUrl, jsonParams, httpType) {
+  SendFormDataAjax: async function (baseApi, serviceUrl, jsonParams, httpType) {
     var token = localStorage.getItem("jwtToken");
     if (!token) {
       AjaxManager.MsgBox(
@@ -593,7 +593,7 @@ var AjaxManager = {
         processData: false,
         contentType: false,
         enctype: "multipart/form-data",
-        headers: AjaxManager.getDefaultHeaders()
+        headers: TokenManger.getDefaultFormDataHeaders(),
       });
 
       return Promise.resolve(response);
@@ -602,7 +602,6 @@ var AjaxManager = {
       return Promise.reject(xhr);
     }
   },
-
 
   PostDataAjax: async function (baseApi, serviceUrl, jsonParams, httpType) {
     var token = localStorage.getItem("jwtToken");
@@ -631,7 +630,7 @@ var AjaxManager = {
         crossDomain: true,
         processData: !isFormData ? true : false,
         contentType: !isFormData ? "application/json; charset=utf-8" : false,
-        headers: AjaxManager.getDefaultHeaders()
+        headers: !isFormData ? TokenManger.getDefaultApplicationJsonHeaders() : TokenManger.getDefaultFormDataHeaders()
       });
 
       return Promise.resolve(response);
@@ -657,13 +656,15 @@ var AjaxManager = {
     try {
       const isFormData = jsonParams instanceof FormData;
 
-      const ajaxSettings = {
+      const response = await $.ajax({
         type: httpType,
         url: baseApi + serviceUrl,
         data: jsonParams,
         crossDomain: true,
-        headers: AjaxManager.getDefaultHeaders()
-      };
+        processData: !isFormData ? true : false,
+        contentType: !isFormData ? "application/json; charset=utf-8" : false,
+        headers: !isFormData ? TokenManger.getDefaultApplicationJsonHeaders() : TokenManger.getDefaultFormDataHeaders()
+      });
 
       // special settings For FormData
       if (isFormData) {
@@ -675,7 +676,7 @@ var AjaxManager = {
         ajaxSettings.processData = true;
       }
 
-      const response = await $.ajax(ajaxSettings);
+      response = await $.ajax(ajaxSettings);
       return Promise.resolve(response);
 
     } catch (xhr) {
@@ -798,15 +799,15 @@ var AjaxManager = {
     return res;
   },
 
-  // Function to get default headers
-  getDefaultHeaders: function () {
-    TokenManger.CheckToken(); // Ensure the token is valid
-    return {
-      "Authorization": "Bearer " + token,
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-    };
-  },
+  //// Function to get default headers
+  //getDefaultHeaders: function () {
+  //  TokenManger.CheckToken(); // Ensure the token is valid
+  //  return {
+  //    "Authorization": "Bearer " + token,
+  //    "Accept": "application/json",
+  //    "Content-Type": "application/json"
+  //  };
+  //},
 
   GetDataForDotnetCoreAsync: function (baseApi, serviceUrl, jsonParams, isAsync, isCache, onSuccess, onFailed) {
     jQuery.support.cors = true;
@@ -1031,7 +1032,6 @@ var AjaxManager = {
   },
 
   SendJson: function (serviceUrl, jsonParams, successCallback, errorCallback) {
-
     jQuery.ajax({
       url: serviceUrl,
       data: jsonParams,
@@ -1091,7 +1091,6 @@ var AjaxManager = {
   },
 
   SendReportServer: function (serviceUrl, jsonParams) {
-
     jQuery.ajax({
       url: reportServerAPI + serviceUrl,
       type: "POST",
@@ -1113,7 +1112,6 @@ var AjaxManager = {
   },
 
   GetString: function (serviceUrl, jsonParams, onSucess) {
-
     jQuery.ajax({
       url: serviceUrl,
       async: false,
@@ -1131,7 +1129,6 @@ var AjaxManager = {
   },
 
   Export: function (serviceUrl, jsonParams) {
-
     //  var jsonParam = 'param:' + JSON.stringify(finalSubmitedParam) + ',reportId:' + reportId;
     $.blockUI({
       message: $('#divBlockMessage'),
@@ -1150,24 +1147,24 @@ var AjaxManager = {
     });
   },
 
-  Export1: function (serviceUrl, jsonParams) {
+  //Export1: function (serviceUrl, jsonParams)4 {
+  //  //  var jsonParam = 'param:' + JSON.stringify(finalSubmitedParam) + ',reportId:' + reportId;
+  //  $.blockUI({
+  //    message: $('#divBlockMessage'),
+  //    onBlock: function () {
+  //      AjaxManager.SendJson(serviceUrl, jsonParams, function (result) {
 
-    //  var jsonParam = 'param:' + JSON.stringify(finalSubmitedParam) + ',reportId:' + reportId;
-    $.blockUI({
-      message: $('#divBlockMessage'),
-      onBlock: function () {
-        AjaxManager.SendJson(serviceUrl, jsonParams, function (result) {
-
-          $.unblockUI();
-          window.open(result, '_self');
+  //        $.unblockUI();
+  //        window.open(result, '_self');
 
 
-        }, function () {
-          $.unblockUI();
-        });
-      }
-    });
-  },
+  //      }, function () {
+  //        $.unblockUI();
+  //      });
+  //    }
+  //  });
+  //},
+
   // message box with auto hide delay
   MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
     try {
@@ -1245,18 +1242,6 @@ var AjaxManager = {
           swalConfig.customClass = swalConfig.customClass || {};
           swalConfig.customClass.cancelButton = cancelButton.addClass || 'btn';
         }
-
-        //if (primaryButton) {
-        //  swalConfig.showConfirmButton = true;
-        //  swalConfig.confirmButtonText = primaryButton.text || 'OK';
-        //  swalConfig.confirmButtonClass = primaryButton.addClass || 'btn btn-primary';
-        //  swalConfig.focusConfirm = true;
-        //}
-        //if (cancelButton) {
-        //  swalConfig.showCancelButton = true;
-        //  swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
-        //  swalConfig.cancelButtonClass = cancelButton.addClass || 'btn';
-        //}
       }
       // Fire the SweetAlert2 dialog
       return Swal.fire(swalConfig).then((result) => {
@@ -1550,206 +1535,6 @@ var AjaxManager = {
       $(el).html(AjaxManager.changeDateFormat(cellval, 1));
   },
 
-  changeDateFormat: function (value, isTime) {
-    var time = value.replace(/\/Date\(([0-9]*)\)\//, '$1');
-    var date = new Date();
-    date.setTime(time);
-    if (isTime == 0) {
-      return (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + date.getFullYear();
-    }
-    else {
-      return (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + date.getFullYear()
-        + '<br> ' + (date.getHours().toString().length == 2 ? date.getHours() : '0' + date.getHours()) + ':' + (date.getMinutes().toString().length == 2 ? date.getMinutes() : '0' + date.getMinutes()) + ':' + (date.getSeconds().toString().length == 2 ? date.getSeconds() : '0' + date.getSeconds());
-    }
-  },
-
-  getCurrentDateTime: function () {
-    var date = new Date();
-    var day = (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()).toString();
-    var month = ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)).toString();
-    var year = date.getFullYear().toString();
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var suffix = "AM";
-    if (hours >= 12) {
-      suffix = "PM";
-      hours = hours - 12;
-    }
-    if (hours == 0) {
-      hours = 12;
-    }
-
-    if (minutes < 10)
-      minutes = "0" + minutes;
-    //var CurrentDateTime = day + "/" + month + "/" + year + " " + hours + ":" + minutes + " " + suffix;
-    //var CurrentDateTime = day + "/" + month + "/" + year + " " + hours + ":" + minutes;
-    var CurrentDateTime = day + "-" + month + "-" + year;
-    return CurrentDateTime;
-  },
-
-  changeToSQLDateFormat: function (value, isTime) {
-
-    if (value != "/Date(-62135596800000)/") {
-      var time = value.replace(/\/Date\(([0-9]*)\)\//, '$1');
-      var date = new Date();
-      date.setTime(time);
-      var dd = (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()).toString();
-      var mm = ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)).toString();
-      var yyyy = date.getFullYear().toString();
-      var timeformat = "";
-      if (isTime == 1) {
-        timeformat = (date.getHours().toString().length == 2 ? date.getHours() : '0' + date.getHours()) + ':' + (date.getMinutes().toString().length == 2 ? date.getMinutes() : '0' + date.getMinutes()) + ':' + (date.getSeconds().toString().length == 2 ? date.getSeconds() : '0' + date.getSeconds());
-      }
-      var sqlFormatedDate = mm + '/' + dd + '/' + yyyy + ' ' + timeformat;
-      return sqlFormatedDate;
-    }
-    else {
-      return "";
-    }
-  },
-
-  changeReverseDateFormat: function (value) {
-    dtvalue = value.split('-');
-    var datetime = dtvalue[1] + "/" + dtvalue[0] + "/" + dtvalue[2];
-    return datetime;
-  },
-
-  changeFormattedDate: function (value, format) {
-    var date = new Date(value);
-    if (format == "DDMMYYYY") {
-      var val = (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + date.getFullYear();
-      if (val == "0NaN-0NaN-NaN") {
-        return "";
-      } else {
-        return val;
-      }
-    }
-    if (format == "MMDDYYYY") {
-      return ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + date.getFullYear();
-    }
-  },
-
-  getDayDifference: function (date1, date2) {
-
-    // The number of milliseconds in one day
-    var ONE_DAY = 1000 * 60 * 60 * 24;
-
-    // Convert both dates to milliseconds
-    var date1_ms = new Date(date1).getTime();
-    var date2_ms = new Date(date2).getTime();
-
-    // Calculate the difference in milliseconds
-    var difference_ms = Math.abs(date1_ms - date2_ms);
-
-    // Convert back to days and return
-    return Math.round(difference_ms / ONE_DAY);
-
-  },
-
-  getMonthDifference: function (date1, date2) {
-
-    // The number of milliseconds in one Month
-    var Month_DAY = 1000 * 60 * 60 * 24 * 30;
-
-    // Convert both dates to milliseconds
-    var date1_ms = new Date(date1).getTime();
-    var date2_ms = new Date(date2).getTime();
-
-    // Calculate the difference in milliseconds
-    var difference_ms = Math.abs(date1_ms - date2_ms);
-
-    // Convert back to days and return
-    return Math.round(difference_ms / Month_DAY);
-
-  },
-
-  getYearDifference: function (currentDate, backdate) {
-
-    var ageDifMs = currentDate - backdate.getTime();
-    var ageDate = new Date(ageDifMs); // miliseconds from epoch
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
-
-  },
-
-  getYearDifferenceWithFloor: function (currentDate, backdate) {
-
-    var ageDifMs = currentDate - backdate.getTime();
-    var ageDate = new Date(ageDifMs); // miliseconds from epoch
-    return Math.floor(ageDate.getUTCFullYear() - 1970);
-
-  },
-
-  hideMasterDetailsForPrint: function () {
-    $("#header").hide();
-    $("#dynamicmenu").hide();
-    $("#divWelcome").hide();
-    $("#content").hide();
-    $("#main").css({
-      "background-color": "#ffffff"
-    });
-    $("body").css({
-      "background-color": "#ffffff"
-    });
-    $("#footer").hide();
-  },
-
-  showMasterDetailsForPrint: function () {
-    $("#header").show();
-    $("#dynamicmenu").show();
-    $("#divWelcome").show();
-    $("#content").show();
-    $("#main").css({
-      "background-color": "#A6D77B"
-    });
-    $("body").css({
-      "background-color": "#A6D77B"
-    });
-    $("#footer").show();
-  },
-
-  daysBetween: function (date1, date2) {
-
-    var d1 = new Date(date1);
-    var d2 = new Date(date2);
-
-    date1 = (d1.getMonth() + 1) + '/' + d1.getDate() + '/' + d1.getFullYear();
-    date2 = (d2.getMonth() + 1) + '/' + d2.getDate() + '/' + d2.getFullYear();
-    // The number of milliseconds in one day
-    var ONE_DAY = 1000 * 60 * 60 * 24;
-
-    // Convert both dates to milliseconds
-    var date1_ms = new Date(date1).getTime();
-    var date2_ms = new Date(date2).getTime();
-
-    // Calculate the difference in milliseconds
-    var difference_ms = Math.abs(date1_ms - date2_ms);
-
-    // Convert back to days and return
-    return Math.round(difference_ms / ONE_DAY);
-
-  },
-
-  isFloat: function (s) {
-    return /^\s*(\d+)?(\.(\d+))?\s*$/.test(s);
-  },
-
-  isDate: function (str) {
-    if (str != null) {
-      var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      return (m) ? true : false;
-    }
-    return false;
-
-  },
-
-  isDigit: function (s) {
-    return /^\s*\d+\s*$/.test(s);
-  },
-
-  isEmpty: function (s) {
-    return !((s != null) && /^\s*(\S+(\s+\S+)*)\s*$/.test(s));
-  },
-
   checkSpecialCharacters: function (id) {
 
     var checkString = $("#" + id).val();
@@ -1775,79 +1560,6 @@ var AjaxManager = {
 
   },
 
-  replaceSingleQoute: function (id) {
-
-    var checkString = $("#" + id).val();
-    checkString = checkString.replace(/'/g, "''");
-    return checkString;
-
-  },
-
-  validator: function (divId) {
-
-    var validator = divId.kendoValidator().data("kendoValidator"),
-      status = $(".status");
-
-    if (validator.validate()) {
-      status.text("").addClass("valid");
-      return true;
-    } else {
-      status.text("Oops! There is invalid data in the form.").addClass("invalid");
-      return false;
-    }
-  },
-
-  Trim: function (s) {
-    //return s.replace(s,"/^ *(\w+ ?)+ *$/", "");
-    return (s.replace(/\s+/g, ' ')).trim();
-  },
-
-  isValidItem: function (ctrlId, isClear) {
-    debugger;
-    var cmbBox = $("#" + ctrlId).data("kendoComboBox");
-
-    if (cmbBox.value() != "" && cmbBox.value() == cmbBox.text()) {
-      AjaxManager.MsgBox('warning', 'center', 'Invalid Item:', 'No Item matched with your Input data as like "[' + cmbBox.text() + ']"!', [{
-        addClass: 'btn btn-primary',
-        text: 'Ok',
-        onClick: function ($noty) {
-          $noty.close();
-          //cmbBox.focus();
-          if (isClear)
-            cmbBox.value('');
-
-
-        }
-      }
-      ]);
-      return false;
-    } else {
-      return true;
-    }
-  },
-
-  toTitleCase: function (str) {
-    return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
-  },
-
-  AmountInWord: function (number) {
-
-    var a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen '];
-    var b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-
-
-    if ((number = number.toString()).length > 9) return 'overflow';
-    n = ('000000000' + number).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-    if (!n) return "";
-    var str = '';
-    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'crore ' : '';
-    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'lakh ' : '';
-    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'thousand ' : '';
-    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
-    str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'only ' : '';
-    return str;
-  },
-
   GetSingleObject2: function (serviceUrl, jsonParams) {
     var rvObj = new Object();
     $.ajax({
@@ -1868,9 +1580,10 @@ var AjaxManager = {
 
     return rvObj;
   }
+};
+//End AjaxManager
 
-};//End AjaxManager
-
+// Menu start
 var MenuManager = {
 
   getMenu: function () {
@@ -2280,58 +1993,581 @@ var MenuHelper = {
       return null;
     }
 
-    //// Split the string into lines
-    //const [keysLine, valuesLine] = currentUserString.split('\n');
-
-    //// Split the keys and values into arrays
-    //const keys = keysLine.split(',');
-    //const values = valuesLine.split(',');
-
-    //// Create an object to store the parsed data
-    //const currentUserObject = {};
-
-    //// Map keys to values
-    //keys.forEach((key, index) => {
-    //  let value = values[index].trim(); // Trim whitespace
-
-    //  // Handle empty values
-    //  if (value === '') {
-    //    currentUserObject[key] = null;
-    //    return;
-    //  }
-
-    //  // Convert numeric values
-    //  if (!isNaN(value)) {
-    //    currentUserObject[key] = Number(value);
-    //    return;
-    //  }
-
-    //  // Convert boolean values
-    //  if (value.toLowerCase() === 'true') {
-    //    currentUserObject[key] = true;
-    //    return;
-    //  }
-    //  if (value.toLowerCase() === 'false') {
-    //    currentUserObject[key] = false;
-    //    return;
-    //  }
-
-    //  // Convert date values
-    //  const dateRegex = /^\d{1,2}\/\d{1,2}\/\d{4}/; // Matches dates like "9/20/2020"
-    //  if (dateRegex.test(value)) {
-    //    currentUserObject[key] = new Date(value);
-    //    return;
-    //  }
-
-    //  // Default: Keep as string
-    //  currentUserObject[key] = value;
-    //});
-
     return currentUserObject;
   },
-
-
 };
+// Menu end
+
+
+// Vanilla Api Call Mechanism start
+const VanillaApiCallManager = {
+
+  //Generic Error Handler
+  handleApiError: function (errorResponse) {
+    let statusCode = errorResponse.statusCode || 500;
+    let errorType = errorResponse.errorType || "Error";
+    let message = errorResponse.message || "Unknown error";
+    let correlationId = errorResponse.correlationId || "";
+    let timestamp = errorResponse.timestamp ? new Date(errorResponse.timestamp).toLocaleString() : "";
+    let details = errorResponse.details || "";
+
+    // For End User (Display Message)
+    let displayMessage = `<strong>[${statusCode}] ${errorType}</strong><br>`;
+    displayMessage += `${message}<br>`;
+
+    // For Developer (Console Message)
+    let consoleMessage = `%c[ERROR] ${errorType} (${statusCode})`;
+    let consoleStyle = "color: red; font-weight: bold;";
+    let additionalInfo = `\nMessage: ${message}`;
+
+    if (correlationId) {
+      additionalInfo += `\nCorrelation ID: ${correlationId}`;
+    }
+    if (timestamp) {
+      additionalInfo += `\nTimestamp: ${timestamp}`;
+    }
+    if (details) {
+      additionalInfo += `\nDetails: ${details}`;
+    }
+
+    console.log(consoleMessage + additionalInfo, consoleStyle);
+
+    ToastrMessage.showError(displayMessage, "API Error", 0);
+  },
+
+  // Convert various error formats to handleApiError expected format
+  _convertToApiError: function (error) {
+    let apiError = {
+      statusCode: 500,
+      errorType: "Error",
+      message: "Unknown error",
+      correlationId: "",
+      timestamp: new Date().toISOString(),
+      details: ""
+    };
+
+    // If error is already in correct format, return as is
+    if (error.statusCode || error.errorType) {
+      return { ...apiError, ...error };
+    }
+
+    // Handle different error types from _performRequest
+    if (error.type) {
+      switch (error.type) {
+        case 'HTTP_ERROR':
+          apiError.statusCode = error.status || 500;
+          apiError.errorType = "HTTP_ERROR";
+          apiError.message = error.statusText || "HTTP Error";
+          apiError.details = error.responseText || "";
+
+          // Try to parse server error response if it exists
+          if (error.response && typeof error.response === 'object') {
+            apiError.message = error.response.message || error.response.error || apiError.message;
+            apiError.correlationId = error.response.correlationId || "";
+            apiError.details = error.response.details || JSON.stringify(error.response);
+          }
+          break;
+
+        case 'TIMEOUT_ERROR':
+          apiError.statusCode = 408;
+          apiError.errorType = "TIMEOUT_ERROR";
+          apiError.message = "Request timeout";
+          apiError.details = "The request took too long to complete";
+          break;
+
+        case 'NETWORK_ERROR':
+          apiError.statusCode = 0;
+          apiError.errorType = "NETWORK_ERROR";
+          apiError.message = "Network connection failed";
+          apiError.details = "Unable to connect to the server";
+          break;
+
+        case 'AUTH_ERROR':
+          apiError.statusCode = 401;
+          apiError.errorType = "AUTH_ERROR";
+          apiError.message = "Authentication failed";
+          apiError.details = error.error || "Authentication token is missing or invalid";
+          break;
+
+        default:
+          apiError.errorType = error.type;
+          apiError.message = error.responseText || error.statusText || "Unknown error";
+          apiError.statusCode = error.status || 500;
+          apiError.details = JSON.stringify(error);
+      }
+    } else {
+      // Handle generic errors
+      apiError.message = error.message || error.toString() || "Unknown error occurred";
+      apiError.details = JSON.stringify(error);
+    }
+
+    return apiError;
+  },
+
+  // for grid.
+  GenericGridDataSource: function (options) {
+    debugger;
+    var apiUrl = options.apiUrl;
+    var serverPaging = options.serverPaging !== undefined ? options.serverPaging : true;
+    var serverSorting = options.serverSorting !== undefined ? options.serverSorting : true;
+    var serverFiltering = options.serverFiltering !== undefined ? options.serverFiltering : true;
+    var pageSize = options.pageSize || 20;
+    var modelFields = options.modelFields || {};
+
+    var gridDataSource = new kendo.data.DataSource({
+      serverPaging: serverPaging,
+      serverSorting: serverSorting,
+      serverFiltering: serverFiltering,
+      allowUnsort: options.allowUnsort || false,
+      pageSize: pageSize,
+      page: 1,
+
+      pageable: {
+        buttonCount: options.buttonCount || 5,
+        input: false,
+        numeric: true
+      },
+
+      transport: {
+        read: {
+          url: apiUrl,
+          type: options.requestType || "POST",
+          dataType: "json",
+          async: options.async !== undefined ? options.async : false,
+          contentType: options.contentType || "application/json; charset=utf-8",
+          headers: TokenManger.getDefaultApplicationJsonHeaders(),
+
+          // Updated Error Handling
+          error: function (xhr, status, error) {
+            console.log("Grid API Error:", {
+              status: xhr.status,
+              statusText: xhr.statusText,
+              responseText: xhr.responseText,
+              error: error
+            });
+
+            let errorResponse;
+            try {
+              errorResponse = JSON.parse(xhr.responseText);
+            } catch {
+              errorResponse = { message: "Unknown error occurred" };
+            }
+
+            // Centralized error handler
+            VanillaApiCallManager.handleApiError(errorResponse);
+
+            // Return empty data source
+            this.success({ data: { Items: [], TotalCount: 0 } });
+          },
+
+          // Success callback to handle API response
+          success: function (data) {
+            if (data && data.IsSuccess === false) {
+              console.error("API returned error:", data.message);
+              VanillaApiCallManager.handleApiError(data);
+              return { data: { Items: [], TotalCount: 0 } };
+            }
+            return data;
+          }
+        },
+
+        parameterMap: options.parameterMap || function (options) {
+          var transformedOptions = {
+            Skip: options.skip,
+            Take: options.take,
+            Page: options.page,
+            PageSize: options.pageSize,
+            Filter: options.filter
+          };
+
+          if (options.sort && options.sort.length > 0) {
+            transformedOptions.Sort = [];
+            for (var i = 0; i < options.sort.length; i++) {
+              transformedOptions.Sort.push({
+                field: options.sort[i].field,
+                dir: options.sort[i].dir
+              });
+            }
+          } else {
+            transformedOptions.Sort = null;
+          }
+
+          return JSON.stringify(transformedOptions);
+        }
+      },
+
+      schema: {
+
+        data: function (response) {
+          // Handle the new API response structure
+          if (response.IsSuccess && response.Data) {
+            return response.Data.Items || [];
+          }
+          return [];
+        },
+
+        total: function (response) {
+          // Handle the new API response structure
+          if (response.IsSuccess && response.Data) {
+            return response.Data.TotalCount || 0;
+          }
+          return 0;
+        },
+
+        parse: function (response) {
+
+          if (response.IsSuccess === false) {
+            console.error("API Error:", response.Message);
+            VanillaApiCallManager.handleApiError(response);
+            return {
+              Data: { Items: [], TotalCount: 0 },
+              IsSuccess: false,
+              Message: response.Message
+            };
+          }
+
+          if (response.IsSuccess && response.Data && response.Data.Items) {
+            var items = response.Data.Items;
+            var totalCount = response.Data.TotalCount || 0;
+
+            var inferredFields = {};
+            if (items.length > 0) {
+              var sampleRecord = items[0];
+              for (var key in sampleRecord) {
+                if (sampleRecord.hasOwnProperty(key)) {
+                  if (typeof sampleRecord[key] === "number") {
+                    inferredFields[key] = { type: "number" };
+                  } else if (typeof sampleRecord[key] === "boolean") {
+                    inferredFields[key] = { type: "boolean" };
+                  } else if (Object.prototype.toString.call(sampleRecord[key]) === "[object Date]") {
+                    inferredFields[key] = { type: "date" };
+                  } else {
+                    inferredFields[key] = { type: "string" };
+                  }
+                }
+              }
+            }
+
+            return {
+              Data: { Items: items, TotalCount: totalCount },
+              inferredFields: inferredFields,
+              IsSuccess: true
+            };
+          }
+
+          return {
+            Data: { Items: [], TotalCount: 0 },
+            IsSuccess: true
+          };
+        },
+
+        model: {
+          fields: modelFields
+        },
+
+        errors: function (response) {
+          if (response.IsSuccess === false) {
+            return response.Message || "An error occurred";
+          }
+          return null;
+        }
+      },
+
+      // Error handling
+      error: function (e) {
+        console.error("DataSource Error:", e);
+        VanillaApiCallManager.handleApiError({
+          statusCode: e.status || 0,
+          errorType: "NetworkError",
+          message: e.errorThrown || "Request failed",
+          details: e.xhr ? e.xhr.responseText : ""
+        });
+      }
+    });
+
+    return gridDataSource;
+  },
+
+  // Function to send a request using Fetch API For Crud not grid.
+  SendRequestVanilla: async function (baseApi, serviceUrl, jsonParams, httpType, options = {}) {
+    // Default configuration
+    const defaultOptions = {
+      timeout: 3000000,
+      retries: 0,
+      retryDelay: 1000,
+      showErrorMessage: true,
+      validateStatus: (status) => status >= 200 && status < 300,
+      requireAuth: true,
+      ...options
+    };
+
+    // JWT Token validation
+    if (defaultOptions.requireAuth) {
+      var token = localStorage.getItem("jwtToken");
+      if (!token) {
+        if (defaultOptions.showErrorMessage) {
+          CommonManager.MsgBox(
+            'error', 'center', 'Authentication Failed!',
+            "Please log in first!",
+            [{ addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }],
+            0
+          );
+        }
+        return Promise.reject({
+          statusCode: 401,
+          errorType: 'AUTH_ERROR',
+          message: "No token found",
+          correlationId: "",
+          timestamp: new Date().toISOString(),
+          details: "Authentication token not found in localStorage"
+        });
+      }
+    }
+
+    // Retry mechanism with exponential backoff
+    let lastError;
+    for (let attempt = 0; attempt <= defaultOptions.retries; attempt++) {
+      try {
+        const result = await this._performRequest(baseApi, serviceUrl, jsonParams, httpType, defaultOptions);
+        return Promise.resolve(result);
+      } catch (error) {
+        console.log(error);
+        // Convert error to handleApiError expected format
+        lastError = this._convertToApiError(error);
+
+        // Don't retry for certain error types
+        if (this._shouldNotRetry(error) || attempt >= defaultOptions.retries) {
+          break;
+        }
+
+        // Wait before retry (exponential backoff)
+        const delay = defaultOptions.retryDelay * Math.pow(2, attempt);
+        await this._sleep(delay);
+
+        VanillaApiCallManager.handleApiError(lastError);
+      }
+    }
+
+    // Show final error if all retries failed
+    if (defaultOptions.showErrorMessage && lastError) {
+      VanillaApiCallManager.handleApiError(lastError);
+    }
+
+    return Promise.reject(lastError);
+  },
+
+  // Core request performer
+  _performRequest: async function (baseApi, serviceUrl, jsonParams, httpType, options) {
+    const isFormData = jsonParams instanceof FormData;
+    const isFile = jsonParams instanceof File;
+    const isBlob = jsonParams instanceof Blob;
+    const isArrayBuffer = jsonParams instanceof ArrayBuffer;
+
+    // Prepare headers
+    const headers = this._prepareHeaders(isFormData, options);
+
+    // Prepare request body
+    const requestBody = this._prepareRequestBody(jsonParams, isFormData, isFile, isBlob, isArrayBuffer);
+
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), options.timeout);
+
+    try {
+      const response = await fetch(baseApi + serviceUrl, {
+        method: httpType.toUpperCase(),
+        headers: headers,
+        body: requestBody,
+        mode: 'cors',
+        credentials: 'same-origin', // need to know
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      // Handle HTTP errors
+      if (!options.validateStatus(response.status)) {
+        const errorData = await this._parseResponse(response);
+        console.log(JSON.stringify(errorData));
+        const error = {
+          status: response.status,
+          statusText: response.statusText,
+          responseText: typeof errorData === 'string' ? errorData : JSON.stringify(errorData),
+          response: errorData,
+          readyState: 4,
+          type: 'HTTP_ERROR'
+        };
+        throw error;
+      }
+
+      // Parse successful response
+      return await this._parseResponse(response);
+
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+
+      if (fetchError.name === 'AbortError') {
+        throw {
+          status: 0,
+          statusText: 'Timeout',
+          responseText: 'Request timeout',
+          readyState: 0,
+          type: 'TIMEOUT_ERROR'
+        };
+      }
+
+      if (fetchError.name === 'TypeError') {
+        throw {
+          status: 0,
+          statusText: 'Network Error',
+          responseText: 'Network connection failed',
+          readyState: 0,
+          type: 'NETWORK_ERROR'
+        };
+      }
+      console.log(fetchError);
+      throw fetchError;
+    }
+  },
+
+  // Prepare headers based on content type
+  _prepareHeaders: function (isFormData, options) {
+    let headers = {};
+
+    // Get default headers
+    if (isFormData) {
+      headers = { ...TokenManger.getDefaultFormDataHeaders() };
+    } else {
+      headers = { ...TokenManger.getDefaultApplicationJsonHeaders() };
+    }
+
+    // Add custom headers from options
+    if (options.customHeaders) {
+      headers = { ...headers, ...options.customHeaders };
+    }
+
+    // Don't set Content-Type for FormData - browser will set it automatically
+    if (isFormData && headers['Content-Type']) {
+      delete headers['Content-Type'];
+    }
+
+    return headers;
+  },
+
+  // Prepare request body based on data type
+  _prepareRequestBody: function (jsonParams, isFormData, isFile, isBlob, isArrayBuffer) {
+    if (isFormData || isFile || isBlob || isArrayBuffer) {
+      return jsonParams; // Send as is
+    }
+
+    if (jsonParams === null || jsonParams === undefined) {
+      return null;
+    }
+
+    if (typeof jsonParams === 'string') {
+      return jsonParams;
+    }
+
+    // For objects, stringify to JSON
+    return JSON.stringify(jsonParams);
+  },
+
+  // Parse response based on content type
+  _parseResponse: async function (response) {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      return await response.json();
+    } else if (contentType.includes('text/')) {
+      return await response.text();
+    } else if (contentType.includes('application/octet-stream') || contentType.includes('application/pdf')) {
+      return await response.blob();
+    } else {
+      // Try to parse as JSON first, fallback to text
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        return text;
+      }
+    }
+  },
+
+  // Check if error should not be retried
+  _shouldNotRetry: function (error) {
+    // Don't retry auth errors, client errors (4xx), or specific network issues
+    const noRetryStatuses = [400, 401, 403, 404, 422, 429];
+    const noRetryTypes = ['AUTH_ERROR', 'VALIDATION_ERROR'];
+
+    return noRetryStatuses.includes(error.status) ||
+      noRetryTypes.includes(error.type) ||
+      (error.status >= 400 && error.status < 500);
+  },
+
+  // Sleep utility for retry delays
+  _sleep: function (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
+  // Convenience methods for different HTTP methods
+  get: function (baseApi, serviceUrl, params = {}, options = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const url = queryString ? `${serviceUrl}?${queryString}` : serviceUrl;
+    return this.SendRequestVanilla(baseApi, url, null, 'GET', options);
+  },
+
+  post: function (baseApi, serviceUrl, data, options = {}) {
+    return this.SendRequestVanilla(baseApi, serviceUrl, data, 'POST', options);
+  },
+
+  put: function (baseApi, serviceUrl, data, options = {}) {
+    return this.SendRequestVanilla(baseApi, serviceUrl, data, 'PUT', options);
+  },
+
+  delete: function (baseApi, serviceUrl, options = {}) {
+    return this.SendRequestVanilla(baseApi, serviceUrl, null, 'DELETE', options);
+  },
+
+  patch: function (baseApi, serviceUrl, data, options = {}) {
+    return this.SendRequestVanilla(baseApi, serviceUrl, data, 'PATCH', options);
+  },
+
+  // File upload helper
+  uploadFile: function (baseApi, serviceUrl, file, additionalData = {}, options = {}) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Add additional form data
+    Object.keys(additionalData).forEach(key => {
+      if (typeof additionalData[key] === 'object') {
+        formData.append(key, JSON.stringify(additionalData[key]));
+      } else {
+        formData.append(key, additionalData[key]);
+      }
+    });
+
+    return this.post(baseApi, serviceUrl, formData, options);
+  },
+
+  // Batch requests
+  batch: async function (requests) {
+    const promises = requests.map(req =>
+      this.SendRequestVanilla(req.baseApi, req.serviceUrl, req.data, req.method, req.options)
+    );
+
+    try {
+      return await Promise.all(promises);
+    } catch (error) {
+      // Return results with errors for partial success handling
+      const results = await Promise.allSettled(promises);
+      return results.map(result =>
+        result.status === 'fulfilled' ? result.value : { error: result.reason }
+      );
+    }
+  }
+};
+// Vanilla Api Call Machanism end
+
 
 var TokenManger = {
   CheckToken: function () {
@@ -2342,595 +2578,133 @@ var TokenManger = {
 
       // Clear user info from localStorage
       localStorage.removeItem("userInfo");
+
       // Redirect to the login page
       window.location.href = "https://localhost:44381/Home/Login";
     }
-  }
-};
-
-
-var currencyConverter = {
-
-  add_commas: function (nStr) {
-    nStr += '';
-    x = nStr.split('.');
-    x1 = x[0];
-    x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
   },
 
-  digitToWordConverter: function (junkVal) {
-    junkVal = Math.floor(junkVal);
-    var obStr = new String(junkVal);
-    numReversed = obStr.split("");
-    actnumber = numReversed.reverse();
-
-    if (Number(junkVal) >= 0) {
-      //do nothing
-    }
-    else {
-      alert('wrong Number cannot be converted');
-      return false;
-    }
-    if (Number(junkVal) == 0) {
-      document.getElementById('container').innerHTML = obStr + '' + 'Rupees Zero Only';
-      return false;
-    }
-    if (actnumber.length > 9) {
-      alert('Oops!!!! the Number is too big to covertes');
-      return false;
-    }
-
-    var iWords = ["Zero", " One", " Two", " Three", " Four", " Five", " Six", " Seven", " Eight", " Nine"];
-    var ePlace = ['Ten', ' Eleven', ' Twelve', ' Thirteen', ' Fourteen', ' Fifteen', ' Sixteen', ' Seventeen', ' Eighteen', ' Nineteen'];
-    var tensPlace = ['dummy', ' Ten', ' Twenty', ' Thirty', ' Forty', ' Fifty', ' Sixty', ' Seventy', ' Eighty', ' Ninety'];
-
-    var iWordsLength = numReversed.length;
-    var totalWords = "";
-    var inWords = new Array();
-    var finalWord = "";
-    j = 0;
-    for (i = 0; i < iWordsLength; i++) {
-      switch (i) {
-        case 0:
-          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
-            inWords[j] = '';
-          }
-          else {
-            inWords[j] = iWords[actnumber[i]];
-          }
-          inWords[j] = inWords[j] + ' Only';
-          break;
-        case 1:
-          tens_complication();
-          break;
-        case 2:
-          if (actnumber[i] == 0) {
-            inWords[j] = '';
-          }
-          else if (actnumber[i - 1] != 0 && actnumber[i - 2] != 0) {
-            inWords[j] = iWords[actnumber[i]] + ' Hundred and';
-          }
-          else {
-            inWords[j] = iWords[actnumber[i]] + ' Hundred';
-          }
-          break;
-        case 3:
-          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
-            inWords[j] = '';
-          }
-          else {
-            inWords[j] = iWords[actnumber[i]];
-          }
-          if (actnumber[i + 1] != 0 || actnumber[i] > 0) {
-            inWords[j] = inWords[j] + " Thousand";
-          }
-          break;
-        case 4:
-          tens_complication();
-          break;
-        case 5:
-          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
-            inWords[j] = '';
-          }
-          else {
-            inWords[j] = iWords[actnumber[i]];
-          }
-          if (actnumber[i + 1] != 0 || actnumber[i] > 0) {
-            inWords[j] = inWords[j] + " Lakh";
-          }
-          break;
-        case 6:
-          tens_complication();
-          break;
-        case 7:
-          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
-            inWords[j] = '';
-          }
-          else {
-            inWords[j] = iWords[actnumber[i]];
-          }
-          inWords[j] = inWords[j] + " Crore";
-          break;
-        case 8:
-          tens_complication();
-          break;
-        default:
-          break;
-      }
-      j++;
-    }
-
-    function tens_complication() {
-      if (actnumber[i] == 0) {
-        inWords[j] = '';
-      }
-      else if (actnumber[i] == 1) {
-        inWords[j] = ePlace[actnumber[i - 1]];
-      }
-      else {
-        inWords[j] = tensPlace[actnumber[i]];
-      }
-    }
-    inWords.reverse();
-    for (i = 0; i < inWords.length; i++) {
-      finalWord += inWords[i];
-    }
-    return finalWord;
-  }
-};
-
-var FileManager = {
-
-  showFilePopup: function (container, valueContainer) {
-    //alert(valueContainer);
-    jQuery(container).dialog("destroy");
-    jQuery(container).dialog({
-      height: 257,
-      modal: true,
-      title: "File Upload",
-      width: 381,
-      //bgiframe: true,            
-      //autoOpen: false, 
-      resizable: false
-    });
+  // Function to get default headers for json
+  getDefaultApplicationJsonHeaders: function () {
+    this.CheckToken(); // Ensure the token is valid
+    return {
+      "Authorization": "Bearer " + token,
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
   },
 
-  getUploadedFileDetails: function (jsonData) {
-    alert(jsonData.message);
-    alert(jsonData.webpath);
-    FileManager.closeFilePopup(container);
+  // Function to get default headers for formData
+  getDefaultFormDataHeaders: function () {
+    this.CheckToken(); // Ensure the token is valid
+    return {
+      "Authorization": "Bearer " + token,
+      "Accept": "application/json",
+    };
   },
 
-  closeFilePopup: function (container) {
-    jQuery(container).dialog("close");
-    jQuery(container).dialog("destroy");
-  }
 };
-
-
-var DistrictManager = {
-  GetDistrictInformation: function () {
-    var items = [["Barguna"],
-    ["Barishal"],
-    ["Bhola"],
-    ["Jhalokati"],
-    ["Patuakhali"],
-    ["Pirojpur"],
-    ["Bandarban"],
-    ["Brahmanbaria"],
-    ["Chandpur"],
-    ["Chittagong"],
-    ["Comilla"],
-    ["Coxs Bazar"],
-    ["Feni"],
-    ["Khagrachhari"],
-    ["Lakshmipur"],
-    ["Noakhali"],
-    ["Rangamati"],
-    ["Dhaka"],
-    ["Faridpur"],
-    ["Gazipur"],
-    ["Gopalganj"],
-    ["Jamalpur"],
-    ["Kishoreganj"],
-    ["Madaripur"],
-    ["Manikganj"],
-    ["Munshiganj"],
-    ["Mymensingh"],
-    ["Narayanganj"],
-    ["Narsingdi"],
-    ["Netrakona"],
-    ["Rajbari"],
-    ["Shariatpur"],
-    ["Sherpur"],
-    ["Tangail"],
-    ["Bagerhat"],
-    ["Chuadanga"],
-    ["Jessore"],
-    ["Jhenaidah"],
-    ["Khulna"],
-    ["Kushtia"],
-    ["Magura"],
-    ["Meherpur"],
-    ["Narail"],
-    ["Satkhira"],
-    ["Bogra"],
-    ["Joypurhat"],
-    ["Naogaon"],
-    ["Natore"],
-    ["Nawabganj"],
-    ["Pabna"],
-    ["Rajshahi"],
-    ["Sirajganj"],
-    ["Dinajpur"],
-    ["Gaibandha"],
-    ["Kurigram"],
-    ["Lalmonirhat"],
-    ["Nilphamari"],
-    ["Panchagarh"],
-    ["Rangpur"],
-    ["Thakurgaon"],
-    ["Habiganj"],
-    ["Moulvibazar"],
-    ["Sunamganj"],
-    ["Sylhet"]];
-    return items;
-  }
-};
-
-var bloodgroupManager = {
-
-  GetBloodGroupArray: function () {
-    var items = [["A+"], ["A-"], ["B+"], ["B-"], ["AB+"], ["AB-"], ["O+"], ["O-"]];
-    return items;
-  },
-
-  GetBloodGroupArrayInBangla: function () {
-    var items = [["এ+"], ["এ-"], ["বি+"], ["বি-"], ["এবি+"], ["এবি-"], ["ও+"], ["ও-"]];
-    return items;
-  }
-};
-
-var heightManager = {
-
-  GetHeightArray: function () {
-    var items = [["3'0\""], ["3'1\""], ["3'2\""], ["3'3\""],
-    ["3'4\""], ["3'5\""], ["3'6\""], ["3'7\""], ["3'8\""],
-    ["3'9\""], ["3'10\""], ["3'11\""], ["4'0\""], ["4'1\""],
-    ["4'2\""], ["4'3\""], ["4'4\""], ["4'5\""], ["4'6\""], ["4'7\""],
-    ["4'8\""], ["4'9\""], ["4'10\""], ["4'11\""], ["5'0\""], ["5'1\""],
-    ["5'2\""], ["5'3\""], ["5'4\""], ["5'5\""], ["5'6\""], ["5'7\""], ["5'8\""],
-    ["5'9\""], ["5'10\""], ["5'11\""], ["6'0\""], ["6'1\""], ["6'2\""],
-    ["6'3\""], ["6'4\""], ["6'5\""], ["6'6\""], ["6'7\""], ["6'8\""],
-    ["6'9\""], ["6'10\""], ["6'11\""], ["7'0\""], ["7'1\""], ["7'2\""],
-    ["7'3\""], ["7'4\""], ["7'5\""], ["7'6\""], ["7'7\""], ["7'8\""],
-    ["7'9\""], ["7'10\""], ["7'11\""], ["8'0\""]];
-    return items;
-  }
-};
-
-var CountryManager = {
-
-  getCountryNames: function () {
-    var states = [
-      ["Afghanistan"],
-      ["Albania"],
-      ["Algeria"],
-      ["Andorra"],
-      ["Angola"],
-      ["Antarctica"],
-      ["Antigua and Barbuda"],
-      ["Argentina"],
-      ["Armenia"],
-      ["Australia"],
-      ["Austria"],
-      ["Azerbaijan"],
-      ["Bahamas"],
-      ["Bahrain"],
-      ["Bangladesh"],
-      ["Barbados"],
-      ["Belarus"],
-      ["Belgium"],
-      ["Belize"],
-      ["Benin"],
-      ["Bermuda"],
-      ["Bhutan"],
-      ["Bolivia"],
-      ["Bosnia and Herzegovina"],
-      ["Botswana"],
-      ["Brazil"],
-      ["Brunei"],
-      ["Bulgaria"],
-      ["Burkina Faso"],
-      ["Burma"],
-      ["Burundi"],
-      ["Cambodia"],
-      ["Cameroon"],
-      ["Canada"],
-      ["Cape Verde"],
-      ["Central African Republic"],
-      ["Chad"],
-      ["Chile"],
-      ["China"],
-      ["Colombia"],
-      ["Comoros"],
-      ["Congo"], ["Democratic Republic"],
-      ["Congo"], ["Republic of the"],
-      ["Costa Rica"],
-      ["Cote d'Ivoire"],
-      ["Croatia"],
-      ["Cuba"],
-      ["Cyprus"],
-      ["Czech Republic"],
-      ["Denmark"],
-      ["Djibouti"],
-      ["Dominica"],
-      ["Dominican Republic"],
-      ["East Timor"],
-      ["Ecuador"],
-      ["Egypt"],
-      ["El Salvador"],
-      ["Equatorial Guinea"],
-      ["Eritrea"],
-      ["Estonia"],
-      ["Ethiopia"],
-      ["Fiji"],
-      ["Finland"],
-      ["France"],
-      ["Gabon"],
-      ["Gambia"],
-      ["Georgia"],
-      ["Germany"],
-      ["Ghana"],
-      ["Greece"],
-      ["Greenland"],
-      ["Grenada"],
-      ["Guatemala"],
-      ["Guinea"],
-      ["Guinea-Bissau"],
-      ["Guyana"],
-      ["Haiti"],
-      ["Honduras"],
-      ["Hong Kong"],
-      ["Hungary"],
-      ["Iceland"],
-      ["India"],
-      ["Indonesia"],
-      ["Iran"],
-      ["Iraq"],
-      ["Ireland"],
-      ["Israel"],
-      ["Italy"],
-      ["Jamaica"],
-      ["Japan"],
-      ["Jordan"],
-      ["Kazakhstan"],
-      ["Kenya"],
-      ["Kiribati"],
-      ["Korea North"],
-      ["Korea South"],
-      ["Kuwait"],
-      ["Kyrgyzstan"],
-      ["Laos"],
-      ["Latvia"],
-      ["Lebanon"],
-      ["Lesotho"],
-      ["Liberia"],
-      ["Libya"],
-      ["Liechtenstein"],
-      ["Lithuania"],
-      ["Luxembourg"],
-      ["Macedonia"],
-      ["Madagascar"],
-      ["Malawi"],
-      ["Malaysia"],
-      ["Maldives"],
-      ["Mali"],
-      ["Malta"],
-      ["Marshall Islands"],
-      ["Mauritania"],
-      ["Mauritius"],
-      ["Mexico"],
-      ["Micronesia"],
-      ["Moldova"],
-      ["Mongolia"],
-      ["Morocco"],
-      ["Monaco"],
-      ["Mozambique"],
-      ["Namibia"],
-      ["Nauru"],
-      ["Nepal"],
-      ["Netherlands"],
-      ["New Zealand"],
-      ["Nicaragua"],
-      ["Niger"],
-      ["Nigeria"],
-      ["Norway"],
-      ["Oman"],
-      ["Pakistan"],
-      ["Panama"],
-      ["Papua New Guinea"],
-      ["Paraguay"],
-      ["Peru"],
-      ["Philippines"],
-      ["Poland"],
-      ["Portugal"],
-      ["Qatar"],
-      ["Romania"],
-      ["Russia"],
-      ["Rwanda"],
-      ["Samoa"],
-      ["San Marino"],
-      ["Sao Tome"],
-      ["Saudi Arabia"],
-      ["Senegal"],
-      ["Serbia and Montenegro"],
-      ["Seychelles"],
-      ["Sierra Leone"],
-      ["Singapore"],
-      ["Slovakia"],
-      ["Slovenia"],
-      ["Solomon Islands"],
-      ["Somalia"],
-      ["South Africa"],
-      ["Spain"],
-      ["Sri Lanka"],
-      ["Sudan"],
-      ["Suriname"],
-      ["Swaziland"],
-      ["Sweden"],
-      ["Switzerland"],
-      ["Syria"],
-      ["Taiwan"],
-      ["Tajikistan"],
-      ["Tanzania"],
-      ["Thailand"],
-      ["Togo"],
-      ["Tonga"],
-      ["Trinidad and Tobago"],
-      ["Tunisia"],
-      ["Turkey"],
-      ["Turkmenistan"],
-      ["Uganda"],
-      ["Ukraine"],
-      ["United Arab Emirates"],
-      ["United Kingdom"],
-      ["United States"],
-      ["Uruguay"],
-      ["Uzbekistan"],
-      ["Vanuatu"],
-      ["Venezuela"],
-      ["Vietnam"],
-      ["Yemen"],
-      ["Zambia"],
-      ["Zimbabwe"]
-    ];
-
-    return states;
-  },
-
-  getCountryArray: function () {
-    var countryList = [
-      "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antarctica", "Antigua and Barbuda",
-      "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
-      "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia",
-      "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burma",
-      "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad",
-      "Chile", "China", "Colombia", "Comoros", "Congo", "Democratic Republic", "Republic of the Congo",
-      "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
-      "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
-      "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
-      "Ghana", "Greece", "Greenland", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti",
-      "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
-      "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea North", "Korea South",
-      "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
-      "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
-      "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Mongolia", "Morocco",
-      "Monaco", "Mozambique", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger",
-      "Nigeria", "Norway", "Oman", "Pakistan", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
-      "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Samoa", "San Marino", "Sao Tome",
-      "Saudi Arabia", "Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
-      "Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan", "Suriname",
-      "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo",
-      "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine",
-      "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu",
-      "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-    ];
-
-    let countryDictionary = {};
-
-    countryList.forEach((country, index) => {
-      countryDictionary[index + 1] = country;
-    });
-
-    return countryDictionary;
-  },
-
-  getCountryData: function () {
-    debugger;
-    var countries = CountryManager.getCountryArray();
-
-    var countryArray = Object.entries(countries).map(([key, value]) => {
-      return {
-        CountryId: parseInt(key),
-        CountryName: value
-      };
-    });
-  }
-};
-
 
 var CommonManager = {
 
-  //MakeFormReadOnly: function (containerSelector) {
-  //  debugger;
+  // Enhanced MsgBox (placeholder - implement based on your notification system)
+  MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
+    try {
+      // Map Noty message types to SweetAlert2 types
+      const typeMap = {
+        'success': 'success',
+        'error': 'error',
+        'warning': 'warning',
+        'info': 'info',
+        'information': 'info',
+        'alert': 'question'
+      };
+      // Get the appropriate icon type
+      const iconType = typeMap[messageBoxType] || 'info';
+      // Set up the SweetAlert2 configuration
+      const swalConfig = {
+        title: messageBoxHeaderText || '',
+        html: messageText || '',
+        icon: iconType,
+        timer: autoHideDelay, // Auto-close after specified delay (default 3000ms)
+        timerProgressBar: true, // Show a progress bar
+        showClass: {
+          popup: 'swal2-show',
+          backdrop: 'swal2-backdrop-show',
+          icon: 'swal2-icon-show'
+        },
+        hideClass: {
+          popup: 'swal2-hide',
+          backdrop: 'swal2-backdrop-hide',
+          icon: 'swal2-icon-hide'
+        },
+        customClass: {
+          container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
+        },
+        showConfirmButton: false,
+        showCancelButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        focusConfirm: false,
+        // Add the didOpen hook here
+        didOpen: () => {
+          document.querySelector('.swal2-container').style.zIndex = '9999'; // Set z-index dynamically
+        }
+      };
 
-  //  const $container = $(containerSelector);
-  //  if ($container.length === 0) {
-  //    console.error("Container with selector '" + containerSelector + "' not found.");
-  //    return;
-  //  }
+      // Handle auto-hide delay
+      if (autoHideDelay > 0) {
+        swalConfig.timer = autoHideDelay; // Auto-close after specified delay
+        swalConfig.timerProgressBar = true; // Show a progress bar
+      }
 
-  //  $container.find(":input").each(function () {
-  //    const $element = $(this);
+      // Handle positioning
+      if (displayPosition.includes('top')) {
+        swalConfig.position = 'top';
+      } else if (displayPosition.includes('bottom')) {
+        swalConfig.position = 'bottom';
+      } else {
+        swalConfig.position = 'center';
+      }
+      // Process buttons
+      if (Array.isArray(buttonsArray) && buttonsArray.length > 0) {
+        const primaryButton = buttonsArray.find(btn => btn.addClass && btn.addClass.includes('btn-primary'));
+        const cancelButton = buttonsArray.find(btn => btn.text === 'Cancel' || btn.text === 'No');
+        if (primaryButton) {
+          swalConfig.showConfirmButton = true;
+          swalConfig.confirmButtonText = primaryButton.text || 'OK';
+          swalConfig.customClass = swalConfig.customClass || {};
+          swalConfig.customClass.confirmButton = primaryButton.addClass || 'btn btn-primary';
+        }
 
-  //    if ($element.is("input[type='text'], input[type='password'], textarea")) {
-  //      $element.attr("readonly", true);
-  //    } else if ($element.is("select")) {
-  //      $element.attr("disabled", true);
-  //    } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
-  //      $element.attr("disabled", true);
-  //      $element.css("pointer-events", "none");
-  //    }
-  //  });
-
-
-  //  $container.find(".custom-combobox").each(function () {
-  //    const comboBox = $(this).data("kendoComboBox");
-  //    if (comboBox) {
-  //      comboBox.enable(false);
-  //    }
-  //  });
-
-  //  $container.find("#btnSave, #btnClear").hide();
-  //},
-
-
-  //MakeFormEditable: function (containerSelector) {
-  //  const $container = $(containerSelector);
-  //  if ($container.length === 0) {
-  //    console.error("Container with selector '" + containerSelector + "' not found.");
-  //    return;
-  //  }
-
-  //  $container.find(":input").each(function () {
-  //    const $element = $(this);
-
-  //    if ($element.is("input[type='text'], input[type='password'], textarea")) {
-  //      $element.removeAttr("readonly");
-  //    } else if ($element.is("select")) {
-  //      $element.removeAttr("disabled");
-  //    } else if ($element.is("input[type='checkbox'], input[type='radio']")) {
-  //      $element.removeAttr("disabled");
-  //      $element.css("pointer-events", "");
-  //    }
-  //  });
-
-
-  //  $container.find(".custom-combobox").each(function () {
-  //    const comboBox = $(this).data("kendoComboBox");
-  //    if (comboBox) {
-  //      comboBox.enable(true);
-  //    }
-  //  });
-
-  //  $container.find("#btnSave, #btnClear").show();
-  //},
+        if (cancelButton) {
+          swalConfig.showCancelButton = true;
+          swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
+          swalConfig.customClass = swalConfig.customClass || {};
+          swalConfig.customClass.cancelButton = cancelButton.addClass || 'btn';
+        }
+      }
+      // Fire the SweetAlert2 dialog
+      return Swal.fire(swalConfig).then((result) => {
+        // Check if auto-closed by timer
+        if (result.dismiss === Swal.DismissReason.timer) {
+          // Optional: Handle timer-based dismissal if needed
+          console.log('Message box was closed by the timer');
+        } else if (result.isConfirmed && buttonsArray[0] && typeof buttonsArray[0].onClick === 'function') {
+          const notyMock = { close: () => { } };
+          buttonsArray[0].onClick(notyMock);
+        } else if (result.isDismissed && buttonsArray[1] && typeof buttonsArray[1].onClick === 'function') {
+          const notyMock = { close: () => { } };
+          buttonsArray[1].onClick(notyMock);
+        }
+      });
+    } catch (error) {
+      console.error("Error in SweetAlert MsgBox:", error);
+      alert(messageText || "Operation confirmation required");
+      return Promise.resolve();
+    }
+  },
 
   MakeFormReadOnly: function (formSelector) {
     const containerSelector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
@@ -3254,27 +3028,6 @@ var CommonManager = {
 
   },
 
-  isValidDate: function (ctrlId) {
-    var res = false;
-    var dateTo = $("#" + ctrlId).val();
-    if (!AjaxManager.isDate(dateTo)) {
-      AjaxManager.MsgBox('warning', 'center', 'Invalid Date', 'Invalid Date. e.g.: MM/dd/yyyy', [{
-        addClass: 'btn btn-primary',
-        text: 'Ok',
-        onClick: function ($noty) {
-          $noty.close();
-          $("#" + ctrlId).val('');
-          $("#" + ctrlId).focus();
-        }
-      }
-      ]);
-      res = false;
-    } else {
-      res = true;
-    }
-    return res;
-  },
-
   /// all about kendo gird.
   // Grid responsive করার জন্য common functions
 
@@ -3322,7 +3075,6 @@ var CommonManager = {
     // যদি columns এর width বেশি হয় তাহলে available width ব্যবহার করুন
     return totalColumnsWidth > availableWidth ? availableWidth + "px" : totalColumnsWidth + "px";
   },
-
 
   /**
     * Grid এর জন্য zoom এবং resize handlers attach করার generic method
@@ -3451,11 +3203,10 @@ var CommonManager = {
     return gridOptions;
   },
 
-  // Grid destroy করার সময় cleanup করুন
+  // Clean up when Grid destroy 
   cleanup: function () {
     CommonManager.destroyGridHandlers("gridSummaryInstitute");
   },
-
 
   // Helper function to get combobox values safely
   getComboValue: function (combo, defaultValue = null) {
@@ -3466,45 +3217,946 @@ var CommonManager = {
 
   getComboText: function (combo, defaultValue = "") {
     if (!combo) return defaultValue;
-    const text = combo.text();
+    const text = combo.text(); 
     return text || defaultValue;
   },
 
-  // Helper function to get input values safely
   getInputValue: function (selector, defaultValue = "") {
-    const element = $(selector);
-    if (!element.length) return defaultValue;
-    const value = element.val();
+    const element = document.querySelector(selector);
+    if (!element) return defaultValue;
+
+    const value = element.value;
     return (value !== null && value !== undefined) ? value.toString().trim() : defaultValue;
   },
 
   getNumericValue: function (selector, defaultValue = null) {
-    const value = getInputValue(selector);
-    if (value === "" || value === null) return defaultValue;
+    const value = this.getInputValue(selector, "");
+    if (value === "") return defaultValue;
+
     const parsed = parseFloat(value);
     return isNaN(parsed) ? defaultValue : parsed;
+  },
+
+  getDropDownListValue: function (dropdownlist, defaultValue = null) {
+    if (!dropdownlist) return defaultValue;
+    const value = dropdownlist.value();
+    return (value !== "" && value !== null && value !== undefined) ? parseInt(value) : defaultValue;
+  },
+
+  getDropDownListText: function (dropdownlist, defaultValue = "") {
+    if (!dropdownlist) return defaultValue;
+    const dataItem = dropdownlist.dataItem();
+    return dataItem ? dataItem.text || dataItem[dropdownlist.options.dataTextField] || defaultValue : defaultValue;
+  },
+
+
+  getMultiSelectValues: function (multiselect, defaultValue = []) {
+    if (!multiselect) return defaultValue;
+
+    const values = multiselect.value();
+    if (!Array.isArray(values)) return defaultValue;
+
+    const filteredValues = values.filter(v => v !== null && v !== undefined && v !== "");
+
+    return filteredValues.length > 0 ? filteredValues.map(v => parseInt(v)) : defaultValue;
+  },
+
+
+  getMultiSelectTexts: function (multiselect, defaultValue = []) {
+    if (!multiselect) return defaultValue;
+
+    const dataItems = multiselect.dataItems();
+    if (!dataItems || dataItems.length === 0) return defaultValue;
+
+    return dataItems.map(item => item.text || item[multiselect.options.dataTextField] || "").filter(Boolean);
   },
 
   getBooleanValue: function (selector, defaultValue = false) {
     const element = $(selector);
     return element.length ? element.is(":checked") : defaultValue;
+  },
+
+  changeDateFormat: function (value, isTime) {
+    var time = value.replace(/\/Date\(([0-9]*)\)\//, '$1');
+    var date = new Date();
+    date.setTime(time);
+    if (isTime == 0) {
+      return (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + date.getFullYear();
+    }
+    else {
+      return (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + date.getFullYear()
+        + '<br> ' + (date.getHours().toString().length == 2 ? date.getHours() : '0' + date.getHours()) + ':' + (date.getMinutes().toString().length == 2 ? date.getMinutes() : '0' + date.getMinutes()) + ':' + (date.getSeconds().toString().length == 2 ? date.getSeconds() : '0' + date.getSeconds());
+    }
+  },
+
+  getCurrentDateTime: function () {
+    var date = new Date();
+    var day = (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()).toString();
+    var month = ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)).toString();
+    var year = date.getFullYear().toString();
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var suffix = "AM";
+    if (hours >= 12) {
+      suffix = "PM";
+      hours = hours - 12;
+    }
+    if (hours == 0) {
+      hours = 12;
+    }
+
+    if (minutes < 10)
+      minutes = "0" + minutes;
+    //var CurrentDateTime = day + "/" + month + "/" + year + " " + hours + ":" + minutes + " " + suffix;
+    //var CurrentDateTime = day + "/" + month + "/" + year + " " + hours + ":" + minutes;
+    var CurrentDateTime = day + "-" + month + "-" + year;
+    return CurrentDateTime;
+  },
+
+  changeToSQLDateFormat: function (value, isTime) {
+
+    if (value != "/Date(-62135596800000)/") {
+      var time = value.replace(/\/Date\(([0-9]*)\)\//, '$1');
+      var date = new Date();
+      date.setTime(time);
+      var dd = (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()).toString();
+      var mm = ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)).toString();
+      var yyyy = date.getFullYear().toString();
+      var timeformat = "";
+      if (isTime == 1) {
+        timeformat = (date.getHours().toString().length == 2 ? date.getHours() : '0' + date.getHours()) + ':' + (date.getMinutes().toString().length == 2 ? date.getMinutes() : '0' + date.getMinutes()) + ':' + (date.getSeconds().toString().length == 2 ? date.getSeconds() : '0' + date.getSeconds());
+      }
+      var sqlFormatedDate = mm + '/' + dd + '/' + yyyy + ' ' + timeformat;
+      return sqlFormatedDate;
+    }
+    else {
+      return "";
+    }
+  },
+
+  changeReverseDateFormat: function (value) {
+    dtvalue = value.split('-');
+    var datetime = dtvalue[1] + "/" + dtvalue[0] + "/" + dtvalue[2];
+    return datetime;
+  },
+
+  changeFormattedDate: function (value, format) {
+    var date = new Date(value);
+    if (format == "DDMMYYYY") {
+      var val = (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + date.getFullYear();
+      if (val == "0NaN-0NaN-NaN") {
+        return "";
+      } else {
+        return val;
+      }
+    }
+    if (format == "MMDDYYYY") {
+      return ((date.getMonth() + 1).toString().length == 2 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate().toString().length == 2 ? date.getDate() : '0' + date.getDate()) + '-' + date.getFullYear();
+    }
+  },
+
+  getDayDifference: function (date1, date2) {
+
+    // The number of milliseconds in one day
+    var ONE_DAY = 1000 * 60 * 60 * 24;
+
+    // Convert both dates to milliseconds
+    var date1_ms = new Date(date1).getTime();
+    var date2_ms = new Date(date2).getTime();
+
+    // Calculate the difference in milliseconds
+    var difference_ms = Math.abs(date1_ms - date2_ms);
+
+    // Convert back to days and return
+    return Math.round(difference_ms / ONE_DAY);
+
+  },
+
+  getMonthDifference: function (date1, date2) {
+
+    // The number of milliseconds in one Month
+    var Month_DAY = 1000 * 60 * 60 * 24 * 30;
+
+    // Convert both dates to milliseconds
+    var date1_ms = new Date(date1).getTime();
+    var date2_ms = new Date(date2).getTime();
+
+    // Calculate the difference in milliseconds
+    var difference_ms = Math.abs(date1_ms - date2_ms);
+
+    // Convert back to days and return
+    return Math.round(difference_ms / Month_DAY);
+
+  },
+
+  getYearDifference: function (currentDate, backdate) {
+
+    var ageDifMs = currentDate - backdate.getTime();
+    var ageDate = new Date(ageDifMs); // miliseconds from epoch
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+
+  },
+
+  getYearDifferenceWithFloor: function (currentDate, backdate) {
+
+    var ageDifMs = currentDate - backdate.getTime();
+    var ageDate = new Date(ageDifMs); // miliseconds from epoch
+    return Math.floor(ageDate.getUTCFullYear() - 1970);
+
+  },
+
+  hideMasterDetailsForPrint: function () {
+    $("#header").hide();
+    $("#dynamicmenu").hide();
+    $("#divWelcome").hide();
+    $("#content").hide();
+    $("#main").css({
+      "background-color": "#ffffff"
+    });
+    $("body").css({
+      "background-color": "#ffffff"
+    });
+    $("#footer").hide();
+  },
+
+  showMasterDetailsForPrint: function () {
+    $("#header").show();
+    $("#dynamicmenu").show();
+    $("#divWelcome").show();
+    $("#content").show();
+    $("#main").css({
+      "background-color": "#A6D77B"
+    });
+    $("body").css({
+      "background-color": "#A6D77B"
+    });
+    $("#footer").show();
+  },
+
+  GetHeightArray: function () {
+    var items = [["3'0\""], ["3'1\""], ["3'2\""], ["3'3\""],
+    ["3'4\""], ["3'5\""], ["3'6\""], ["3'7\""], ["3'8\""],
+    ["3'9\""], ["3'10\""], ["3'11\""], ["4'0\""], ["4'1\""],
+    ["4'2\""], ["4'3\""], ["4'4\""], ["4'5\""], ["4'6\""], ["4'7\""],
+    ["4'8\""], ["4'9\""], ["4'10\""], ["4'11\""], ["5'0\""], ["5'1\""],
+    ["5'2\""], ["5'3\""], ["5'4\""], ["5'5\""], ["5'6\""], ["5'7\""], ["5'8\""],
+    ["5'9\""], ["5'10\""], ["5'11\""], ["6'0\""], ["6'1\""], ["6'2\""],
+    ["6'3\""], ["6'4\""], ["6'5\""], ["6'6\""], ["6'7\""], ["6'8\""],
+    ["6'9\""], ["6'10\""], ["6'11\""], ["7'0\""], ["7'1\""], ["7'2\""],
+    ["7'3\""], ["7'4\""], ["7'5\""], ["7'6\""], ["7'7\""], ["7'8\""],
+    ["7'9\""], ["7'10\""], ["7'11\""], ["8'0\""]];
+    return items;
+  },
+
+  daysBetween: function (date1, date2) {
+
+    var d1 = new Date(date1);
+    var d2 = new Date(date2);
+
+    date1 = (d1.getMonth() + 1) + '/' + d1.getDate() + '/' + d1.getFullYear();
+    date2 = (d2.getMonth() + 1) + '/' + d2.getDate() + '/' + d2.getFullYear();
+    // The number of milliseconds in one day
+    var ONE_DAY = 1000 * 60 * 60 * 24;
+
+    // Convert both dates to milliseconds
+    var date1_ms = new Date(date1).getTime();
+    var date2_ms = new Date(date2).getTime();
+
+    // Calculate the difference in milliseconds
+    var difference_ms = Math.abs(date1_ms - date2_ms);
+
+    // Convert back to days and return
+    return Math.round(difference_ms / ONE_DAY);
+
+  },
+
+  GetBloodGroupArray: function () {
+    var items = [["A+"], ["A-"], ["B+"], ["B-"], ["AB+"], ["AB-"], ["O+"], ["O-"]];
+    return items;
+  },
+
+  GetBloodGroupArrayInBangla: function () {
+    var items = [["এ+"], ["এ-"], ["বি+"], ["বি-"], ["এবি+"], ["এবি-"], ["ও+"], ["ও-"]];
+    return items;
+  },
+
+  GetDistrictInformation: function () {
+    var items = [["Barguna"],
+    ["Barishal"],
+    ["Bhola"],
+    ["Jhalokati"],
+    ["Patuakhali"],
+    ["Pirojpur"],
+    ["Bandarban"],
+    ["Brahmanbaria"],
+    ["Chandpur"],
+    ["Chittagong"],
+    ["Comilla"],
+    ["Coxs Bazar"],
+    ["Feni"],
+    ["Khagrachhari"],
+    ["Lakshmipur"],
+    ["Noakhali"],
+    ["Rangamati"],
+    ["Dhaka"],
+    ["Faridpur"],
+    ["Gazipur"],
+    ["Gopalganj"],
+    ["Jamalpur"],
+    ["Kishoreganj"],
+    ["Madaripur"],
+    ["Manikganj"],
+    ["Munshiganj"],
+    ["Mymensingh"],
+    ["Narayanganj"],
+    ["Narsingdi"],
+    ["Netrakona"],
+    ["Rajbari"],
+    ["Shariatpur"],
+    ["Sherpur"],
+    ["Tangail"],
+    ["Bagerhat"],
+    ["Chuadanga"],
+    ["Jessore"],
+    ["Jhenaidah"],
+    ["Khulna"],
+    ["Kushtia"],
+    ["Magura"],
+    ["Meherpur"],
+    ["Narail"],
+    ["Satkhira"],
+    ["Bogra"],
+    ["Joypurhat"],
+    ["Naogaon"],
+    ["Natore"],
+    ["Nawabganj"],
+    ["Pabna"],
+    ["Rajshahi"],
+    ["Sirajganj"],
+    ["Dinajpur"],
+    ["Gaibandha"],
+    ["Kurigram"],
+    ["Lalmonirhat"],
+    ["Nilphamari"],
+    ["Panchagarh"],
+    ["Rangpur"],
+    ["Thakurgaon"],
+    ["Habiganj"],
+    ["Moulvibazar"],
+    ["Sunamganj"],
+    ["Sylhet"]];
+    return items;
+  },
+
+  getCountryNames: function () {
+    var states = [
+      ["Afghanistan"],
+      ["Albania"],
+      ["Algeria"],
+      ["Andorra"],
+      ["Angola"],
+      ["Antarctica"],
+      ["Antigua and Barbuda"],
+      ["Argentina"],
+      ["Armenia"],
+      ["Australia"],
+      ["Austria"],
+      ["Azerbaijan"],
+      ["Bahamas"],
+      ["Bahrain"],
+      ["Bangladesh"],
+      ["Barbados"],
+      ["Belarus"],
+      ["Belgium"],
+      ["Belize"],
+      ["Benin"],
+      ["Bermuda"],
+      ["Bhutan"],
+      ["Bolivia"],
+      ["Bosnia and Herzegovina"],
+      ["Botswana"],
+      ["Brazil"],
+      ["Brunei"],
+      ["Bulgaria"],
+      ["Burkina Faso"],
+      ["Burma"],
+      ["Burundi"],
+      ["Cambodia"],
+      ["Cameroon"],
+      ["Canada"],
+      ["Cape Verde"],
+      ["Central African Republic"],
+      ["Chad"],
+      ["Chile"],
+      ["China"],
+      ["Colombia"],
+      ["Comoros"],
+      ["Congo"], ["Democratic Republic"],
+      ["Congo"], ["Republic of the"],
+      ["Costa Rica"],
+      ["Cote d'Ivoire"],
+      ["Croatia"],
+      ["Cuba"],
+      ["Cyprus"],
+      ["Czech Republic"],
+      ["Denmark"],
+      ["Djibouti"],
+      ["Dominica"],
+      ["Dominican Republic"],
+      ["East Timor"],
+      ["Ecuador"],
+      ["Egypt"],
+      ["El Salvador"],
+      ["Equatorial Guinea"],
+      ["Eritrea"],
+      ["Estonia"],
+      ["Ethiopia"],
+      ["Fiji"],
+      ["Finland"],
+      ["France"],
+      ["Gabon"],
+      ["Gambia"],
+      ["Georgia"],
+      ["Germany"],
+      ["Ghana"],
+      ["Greece"],
+      ["Greenland"],
+      ["Grenada"],
+      ["Guatemala"],
+      ["Guinea"],
+      ["Guinea-Bissau"],
+      ["Guyana"],
+      ["Haiti"],
+      ["Honduras"],
+      ["Hong Kong"],
+      ["Hungary"],
+      ["Iceland"],
+      ["India"],
+      ["Indonesia"],
+      ["Iran"],
+      ["Iraq"],
+      ["Ireland"],
+      ["Israel"],
+      ["Italy"],
+      ["Jamaica"],
+      ["Japan"],
+      ["Jordan"],
+      ["Kazakhstan"],
+      ["Kenya"],
+      ["Kiribati"],
+      ["Korea North"],
+      ["Korea South"],
+      ["Kuwait"],
+      ["Kyrgyzstan"],
+      ["Laos"],
+      ["Latvia"],
+      ["Lebanon"],
+      ["Lesotho"],
+      ["Liberia"],
+      ["Libya"],
+      ["Liechtenstein"],
+      ["Lithuania"],
+      ["Luxembourg"],
+      ["Macedonia"],
+      ["Madagascar"],
+      ["Malawi"],
+      ["Malaysia"],
+      ["Maldives"],
+      ["Mali"],
+      ["Malta"],
+      ["Marshall Islands"],
+      ["Mauritania"],
+      ["Mauritius"],
+      ["Mexico"],
+      ["Micronesia"],
+      ["Moldova"],
+      ["Mongolia"],
+      ["Morocco"],
+      ["Monaco"],
+      ["Mozambique"],
+      ["Namibia"],
+      ["Nauru"],
+      ["Nepal"],
+      ["Netherlands"],
+      ["New Zealand"],
+      ["Nicaragua"],
+      ["Niger"],
+      ["Nigeria"],
+      ["Norway"],
+      ["Oman"],
+      ["Pakistan"],
+      ["Panama"],
+      ["Papua New Guinea"],
+      ["Paraguay"],
+      ["Peru"],
+      ["Philippines"],
+      ["Poland"],
+      ["Portugal"],
+      ["Qatar"],
+      ["Romania"],
+      ["Russia"],
+      ["Rwanda"],
+      ["Samoa"],
+      ["San Marino"],
+      ["Sao Tome"],
+      ["Saudi Arabia"],
+      ["Senegal"],
+      ["Serbia and Montenegro"],
+      ["Seychelles"],
+      ["Sierra Leone"],
+      ["Singapore"],
+      ["Slovakia"],
+      ["Slovenia"],
+      ["Solomon Islands"],
+      ["Somalia"],
+      ["South Africa"],
+      ["Spain"],
+      ["Sri Lanka"],
+      ["Sudan"],
+      ["Suriname"],
+      ["Swaziland"],
+      ["Sweden"],
+      ["Switzerland"],
+      ["Syria"],
+      ["Taiwan"],
+      ["Tajikistan"],
+      ["Tanzania"],
+      ["Thailand"],
+      ["Togo"],
+      ["Tonga"],
+      ["Trinidad and Tobago"],
+      ["Tunisia"],
+      ["Turkey"],
+      ["Turkmenistan"],
+      ["Uganda"],
+      ["Ukraine"],
+      ["United Arab Emirates"],
+      ["United Kingdom"],
+      ["United States"],
+      ["Uruguay"],
+      ["Uzbekistan"],
+      ["Vanuatu"],
+      ["Venezuela"],
+      ["Vietnam"],
+      ["Yemen"],
+      ["Zambia"],
+      ["Zimbabwe"]
+    ];
+
+    return states;
+  },
+
+  getCountryArray: function () {
+    var countryList = [
+      "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antarctica", "Antigua and Barbuda",
+      "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
+      "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia",
+      "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burma",
+      "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad",
+      "Chile", "China", "Colombia", "Comoros", "Congo", "Democratic Republic", "Republic of the Congo",
+      "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
+      "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
+      "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
+      "Ghana", "Greece", "Greenland", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti",
+      "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
+      "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea North", "Korea South",
+      "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
+      "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+      "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Mongolia", "Morocco",
+      "Monaco", "Mozambique", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger",
+      "Nigeria", "Norway", "Oman", "Pakistan", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
+      "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Samoa", "San Marino", "Sao Tome",
+      "Saudi Arabia", "Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
+      "Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan", "Suriname",
+      "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo",
+      "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine",
+      "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu",
+      "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+    ];
+
+    let countryDictionary = {};
+
+    countryList.forEach((country, index) => {
+      countryDictionary[index + 1] = country;
+    });
+
+    return countryDictionary;
+  },
+
+  getCountryData: function () {
+    debugger;
+    var countries = CountryManager.getCountryArray();
+
+    var countryArray = Object.entries(countries).map(([key, value]) => {
+      return {
+        CountryId: parseInt(key),
+        CountryName: value
+      };
+    });
+  },
+
+  replaceSingleQoute: function (id) {
+
+    var checkString = $("#" + id).val();
+    checkString = checkString.replace(/'/g, "''");
+    return checkString;
+
+  },
+
+  Trim: function (s) {
+    //return s.replace(s,"/^ *(\w+ ?)+ *$/", "");
+    return (s.replace(/\s+/g, ' ')).trim();
+  },
+
+  toTitleCase: function (str) {
+    return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+  },
+
+  AmountInWord: function (number) {
+
+    var a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen '];
+    var b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
+
+    if ((number = number.toString()).length > 9) return 'overflow';
+    n = ('000000000' + number).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return "";
+    var str = '';
+    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'crore ' : '';
+    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'lakh ' : '';
+    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'thousand ' : '';
+    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
+    str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'only ' : '';
+    return str;
+  },
+
+};
+
+var ToastrMessage = {
+  showToastrNotification: function (options = {}) {
+    const defaultOptions = {
+      preventDuplicates: true,
+      closeButton: options.timeOut === 0 ? true : false,
+      progressBar: options.timeOut > 0 ? true : false,
+      timeOut: options.timeOut || 5000,
+      positionClass: options.positionClass || 'toast-top-right',
+      extendedTimeOut: 1000,
+      showEasing: 'swing',
+      hideEasing: 'linear',
+      showMethod: 'fadeIn',
+      hideMethod: 'fadeOut',
+      escapeHtml: false // Allow HTML in Toastr messages
+    };
+
+    toastr.options = defaultOptions;
+
+    const title = options.title || null;
+    const message = options.message || 'This is a message';
+    const type = options.type ? options.type.toLowerCase() : 'info';
+
+    switch (type) {
+      case 'success':
+        toastr.success(message, title);
+        break;
+      case 'error':
+        toastr.error(message, title);
+        break;
+      case 'warning':
+        toastr.warning(message, title);
+        break;
+      case 'info':
+      default:
+        toastr.info(message, title);
+        break;
+    }
+  },
+
+  showSuccess: function (message, title = null, timeOut = 3000) {
+    ToastrMessage.showToastrNotification({ message, title, type: 'success', timeOut });
+  },
+
+  showError: function (message, title = null, timeOut = 0) {
+    ToastrMessage.showToastrNotification({ message, title, type: 'error', timeOut });
+  },
+
+  showWarning: function (message, title = null, timeOut = 5000) {
+    ToastrMessage.showToastrNotification({ message, title, type: 'warning', timeOut });
+  },
+
+  showInfo: function (message, title = null, timeOut = 3000) {
+    ToastrMessage.showToastrNotification({ message, title, type: 'info', timeOut });
+  },
+
+  formatApiErrorMessage: function (errorResponse) {
+    debugger;
+    let statusCode = errorResponse.statusCode || 500;
+    let errorType = errorResponse.errorType || "Error";
+    let message = errorResponse.message || "Unknown error";
+    let correlationId = errorResponse.correlationId || "";
+    let details = errorResponse.details || "";
+    let consoleMessage = "";
+
+    let displayMessage = `<strong>[${statusCode}] ${errorType}</strong><br>`;
+    displayMessage += `${message}<br>`;
+
+    if (correlationId) {
+      consoleMessage = displayMessage + `<small>Correlation ID: ${correlationId}</small><br>`;
+    }
+
+    if (details) {
+      consoleMessage += `<small><strong>Details:</strong> ${details.replace(/\r\n/g, "<br>")}</small>`;
+    }
+
+    console.log(consoleMessage);
+    return displayMessage;
   }
+};
 
-  // how to call above helper function
-  // ComboBox Instance
-  //const countryCbo = $("#cmbInstituteCountry").data("kendoComboBox");
-  //const currencyCbo = $("#cmbInstituteCurrency").data("kendoComboBox");
-  //const typeCbo = $("#cmbInstituteType").data("kendoComboBox");
-  //// Get combobox values
-  //const countryId = getComboValue(countryCbo);
-  //const currencyId = getComboValue(currencyCbo);
-  //const typeId = getComboValue(typeCbo);
-  //InstituteId: parseInt(getInputValue("#instituteId", "0")),
-  //InstituteName: getInputValue("#instituteName"),
-  //MonthlyLivingCost: getNumericValue("#monthlyLivingCost"),
-  //IsLanguageMandatory: getBooleanValue("#chkIsLanguageMandatory"),
-  //CountryName: getComboText(countryCbo),
+var ValidatorManager = {
 
+  validator: function (divId) {
+
+    var validator = divId.kendoValidator().data("kendoValidator"),
+      status = $(".status");
+
+    if (validator.validate()) {
+      status.text("").addClass("valid");
+      return true;
+    } else {
+      status.text("Oops! There is invalid data in the form.").addClass("invalid");
+      return false;
+    }
+  },
+
+  isValidItem: function (ctrlId, isClear) {
+    debugger;
+    var cmbBox = $("#" + ctrlId).data("kendoComboBox");
+
+    if (cmbBox.value() != "" && cmbBox.value() == cmbBox.text()) {
+      AjaxManager.MsgBox('warning', 'center', 'Invalid Item:', 'No Item matched with your Input data as like "[' + cmbBox.text() + ']"!', [{
+        addClass: 'btn btn-primary',
+        text: 'Ok',
+        onClick: function ($noty) {
+          $noty.close();
+          //cmbBox.focus();
+          if (isClear)
+            cmbBox.value('');
+
+
+        }
+      }
+      ]);
+      return false;
+    } else {
+      return true;
+    }
+  },
+
+  isEmpty: function (s) {
+    return !((s != null) && /^\s*(\S+(\s+\S+)*)\s*$/.test(s));
+  },
+
+  isFloat: function (s) {
+    return /^\s*(\d+)?(\.(\d+))?\s*$/.test(s);
+  },
+
+  isDate: function (str) {
+    if (str != null) {
+      var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      return (m) ? true : false;
+    }
+    return false;
+
+  },
+
+  isDigit: function (s) {
+    return /^\s*\d+\s*$/.test(s);
+  },
+
+  isValidDate: function (ctrlId) {
+    var res = false;
+    var dateTo = $("#" + ctrlId).val();
+    if (!AjaxManager.isDate(dateTo)) {
+      AjaxManager.MsgBox('warning', 'center', 'Invalid Date', 'Invalid Date. e.g.: MM/dd/yyyy', [{
+        addClass: 'btn btn-primary',
+        text: 'Ok',
+        onClick: function ($noty) {
+          $noty.close();
+          $("#" + ctrlId).val('');
+          $("#" + ctrlId).focus();
+        }
+      }
+      ]);
+      res = false;
+    } else {
+      res = true;
+    }
+    return res;
+  },
+
+};
+
+var currencyConverter = {
+
+  add_commas: function (nStr) {
+    nStr += '';
+    x = nStr.split('.');
+    x1 = x[0];
+    x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  },
+
+  digitToWordConverter: function (junkVal) {
+    junkVal = Math.floor(junkVal);
+    var obStr = new String(junkVal);
+    numReversed = obStr.split("");
+    actnumber = numReversed.reverse();
+
+    if (Number(junkVal) >= 0) {
+      //do nothing
+    }
+    else {
+      alert('wrong Number cannot be converted');
+      return false;
+    }
+    if (Number(junkVal) == 0) {
+      document.getElementById('container').innerHTML = obStr + '' + 'Rupees Zero Only';
+      return false;
+    }
+    if (actnumber.length > 9) {
+      alert('Oops!!!! the Number is too big to covertes');
+      return false;
+    }
+
+    var iWords = ["Zero", " One", " Two", " Three", " Four", " Five", " Six", " Seven", " Eight", " Nine"];
+    var ePlace = ['Ten', ' Eleven', ' Twelve', ' Thirteen', ' Fourteen', ' Fifteen', ' Sixteen', ' Seventeen', ' Eighteen', ' Nineteen'];
+    var tensPlace = ['dummy', ' Ten', ' Twenty', ' Thirty', ' Forty', ' Fifty', ' Sixty', ' Seventy', ' Eighty', ' Ninety'];
+
+    var iWordsLength = numReversed.length;
+    var totalWords = "";
+    var inWords = new Array();
+    var finalWord = "";
+    j = 0;
+    for (i = 0; i < iWordsLength; i++) {
+      switch (i) {
+        case 0:
+          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+            inWords[j] = '';
+          }
+          else {
+            inWords[j] = iWords[actnumber[i]];
+          }
+          inWords[j] = inWords[j] + ' Only';
+          break;
+        case 1:
+          tens_complication();
+          break;
+        case 2:
+          if (actnumber[i] == 0) {
+            inWords[j] = '';
+          }
+          else if (actnumber[i - 1] != 0 && actnumber[i - 2] != 0) {
+            inWords[j] = iWords[actnumber[i]] + ' Hundred and';
+          }
+          else {
+            inWords[j] = iWords[actnumber[i]] + ' Hundred';
+          }
+          break;
+        case 3:
+          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+            inWords[j] = '';
+          }
+          else {
+            inWords[j] = iWords[actnumber[i]];
+          }
+          if (actnumber[i + 1] != 0 || actnumber[i] > 0) {
+            inWords[j] = inWords[j] + " Thousand";
+          }
+          break;
+        case 4:
+          tens_complication();
+          break;
+        case 5:
+          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+            inWords[j] = '';
+          }
+          else {
+            inWords[j] = iWords[actnumber[i]];
+          }
+          if (actnumber[i + 1] != 0 || actnumber[i] > 0) {
+            inWords[j] = inWords[j] + " Lakh";
+          }
+          break;
+        case 6:
+          tens_complication();
+          break;
+        case 7:
+          if (actnumber[i] == 0 || actnumber[i + 1] == 1) {
+            inWords[j] = '';
+          }
+          else {
+            inWords[j] = iWords[actnumber[i]];
+          }
+          inWords[j] = inWords[j] + " Crore";
+          break;
+        case 8:
+          tens_complication();
+          break;
+        default:
+          break;
+      }
+      j++;
+    }
+
+    function tens_complication() {
+      if (actnumber[i] == 0) {
+        inWords[j] = '';
+      }
+      else if (actnumber[i] == 1) {
+        inWords[j] = ePlace[actnumber[i - 1]];
+      }
+      else {
+        inWords[j] = tensPlace[actnumber[i]];
+      }
+    }
+    inWords.reverse();
+    for (i = 0; i < inWords.length; i++) {
+      finalWord += inWords[i];
+    }
+    return finalWord;
+  }
+};
+
+var FileManager = {
+
+  showFilePopup: function (container, valueContainer) {
+    //alert(valueContainer);
+    jQuery(container).dialog("destroy");
+    jQuery(container).dialog({
+      height: 257,
+      modal: true,
+      title: "File Upload",
+      width: 381,
+      //bgiframe: true,            
+      //autoOpen: false, 
+      resizable: false
+    });
+  },
+
+  getUploadedFileDetails: function (jsonData) {
+    alert(jsonData.message);
+    alert(jsonData.webpath);
+    FileManager.closeFilePopup(container);
+  },
+
+  closeFilePopup: function (container) {
+    jQuery(container).dialog("close");
+    jQuery(container).dialog("destroy");
+  }
 };
 
 // Universal FormData Helper - Works with any object
@@ -3864,13 +4516,14 @@ const UpdatedInstituteHelper = {
 };
 
 // Example of using the universal helper for different objects:
-
 // For a simple User object
 const userObj = { name: "John", email: "", age: 25, active: true };
+
 const userFormData = UniversalFormDataHelper.simpleConvert(userObj, ['id'], ['email']);
 
 // For a complex Product object with full customization
 const productObj = { name: "Product", price: 0, category: null, tags: ['new', 'sale'] };
+
 const productResult = UniversalFormDataHelper.advancedConvert(productObj, {
   includeEmptyFields: ['price'],
   skipNull: true,
@@ -3883,11 +4536,6 @@ const productResult = UniversalFormDataHelper.advancedConvert(productObj, {
     }
   }
 });
-
-console.log("Universal FormData Helper is ready to use with any object!");
-
-
-
 
 function addExtensionClass(extension) {
   switch (extension) {
@@ -3911,9 +4559,6 @@ function addExtensionClass(extension) {
       return "default-file";
   }
 }
-
-
-
 
 (function () {
   var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -3963,7 +4608,6 @@ function addExtensionClass(extension) {
     //return new Date(year, month, 0).getDate();
   }
 })();
-
 
 (function () {
 
@@ -4030,14 +4674,130 @@ function addExtensionClass(extension) {
 })();
 
 
-//var filterable = {
-//    extra: true,
-//    operators: {
-//        string: {
-//            contains: "Contains",
-//            startswith: "Starts with",
-//            eq: "Is equal to",
-//            neq: "Is not equal to"
-//        }
-//    }
-//}
+
+
+
+
+/////////////  Example of VanillaApiCallManager
+
+// Usage Examples:
+const Examples = {
+
+  // Basic JSON request
+  async sendJsonData() {
+    try {
+      const userData = {
+        name: "John Doe",
+        email: "john@example.com",
+        isActive: true
+      };
+
+      const response = await AjaxManager.post('/api', '/users', userData);
+      console.log('User created:', response);
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+  },
+
+  // FormData with files
+  async sendFormData() {
+    try {
+      const formData = new FormData();
+      const entityData = {
+        institutionName: "ABC University",
+        address: "Dhaka, Bangladesh"
+      };
+
+      formData.append("modelDto", JSON.stringify(entityData));
+
+      const fileInput = document.getElementById('logoFile');
+      if (fileInput.files[0]) {
+        formData.append("InstitutionLogoFile", fileInput.files[0]);
+      }
+
+      const response = await AjaxManager.post('/api', '/CreateNewRecord', formData);
+      console.log('Record created:', response);
+    } catch (error) {
+      console.error('Error creating record:', error);
+    }
+  },
+
+  // File upload
+  async uploadFile() {
+    try {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+
+      const additionalData = {
+        description: "Profile picture",
+        category: "avatar"
+      };
+
+      const response = await AjaxManager.uploadFile('/api', '/upload', file, additionalData);
+      console.log('File uploaded:', response);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  },
+
+  // Advanced options
+  async advancedRequest() {
+    try {
+      const response = await AjaxManager.post('/api', '/heavy-operation',
+        { data: 'complex data' },
+        {
+          timeout: 60000, // 60 seconds
+          retries: 2,
+          retryDelay: 2000,
+          customHeaders: {
+            'X-Custom-Header': 'custom-value'
+          },
+          validateStatus: (status) => status === 200 || status === 201
+        }
+      );
+      console.log('Success:', response);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  },
+
+  // Simple JSON request
+  async simpleJsonRequest() {
+    try {
+      // Simple JSON request (no stringify needed!)
+      const userData = { name: "John", email: "john@example.com" };
+      await AjaxManager.post('/api', '/users', userData);
+
+      // FormData with files
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(entityData));
+      formData.append("file", fileInput.files[0]);
+      await AjaxManager.post('/api', '/CreateNewRecord', formData);
+
+      // With advanced options
+      await AjaxManager.post('/api', '/data', jsonData, {
+        timeout: 60000,
+        retries: 3,
+        customHeaders: { 'X-Custom': 'value' }
+      });
+    } catch (error) {
+      console.error('Batch error:', error);
+    }
+  },
+
+  // Batch requests
+  async batchRequests() {
+    try {
+      const requests = [
+        { baseApi: '/api', serviceUrl: '/users/1', method: 'GET' },
+        { baseApi: '/api', serviceUrl: '/users/2', method: 'GET' },
+        { baseApi: '/api', serviceUrl: '/posts', data: { title: 'New Post' }, method: 'POST' }
+      ];
+
+      const results = await AjaxManager.batch(requests);
+      console.log('Batch results:', results);
+    } catch (error) {
+      console.error('Batch error:', error);
+    }
+  }
+};

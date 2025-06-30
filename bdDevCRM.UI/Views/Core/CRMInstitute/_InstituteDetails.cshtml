@@ -1,192 +1,193 @@
-﻿@* 
-<script src="~/assets/libs/pdfviewer/pdf.2.10.377.min.js"></script> *@
+﻿
 
 <script src="~/assets/scripts/core/crminstitute/institutedetails.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 
 
-<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12" id="InstituteForm">
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
   <fieldset class="reset">
     <legend class="reset">Institute Form</legend>
 
-    <div class="row mb-2">
-      <!-- Institute Id -->
-      <input id="instituteId" name="InstituteId" type="hidden" value="0" />
+    <form id="InstituteForm" enctype="multipart/form-data">
 
-      <!-- =====  Name, Code, Type ===== -->
-      <!-- Institute Name -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteName">Institute Name <span class="redstart">*</span></label>
-        <input type="text" class="form-control" id="instituteName" name="InstituteName" placeholder="Institute name" required validationMessage="Name is required" />
-      </div>
+      <div class="row mb-2">
+        <!-- Institute Id -->
+        <input id="instituteId" name="InstituteId" type="hidden" value="0" />
 
-      <!-- Institute Code -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteCode">Institute Code</label>
-        <input type="text" class="form-control" id="instituteCode" name="InstituteCode" placeholder="Institute code" />
-      </div>
-
-      <!-- Institute Type -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteTypeId" class="lbl widthSize100_per">Institute Type</label>
-        <div class="d-flex align-items-start icon-wrapper">
-          <input id="cmbInstituteType" name="InstituteTypeId" class="flex-grow-1 border-right-strait" />
-          <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openInstituteTypePopup();">
-            <span class="k-icon k-i-plus"></span>
-          </button>
+        <!-- =====  Name, Code, Type ===== -->
+        <!-- Institute Name -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="InstituteName">Institute Name <span class="redstart">*</span></label>
+          <input type="text" class="form-control" id="instituteName" name="InstituteName" placeholder="Institute name" required validationMessage="Name is required" />
         </div>
-      </div>
 
-      <!-- ===== Country, Currency, Campus ===== -->
-      <!-- Country -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="CountryId" class="lbl widthSize100_per">Country <span class="redstart">*</span></label>
-        <div class="d-flex align-items-start icon-wrapper">
-          <input id="cmbCountry_Institute" name="CountryId" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
-          <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCountryPopup();">
-            <span class="k-icon k-i-plus"></span>
-          </button>
+        <!-- Institute Code -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="InstituteCode">Institute Code</label>
+          <input type="text" class="form-control" id="instituteCode" name="InstituteCode" placeholder="Institute code" />
         </div>
-      </div>
 
-      <!-- Currency -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="CurrencyId" class="lbl widthSize100_per">Currency</label>
-        <div class="d-flex align-items-start icon-wrapper">
-          <input id="cmbCurrency_Institute" name="CurrencyId" class="flex-grow-1 border-right-strait" />
-          <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCurrencyPopup();">
-            <span class="k-icon k-i-plus"></span>
-          </button>
+        <!-- Institute Type -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="InstituteTypeId" class="lbl widthSize100_per">Institute Type</label>
+          <div class="d-flex align-items-start icon-wrapper">
+            <input id="cmbInstituteType" name="InstituteTypeId" class="flex-grow-1 border-right-strait" />
+            <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openInstituteTypePopup();">
+              <span class="k-icon k-i-plus"></span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Campus -->
-      <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
-        <label for="Campus">Campus</label>
-        <input type="text" class="form-control" id="campus" name="Campus" />
-      </div>
+        <!-- ===== Country, Currency, Campus ===== -->
+        <!-- Country -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="CountryId" class="lbl widthSize100_per">Country <span class="redstart">*</span></label>
+          <div class="d-flex align-items-start icon-wrapper">
+            <input id="cmbCountry_Institute" name="CountryId" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
+            <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCountryPopup();">
+              <span class="k-icon k-i-plus"></span>
+            </button>
+          </div>
+        </div>
 
-      <!-- ===== Website, Monthly Cost, Application Fee ===== -->
-      <!-- Website -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="Website">Website</label>
-        <input type="url" class="form-control" id="website" name="Website" placeholder="https://example.edu" />
-      </div>
+        <!-- Currency -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="CurrencyId" class="lbl widthSize100_per">Currency</label>
+          <div class="d-flex align-items-start icon-wrapper">
+            <input id="cmbCurrency_Institute" name="CurrencyId" class="flex-grow-1 border-right-strait" />
+            <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCurrencyPopup();">
+              <span class="k-icon k-i-plus"></span>
+            </button>
+          </div>
+        </div>
 
-      <!-- Monthly Living Cost -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="MonthlyLivingCost">Monthly Living&nbsp;Cost</label>
-        <input type="number" class="form-control" id="monthlyLivingCost" name="MonthlyLivingCost" />
-      </div>
+        <!-- Campus -->
+        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2">
+          <label for="Campus">Campus</label>
+          <input type="text" class="form-control" id="campus" name="Campus" />
+        </div>
 
-      <!-- Application Fee -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="ApplicationFee">Application Fee</label>
-        <input type="number" class="form-control" id="applicationFee" name="ApplicationFee" />
-      </div>
+        <!-- ===== Website, Monthly Cost, Application Fee ===== -->
+        <!-- Website -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="Website">Website</label>
+          <input type="url" class="form-control" id="website" name="Website" placeholder="https://example.edu" />
+        </div>
 
-      <!-- ===== Email, Phone, Mobile ===== -->
-      <!-- Email -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteEmail">Email</label>
-        <input type="email" class="form-control" id="instituteEmail" name="InstituteEmail" />
-      </div>
+        <!-- Monthly Living Cost -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="MonthlyLivingCost">Monthly Living&nbsp;Cost</label>
+          <input type="number" class="form-control" id="monthlyLivingCost" name="MonthlyLivingCost" />
+        </div>
 
-      <!-- Phone -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstitutePhoneNo">Phone No</label>
-        <input type="text" class="form-control" id="institutePhoneNo" name="InstitutePhoneNo" />
-      </div>
+        <!-- Application Fee -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="ApplicationFee">Application Fee</label>
+          <input type="number" class="form-control" id="applicationFee" name="ApplicationFee" />
+        </div>
 
-      <!-- Mobile -->
-      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteMobileNo">Mobile No</label>
-        <input type="text" class="form-control" id="instituteMobileNo" name="InstituteMobileNo" />
-      </div>
+        <!-- ===== Email, Phone, Mobile ===== -->
+        <!-- Email -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="InstituteEmail">Email</label>
+          <input type="email" class="form-control" id="instituteEmail" name="InstituteEmail" />
+        </div>
 
+        <!-- Phone -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="InstitutePhoneNo">Phone No</label>
+          <input type="text" class="form-control" id="institutePhoneNo" name="InstitutePhoneNo" />
+        </div>
 
-      <!-- ===== Address (full width) ===== -->
-      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
-        <label for="InstituteAddress">Address</label>
-        <textarea id="instituteAddress" name="InstituteAddress" class="form-control" rows="2"></textarea>
-      </div>
-
-      <!-- ===== Status Checkbox ===== -->
-      <div class="col-xl-2 col-lg-2 col-md-2 col-sm-12 mb-2 custom-checkbox">
-        <label class="form-check-label" for="Status">Status</label>
-        <input type="checkbox" id="chkStatusInstitute" name="Status" class="form-check-input" />
-      </div>
-
-      <!-- ===== Language Mandatory & Requirement ===== -->
-      <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2 custom-checkbox">
-        <label class="form-check-label" for="IsLanguageMandatory">Is Language Mandatory? (Eg: IELTS or TOEFL)  </label>
-        <input type="checkbox" id="chkIsLanguageMandatory" name="IsLanguageMandatory" class="form-check-input" />
-      </div>
-      <div class="col-sm-12 mb-2">
-        <label for="LanguagesRequirement">Languages Requirement</label>
-        <textarea id="languagesRequirement" name="LanguagesRequirement" class="form-control" rows="2"></textarea>
-      </div>
+        <!-- Mobile -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="InstituteMobileNo">Mobile No</label>
+          <input type="text" class="form-control" id="instituteMobileNo" name="InstituteMobileNo" />
+        </div>
 
 
-      <!-- ===== Descriptive TextAreas ===== -->
-      <div class="col-12 mb-2">
-        <label for="InstitutionalBenefits">Institutional Benefits</label>
-        <textarea id="institutionalBenefits" name="InstitutionalBenefits" class="form-control" rows="2"></textarea>
-      </div>
-      <div class="col-12 mb-2">
-        <label for="PartTimeWorkDetails">Part Time Work Details (Mention hours permitted with estimated wages)</label>
-        <textarea id="partTimeWorkDetails" name="PartTimeWorkDetails" class="form-control" rows="2"></textarea>
-      </div>
-      <div class="col-12 mb-2">
-        <label for="ScholarshipsPolicy">Scholarships Policy</label>
-        <textarea id="scholarshipsPolicy" name="ScholarshipsPolicy" class="form-control" rows="2"></textarea>
-      </div>
-      <div class="col-12 mb-2">
-        <label for="InstitutionStatusNotes">Institution Status Notes important for counsellor/Processing office to understand next step</label>
-        <textarea id="institutionStatusNotes" name="InstitutionStatusNotes" class="form-control" rows="2"></textarea>
-      </div>
+        <!-- ===== Address (full width) ===== -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
+          <label for="InstituteAddress">Address</label>
+          <textarea id="instituteAddress" name="InstituteAddress" class="form-control" rows="2"></textarea>
+        </div>
 
-      <!-- ===== File Uploads ===== -->
-      <!-- Logo (image) -->
-      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
-        <label for="InstitutionLogoFile">Institution Logo</label>
-        <input type="file" class="form-control" id="institutionLogoFile" name="InstitutionLogoFile" accept="image/*" />
-        <!-- 200X200 perview thumb -->
-        <img id="logoThumb" class="d-none border mt-1" style="height:200px;width:200px;object-fit:contain;cursor:pointer" onclick="openPreview('logo')" />
-      </div>
+        <!-- ===== Status Checkbox ===== -->
+        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-12 mb-2 custom-checkbox">
+          <label class="form-check-label" for="Status">Status</label>
+          <input type="checkbox" id="chkStatusInstitute" name="Status" class="form-check-input" />
+        </div>
 
-      <!-- Prospectus (PDF) -->
-      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
-        <label for="InstitutionProspectusFile">Institution Prospectus (PDF)</label>
-        <input type="file" class="form-control" id="prospectusFile" name="InstitutionProspectusFile" accept="application/pdf" />
-        <div class="mt-1">
-          <span id="pdfName" class="text-muted"></span>
-          <button type="button" class="btn btn-outline-primary btn-sm d-none" id="pdfPreviewBtn" onclick="InstituteDetailsHelper.openPreview('pdf')"> Preview </button>
+        <!-- ===== Language Mandatory & Requirement ===== -->
+        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-2 custom-checkbox">
+          <label class="form-check-label" for="IsLanguageMandatory">Is Language Mandatory? (Eg: IELTS or TOEFL)  </label>
+          <input type="checkbox" id="IsLanguageMandatory" name="IsLanguageMandatory" class="form-check-input" />
+        </div>
+        <div class="col-sm-12 mb-2">
+          <label for="LanguagesRequirement">Languages Requirement</label>
+          <textarea id="languagesRequirement" name="LanguagesRequirement" class="form-control" rows="2"></textarea>
+        </div>
+
+
+        <!-- ===== Descriptive TextAreas ===== -->
+        <div class="col-12 mb-2">
+          <label for="InstitutionalBenefits">Institutional Benefits</label>
+          <textarea id="institutionalBenefits" name="InstitutionalBenefits" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-12 mb-2">
+          <label for="PartTimeWorkDetails">Part Time Work Details (Mention hours permitted with estimated wages)</label>
+          <textarea id="partTimeWorkDetails" name="PartTimeWorkDetails" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-12 mb-2">
+          <label for="ScholarshipsPolicy">Scholarships Policy</label>
+          <textarea id="scholarshipsPolicy" name="ScholarshipsPolicy" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-12 mb-2">
+          <label for="InstitutionStatusNotes">Institution Status Notes important for counsellor/Processing office to understand next step</label>
+          <textarea id="institutionStatusNotes" name="InstitutionStatusNotes" class="form-control" rows="2"></textarea>
+        </div>
+
+        <!-- ===== File Uploads ===== -->
+        <!-- Logo (image) -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
+          <label for="InstitutionLogoFile">Institution Logo</label>
+          <input type="file" class="form-control" id="institutionLogoFile" name="InstitutionLogoFile" accept="image/*" />
           <!-- 200X200 perview thumb -->
-          <img id="pdfThumbnail" class="d-none mt-2 border" style="width:200px;height:200px;object-fit:cover;cursor:pointer" onclick="InstituteDetailsHelper.openPreview('pdf')" />
-
+          <img id="logoThumb" class="d-none border mt-1" style="height:200px;width:200px;object-fit:contain;cursor:pointer" onclick="openPreview('logo')" />
         </div>
+
+        <!-- Prospectus (PDF) -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
+          <label for="InstitutionProspectusFile">Institution Prospectus (PDF)</label>
+          <input type="file" class="form-control" id="prospectusFile" name="InstitutionProspectusFile" accept="application/pdf" />
+          <div class="mt-1">
+            <span id="pdfName" class="text-muted"></span>
+            <button type="button" class="btn btn-outline-primary btn-sm d-none" id="pdfPreviewBtn" onclick="InstituteDetailsHelper.openPreview('pdf')"> Preview </button>
+            <!-- 200X200 perview thumb -->
+            <img id="pdfThumbnail" class="d-none mt-2 border" style="width:200px;height:200px;object-fit:cover;cursor:pointer" onclick="InstituteDetailsHelper.openPreview('pdf')" />
+
+          </div>
+        </div>
+
+        <!-- to show pdf view with kendo Window -->
+        <partial name="~/Views/Shared/_previewWindow.cshtml" />
+
       </div>
 
-      <!-- to show pdf view with kendo Window -->
-      <div id="pdfViewerWindow" style="display:none;">
-        <div id="pdfViewer" style="height: 80vh;"></div>
+      <!-- Action Buttons -->
+      <div class="btnDiv mt-2">
+        <ul>
+          <li class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" id="btnInstituteSaveOrUpdate" onclick="InstituteDetailsManager.saveOrUpdateItem();"> + Add Institute </button>
+            @* <button type="submit" class="btn btn-primary me-2" > + Add Institute </button> *@
+            <button type="button" class="btn btn-secondary me-2" onclick="InstituteDetailsHelper.clearForm();"> Clear </button>
+          </li>
+        </ul>
       </div>
-
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="btnDiv mt-2">
-      <ul>
-        <li class="d-flex justify-content-end">
-          <button type="button" class="btn btn-primary me-2" id="btnInstituteSaveOrUpdate" onclick="InstituteDetailsManager.saveOrUpdateItem();"> + Add Institute </button>
-          <button type="button" class="btn btn-secondary me-2" onclick="InstituteDetailsHelper.clearForm();"> Clear </button>
-        </li>
-      </ul>
-    </div>
+    </form>
 
     <!-- Combo Box Items UI by PopUp -->
-    @* Country PopUP *@
+    <!-- Country PopUP -->
     <div style="display:none" id="InstituteTypePopUp_Institute" class="">
       <div class="row">
         <!-- InstituteType Form -->
@@ -196,7 +197,7 @@
       </div>
     </div>
 
-    @* Country PopUP *@
+    <!-- Country PopUP -->
     <div style="display:none" id="CountryPopUp_Institute" class="">
       <div class="row">
         <!-- Country Form -->
@@ -207,7 +208,7 @@
       </div>
     </div>
 
-    @* Currency PopUp *@
+    <!-- Currency PopUp -->
     <div style="display:none" id="CurrencyPopUp_Institute" class="">
       <div class="row">
         <!-- Currency Form -->
@@ -224,7 +225,87 @@
 
 
 
+@* ------------------------------------------------------------------------------ *@
+@* 
+<div class="col-12">
+
+  <form id="instituteForm" enctype="multipart/form-data">
+    <!-- Basic Info -->
+    <label>Institute Name:</label>
+    <input type="text" name="InstituteName" required />
+
+    <label>Institute Code:</label>
+    <input type="text" name="InstituteCode" />
+
+    <label>Email:</label>
+    <input type="email" name="InstituteEmail" />
+
+    <label>Address:</label>
+    <input type="text" name="InstituteAddress" />
+
+    <label>Phone No:</label>
+    <input type="text" name="InstitutePhoneNo" />
+
+    <label>Mobile No:</label>
+    <input type="text" name="InstituteMobileNo" />
+
+    <label>Campus:</label>
+    <input type="text" name="Campus" />
+
+    <label>Website:</label>
+    <input type="url" name="Website" />
+
+    <!-- Country & Type -->
+    <label>Country ID:</label>
+    <input type="number" name="CountryId" required />
+
+    <label>Currency ID:</label>
+    <input type="number" name="CurrencyId" />
+
+    <label>Institute Type ID:</label>
+    <input type="number" name="InstituteTypeId" />
+
+    <!-- Financial Info -->
+    <label>Monthly Living Cost:</label>
+    <input type="number" step="0.01" name="MonthlyLivingCost" />
+
+    <label>Application Fee:</label>
+    <input type="number" step="0.01" name="ApplicationFee" />
+
+    <!-- Language Info -->
+    <label>Is Language Mandatory?</label>
+    <input type="checkbox" name="IsLanguageMandatory" value="true" />
+
+    <label>Languages Requirement:</label>
+    <input type="text" name="LanguagesRequirement" />
+
+    <!-- Descriptive Info -->
+    <label>Institutional Benefits:</label>
+    <textarea name="InstitutionalBenefits"></textarea>
+
+    <label>Part Time Work Details:</label>
+    <textarea name="PartTimeWorkDetails"></textarea>
+
+    <label>Scholarships Policy:</label>
+    <textarea name="ScholarshipsPolicy"></textarea>
+
+    <label>Institution Status Notes:</label>
+    <textarea name="InstitutionStatusNotes"></textarea>
+
+    <!-- Status -->
+    <label>Status:</label>
+    <input type="checkbox" name="Status" value="true" />
+
+    <!-- Files -->
+    <label>Institution Logo:</label>
+    <input type="file" id="logoFileInput" name="InstitutionLogoFile" />
+
+    <label>Institution Prospectus:</label>
+    <input type="file" name="InstitutionProspectusFile" id="prospectusFileInput" />
+
+    <button type="submit">Submit</button>
+  </form>
+</div>
 
 
-
-
+ *@

@@ -8,8 +8,11 @@ $(document).ready(function () {
   // grid initialization
   InstituteSummaryHelper.initInstituteSummary();
   InstituteDetailsHelper.instituteInit();
-  //// 
+
+  ////
   //CommonManager.initializeKendoWindow("#CountryPopUp", "Country Details", "80%");
+
+
 });
 
 var InstituteManager = {

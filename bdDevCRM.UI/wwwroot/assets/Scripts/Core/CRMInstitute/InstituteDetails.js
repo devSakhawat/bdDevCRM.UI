@@ -16,48 +16,66 @@ let prospectusFileData = null;
 
 var InstituteDetailsManager = {
   /* -------- DataSource:  DDL -------- */
-  fetchInstituteTypeComboBoxData: function () {
-    const jsonParams = "";
+  fetchInstituteTypeComboBoxData: async function () {
     const serviceUrl = "/crm-institutetype-ddl";
 
-    return AjaxManager.GetDataAsyncOrSyncronous(
-      baseApi,
-      serviceUrl,
-      jsonParams,
-      true,
-      false
-    );
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load institute type data");
+      }
+
+      return Promise.resolve(response.Data); // assuming response.Data contains the list
+    } catch (error) {
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
-  fetchCountryComboBoxData: function () {
-    const jsonParams = "";
-    const serviceUrl = "/crm-countryddl";
+  fetchCountryComboBoxData: async function () {
+    const serviceUrl = "/countryddl"; // Service URL
 
-    return AjaxManager.GetDataAsyncOrSyncronous(
-      baseApi,
-      serviceUrl,
-      jsonParams,
-      true,
-      false
-    );
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load country data");
+      }
+
+      return Promise.resolve(response.Data); // assuming response.Data contains the list
+    } catch (error) {
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
   fetchCurrencyComboBoxData: async function () {
-    const jsonParams = "";
     const serviceUrl = "/currencyddl";
-    return AjaxManager.GetDataAsyncOrSyncronous(
-      baseApi,
-      serviceUrl,
-      jsonParams,
-      true,
-      false
-    );
+
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load currency data.");
+      }
+      return Promise.resolve(response.Data);
+    } catch (error) {
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
-  /* -------- Save ⬌ Update -------- */
 
+  /* -------- Save ⬌ Update -------- */
   saveOrUpdateItem: async function () {
-    debugger
+    debugger;
     const id = $("#instituteId").val() || 0;
     const isCreate = id == 0;
     const serviceUrl = isCreate ? "/crm-institute" : `/crm-institute/${id}`;
@@ -65,74 +83,26 @@ var InstituteDetailsManager = {
     const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
     const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
 
-    // object without file and image
-    //const dto = InstituteDetailsHelper.createItem();
+    const modelDto = InstituteDetailsHelper.createItem();
 
-    const formData = InstituteDetailsHelper.createFormData(id);
-    console.table(formData.entries());
-    console.table(Object.fromEntries(formData.entries()));
+    if (!modelDto) {
+      throw new Error("Failed to create DTO object");
+    }
 
-    // Append all DTO properties except display-only fields
-    // Properly append form data with type checking
-    //for (const [propertyName, propertyValue] of Object.entries(dto)) {
-    //  // Skip dropdown text fields that don't exist in backend DTO
-    //  if (propertyName === 'CountryName' || propertyName === 'InstituteType' || propertyName === 'CurrencyName') {
-    //    continue;
-    //  }
+    const formData = new FormData();
+    const logoFileInput = document.getElementById('institutionLogoFile');
+    const prospectusFileInput = document.getElementById('prospectusFile');
 
-    //  // Only append meaningful values (not null, undefined, or empty string)
-    //  if (propertyValue !== undefined && propertyValue !== null && propertyValue !== "") {
-    //    // Convert boolean to string for FormData
-    //    if (typeof propertyValue === 'boolean') {
-    //      formData.append(propertyName, propertyValue.toString());
-    //    } else {
-    //      formData.append(propertyName, propertyValue.toString());
-    //    }
-    //  } else if (typeof propertyValue === 'boolean') {
-    //    // Boolean false values should also be sent
-    //    formData.append(propertyName, propertyValue.toString());
-    //  }
-    //}
+    if (logoFileInput.files[0]) {
+      formData.append("InstitutionLogoFile", logoFileInput.files[0]);
+    }
+    if (prospectusFileInput.files[0]) {
+      formData.append("InstitutionProspectusFile", prospectusFileInput.files[0]);
+    }
 
-    //for (const [propertyName, propertyValue] of Object.entries(dto)) {
-    //  if (propertyValue !== undefined && propertyValue !== null) {
-    //    formData.append(propertyName, propertyValue);
-    //  }
-    //}
+    formData.append("modelDto", JSON.stringify(modelDto));
 
-    //// Properly append form data with type checking
-    //for (const [propertyName, propertyValue] of Object.entries(dto)) {
-    //  // Skip dropdown text fields that don't exist in DTO
-    //  if (propertyName === 'CountryName' || propertyName === 'InstituteType' || propertyName === 'CurrencyName') {
-    //    continue;
-    //  }
-
-    //  // Only append non-null, non-undefined values
-    //  if (propertyValue !== undefined && propertyValue !== null && propertyValue !== "") {
-    //    // Convert boolean to string for FormData
-    //    if (typeof propertyValue === 'boolean') {
-    //      formData.append(propertyName, propertyValue.toString());
-    //    } else {
-    //      formData.append(propertyName, propertyValue.toString());
-    //    }
-    //  }
-    //}
-
-    // Handle file uploads
-    //const logo = $("#institutionLogoFile")[0].files[0];
-    //if (logo) formData.append("InstitutionLogoFile", logo);
-
-    //const pdf = $("#prospectusFile")[0].files[0];
-    //if (pdf) formData.append("InstitutionProspectusFile", pdf);
-
-    //// Debug: Log form data
-    //console.log("=== FormData Contents ===");
-    //for (var pair of formData.entries()) {
-    //  console.log(pair[0] + ': ' + pair[1]);
-    //}
-    //console.table(Object.fromEntries(formData.entries()));
-
-    AjaxManager.MsgBox(
+    CommonManager.MsgBox(
       "info",
       "center",
       "Confirmation",
@@ -145,40 +115,40 @@ var InstituteDetailsManager = {
           try {
             debugger;
 
-            //await AjaxManager.SendRequestAjax(baseApi, serviceUrl, formData, httpType );
-            //await AjaxManager.PostDataAjax(baseApi, serviceUrl, JSON.stringify(dto), httpType );
+            // Use POST or PUT based on create/update
+            const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, formData, httpType);
 
-            await AjaxManager.PostFormDataAjax( baseApi, serviceUrl, formData, httpType );
+            // Check if the response has a success message
+            if (response && response.IsSuccess === true) {
+              ToastrMessage.showSuccess(successMsg);
 
-            ToastrMessage.showToastrNotification({
-              preventDuplicates: true,
-              closeButton: true,
-              timeOut: 3000,
-              message: successMsg,
-              type: "success"
-            });
+              InstituteDetailsHelper.clearForm();
+              const windowId = "InstitutePopUp";
 
-            InstituteDetailsHelper.clearForm();
-            $("#gridSummaryInstitute").data("kendoGrid").dataSource.read();
+              CommonManager.closeKendoWindow(windowId);
+              $("#gridSummaryInstitute").data("kendoGrid").dataSource.read();
+            } else {
+              throw new Error(response.Message || "Unknown error occurred");
+            }
+
           } catch (err) {
-            const msg = err.responseText || err.statusText || "Unknown error";
-            ToastrMessage.showToastrNotification({
-              preventDuplicates: true, closeButton: true, timeOut: 0,
-              message: `${err.status} : ${msg}`, type: "error"
-            });
+            // error VanillaApiCallManager.SendRequestVanilla ei function e handle kora ache tai ekha korle abar double hobe.
+            console.log(err);
+            //const msg = err.responseText || err.statusText || err.message || "Unknown error";
+            //VanillaApiCallManager.handleApiError(err.response || msg);
           }
         }
       },
       { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
-      0 /* modal */
+      0
     );
   },
 
-  /* -------- Delete -------- */
   deleteItem: function (gridItem) {
     if (!gridItem) return;
 
     const serviceUrl = `/crm-institute/${gridItem.InstituteId}`;
+
     AjaxManager.MsgBox(
       "info",
       "center",
@@ -190,21 +160,20 @@ var InstituteDetailsManager = {
         onClick: async function ($noty) {
           $noty.close();
           try {
-            await AjaxManager.PostDataAjax(
-              baseApi, serviceUrl, JSON.stringify(gridItem), "DELETE");
+            const response = await VanillaApiCallManager.delete(baseApi, serviceUrl);
 
-            InstituteDetailsHelper.clearForm();
-            ToastrMessage.showToastrNotification({
-              preventDuplicates: true, closeButton: true, timeOut: 3000,
-              message: "Data deleted successfully.", type: "success"
-            });
-            $("#gridSummaryInstitute").data("kendoGrid").dataSource.read();
+            if (response && response.IsSuccess === true) {
+              ToastrMessage.showSuccess("Data deleted successfully.");
+
+              InstituteDetailsHelper.clearForm();
+              $("#gridSummaryInstitute").data("kendoGrid").dataSource.read();
+            } else {
+              throw new Error(response.Message || "Delete operation failed.");
+            }
+
           } catch (err) {
-            const msg = err.responseText || err.statusText || "Unknown error";
-            ToastrMessage.showToastrNotification({
-              preventDuplicates: true, closeButton: true, timeOut: 0,
-              message: `${err.status} : ${msg}`, type: "error"
-            });
+            const msg = err.responseText || err.statusText || err.message || "Unknown error";
+            VanillaApiCallManager.handleApiError(err.response || msg);
           }
         }
       },
@@ -212,6 +181,7 @@ var InstituteDetailsManager = {
       0
     );
   }
+
 
 };
 
@@ -290,13 +260,15 @@ var InstituteDetailsHelper = {
       dataValueField: "InstituteTypeId",
       filter: "contains",
       suggest: true,
-      dataSource: [],
+      dataSource: []
     });
 
     var instituteComboBoxInstant = $("#cmbInstituteType").data("kendoComboBox");
     if (instituteComboBoxInstant) {
       InstituteDetailsManager.fetchInstituteTypeComboBoxData().then(data => {
         instituteComboBoxInstant.setDataSource(data);
+      }).catch(() => {
+        instituteComboBoxInstant.setDataSource([]);
       });
     }
   },
@@ -308,13 +280,15 @@ var InstituteDetailsHelper = {
       dataValueField: "CountryId",
       filter: "contains",
       suggest: true,
-      dataSource: [],
+      dataSource: []
     });
 
     var countryComboBoxInstant = $("#cmbCountry_Institute").data("kendoComboBox");
     if (countryComboBoxInstant) {
       InstituteDetailsManager.fetchCountryComboBoxData().then(data => {
         countryComboBoxInstant.setDataSource(data);
+      }).catch(() => {
+        countryComboBoxInstant.setDataSource([]);
       });
     }
   },
@@ -333,10 +307,11 @@ var InstituteDetailsHelper = {
     if (currencyComboBoxInstant) {
       InstituteDetailsManager.fetchCurrencyComboBoxData().then(data => {
         currencyComboBoxInstant.setDataSource(data);
+      }).catch(() => {
+        currencyComboBoxInstant.setDataSource([]);
       });
     }
   },
-
 
   /* ------ Clear Form ------ */
   clearForm: function () {
@@ -350,139 +325,13 @@ var InstituteDetailsHelper = {
   },
 
   /* ------ Create DTO Object ------ */
-  createItem: function () {
+  createItemWithoutHelperFunction: function () {
     debugger
 
     // ComboBox Instance
     const typeCbo = $("#cmbInstituteType").data("kendoComboBox");
     const countryCbo = $("#cmbCountry_Institute").data("kendoComboBox");
     const currencyCbo = $("#cmbCurrency_Institute").data("kendoComboBox");
-
-    // selected text/values - ensure proper null handling
-    const countryId = countryCbo?.value() || null;
-    const countryName = countryCbo?.text() || "";
-    const currencyId = currencyCbo?.value() || null;
-    const currencyName = currencyCbo?.text() || "";
-    const typeId = typeCbo?.value() || null;
-    const typeName = typeCbo?.text() || "";
-
-    /* === DTO Institute === */
-    const dto = {
-      // --- Primary / Foreign Keys ---
-      InstituteId: parseInt($("#instituteId").val()) || 0,
-      CountryId: countryId ? parseInt(countryId) : null,
-      InstituteTypeId: typeId ? parseInt(typeId) : null,
-      CurrencyId: currencyId ? parseInt(currencyId) : null,
-      //InstituteTypeId: $("#cmbInstituteType").val(),
-      //CountryId: $("#cmbCountry_Institute").val(),
-      //CurrencyId: $("#cmbCurrency_Institute").val(),
-
-      // --- Basic Info ---
-      InstituteName: $("#instituteName").val()?.trim() || "",
-      InstituteCode: $("#instituteCode").val()?.trim() || "",
-      InstituteEmail: $("#instituteEmail").val()?.trim() || "",
-      InstituteAddress: $("#instituteAddress").val()?.trim() || "",
-      InstitutePhoneNo: $("#institutePhoneNo").val()?.trim() || "",
-      InstituteMobileNo: $("#instituteMobileNo").val()?.trim() || "",
-      Campus: $("#campus").val()?.trim() || "",
-      Website: $("#website").val()?.trim() || "",
-
-      // --- Financial / Visa ---
-      MonthlyLivingCost: parseFloat($("#monthlyLivingCost").val()) || null,
-      FundsRequirementforVisa: $("#fundsRequirementforVisa").val()?.trim() || "",
-      ApplicationFee: parseFloat($("#applicationFee").val()) || null,
-
-      // --- Language & Academic ---
-      IsLanguageMandatory: $("#chkIsLanguageMandatory").is(":checked"),
-      LanguagesRequirement: $("#languagesRequirement").val()?.trim() || "",
-
-      // --- Descriptive Info ---
-      InstitutionalBenefits: $("#institutionalBenefits").val()?.trim() || "",
-      PartTimeWorkDetails: $("#partTimeWorkDetails").val()?.trim() || "",
-      ScholarshipsPolicy: $("#scholarshipsPolicy").val()?.trim() || "",
-      InstitutionStatusNotes: $("#institutionStatusNotes").val()?.trim() || "",
-
-      // --- File Paths (file name / path) ---
-      InstitutionLogo: $("#institutionLogoFile").val()?.trim() || "",
-      InstitutionProspectus: $("#prospectusFile").val()?.trim() || "",
-
-      // --- Status ---
-      Status: $("#chkStatusInstitute").is(":checked"),
-
-      // --- Dropdown Text (Name) - These won't be sent in FormData ---
-      CountryName: countryName,
-      InstituteType: typeName,
-      CurrencyName: currencyName
-    };
-
-    return dto;
-  },
-
-  createFormData: function (id) {
-    const formData = new FormData();
-    const tryGetValue = (selector) => {
-      const val = $(selector).val();
-      return val === "" || val == null ? "" : val;
-    };
-
-    // PK & FK
-    formData.append("InstituteId", id || 0);
-    formData.append("CountryId", $("#cmbCountry_Institute").data("kendoComboBox").value());
-    formData.append("CurrencyId", $("#cmbCurrency_Institute").data("kendoComboBox")?.value() || null);
-    formData.append("InstituteTypeId", $("#cmbInstituteType").data("kendoComboBox")?.value() || null);
-
-    // Basic Info
-    formData.append("InstituteName", $("#instituteName").val());
-    formData.append("InstituteCode", $("#instituteCode").val());
-    formData.append("InstituteEmail", $("#instituteEmail").val());
-    formData.append("InstituteAddress", $("#instituteAddress").val());
-    formData.append("InstitutePhoneNo", $("#institutePhoneNo").val());
-    formData.append("InstituteMobileNo", $("#instituteMobileNo").val());
-    formData.append("Campus", $("#campus").val());
-    formData.append("Website", $("#website").val());
-
-    // Financial / Visa
-    //formData.append("MonthlyLivingCost", $("#monthlyLivingCost").val() || null);
-    formData.append("MonthlyLivingCost", tryGetValue("#monthlyLivingCost"));
-    formData.append("ApplicationFee", tryGetValue("#applicationFee"));
-    //formData.append("FundsRequirementforVisa", tryGetValue("#fundsRequirementforVisa"));
-
-    // Language & Academic
-    //formData.append("IsLanguageMandatory", $("#chkIsLanguageMandatory").is(":checked"));
-    formData.append("IsLanguageMandatory", $("#chkIsLanguageMandatory").is(":checked").toString());
-    formData.append("LanguagesRequirement", $("#languagesRequirement").val());
-
-    // Descriptive Info
-    formData.append("InstitutionalBenefits", $("#institutionalBenefits").val());
-    formData.append("PartTimeWorkDetails", $("#partTimeWorkDetails").val());
-    formData.append("ScholarshipsPolicy", $("#scholarshipsPolicy").val());
-    formData.append("InstitutionStatusNotes", $("#institutionStatusNotes").val());
-
-    // Status
-    //formData.append("Status", $("#chkStatusInstitute").is(":checked"));
-    formData.append("Status", $("#chkStatusInstitute").is(":checked").toString());
-
-    // File Uploads
-    const logoFile = $("#institutionLogoFile")[0].files[0];
-    if (logoFile) {
-      formData.append("InstitutionLogoFile", logoFile);
-    }
-
-    const prospectusFile = $("#prospectusFile")[0].files[0];
-    if (prospectusFile) {
-      formData.append("InstitutionProspectusFile", prospectusFile);
-    }
-
-    return formData;
-  },
-
-  createItemGPT: function () {
-    debugger
-
-    // ComboBox Instance
-    const countryCbo = $("#cmbInstituteCountry").data("kendoComboBox");
-    const currencyCbo = $("#cmbInstituteCurrency").data("kendoComboBox");
-    const typeCbo = $("#cmbInstituteType").data("kendoComboBox");
 
     // selected text/valus
     const countryId = countryCbo?.value() || null;
@@ -496,41 +345,37 @@ var InstituteDetailsHelper = {
     const dto = {
       // --- Primary / Foreign Keys ---
       InstituteId: $("#instituteId").val() || 0,
-      CountryId: countryId,
-      InstituteTypeId: typeId,
-      CurrencyId: currencyId,
+      CountryId: parseInt(countryId),
+      InstituteTypeId: parseInt(typeId),
+      CurrencyId: parseInt(currencyId),
 
       // --- Basic Info ---
-      InstituteName: $("#instituteName").val(),
-      InstituteCode: $("#instituteCode").val(),
-      InstituteEmail: $("#instituteEmail").val(),
-      InstituteAddress: $("#instituteAddress").val(),
-      InstitutePhoneNo: $("#institutePhoneNo").val(),
-      InstituteMobileNo: $("#instituteMobileNo").val(),
-      Campus: $("#campus").val(),
-      Website: $("#website").val(),
+      InstituteName: $("input[name='InstituteName']").val(),
+      InstituteCode: $("input[name='InstituteCode']").val(),
+      InstituteEmail: $("input[name='InstituteEmail']").val(),
+      InstituteAddress: $("input[name='InstituteAddress']").val(),
+      InstitutePhoneNo: $("input[name='InstitutePhoneNo']").val(),
+      InstituteMobileNo: $("input[name='InstituteMobileNo']").val(),
+      Campus: $("input[name='Campus']").val(),
+      Website: $("input[name='Website']").val(),
 
       // --- Financial / Visa ---
-      MonthlyLivingCost: $("#monthlyLivingCost").val(),
-      FundsRequirementforVisa: $("#fundsRequirementforVisa").val(),
-      ApplicationFee: $("#applicationFee").val(),
+      //FundsRequirementforVisa: $("#fundsRequirementforVisa").val(),
+      MonthlyLivingCost: parseFloat($("input[name='MonthlyLivingCost']").val()),
+      ApplicationFee: parseFloat($("input[name='ApplicationFee']").val()),
 
       // --- Language & Academic ---
-      IsLanguageMandatory: $("#chkIsLanguageMandatory").is(":checked"),
-      LanguagesRequirement: $("#languagesRequirement").val(),
+      IsLanguageMandatory: $("input[name='IsLanguageMandatory']").is(":checked"),
+      LanguagesRequirement: $("input[name='LanguagesRequirement']").val(),
 
       // --- Descriptive Info ---
-      InstitutionalBenefits: $("#institutionalBenefits").val(),
-      PartTimeWorkDetails: $("#partTimeWorkDetails").val(),
-      ScholarshipsPolicy: $("#scholarshipsPolicy").val(),
-      InstitutionStatusNotes: $("#institutionStatusNotes").val(),
-
-      // --- File Paths (file name / path) ---
-      InstitutionLogo: $("#institutionLogoFile").val(),
-      InstitutionProspectus: $("#prospectusFile").val(),
+      InstitutionalBenefits: $("textarea[name='InstitutionalBenefits']").val(),
+      PartTimeWorkDetails: $("textarea[name='PartTimeWorkDetails']").val(),
+      ScholarshipsPolicy: $("textarea[name='ScholarshipsPolicy']").val(),
+      InstitutionStatusNotes: $("textarea[name='InstitutionStatusNotes']").val(),
 
       // --- Status ---
-      Status: $("#chkStatusInstitute").is(":checked"),
+      Status: $("input[name='Status']").is(":checked"),
 
       // --- Dropdown Text (Name) ---
       CountryName: countryName,
@@ -539,6 +384,86 @@ var InstituteDetailsHelper = {
     };
 
     return dto;
+  },
+
+
+  createItem: function () {
+    debugger;
+
+    // Get Kendo ComboBox instances
+    const typeCbo = $("#cmbInstituteType").data("kendoComboBox");
+    const countryCbo = $("#cmbCountry_Institute").data("kendoComboBox");
+    const currencyCbo = $("#cmbCurrency_Institute").data("kendoComboBox");
+
+    // Get values using CommonManager helper functions
+    const countryId = CommonManager.getComboValue(countryCbo);
+    const countryName = CommonManager.getComboText(countryCbo);
+    const typeId = CommonManager.getComboValue(typeCbo);
+    const typeName = CommonManager.getComboText(typeCbo);
+    const currencyId = CommonManager.getComboValue(currencyCbo);
+    const currencyName = CommonManager.getComboText(currencyCbo);
+
+    /* === DTO Institute === */
+    var dto = new Object();
+
+    //const dto = {
+    // --- Primary / Foreign Keys ---
+    dto.InstituteId = CommonManager.getInputValue("#instituteId", 0);
+    dto.CountryId = countryId;
+    dto.InstituteTypeId = typeId;
+    dto.CurrencyId = currencyId;
+
+    // --- Basic Info ---
+    dto.InstituteName = CommonManager.getInputValue("#instituteName");
+    dto.InstituteCode = CommonManager.getInputValue("#instituteCode");
+    dto.InstituteEmail = CommonManager.getInputValue("#instituteEmail");
+    dto.InstituteAddress = CommonManager.getInputValue("#instituteAddress");
+    dto.InstitutePhoneNo = CommonManager.getInputValue("#institutePhoneNo");
+    dto.InstituteMobileNo = CommonManager.getInputValue("#instituteMobileNo");
+    dto.Campus = CommonManager.getInputValue("#campus");
+    dto.Website = CommonManager.getInputValue("#website");
+
+    // --- Financial / Visa ---
+    dto.MonthlyLivingCost = CommonManager.getNumericValue("#monthlyLivingCost");
+    dto.ApplicationFee = CommonManager.getNumericValue("#applicationFee");
+
+    // --- Language & Academic ---
+    dto.IsLanguageMandatory = document.querySelector("#isLanguageMandatory")?.checked || false;
+    dto.LanguagesRequirement = CommonManager.getInputValue("#languagesRequirement");
+
+    // --- Descriptive Info ---
+    dto.InstitutionalBenefits = CommonManager.getInputValue("#institutionalBenefits");
+    dto.PartTimeWorkDetails = CommonManager.getInputValue("#partTimeWorkDetails");
+    dto.ScholarshipsPolicy = CommonManager.getInputValue("#scholarshipsPolicy");
+    dto.InstitutionStatusNotes = CommonManager.getInputValue("#institutionStatusNotes");
+
+    // --- Status ---
+    dto.Status = document.querySelector("#status")?.checked || false;
+
+    // --- Dropdown Text (Name) ---
+    dto.CountryName = countryName;
+    dto.InstituteType = typeName;
+    dto.CurrencyName = currencyName;
+    //};
+
+    return dto;
+  },
+
+  getFormData: function () {
+    const form = new FormData();
+
+    const logoFile = $("input[name='InstitutionLogoFile']")[0].files[0];
+    const prospectusFile = $("input[name='InstitutionProspectusFile']")[0].files[0];
+
+    if (logoFile) {
+      form.append("InstitutionLogoFile", logoFile);
+    }
+
+    if (prospectusFile) {
+      form.append("InstitutionProspectusFile", prospectusFile);
+    }
+
+    return form;
   },
 
   /* ------ Populate Grid Item ------ */
@@ -574,14 +499,54 @@ var InstituteDetailsHelper = {
     $("#cmbInstituteCurrencyId").data("kendoComboBox")?.value(item.CurrencyId);
     $("#cmbInstituteTypeId").data("kendoComboBox")?.value(item.InstituteTypeId);
 
-    /* Files  */
-    // $('#institutionLogoFile').val(item.InstitutionLogo);
-    // $('#prospectusFile').val(item.InstitutionProspectus);
+     //Files
+     //$('#institutionLogoFile').val(item.InstitutionLogo);
+    //$('#prospectusFile').val(item.InstitutionProspectus);
+
+    // --- Logo Preview ---
+    if (item.InstitutionLogo) {
+      $("#logoThumb")
+        .attr("src", item.InstitutionLogo)
+        .removeClass("d-none")
+        .css("cursor", "pointer")
+        .off("click")
+        .on("click", function () {
+          PreviewManger.openGridImagePreview(item.InstitutionLogo);
+        });
+    } else {
+      $("#logoThumb").addClass("d-none").attr("src", "#");
+    }
+
+    // --- Prospectus Preview (PDF) ---
+    if (item.InstitutionProspectus) {
+      const fileName = item.InstitutionProspectus.split("/").pop();
+      $("#pdfName").text(fileName);
+
+      $("#pdfPreviewBtn")
+        .removeClass("d-none")
+        .off("click")
+        .on("click", function () {
+          PreviewManger.openPreview(item.InstitutionProspectus);
+        });
+
+      $("#pdfThumbnail")
+        .removeClass("d-none")
+        .attr("src", "/images/pdf-thumbnail.png") // optional static thumbnail or use canvas preview
+        .off("click")
+        .on("click", function () {
+          PreviewManger.openPreview(item.InstitutionProspectus);
+        });
+    } else {
+      $("#pdfName").text("");
+      $("#pdfPreviewBtn").addClass("d-none");
+      $("#pdfThumbnail").addClass("d-none").attr("src", "#");
+    }
 
     $("#chkStatusInstitute").prop("checked", item.Status);
   },
 
   openPreview: function (type) {
+    debugger;
     if (!prospectusFileData) return;
 
     const reader = new FileReader();
@@ -589,22 +554,22 @@ var InstituteDetailsHelper = {
       const blob = new Blob([e.target.result], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
 
-      if (!$("#pdfViewerWindow").data("kendoWindow")) {
-        $("#pdfViewerWindow").kendoWindow({
+      if (!$("#previewWindow").data("kendoWindow")) {
+        $("#previewWindow").kendoWindow({
           width: "80%",
           height: "80vh",
           title: "Prospectus Preview",
           modal: true,
           visible: false,
           close: function () {
-            $("#pdfViewer").empty();
+            $("#preview").empty();
           }
         });
       }
 
-      $("#pdfViewerWindow").data("kendoWindow").center().open();
+      $("#previewWindow").data("kendoWindow").center().open();
 
-      $("#pdfViewer").kendoPDFViewer({
+      $("#preview").kendoPDFViewer({
         pdfjsProcessing: { file: url },
         width: "100%",
         height: "100%",

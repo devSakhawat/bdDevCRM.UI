@@ -30,20 +30,6 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
   options.DefaultRequestCulture = new RequestCulture("en");
   options.SupportedCultures = supportedCultures;
   options.SupportedUICultures = supportedCultures;
-
-  //options.RequestCultureProviders.Insert(0, new CustomRequestCultureProvider(context =>
-  //{
-  //    var languages = context.Request.Headers["Accept-Language"].ToString();
-  //    var currentLanguage = languages.Split(',').FirstOrDefault();
-  //    var defaultLanguage = string.IsNullOrEmpty(currentLanguage) ? "en" : currentLanguage;
-
-  //    if (defaultLanguage != "de" && defaultLanguage != "en-US")
-  //    {
-  //        defaultLanguage = "en-US";
-  //    }
-
-  //    return Task.FromResult(new ProviderCultureResult(defaultLanguage, defaultLanguage));
-  //}));
 });
 
 builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>

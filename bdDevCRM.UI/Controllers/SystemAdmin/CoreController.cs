@@ -66,6 +66,18 @@ namespace bdDevCRM.UI.Controllers.SystemAdmin
       //}
     }
 
+    public ActionResult CRMCourse()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("CRMCourse/Course");
+      //}
+      //else
+      //{
+      //    return RedirectToAction("Logoff", "Home");
+      //}
+    }
+
     public ActionResult CRMInstitute()
     {
       //if (Session["CurrentUser"] != null)

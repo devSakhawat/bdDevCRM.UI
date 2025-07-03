@@ -2055,13 +2055,14 @@ const VanillaApiCallManager = {
     if (error.type) {
       switch (error.type) {
         case 'HTTP_ERROR':
-          apiError.statusCode = error.status || 500;
+          apiError.statusCode = error.response.StatusCode || 500;
           apiError.errorType = "HTTP_ERROR";
           apiError.message = error.statusText || "HTTP Error";
           apiError.details = error.responseText || "";
 
           // Try to parse server error response if it exists
           if (error.response && typeof error.response === 'object') {
+            apiError.statusCode = error.response.StatusCode;
             apiError.message = error.response.message || error.response.error || apiError.message;
             apiError.correlationId = error.response.correlationId || "";
             apiError.details = error.response.details || JSON.stringify(error.response);
@@ -2275,7 +2276,7 @@ const VanillaApiCallManager = {
 
       // Error handling
       error: function (e) {
-        console.error("DataSource Error:", e);
+        console.log("DataSource Error:", e);
         VanillaApiCallManager.handleApiError({
           statusCode: e.status || 0,
           errorType: "NetworkError",
@@ -2863,9 +2864,16 @@ var CommonManager = {
   },
 
   closeKendoWindow: function (windowSelector) {
+
+    if (!windowSelector.startsWith("#")) {
+      windowSelector = "#" + windowSelector;
+    }
+
     var window = $(windowSelector).data("kendoWindow");
     if (window) {
       window.close();
+    } else {
+      kendo.warning("No Kendo Window found for selector:", windowSelector);
     }
   },
 

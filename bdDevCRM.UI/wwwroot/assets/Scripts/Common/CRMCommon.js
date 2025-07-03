@@ -27,9 +27,9 @@ class AjaxConfig {
   complete = null;
   retries = 3;
   retryDelay = 1000;
-  antiForgeryToken = true;  // Whether to include anti-forgery token
-  loadingElementId = '';    // ID of element to show/hide during loading
-  area = '';               // MVC Area name if using areas
+  antiForgeryToken = true;  
+  loadingElementId = '';    
+  area = '';             
 
   // Validation method
   validate() {

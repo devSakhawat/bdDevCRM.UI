@@ -41,7 +41,7 @@ var InstituteSummaryManager = {
       schemaData: "Data.Items",
       schemaTotal: "Data.TotalCount" 
     });
-  }
+  },
 
 
 

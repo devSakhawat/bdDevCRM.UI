@@ -1,5 +1,4 @@
-﻿
-<script src="~/assets/scripts/crm/crmapplication/crmcourseinformation.js"></script>
+﻿<script src="~/assets/scripts/crm/crmapplication/crmcourseinformation.js"></script>
 
 <div id="">
 	<!-- Course Details -->
@@ -395,9 +394,12 @@
 	<div class="btnDiv mt-2">
 		<ul>
 			<li class="d-flex justify-content-end">
-				<button type="button" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
-				<button type="button" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearCRMApplicationForm()">Clear</button>
-				<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow()'>Close</button>
+				<button type="button" class="btn btn-success me-2" onclick="CRMCourseInformationHelper.fillDemoData()">ডেমো ডেটা পূরণ করুন</button>
+				<button type="button" class="btn btn-info me-2" onclick="CRMCourseInformationHelper.exportFormDataAsJSON()">JSON এ রূপান্তর</button>
+				<button type="button" class="btn btn-warning me-2" onclick="CRMCourseInformationHelper.validateCompleteForm()">ভ্যালিডেশন চেক</button>
+				<button type="button" class="btn btn-primary me-2" onclick="CRMCourseInformationHelper.submitApplication()">আবেদন সাবমিট</button>
+				<button type="button" class="btn btn-secondary me-2" onclick="CRMCourseInformationHelper.clearCRMApplicationForm()">পরিষ্কার করুন</button>
+				<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow()'>বন্ধ করুন</button>
 			</li>
 		</ul>
 	</div>

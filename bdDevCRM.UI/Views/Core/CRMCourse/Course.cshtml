@@ -1,0 +1,15 @@
+﻿@{
+  ViewBag.Title = "Course Info";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+<div class="row">
+  <partial name="CRMCourse/_CourseSummary" />
+  <div class="row">
+    <div id="CoursePopUp" style="display: none">
+      <partial name="CRMCourse/_CourseDetails" />
+    </div>
+  </div>
+</div>
+
+<script src="~/assets/scripts/core/crmcourse/course.js"></script>

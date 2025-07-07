@@ -1,9 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace bdDevCRM.UI.Controllers.SystemAdmin
 {
   public class CoreController : Controller
   {
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IWebHostEnvironment _environment;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<CoreController> _logger;
+
+    public CoreController(
+        IHttpClientFactory httpClientFactory, 
+        IWebHostEnvironment environment,
+        IConfiguration configuration,
+        ILogger<CoreController> logger)
+    {
+        _httpClientFactory = httpClientFactory;
+        _environment = environment;
+        _configuration = configuration;
+        _logger = logger;
+    }
 
     public ActionResult AccessSettings()
     {
@@ -28,8 +45,6 @@ namespace bdDevCRM.UI.Controllers.SystemAdmin
       //  return RedirectToAction("Logoff", "Home");
       //}
     }
-
-
 
     public ActionResult WorkFlowStatus()
     {
@@ -260,10 +275,19 @@ namespace bdDevCRM.UI.Controllers.SystemAdmin
 
     }
 
+    public IActionResult FileUploadTest()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("FileUploadTest/FileUploadTest");
+      //}
+      //else
+      //{
+      //  return RedirectToAction("LogOut", "Home");
+      //}
 
-
-
-
+    }
 
   }
+
 }

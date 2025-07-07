@@ -57,143 +57,6 @@ var InstituteSummaryHelper = {
     this.initializeSummaryGrid();
   },
 
-  //initializeSummaryGrid: function () {
-  //  debugger;
-  //  var Columns = InstituteSummaryHelper.generateColumns();
-  //  var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(InstituteSummaryHelper.generateColumns());
-  //  var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
-
-  //  const gridOptions = {
-  //    toolbar: [
-  //      { template: '<button type="button" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base" onclick="InstituteDetailsHelper.openInistitutePopUp();"><span class="k-button-text"> + Create New </span></button>' },
-  //      { name: "excel" },
-  //      { name: "pdf" },
-  //      { template: '<button type="button" id="btnExportCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
-
-  //    ],
-  //    excel: {
-  //      fileName: "InstituteList" + Date.now() + ".xlsx",
-  //      filterable: true,
-  //      allPages: true,
-  //      columnInfo: true,
-  //    },
-  //    pdf: {
-  //      fileName: "Menu_Information.pdf",
-  //      allPages: true,
-  //      paperSize: "A4",
-  //      landscape: true,
-  //      margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
-  //      scale: 0.9, // Slight scaling to prevent overflow
-  //      repeatHeaders: true,
-  //      columns: [
-  //        { field: "Name", width: 150 },
-  //        { field: "ParentMenu", width: 120 },
-  //        { field: "ModuleName", width: 150 },
-  //        { field: "Type", width: 80 },
-  //        { field: "Status", width: 80 }
-  //      ],
-  //      // Custom styles for PDF export
-  //      styles: [
-  //        {
-  //          type: "text",
-  //          style: {
-  //            fontFamily: "Helvetica",
-  //            fontSize: 10
-  //          }
-  //        }
-  //      ]
-  //    },
-  //    dataSource: [],
-  //    autoBind: true,
-  //    navigatable: true, // Enable keyboard navigation
-  //    scrollable: true,
-  //    resizable: true,
-  //    //width: "100%",
-  //    width: gridWidth, //CommonManager.calculateTotalColumnsWidth(this.generateColumns()) > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`,
-  //    //width: CommonManager.calculateResponsiveWidth(this.generateColumns()),
-  //    filterable: true,
-  //    sortable: true,
-  //    pageable: {
-  //      refresh: true,
-  //      pageSizes: [10, 20, 20, 30, 50,100],
-  //      buttonCount: 5,
-  //      input: false,
-  //      numeric: true,
-  //      serverPaging: true,
-  //      serverFiltering: true,
-  //      serverSorting: true
-  //    },
-  //    columns: Columns,
-  //    editable: false, // Disable inline editing
-  //    selectable: "row", // Enable row selection
-
-  //    error: function (e) {
-  //      console.log("Grid Error:", e);
-  //      //kendo.alert("Grid Error: " + e.errors);
-  //      ToastrMessage.showToastrNotification({
-  //        preventDuplicates: true,
-  //        closeButton: true,
-  //        timeOut: 3000,
-  //        message: "Grid Error: " + e.errors,
-  //        type: 'error'
-  //      });
-
-  //    }
-  //  };
-
-  //  // Initialize the Kendo Grid
-  //  $("#gridSummaryInstitute").kendoGrid(gridOptions);
-
-  //  $("#btnExportCsv").on("click", function () {
-  //    debugger;
-  //    CommonManager.GenerateCSVFileAllPages("gridSummaryInstitute", "MenuListCSV", "Actions");
-  //  });
-
-  //  // Fetch and set the data source after the grid is initialized
-  //  const grid = $("#gridSummaryInstitute").data("kendoGrid");
-  //  if (grid) {
-  //    const ds = InstituteSummaryManager.getSummaryInstituteGridDataSourceVanilla();
-  //    //const ds = InstituteSummaryManager.getSummaryInstituteGridDataSource();
-
-  //    // Add data source error handling
-  //    ds.bind("error", function (e) {
-  //      console.error("DataSource Error Event:", e);
-  //      //kendo.alert("Failed to load data. Please check your connection and try again.");
-  //      ToastrMessage.showToastrNotification({
-  //        preventDuplicates: true,
-  //        closeButton: true,
-  //        timeOut: 3000,
-  //        message: "Failed to load data. Please check your connection and try again.",
-  //        type: 'error'
-  //      });
-  //    });
-
-  //    // Add data source success handling
-  //    ds.bind("requestEnd", function (e) {
-  //      if (e.response && e.response.isSuccess === false) {
-  //        console.error("API returned error:", e.response.message);
-  //        //kendo.alert("Error: " + e.response.message);
-  //        ToastrMessage.showToastrNotification({
-  //          preventDuplicates: true,
-  //          closeButton: true,
-  //          timeOut: 3000,
-  //          message: "Error: " + e.response.message,
-  //          type: 'error'
-  //        });
-  //      }
-  //    });
-
-  //    grid.setDataSource(ds);
-  //  }
-
-  //  //if (grid) {
-  //  //  const ds = InstituteSummaryManager.getSummaryInstituteGridDataSource();
-  //  //  ds.fetch().then(() => grid.setDataSource(ds));
-  //  //  grid.setDataSource(ds);
-  //  //}
-
-  //},
-
   initializeSummaryGrid: function () {
     var Columns = this.generateColumns();
     var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(this.generateColumns());
@@ -247,8 +110,9 @@ var InstituteSummaryHelper = {
       selectable: "row",
 
       error: function (e) {
-        console.error("Grid Error:", e);
-        kendo.alert("Grid Error: " + e.errors);
+        VanillaApiCallManager.handleApiError(error);
+        //console.error("Grid Error:", e);
+        //kendo.alert("Grid Error: " + e.errors);
       }
     };
 
@@ -265,17 +129,17 @@ var InstituteSummaryHelper = {
       const ds = InstituteSummaryManager.getSummaryInstituteGridDataSourceVanilla();
 
       // Add data source error handling
-      ds.bind("error", function (e) {
-        console.error("DataSource Error Event:", e);
-        kendo.alert("Failed to load data. Please check your connection and try again.");
+      ds.bind("error", function (error) {
+        VanillaApiCallManager.handleApiError(error);
       });
 
       // Add data source success handling
       ds.bind("requestEnd", function (e) {
         console.log(ds);
         if (e.response && e.response.isSuccess === false) {
-          console.error("API returned error:", e.response.message);
-          kendo.alert("Error: " + e.response.message);
+          VanillaApiCallManager.handleApiError(e.response);
+          //console.error("API returned error:", e.response.message);
+          //kendo.alert("Error: " + e.response.message);
         }
       });
 

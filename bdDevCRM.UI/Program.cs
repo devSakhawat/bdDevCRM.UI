@@ -7,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add HttpClient for API calls
+builder.Services.AddHttpClient();
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -38,7 +41,6 @@ builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
 
 builder.Services.AddRazorPages();
 builder.Services.AddMvc();
-
 
 builder.Services.AddCors(options =>
 {
@@ -75,6 +77,12 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Login}/{id?}")
     .WithStaticAssets();
+
+// Add API routes for CRM Institute
+app.MapControllerRoute(
+    name: "api",
+    pattern: "api/{action}/{id?}",
+    defaults: new { controller = "Core" });
 
 app.UseCors();
 app.Run();

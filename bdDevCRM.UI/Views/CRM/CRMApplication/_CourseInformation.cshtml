@@ -404,410 +404,50 @@
 		</ul>
 	</div>
 
+</div>
 
-	@* Country PopUP *@
-	<div style="display:none" id="CountryPopUp" class="">
-		
+
+
+
+
+@* Institute PopUp *@
+@* <div style="display:none" id="InstitutePopUp_Course" class="">
+	<!-- row -->
+	<div class="row">
+		<!-- Institute Summary -->
 		<div class="row">
-			<!-- Country Form -->
-			<partial name="~/Views/Core/Country/_CountryDetail.cshtml" />
-
-			<!-- Country Summary -->
-			<partial name="~/Views/Core/Country/_CountrySummery.cshtml" />
-		
+		<partial name="~/Views/Core/CRMInstitute/_InstituteSummary" />
 		</div>
-	
-	</div>
 
-	@* Institute PopUp *@
-	<div style="display:none" id="course_InstitutePopUp" class="">
-		
+		<!-- Institute Form -->
 		<div class="row">
-			<!-- Institute -->
-			<div class="col-lg-12 col-md-12 col-sm-12">
-				<fieldset class="reset">
-					<legend class="reset">Institute Information</legend>
-					<form id="course_InistituteForm" method="post">
-						<div class="row mb-2">
-							<input id="institutePopUp_InstituteId" type="hidden" value="" />
-
-							<!-- Institute Name -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="InstituteInstituteName" class="lbl widthSize100_per">Institute Name <span class="redstart">*</span></label>
-								<input id="txtInstituteInstituteName" name="InstituteInstituteName" class="w-100" placeholder="Institute Name" />
-							</div>
-
-							<!-- Institute Code -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtInstituteCode" class="lbl widthSize100_per">Institute Code</label>
-								<input id="txtInstituteCode" name="InstituteCode" class="w-100" placeholder="Institute Code" />
-							</div>
-
-							<!-- Institute Type -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="InstituteType" class="lbl widthSize100_per">Institute Type</label>
-								<div class="d-flex align-items-start icon-wrapper">
-									<input id="cmbInstituteTypeId" name="InstituteType" class="flex-grow-1 border-right-strait" />
-									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openInstituteTypePopup();">
-										<span class="k-icon k-i-plus"></span>
-									</button>
-								</div>
-							</div>
-
-							<!-- Institute Email -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtInstituteEmail" class="lbl widthSize100_per">Institute Email</label>
-								<input id="txtInstituteEmail" type="email" name="InstituteEmail" class="w-100" placeholder="Institute Email" />
-							</div>
-
-							<!-- Institute Address -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtInstituteAddress" class="lbl widthSize100_per">Institute Address</label>
-								<input id="txtInstituteAddress" name="InstituteAddress" class="w-100" placeholder="Institute Address" />
-							</div>
-
-							<!-- Phone No -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtInstitutePhoneNo" class="lbl widthSize100_per">Phone No</label>
-								<input id="txtInstitutePhoneNo" name="InstitutePhoneNo" class="w-100" placeholder="Phone Number" />
-							</div>
-
-							<!-- Mobile No -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtInstituteMobileNo" class="lbl widthSize100_per">Mobile No</label>
-								<input id="txtInstituteMobileNo" name="InstituteMobileNo" class="w-100" placeholder="Mobile Number" />
-							</div>
-
-							<!-- Campus -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtCampus" class="lbl widthSize100_per">Campus</label>
-								<input id="txtCampus" name="Campus" class="w-100" placeholder="Campus" />
-							</div>
-
-							<!-- Website -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtWebsite" class="lbl widthSize100_per">Website</label>
-								<input id="txtWebsite" type="url" name="Website" class="w-100" placeholder="Website URL" />
-							</div>
-
-							<!-- Monthly Living Cost -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtMonthlyLivingCost" class="lbl widthSize100_per">Monthly Living Cost</label>
-								<input id="txtMonthlyLivingCost" name="MonthlyLivingCost" class="w-100" placeholder="0.00" />
-							</div>
-
-							<!-- Funds Requirement for Visa -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtFundsRequirementforVisa" class="lbl widthSize100_per">Funds Requirement for Visa</label>
-								<input id="txtFundsRequirementforVisa" name="FundsRequirementforVisa" class="w-100" placeholder="Funds Info" />
-							</div>
-
-							<!-- Application Fee -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtApplicationFee" class="lbl widthSize100_per">Application Fee</label>
-								<input id="txtApplicationFee" name="ApplicationFee" class="w-100" placeholder="0.00" />
-							</div>
-
-							<!-- Country -->
-							<div class="col-xl-4 col-lg-4 col-md-6 col-12 mb-2">
-								<label for="InstituteCountry" class="lbl widthSize100_per">Country <span class="redstart">*</span></label>
-								<div class="d-flex align-items-start icon-wrapper">
-									<input id="cmbInstituteCountryId" name="InstituteCountry" required validationMessage="Please Select Country" class="flex-grow-1 border-right-strait" />
-									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCountryPopup();">
-										<span class="k-icon k-i-plus"></span>
-									</button>
-								</div>
-							</div>
-
-							<!-- Currency -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="InstituteCurrency" class="lbl widthSize100_per">Currency</label>
-								<div class="d-flex align-items-start icon-wrapper">
-									<input id="cmbInstituteCurrencyId" name="InstituteCurrency" class="flex-grow-1 border-right-strait" />
-									<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openCurrencyPopup();">
-										<span class="k-icon k-i-plus"></span>
-									</button>
-								</div>
-							</div>
-
-
-
-
-							<!-- Is Language Mandatory -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
-								<label for="chkIsLanguageMandatory" class="form-check-label">Is Language Mandatory?</label>
-								<input type="checkbox" id="chkIsLanguageMandatory" name="IsLanguageMandatory" class="form-check-input" />
-							</div>
-
-							<!-- Languages Requirement -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtLanguagesRequirement" class="lbl widthSize100_per">Languages Requirement</label>
-								<input id="txtLanguagesRequirement" name="LanguagesRequirement" class="w-100" />
-							</div>
-
-							<!-- Institutional Benefits -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtInstitutionalBenefits" class="lbl widthSize100_per">Institutional Benefits</label>
-								<input id="txtInstitutionalBenefits" name="InstitutionalBenefits" class="w-100" />
-							</div>
-
-							<!-- Part Time Work Details -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtPartTimeWorkDetails" class="lbl widthSize100_per">Part Time Work Details</label>
-								<input id="txtPartTimeWorkDetails" name="PartTimeWorkDetails" class="w-100" />
-							</div>
-
-							<!-- Scholarships Policy -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="txtScholarshipsPolicy" class="lbl widthSize100_per">Scholarships Policy</label>
-								<input id="txtScholarshipsPolicy" name="ScholarshipsPolicy" class="w-100" />
-							</div>
-
-							<!-- Institution Logo -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="fileInstitutionLogo" class="lbl widthSize100_per">Institution Logo</label>
-								<input type="file" id="fileInstitutionLogo" name="InstitutionLogo" class="form-control" />
-							</div>
-
-							<!-- Institution Prospectus -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-								<label for="fileInstitutionProspectus" class="lbl widthSize100_per">Institution Prospectus</label>
-								<input type="file" id="fileInstitutionProspectus" name="InstitutionProspectus" class="form-control" />
-							</div>
-
-							<!-- Status -->
-							<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
-								<label for="chkStatus" class="form-check-label">Is Active</label>
-								<input type="checkbox" id="chkStatus" name="Status" class="form-check-input" />
-							</div>
-
-							<!-- Institution Status Notes -->
-							<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
-								<label for="txtInstitutionStatusNotes" class="lbl widthSize100_per">Institution Status Notes</label>
-								<textarea id="txtInstitutionStatusNotes" name="InstitutionStatusNotes" rows="2" class="form-control"></textarea>
-							</div>
-
-						</div>
-
-						<div class="btnDiv mt-2">
-							<ul>
-								<li class="d-flex justify-content-end">
-									<button type="button" class="btn btn-primary me-2" onclick="CrmInstituteHelper.SaveInstitute();">+ Add Institute</button>
-									<button type="button" class="btn btn-secondary me-2" onclick="CrmInstituteHelper.clearInstituteForm();">Clear</button>
-									<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#course_InstitutePopUp")'>Close</button>
-								</li>
-							</ul>
-						</div>
-						
-					</form>
-				
-				</fieldset>
+			<div id="InstitutePopUp" style="display: none">
+				<partial name="~/Views/Core/CRMInstitute/_InstituteDetails" />
 			</div>
-
-
-      <div class="col-lg-12 col-md-12 col-sm-12">
-				<fieldset class="reset">
-					<legend class="reset">Institute Information</legend>
-
-					<div id="gridSummaryInstitute"></div>
-					<div class="clear"></div>
-				</fieldset>
-			</div>
-		
-		</div>
-	</div>
-
-
-	@* Course PopUp *@
-	<div style="display:none" id="course_CoursePopUp" class="">
-
-		<div class="row">
-			<!-- Institute -->
-			<div class="col-12">
-				<fieldset class="reset">
-					<legend class="reset">Course Information</legend>
-
-					<div class="row mb-2">
-            <input id="institutePopUp_InstituteId" type="hidden" value="" />
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="InstituteId">Institute</label>
-							<input type="number" class="form-control" id="InstituteId" name="InstituteId" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CourseTitle">Course Title</label>
-							<input type="text" class="form-control" id="CourseTitle" name="CourseTitle" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CourseLevel">Course Level</label>
-							<input type="text" class="form-control" id="CourseLevel" name="CourseLevel" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CourseFee">Course Fee</label>
-							<input type="number" class="form-control" id="CourseFee" name="CourseFee" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="ApplicationFee">Application Fee</label>
-							<input type="number" class="form-control" id="ApplicationFee" name="ApplicationFee" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CurrencyId">Currency</label>
-							<input type="number" class="form-control" id="CurrencyId" name="CurrencyId" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="MonthlyLivingCost">Monthly Living Cost</label>
-							<input type="number" class="form-control" id="MonthlyLivingCost" name="MonthlyLivingCost" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="StartDate">Start Date</label>
-							<input type="date" class="form-control" id="StartDate" name="StartDate" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="EndDate">End Date</label>
-							<input type="date" class="form-control" id="EndDate" name="EndDate" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="LanguagesRequirement">Languages Requirement</label>
-							<input type="text" class="form-control" id="LanguagesRequirement" name="LanguagesRequirement" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CourseDuration">Course Duration</label>
-							<input type="text" class="form-control" id="CourseDuration" name="CourseDuration" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CourseCategory">Course Category</label>
-							<input type="text" class="form-control" id="CourseCategory" name="CourseCategory" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="AwardingBody">Awarding Body</label>
-							<input type="text" class="form-control" id="AwardingBody" name="AwardingBody" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="Status">Status</label>
-							<select class="form-control" id="Status" name="Status">
-								<option value="">Select</option>
-								<option value="true">Active</option>
-								<option value="false">Inactive</option>
-							</select>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="DocumentId">Document ID</label>
-							<input type="text" class="form-control" id="DocumentId" name="DocumentId" />
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CourseBenefits">Course Benefits</label>
-							<textarea class="form-control" id="CourseBenefits" name="CourseBenefits" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="PartTimeWorkDetails">Part-time Work Details</label>
-							<textarea class="form-control" id="PartTimeWorkDetails" name="PartTimeWorkDetails" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="AdditionalInformationOfCourse">Additional Information</label>
-							<textarea class="form-control" id="AdditionalInformationOfCourse" name="AdditionalInformationOfCourse" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="GeneralEligibility">General Eligibility</label>
-							<textarea class="form-control" id="GeneralEligibility" name="GeneralEligibility" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="FundsRequirementforVisa">Funds Requirement for Visa</label>
-							<textarea class="form-control" id="FundsRequirementforVisa" name="FundsRequirementforVisa" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="InstitutionalBenefits">Institutional Benefits</label>
-							<textarea class="form-control" id="InstitutionalBenefits" name="InstitutionalBenefits" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="VisaRequirement">Visa Requirement</label>
-							<textarea class="form-control" id="VisaRequirement" name="VisaRequirement" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="CountryBenefits">Country Benefits</label>
-							<textarea class="form-control" id="CountryBenefits" name="CountryBenefits" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="KeyModules">Key Modules</label>
-							<textarea class="form-control" id="KeyModules" name="KeyModules" rows="2"></textarea>
-						</div>
-
-						<div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
-							<label for="After2YearsPswcompletingCourse">After 2 Years PSW Info</label>
-							<textarea class="form-control" id="After2YearsPswcompletingCourse" name="After2YearsPswcompletingCourse" rows="2"></textarea>
-						</div>
-
-
-					</div>
-
-					<div class="btnDiv mt-2">
-						<ul>
-							<li class="d-flex justify-content-end">
-								<button type="button" class="btn btn-primary me-2" onclick="CrmInstituteHelper.SaveCourseForm();">+ Add Institute</button>
-								<button type="button" class="btn btn-secondary me-2" onclick="CrmInstituteHelper.clearCourseForm();">Clear</button>
-								<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#course_CoursePopUp")'>Close</button>
-							</li>
-						</ul>
-					</div>
-				</fieldset>
-			</div>
-		</div>
-		<div class="row">
-
-      <div class="col-lg-12 col-md-12 col-sm-12">
-				<fieldset class="reset">
-					<legend class="reset">Institute Information</legend>
-
-					<div id="gridSummaryCourse"></div>
-					<div class="clear"></div>
-				</fieldset>
-			</div>
-		
-		</div>
-	</div>
-
-
-	@* Currency PopUp *@
-	<div style="display:none" id="CurrencyPopUp_Course" class="">
-
-    <div class="row">
-			<!-- Currency Form -->
-			<partial name="~/Views/Core/Currency/_CurrencyDetail.cshtml" />
-
-			<!-- Currency Summary -->
-			<partial name="~/Views/Core/Currency/_CurrencySummery.cshtml" />
-
 		</div>
 
 	</div>
+</div> *@
 
 
+@* Course PopUp *@
+<div style="display:none" id="course_CoursePopUp" class="">
 
 </div>
 
 
+@* Currency PopUp *@
+<div style="display:none" id="CurrencyPopUp_Course" class="">
+
+	<div class="row">
+		<!-- Currency Form -->
+		<partial name="~/Views/Core/Currency/_CurrencyDetail.cshtml" />
+
+		<!-- Currency Summary -->
+		<partial name="~/Views/Core/Currency/_CurrencySummery.cshtml" />
+
+	</div>
+</div>
 
 <style>
 

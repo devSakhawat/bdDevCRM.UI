@@ -1,56 +1,53 @@
 ﻿
 var MenuDetailsManager = {
 
-  SaveDataOld: function () {
+  saveOrUpdateItem: async function () {
+    const id = $("#hdMenuId").val() || 0;
+    const isCreate = id == 0;
+    const serviceUrl = isCreate ? "/menu" : `//menu//${id}`;
+    const httpType = isCreate ? "POST" : "PUT";
+    const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+    const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
+
+    const modelDto = MenuDetailsHelper.CreateObject();
+    if (!modelDto) {
+      throw new Error("Failed to create DTO object");
+    }
     debugger;
-    var isToUpdateOrCreate = $("#hdMenuId").val();
-    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
-    var serviceUrl = isToUpdateOrCreate == 0 ? "/menu" : "/menu/" + isToUpdateOrCreate;
-    var confmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
-    var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
-   
-    AjaxManager.MsgBox(
-      'info',
-      'center',
-      'Confirmation',
-      confmsg,
-      [
-        {
-          addClass: 'btn btn-primary',
-          text: 'Yes',
-          onClick: function ($noty) {
-            $noty.close();
-            var obj = MenuDetailsHelper.CreateObject();
-            var jsonObject = JSON.stringify(obj);
-            var responseData = AjaxManager.PostDataForDotnetCoreWithHttp(baseApi, serviceUrl, jsonObject, httpType ,onSuccess ,onFailed);
-            function onSuccess(responseData) {
-              Message.Success(successmsg);
-              MenuDetailsHelper.CloseInformation();
-              $("#gridSummary").data("kendoGrid").dataSource.read();
+
+    CommonManager.MsgBox(
+      "info",
+      "center",
+      "Confirmation",
+      confirmMsg,
+      [{
+        addClass: "btn btn-primary",
+        text: "Yes",
+        onClick: async function ($noty) {
+          $noty.close();
+          var jsonObject = JSON.stringify(modelDto);
+          try {
+            const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+            if (response && (response.IsSuccess === true || response === "Success")) {
+              ToastrMessage.showSuccess(successMsg);
+              CourseDetailsHelper.clearForm();
+              const windowId = "CoursePopUp";
+              CommonManager.closeKendoWindow(windowId);
+              $("#gridSummaryCourse").data("kendoGrid").dataSource.read();
+            } else {
+              throw new Error(response.Message || response || "Unknown error occurred");
             }
-            function onFailed(jqXHR, textStatus, errorThrown) {
-              //Message.Warning(textStatus, ": ", errorThrown);
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 0,
-                message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
-                type: 'error',
-              });
-            }
-          }
-        },
-        {
-          addClass: 'btn',
-          text: 'Cancel',
-          onClick: function ($noty) {
-            $noty.close();
+          } catch (err) {
+            console.log(err);
+            VanillaApiCallManager?.handleApiError?.(err);
           }
         }
-      ]
-      ,0
+      },
+      { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
+      0
     );
   },
+
 
   SaveData: async function () {
     debugger;
@@ -271,7 +268,8 @@ var MenuDetailsHelper = {
     //if (MenuDetailsHelper.validator()) {
 
     //}
-    MenuDetailsManager.SaveData();
+    //MenuDetailsManager.SaveData();
+    MenuDetailsManager.saveOrUpdateItem();
   },
 
   AddNewInformation: function () {

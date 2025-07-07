@@ -87,7 +87,7 @@ var loginManager = {
 		debugger;
 		var logonId = $("#txtLoginId").val();
 		var pass = $("#txtPassword").val();
-
+		console.log("Frontend Hosting URL: " + window.location.origin);
 		if (logonId === "") {
 			$("#txtLoginId").focus();
 			AjaxManager.MsgBox('warning', 'center', 'Warning', "Please enter Login ID!", [
@@ -135,6 +135,10 @@ var loginManager = {
 			},
 			error: function (xhr, status, error) {
 				// null for message delay time
+				console.log(serviceURL);
+				console.log(xhr);
+				console.log(status);
+				console.log(error);
 				Message.ErrorWithHeaderText('Login Failed', xhr.responseJSON?.statusCode + ": " + xhr.responseJSON?.message,null);
 			},
 			//}

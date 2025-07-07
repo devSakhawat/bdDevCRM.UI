@@ -2004,12 +2004,14 @@ const VanillaApiCallManager = {
 
   //Generic Error Handler
   handleApiError: function (errorResponse) {
-    let statusCode = errorResponse.statusCode || 500;
-    let errorType = errorResponse.errorType || "Error";
-    let message = errorResponse.message || "Unknown error";
-    let correlationId = errorResponse.correlationId || "";
-    let timestamp = errorResponse.timestamp ? new Date(errorResponse.timestamp).toLocaleString() : "";
-    let details = errorResponse.details || "";
+    var apiError = this._convertToApiError(errorResponse);
+
+    let statusCode = apiError.statusCode || 500;
+    let errorType = apiError.errorType || "Error";
+    let message = apiError.message || "Unknown error";
+    let correlationId = apiError.correlationId || "";
+    let timestamp = apiError.timestamp ? new Date(apiError.timestamp).toLocaleString() : "";
+    let details = apiError.details || "";
 
     // For End User (Display Message)
     let displayMessage = `<strong>[${statusCode}] ${errorType}</strong><br>`;
@@ -2032,7 +2034,22 @@ const VanillaApiCallManager = {
 
     console.log(consoleMessage + additionalInfo, consoleStyle);
 
-    ToastrMessage.showError(displayMessage, "API Error", 0);
+    CommonManager.MsgBox(
+      "error",
+      "center",
+      errorType,
+      displayMessage,
+      [{
+        addClass: "btn btn-primary",
+        text: "Close",
+        onClick: function ($noty) {
+          $noty.close();
+        }
+      }],
+      0
+    );
+
+    // ToastrMessage.showError(displayMessage, errorType, 0);
   },
 
   // Convert various error formats to handleApiError expected format
@@ -2062,7 +2079,7 @@ const VanillaApiCallManager = {
 
           // Try to parse server error response if it exists
           if (error.response && typeof error.response === 'object') {
-            apiError.statusCode = error.response.StatusCode;
+            apiError.statusCode = error.response.statusCode;
             apiError.message = error.response.message || error.response.error || apiError.message;
             apiError.correlationId = error.response.correlationId || "";
             apiError.details = error.response.details || JSON.stringify(error.response);
@@ -2388,6 +2405,7 @@ const VanillaApiCallManager = {
 
       // Handle HTTP errors
       if (!options.validateStatus(response.status)) {
+        console.log(response);
         const errorData = await this._parseResponse(response);
         console.log(JSON.stringify(errorData));
         const error = {
@@ -2448,8 +2466,12 @@ const VanillaApiCallManager = {
     }
 
     // Don't set Content-Type for FormData - browser will set it automatically
-    if (isFormData && headers['Content-Type']) {
-      delete headers['Content-Type'];
+    if (isFormData) {
+      for (const key in headers) {
+        if (key.toLowerCase() === 'content-type') {
+          delete headers[key];
+        }
+      }
     }
 
     return headers;
@@ -2458,7 +2480,7 @@ const VanillaApiCallManager = {
   // Prepare request body based on data type
   _prepareRequestBody: function (jsonParams, isFormData, isFile, isBlob, isArrayBuffer) {
     if (isFormData || isFile || isBlob || isArrayBuffer) {
-      return jsonParams; // Send as is
+      return jsonParams;
     }
 
     if (jsonParams === null || jsonParams === undefined) {

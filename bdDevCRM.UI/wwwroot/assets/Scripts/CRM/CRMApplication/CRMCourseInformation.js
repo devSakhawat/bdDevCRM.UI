@@ -9,7 +9,7 @@
 /// <reference path="../../core/crmcourse/coursedetails.js" />
 /// <reference path="../../core/crminstitute/institutedetails.js" />
 
-// Global Variable - ??????? ?????????
+// Global Variable
 var isCountryDataLoaded = false;
 
 /* =========================================================
@@ -18,7 +18,6 @@ var isCountryDataLoaded = false;
 var CRMCourseInformationManager = {
 
   fetchCountryComboBoxData: async function () {
-    debugger;
     const serviceUrl = "/countryddl";
 
     try {
@@ -111,7 +110,6 @@ var CRMCourseInformationManager = {
     }
   },
 
-  // ?????? ????? ?????? ???? ???? ?????
   getIntakeMonthData: function () {
     return [
       { IntakeMonthId: 1, IntakeMonth: "January" },
@@ -129,28 +127,54 @@ var CRMCourseInformationManager = {
     ];
   },
 
-  // ?????? ????? ?????? ???? ???? ?????
   getIntakeYearData: function () {
     const currentYear = new Date().getFullYear();
     const years = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = -2; i < 7; i++) {
       const year = currentYear + i;
       years.push({ IntakeYearId: year, IntakeYear: year.toString() });
     }
     return years;
   },
 
-  // ??????? ??????? ?????? ???? ???? ?????
   getPaymentMethodData: function () {
     return [
-      { PaymentMethodId: 1, PaymentMethod: "Credit Card" },
-      { PaymentMethodId: 2, PaymentMethod: "Debit Card" },
+      { PaymentMethodId: 1, PaymentMethod: "Cash" },
+      { PaymentMethodId: 2, PaymentMethod: "By Cheque" },
       { PaymentMethodId: 3, PaymentMethod: "Bank Transfer" },
-      { PaymentMethodId: 4, PaymentMethod: "Online Payment" },
-      { PaymentMethodId: 5, PaymentMethod: "Check" },
-      { PaymentMethodId: 6, PaymentMethod: "Cash" }
+      { PaymentMethodId: 4, PaymentMethod: "Demand Draft" },
+      { PaymentMethodId: 5, PaymentMethod: "Credit Card" },
+      { PaymentMethodId: 6, PaymentMethod: "Paypal" },
+      { PaymentMethodId: 7, PaymentMethod: "Paytm" },
+      { PaymentMethodId: 8, PaymentMethod: "UPI" }
     ];
-  }
+  },
+
+  getGenderData: function () {
+    return [
+      { GenderId: 1, GenderName: "Male" },
+      { GenderId: 2, GenderName: "Female" },
+      { GenderId: 3, GenderName: "Others" }
+    ];
+  },
+
+  getTitleData: function () {
+    return [
+      { TitleValue: "Mr", TitleText: "Mr" },
+      { TitleValue: "Mrs", TitleText: "Mrs" },
+      { TitleValue: "Miss", TitleText: "Miss" },
+      { TitleValue: "Ms", TitleText: "Ms" },
+    ]
+  },
+
+  getMaritalStatusData: function () {
+    return [
+      { MaritalStatusId: "1", MaritalStatusName: "Married" },
+      { MaritalStatusId: "2", MaritalStatusName: "Unmarried" },
+      { MaritalStatusId: "3", MaritalStatusName: "Divorced" },
+    ]
+  },
+
 };
 
 /* =========================================================
@@ -161,7 +185,7 @@ var CRMCourseInformationHelper = {
   intCourse: function () {
     debugger;
     console.log("=== CRM Course Information Initializing ===");
-
+    //// Kendo window
     //CommonManager.initializeKendoWindow("#CountryPopUp", "Country Details", "80%");
     //CommonManager.initializeKendoWindow("#course_InstitutePopUp", "Institute Details", "80%");
     //CommonManager.initializeKendoWindow("#course_CoursePopUp", "Course Details", "80%");
@@ -171,30 +195,48 @@ var CRMCourseInformationHelper = {
     CRMCourseInformationHelper.generateCountryCombo();
     CRMCourseInformationHelper.generateInstituteCombo();
     CRMCourseInformationHelper.generateCourseCombo();
+    CRMCourseInformationHelper.generateIntakeMonthCombo();
+    CRMCourseInformationHelper.generateIntakeYearCombo();
 
-    //this.generateIntakeMonthCombo();
-    //this.generateIntakeYearCombo();
-    //this.generateCurrencyCombo();
-    //this.generatePaymentMethodCombo();
+    CRMCourseInformationHelper.generateCurrencyCombo();
+    CRMCourseInformationHelper.generatePaymentMethodCombo();
 
     //// Personal Details ComboBoxes
-    //this.generateGenderCombo();
-    //this.generateTitleCombo();
-    //this.generateMaritalStatusCombo();
+    CRMCourseInformationHelper.generateGenderCombo();
+    CRMCourseInformationHelper.generateTitleCombo();
+    CRMCourseInformationHelper.generateMeritalStatusCombo();
+
+    // Passport
+
+    CRMCourseInformationHelper.initializePaymentDate();
+    CRMCourseInformationHelper.initializeDateOfBirth();
+    CRMCourseInformationHelper.initializePassportIssueDate();
+    CRMCourseInformationHelper.initializePassportExpiryDate();
 
     //// Address ComboBoxes
     //this.generateCountryForPermanentAddressCombo();
     //this.generateCountryForPresentAddressCombo();
 
-    //// Date Pickers ???????????? ???
-    //this.initializePaymentDate();
-    //this.initializeDateOfBirth();
+    this.bindEvents();
+  },
 
-    console.log("=== CRM Course Information Successfully Initialized ===");
+  bindEvents: function () {
+    //$("#btnSave").on("click", this.saveForm);
+    $("input[name='ValidPassport']").on("change", this.togglePassportFieldsByRadio);
+
+    // if the
+    $("#datepickerPassportIssueDate").data("kendoDatePicker").bind("change", function () {
+      const issueDate = this.value();
+      const expiryPicker = $("#datepickerPassportExpiryDate").data("kendoDatePicker");
+
+      if (issueDate && expiryPicker) {
+        expiryPicker.min(issueDate);
+      }
+    });
+
   },
 
   /* ------ PopUp UI Methods (InstituteDetails.js pattern ????????) ------ */
-
   //
   generateCountryPopUp: function () {
     console.log("Opening country popup...");
@@ -321,7 +363,6 @@ var CRMCourseInformationHelper = {
       CRMCourseInformationManager.fetchInstituteComboBoxDataByCountryId(countryId)
         .then(data => { if (instituteCombo) { instituteCombo.setDataSource(data) } })
         .catch(error => {
-          console.log("Error loading institute data for country");
           if (instituteCombo) {
             instituteCombo.setDataSource([]);
           }
@@ -448,9 +489,165 @@ var CRMCourseInformationHelper = {
 
   generateGenderCombo: function () {
     $("#cmbGenderForCourse").kendoComboBox({
-      placeholder: "Select gender...",
-      dataTextField: "GenderName"
+      placeholder: "Select Gender...",
+      dataTextField: "GenderName",
+      dataValuseField: "GenderId",
+      dataSource: CRMCourseInformationManager.getGenderData(),
     });
+  },
+
+  initializePaymentDate: function () {
+    $("#datePickerPaymentDate").kendoDatePicker({
+      format: "dd-MMM-yyyy",
+      parseFormats: "yyyy-MM-dd",
+      value: new Date(),
+      placeholder: "Select Payment Date"
+    });
+  },
+
+  generateTitleCombo: function () {
+    $("#cmbTitleForCourse").kendoComboBox({
+      placeholder: "Select Title",
+      dataTextField: "TitleText",
+      dataValuesField: "TitleValue",
+      filter: "contains",
+      suggest: true,
+      dataSource: CRMCourseInformationManager.getTitleData(),
+    });
+  },
+
+  initializeDateOfBirth: function () {
+    const dobInput = $("#datePickerDateOfBirth");
+
+    dobInput.kendoDatePicker({
+      format: "dd-MMM-yyyy",
+      parseFormats: ["yyyy-MM-dd"],
+      max: new Date()
+    });
+
+    // Set placeholder manually after widget initialized
+    dobInput.attr("placeholder", "Select Date of Birth");
+  },
+
+  generateMeritalStatusCombo: function () {
+    $("#cmbMaritalStatusForCourse").kendoComboBox({
+      placeholder: "Select Title",
+      dataTextField: "MaritalStatusName",
+      dataValuesField: "MaritalStatusId",
+      filter: "contains",
+      suggest: true,
+      dataSource: CRMCourseInformationManager.getMaritalStatusData(),
+    });
+  },
+
+  initializePassportIssueDate: function () {
+    const passportInssueDate = $("#datepickerPassportIssueDate");
+    passportInssueDate.kendoDatePicker({
+      format: "dd-MMM-yyyy",
+      parseFormats: "yyyy-MM-dd",
+      max: new Date(),
+      value: null
+    });
+
+    passportInssueDate.attr("placeholder", "Select Passport Issue Date");
+  },
+
+  initializePassportExpiryDate: function () {
+    const passportExpiryDate = $("#datepickerPassportExpiryDate");
+    $("#datepickerPassportExpiryDate").kendoDatePicker({
+      format: "dd-MMM-yyyy",
+      parseFormats: "yyyy-MM-dd",
+      value: new Date(),
+    });
+
+    passportExpiryDate.attr("placeholder", "Select Passport Expire Date");
+  },
+
+  togglePassportFieldsByRadio: function () {
+    debugger;
+    const isYes = document.getElementById("radioIsPassportYes").checked;
+
+    const passportNumber = document.getElementById("txtPassportNumberForCourse");
+    const issueDateInput = $("#datepickerPassportIssueDate");
+    const expiryDateInput = $("#datepickerPassportExpiryDate");
+
+    const lblPassportNumber = document.querySelector("label[for='PassportNumber']");
+    const lblIssueDate = document.querySelector("label[for='PassportIssueDate']");
+    const lblExpiryDate = document.querySelector("label[for='PassportExpiryDate']");
+
+    const toggleStar = (label, show) => {
+      if (!label) return;
+
+      const existingStar = label.querySelector(".redstart");
+
+      if (show) {
+        if (!existingStar) {
+          const star = document.createElement("span");
+          star.className = "redstart";
+          star.innerHTML = " *";
+          label.appendChild(star);
+        }
+      } else {
+        if (existingStar) existingStar.remove();
+      }
+    };
+
+    if (isYes) {
+      passportNumber.disabled = false;
+      passportNumber.setAttribute("required", "true");
+
+      issueDateInput.prop("disabled", false).attr("required", true);
+      expiryDateInput.prop("disabled", false).attr("required", true);
+
+      toggleStar(lblPassportNumber, true);
+      toggleStar(lblIssueDate, true);
+      toggleStar(lblExpiryDate, true);
+
+      // 👉 Set min of expiry = issue date (if selected)
+      const issuePicker = issueDateInput.data("kendoDatePicker");
+      const expiryPicker = expiryDateInput.data("kendoDatePicker");
+
+
+      const issueDate = issuePicker?.value();
+      if (issueDate && expiryPicker) {
+        expiryPicker.min(issueDate); // 👈 Prevent expiry before issue
+      }
+      else {
+        expiryPicker.value(new Date());
+      }
+
+    } else {
+      passportNumber.disabled = true;
+      passportNumber.removeAttribute("required");
+      passportNumber.value = "";
+
+      issueDateInput.prop("disabled", true).removeAttr("required");
+      expiryDateInput.prop("disabled", true).removeAttr("required");
+
+      const issuePicker = issueDateInput.data("kendoDatePicker");
+      const expiryPicker = expiryDateInput.data("kendoDatePicker");
+
+
+      //
+      if (issuePicker) {
+        issuePicker.value(null);
+        issuePicker.enable(false);
+      }
+      if (expiryPicker) {
+        expiryPicker.value(null);
+        expiryPicker.enable(false);
+      }
+
+      if (issuePicker) issuePicker.value(null);
+      if (expiryPicker) {
+        expiryPicker.value(null);
+        expiryPicker.min(new Date());
+      }
+
+      toggleStar(lblPassportNumber, false);
+      toggleStar(lblIssueDate, false);
+      toggleStar(lblExpiryDate, false);
+    }
   },
 
 

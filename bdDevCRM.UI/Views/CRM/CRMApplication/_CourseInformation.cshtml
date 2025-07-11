@@ -185,7 +185,7 @@
 				<!-- icon-wrapper class for add-new-ddl-item-btn -->
 				<div class="d-flex align-items-start icon-wrapper">
 					<input id="cmbMaritalStatusForCourse" name="MaritalStatus" required validationMessage="Marital Status" class="flex-grow-1 border-right-strait" />
-					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateCountryPopUp();">
+					<button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.generateMaritalStatusPopUp();">
 						<span class="k-icon k-i-plus"></span>
 					</button>
 				</div>
@@ -199,23 +199,38 @@
 				</div>
 			</div>
 
-
 			<!-- valid passport -->
-			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2 custom-checkbox">
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2 custom-checkbox">
 				<span class="me-5">Do you have a valid passport</span>
 
-				<input id="radioIsPassportYes" name="validPassport" type="radio" class="form-check-input inputRadio" />
+				<input id="radioIsPassportYes" name="ValidPassport" type="radio" class="form-check-input inputRadio" />
 				<label class="lbl">Yes</label>
 
-				<input id="radioIsPassportNo" name="validPassport" type="radio" class="form-check-input inputRadio" />
+				<input id="radioIsPassportNo" name="ValidPassport" type="radio" class="form-check-input inputRadio" />
 				<label class="lbl">No</label>
 			</div>
 
 			<!-- Passport Number -->
-			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PassportNumber" class="lbl widthSize100_per">Passport Number</label>
 				<div class="">
 					<input type="text" id="txtPassportNumberForCourse" name="PassportNumber" class="w-100" />
+				</div>
+			</div>
+
+			<!-- Passport Issue Date -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PassportIssueDate" class="lbl widthSize100_per">Passport Issue Date</label>
+				<div>
+					<input id="datepickerPassportIssueDate" name="PassportIssueDate" class="w-100" placeholder="Passport Issue Date" />
+				</div>
+			</div>
+
+			<!-- Passport Expiry Date -->
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+				<label for="PassportExpiryDate" class="lbl widthSize100_per">Passport Expiry Date</label>
+				<div>
+					<input id="datepickerPassportExpiryDate" name="PassportExpiryDate" class="w-100" placeholder="Passport Expiry Date" />
 				</div>
 			</div>
 

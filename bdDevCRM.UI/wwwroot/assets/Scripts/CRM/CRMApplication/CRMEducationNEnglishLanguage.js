@@ -102,8 +102,6 @@ var CRMEducationNEnglishLanguagHelper = {
       //const dataSource = CRMEducationNEnglishLanguagManager.educationSummaryDataSource();
     }
 
-
-
   },
 
   generateEducationSummaryColumn: function () {

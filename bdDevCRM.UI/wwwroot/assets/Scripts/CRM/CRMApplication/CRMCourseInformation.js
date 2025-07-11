@@ -158,7 +158,7 @@ var CRMCourseInformationManager = {
 =========================================================*/
 var CRMCourseInformationHelper = {
 
-  courseInit: function () {
+  intCourse: function () {
     debugger;
     console.log("=== CRM Course Information Initializing ===");
 
@@ -170,7 +170,7 @@ var CRMCourseInformationHelper = {
     // ComboBoxes 
     CRMCourseInformationHelper.generateCountryCombo();
     CRMCourseInformationHelper.generateInstituteCombo();
-    this.generateCourseCombo();
+    CRMCourseInformationHelper.generateCourseCombo();
 
     //this.generateIntakeMonthCombo();
     //this.generateIntakeYearCombo();
@@ -325,6 +325,7 @@ var CRMCourseInformationHelper = {
           if (instituteCombo) {
             instituteCombo.setDataSource([]);
           }
+          VanillaApiCallManager.handleApiError(error);
         });
     }
   },
@@ -356,21 +357,23 @@ var CRMCourseInformationHelper = {
     // clear course combo box
     const courseCombo = $("#cmbCourseForCourse").data("kendoComboBox");
 
-    if (!courseCombo) return;
+    if (!courseCombo) this.generateCourseCombo();
 
     if (courseCombo) {
       courseCombo.setDataSource([]);
       courseCombo.value("");
-      courseCombo.placeholder("Select Course");
+      courseCombo.input.attr("placeholder", "Select Course");
     }
 
     // Load courses based on selected institute
     if (instituteId) {
-      CRMCourseInformationHelper.fetchCourseByInstituteIdData(instituteId)
+      CRMCourseInformationManager.fetchCourseByInstituteIdData(instituteId)
         .then(data => { courseCombo.setDataSource(data) })
         .catch(error => {
-          console.log("Error loading course data for institute");
-          courseCombo.setDataSource([]);
+          if (courseCombo) {
+            courseCombo.setDataSource([]);
+          }
+          VanillaApiCallManager.handleApiError(error);
         });
     }
   },
@@ -378,12 +381,11 @@ var CRMCourseInformationHelper = {
   generateCourseCombo: function () {
     $("#cmbCourseForCourse").kendoComboBox({
       placeholder: "Select Course...",
-      dataTextField: "CourseName",
+      dataTextField: "CourseTitle",
       dataValueField: "CourseId",
       filter: "contains",
       suggest: true,
       dataSource: [],
-      change: CRMCourseInformationHelper.onInstituteChange
     });
   },
 

@@ -6,30 +6,47 @@
 
 <!-- row -->
 <div class="row gx-1 gy-2">
-	<h3 class="k-header text-center">Application Form</h3>
+  <h3 class="k-header text-center">Application Form</h3>
+  <form id="CRMApplicationForm" enctype="multipart/form-data">
+    <div id="tabstrip">
+      <ul>
+        <li>
+          Course Information
+        </li>
+        <li>
+          Education and English Language
+        </li>
+        <li>
+          Additional Information
+        </li>
+      </ul>
+      <div>
+        <partial name="CRMApplication/_CourseInformation" />
+      </div>
+      <div>
+        <partial name="CRMApplication/_EducationNEnglishLanguage" />
+      </div>
+      <div>
+        <partial name="CRMApplication/_AdditionalInformation" />
+      </div>
+    </div>
 
-  <div id="tabstrip">
-    <ul>
-      <li>
-        Course Information
-      </li>
-      <li>
-        Education and English Language
-      </li>
-      <li>
-        Additional Information
-      </li>
-    </ul>
-    <div>
-      <partial name="CRMApplication/_CourseInformation" />
+    <div class="btnDiv mt-2">
+      <ul>
+        <li class="d-flex justify-content-end">
+          <button type="button" class="btn btn-success me-2" onclick="CRMCourseInformationHelper.fillDemoData()">ডেমো ডেটা পূরণ করুন</button>
+          <button type="button" class="btn btn-info me-2" onclick="CRMCourseInformationHelper.exportFormDataAsJSON()">JSON এ রূপান্তর</button>
+          <button type="button" class="btn btn-warning me-2" onclick="CRMCourseInformationHelper.validateCompleteForm()">ভ্যালিডেশন চেক</button>
+          <button type="button" class="btn btn-primary me-2" onclick="CRMCourseInformationHelper.submitApplication()">আবেদন সাবমিট</button>
+          <button type="button" class="btn btn-secondary me-2" onclick="CRMCourseInformationHelper.clearCRMApplicationForm()">পরিষ্কার করুন</button>
+          <button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow()'>বন্ধ করুন</button>
+          <button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
+          <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearStateForm()">Clear</button>
+        </li>
+      </ul>
     </div>
-    <div >
-      <partial name="CRMApplication/_EducationNEnglishLanguage" />
-    </div>
-    <div>
-      <partial name="CRMApplication/_AdditionalInformation" />
-    </div>
-  </div>
+
+  </form>
 </div>
 
 <script src="~/assets/scripts/crm/crmapplication/crmapplicationsettings.js"></script>

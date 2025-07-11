@@ -8,13 +8,10 @@ $(document).ready(function () {
   console.log("Bangladesh Development CRM System - Managing Institute and Course Information from Various Countries");
 
   CRMApplicationSettingsHelper.createTabstrip();
-  CRMCourseInformationHelper.courseInit();
 
+  CRMCourseInformationHelper.intCourse();
   CRMEducationNEnglishLanguagHelper.initEducationNEnglishtLanguage();
-
-  //// Initialize the grid
-  //CRMEducationNEnglishLanguagHelper.initEducationNEnglishLanguage();
-  //CRMAdditionalInformationHelper.initAdditionalInformation();
+  CRMAdditionalInformationHelper.initAdditionalInformation();
 
   //// Optional: Add sample data for testing scrolling
   //var sampleData = [

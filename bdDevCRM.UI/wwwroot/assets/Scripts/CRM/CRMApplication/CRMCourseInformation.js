@@ -213,9 +213,13 @@ var CRMCourseInformationHelper = {
     CRMCourseInformationHelper.initializePassportIssueDate();
     CRMCourseInformationHelper.initializePassportExpiryDate();
 
-    //// Address ComboBoxes
-    //this.generateCountryForPermanentAddressCombo();
-    //this.generateCountryForPresentAddressCombo();
+    // Applicant image preview
+    CRMCourseInformationHelper.initApplicantImagePreview();
+
+
+    // Address ComboBoxes
+    this.generateCountryForPermanentAddressCombo();
+    this.generateCountryForPresentAddressCombo();
 
     this.bindEvents();
   },
@@ -233,6 +237,14 @@ var CRMCourseInformationHelper = {
         expiryPicker.min(issueDate);
       }
     });
+
+    // Same as permanent address checkbox functionality
+    $("#chkDoPermanentAddress").on("change", this.toggleSameAsPermanentAddress);
+
+    //// Applicant image preview click
+    //$("#applicantImageThumb").on("click", function () {
+    //  CRMCourseInformationHelper.openApplicantImagePreview();
+    //});
 
   },
 
@@ -540,6 +552,49 @@ var CRMCourseInformationHelper = {
     });
   },
 
+  /* ------ Address ComboBox Generation Methods ------ */
+  generateCountryForPermanentAddressCombo: function () {
+    $("#cmbCountryForPermanentAddress").kendoComboBox({
+      placeholder: "Select Country...",
+      dataTextField: "CountryName",
+      dataValueField: "CountryId",
+      filter: "contains",
+      suggest: true,
+      dataSource: []
+    });
+
+    var countryComboBoxInstant = $("#cmbCountryForPermanentAddress").data("kendoComboBox");
+    if (countryComboBoxInstant) {
+      CRMCourseInformationManager.fetchCountryComboBoxData().then(data => {
+        countryComboBoxInstant.setDataSource(data);
+      }).catch(error => {
+        console.error("Error loading country data for permanent address:", error);
+        countryComboBoxInstant.setDataSource([]);
+      });
+    }
+  },
+
+  generateCountryForPresentAddressCombo: function () {
+    $("#cmbCountryForAddress").kendoComboBox({
+      placeholder: "Select Country...",
+      dataTextField: "CountryName",
+      dataValueField: "CountryId",
+      filter: "contains",
+      suggest: true,
+      dataSource: []
+    });
+
+    var countryComboBoxInstant = $("#cmbCountryForAddress").data("kendoComboBox");
+    if (countryComboBoxInstant) {
+      CRMCourseInformationManager.fetchCountryComboBoxData().then(data => {
+        countryComboBoxInstant.setDataSource(data);
+      }).catch(error => {
+        console.error("Error loading country data for present address:", error);
+        countryComboBoxInstant.setDataSource([]);
+      });
+    }
+  },
+
   initializePassportIssueDate: function () {
     const passportInssueDate = $("#datepickerPassportIssueDate");
     passportInssueDate.kendoDatePicker({
@@ -564,7 +619,6 @@ var CRMCourseInformationHelper = {
   },
 
   togglePassportFieldsByRadio: function () {
-    debugger;
     const isYes = document.getElementById("radioIsPassportYes").checked;
 
     const passportNumber = document.getElementById("txtPassportNumberForCourse");
@@ -579,76 +633,128 @@ var CRMCourseInformationHelper = {
       if (!label) return;
 
       const existingStar = label.querySelector(".redstart");
-
-      if (show) {
-        if (!existingStar) {
-          const star = document.createElement("span");
-          star.className = "redstart";
-          star.innerHTML = " *";
-          label.appendChild(star);
-        }
-      } else {
-        if (existingStar) existingStar.remove();
+      if (show && !existingStar) {
+        const star = document.createElement("span");
+        star.className = "redstart";
+        star.innerHTML = " *";
+        label.appendChild(star);
+      } else if (!show && existingStar) {
+        existingStar.remove();
       }
     };
 
+    const issuePicker = issueDateInput.data("kendoDatePicker");
+    const expiryPicker = expiryDateInput.data("kendoDatePicker");
+
     if (isYes) {
+      // Enable input fields
       passportNumber.disabled = false;
       passportNumber.setAttribute("required", "true");
 
-      issueDateInput.prop("disabled", false).attr("required", true);
-      expiryDateInput.prop("disabled", false).attr("required", true);
+      if (issuePicker) {
+        issuePicker.enable(true); // enable calendar icon
+        issueDateInput.removeAttr("disabled").attr("required", true);
+      }
 
+      if (expiryPicker) {
+        expiryPicker.enable(true); // enable calendar icon
+        expiryDateInput.removeAttr("disabled").attr("required", true);
+        expiryPicker.value(new Date());
+      }
+
+      // Add required star
       toggleStar(lblPassportNumber, true);
       toggleStar(lblIssueDate, true);
       toggleStar(lblExpiryDate, true);
 
-      // 👉 Set min of expiry = issue date (if selected)
-      const issuePicker = issueDateInput.data("kendoDatePicker");
-      const expiryPicker = expiryDateInput.data("kendoDatePicker");
-
-
+      // Set expiry min date = issue date if available
       const issueDate = issuePicker?.value();
       if (issueDate && expiryPicker) {
-        expiryPicker.min(issueDate); // 👈 Prevent expiry before issue
-      }
-      else {
-        expiryPicker.value(new Date());
+        expiryPicker.min(issueDate);
+      } else {
+        expiryPicker?.min(new Date());
       }
 
     } else {
+      // Disable input fields
       passportNumber.disabled = true;
       passportNumber.removeAttribute("required");
       passportNumber.value = "";
 
-      issueDateInput.prop("disabled", true).removeAttr("required");
-      expiryDateInput.prop("disabled", true).removeAttr("required");
-
-      const issuePicker = issueDateInput.data("kendoDatePicker");
-      const expiryPicker = expiryDateInput.data("kendoDatePicker");
-
-
-      //
       if (issuePicker) {
         issuePicker.value(null);
-        issuePicker.enable(false);
-      }
-      if (expiryPicker) {
-        expiryPicker.value(null);
-        expiryPicker.enable(false);
+        issuePicker.enable(false); // disables input + calendar icon
       }
 
-      if (issuePicker) issuePicker.value(null);
       if (expiryPicker) {
         expiryPicker.value(null);
-        expiryPicker.min(new Date());
+        expiryPicker.enable(false); // disables input + calendar icon
+        expiryPicker.min(new Date(1900, 0, 1)); // Optional reset
       }
 
+      // Remove required stars
       toggleStar(lblPassportNumber, false);
       toggleStar(lblIssueDate, false);
       toggleStar(lblExpiryDate, false);
     }
   },
+
+  /* ------ Image Preview Methods ------ */
+
+  initApplicantImagePreview: function () {
+    $("#ApplicantImageFile").on("change", function () {
+      const file = this.files[0];
+      if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = e =>
+          $("#applicantImageThumb").attr("src", e.target.result).removeClass("d-none");
+        reader.readAsDataURL(file);
+      } else {
+        $("#applicantImageThumb").addClass("d-none").attr("src", "#");
+      }
+    });
+  },
+
+  /* ------ Address Toggle Methods ------ */
+  toggleSameAsPermanentAddress: function () {
+    const isChecked = $("#chkDoPermanentAddress").is(":checked");
+
+    if (isChecked) {
+      // Copy permanent address values to present address
+      $("#txtPresentAddress").val($("#txtPermanentAddress").val());
+      $("#txtPresentCity").val($("#txtPermanentCity").val());
+      $("#txtPresentState").val($("#txtPermanentState").val());
+      $("#txtPostalCode").val($("#txtPostalCode_PermanenetAddress").val());
+
+      // Copy country selection
+      const permanentCountryCombo = $("#cmbCountryForPermanentAddress").data("kendoComboBox");
+      const presentCountryCombo = $("#cmbCountryForAddress").data("kendoComboBox");
+
+      if (permanentCountryCombo && presentCountryCombo) {
+        presentCountryCombo.value(permanentCountryCombo.value());
+      }
+
+      // Disable present address fields
+      $("#txtPresentAddress, #txtPresentCity, #txtPresentState, #txtPostalCode").prop("disabled", true);
+      if (presentCountryCombo) {
+        presentCountryCombo.enable(false);
+      }
+    } else {
+      // Enable present address fields
+      $("#txtPresentAddress, #txtPresentCity, #txtPresentState, #txtPostalCode").prop("disabled", false);
+      const presentCountryCombo = $("#cmbCountryForAddress").data("kendoComboBox");
+      if (presentCountryCombo) {
+        presentCountryCombo.enable(true);
+      }
+    }
+  },
+
+  //openApplicantImagePreview: function () {
+  //  const imgSrc = $("#applicantImageThumb").attr("src");
+  //  if (imgSrc && imgSrc !== "#") {
+  //    PreviewManger.openGridImagePreview(imgSrc);
+  //  }
+  //},
 
 
 }

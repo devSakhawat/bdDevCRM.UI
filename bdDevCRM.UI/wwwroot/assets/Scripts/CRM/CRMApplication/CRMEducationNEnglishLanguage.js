@@ -1,8 +1,15 @@
-﻿
+﻿/// <reference path="../../common/common.js" />
+/// <reference path="../../core/currency/currencydetail.js" />
+/// <reference path="../../core/currency/currencysummary.js" />
+/// <reference path="../../core/country/countrydetail.js" />
+/// <reference path="../../core/country/countrysummary.js" />
+/// <reference path="../../core/crmcourse/coursedetails.js" />
+/// <reference path="../../core/crminstitute/institutedetails.js" />
 
-// <reference path="CRMAdditionalInformation.js" />
-// <reference path="CRMCourseInformation.js" />
-// <reference path="CRMApplicationSettings.js" />
+
+/// <reference path="crmadditionalinformation.js" />
+/// <reference path="crmapplicationsettings.js" />
+/// <reference path="crmcourseinformation.js" />
 
 
 var CRMEducationNEnglishLanguagManager = {
@@ -121,7 +128,7 @@ var CRMEducationNEnglishLanguagHelper = {
   },
 
   editorFileUpload: function (data) {
-    return '<input type="file" value="Select file"  class="k-button btns" onclick="CRMEducationNEnglishLanguagHelper.SelectFileBrowser(\'' + data.uid + '\')"/>';
+    return '<input type="file" value="Select file"  class="k-button form-control btn" onclick="CRMEducationNEnglishLanguagHelper.SelectFileBrowser(\'' + data.uid + '\')"/>';
   },
 
   SelectFileBrowser: function (docuid) {

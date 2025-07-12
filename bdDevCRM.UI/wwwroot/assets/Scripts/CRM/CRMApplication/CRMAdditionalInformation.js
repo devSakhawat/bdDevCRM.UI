@@ -18,7 +18,6 @@ var CRMAdditionalInformationHelper = {
     CRMAdditionalInformationHelper.initializeAdditionalDocumentsSummaryGrid();
   },
 
-
   initializeAdditionalReferenceSummaryGrid: function () {
     const gridOption = {
       dataSource: new kendo.data.DataSource({
@@ -75,7 +74,6 @@ var CRMAdditionalInformationHelper = {
       { command: "destroy", title: "Action", width: "100px" }
     ];
   },
-
 
   initializeAdditionalDocumentsSummaryGrid: function () {
     const gridOption = {

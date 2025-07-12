@@ -291,7 +291,8 @@
 			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
 				<label for="ApplicantImage" class="lbl widthSize100_per">Applicant Image</label>
 				<div class="">
-					<input type="text" id="txtApplicantImageForCourse" name="ApplicantImage" placeholder="Applicant Image" class="w-100" />
+					<input type="file" class="form-control w-100" id="ApplicantImageFile" name="ApplicantImage" placeholder="Applicant Image" accept="image/*" />
+					<img id="applicantImageThumb" class="d-none border mt-1" style="height:100px;width:auto;object-fit:contain;cursor:pointer" />
 				</div>
 			</div>
 
@@ -466,6 +467,10 @@
 
 	</div>
 </div>
+
+@* <!-- to show image preview with kendo Window -->
+<partial name="~/Views/Shared/_previewWindow.cshtml" /> *@
+
 
 <style>
 

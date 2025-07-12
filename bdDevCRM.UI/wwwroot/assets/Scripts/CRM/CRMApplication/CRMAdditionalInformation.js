@@ -63,6 +63,7 @@ var CRMAdditionalInformationHelper = {
       { field: "ApplicantRefferenceId", title: "ApplicantRefferenceId", hidden: true },
       { field: "Name", title: "Name", width: "200px" },
       { field: "Designation", title: "Designation", width: "200px" },
+      { field: "Institution", title: "Institution", width: "200px" },
       { field: "EmailID", title: "Email ID", width: "150px" },
       { field: "PhoneNo", title: "Phone No", width: "150px" },
       { field: "FaxNo", title: "Fax No", width: "150px" },

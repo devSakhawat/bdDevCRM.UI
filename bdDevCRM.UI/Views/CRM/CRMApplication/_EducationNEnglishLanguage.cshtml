@@ -1,8 +1,7 @@
-﻿
-
-<script src="~/assets/scripts/crm/crmapplication/crmeducationnenglishlanguage.js"></script>
+﻿<script src="~/assets/scripts/crm/crmapplication/crmeducationnenglishlanguage.js"></script>
 
 <div class="gridParrentDivOverflowHidden">
+
 	<!-- Education Details -->
 	<fieldset class="reset">
 		<legend class="reset">Education Details</legend>
@@ -86,7 +85,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="IELTSScannedCopy" class="lbl widthSize100_per">IELTS Scanned Copy</label>
 				<div class="">
-					<input id="fileIELTSScannedCopy" name="IELTSScannedCopy" class="w-100" />
+					<input type="file" id="fileIELTSScannedCopy" name="IELTSScannedCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -158,7 +157,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="TOEFLScanCopy" class="lbl widthSize100_per">Browse Scanned Copy</label>
 				<div class="">
-					<input id="fileTOEFLScanCopy" name="TOEFLScanCopy" class="w-100" />
+					<input file="type" id="fileTOEFLScanCopy" name="TOEFLScanCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -166,7 +165,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="TOEFLScannedCopy" class="lbl widthSize100_per">TOEFL Scanned Copy</label>
 				<div class="">
-					<input id="fileTOEFLScannedCopy" name="TOEFLScannedCopy" class="w-100" />
+					<input type="file" id="fileTOEFLScannedCopy" name="TOEFLScannedCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -238,7 +237,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PTEScanCopy" class="lbl widthSize100_per">Browse Scanned Copy</label>
 				<div class="">
-					<input id="filePTEScanCopy" name="PTEScanCopy" class="w-100" />
+					<input type="file" id="filePTEScanCopy" name="PTEScanCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -246,7 +245,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PTEScannedCopy" class="lbl widthSize100_per">PTE Scanned Copy</label>
 				<div class="">
-					<input id="filePTEScannedCopy" name="PTEScannedCopy" class="w-100" />
+					<input type="file" id="filePTEScannedCopy" name="PTEScannedCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -326,7 +325,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="GMATScannedCopy" class="lbl widthSize100_per">GMAT Scanned Copy</label>
 				<div class="">
-					<input id="fileGMATScannedCopy" name="GMATScannedCopy" class="w-100" />
+					<input type="file" id="fileGMATScannedCopy" name="GMATScannedCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -360,33 +359,45 @@
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
 				<label for="OTHERSScannedCopy" class="lbl widthSize100_per">OTHERS Scanned Copy</label>
 				<div class="">
-					<input id="fileOTHERSScannedCopy" name="OTHERSScannedCopy" class="w-100" />
+					<input type="file" id="fileOTHERSScannedCopy" name="OTHERSScannedCopy" class="form-control w-100" />
 				</div>
 			</div>
 
 		</div>
 	</fieldset>
+	
 
-	@* <!-- Buttons -->
-	<div class="btnDiv mt-2">
-		<ul>
-			<li class="d-flex justify-content-end">
-				<button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
-				<button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearStateForm()">Clear</button>
-			</li>
-		</ul>
-	</div>
- *@
-
-
-
-
-
+	<!-- Work Experience Information -->
+	<fieldset class="reset">
+		<legend class="reset">Work Experience</legend>
+		<div class="row">
+			<!-- Title -->
+			<h4 class="k-header mb-3">Please give details of your experience which should include the name of the employer and other releated information.</h4>
+			<!-- Education Grid -->
+			<div class="col-12 mb-2">
+				<div id="gridWorkExperience" class="min-width_100"></div>
+			</div>
+		</div>
+	</fieldset>
 
 </div>
 
+<!-- File Upload Modal Window -->
+<div style="display:none" id="windDocumentPhotoUpload" class="">
+	<div class="row">
+		<div class="col-12">
+			<h4>Upload Education Document (PDF Only)</h4>
+			<div id="uploadDocumentPhoto"></div>
+		</div>
+	</div>
+	<div class="btnDiv mt-2">
+		<ul>
+			<li class="d-flex justify-content-end">
+				<button type="button" class="btn btn-secondary me-2" onclick="CommonManager.closeKendoWindow('#windDocumentPhotoUpload')">Close</button>
+			</li>
+		</ul>
+	</div>
+</div>
 
-<style>
-
-
-</style>
+<!-- Include Preview Window for Document Preview -->
+<partial name="~/Views/Shared/_previewWindow.cshtml" />

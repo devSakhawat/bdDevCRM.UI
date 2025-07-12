@@ -552,6 +552,7 @@ var InstituteDetailsHelper = {
   },
 
   openPreview: function (type) {
+    PreviewManger.cleanupPreviewResources();
     debugger;
     if (!prospectusFileData) return;
 

@@ -4,10 +4,10 @@
 
 	<!-- Course Details -->
 	<fieldset class="reset">
-		<legend class="reset">Course Details</legend>
+		<legend class="reset">Applicant Course Details</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
-			<input type="hidden" id="hdnCountryId" value="0" />
+			<input type="hidden" id="hdnApplicantCourseId" value="0" />
 
 			<!-- Country with Add Icon -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
@@ -137,6 +137,8 @@
 		<legend class="reset">Personal Details</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnApplicantInfoId" value="0" />
+
 			<!-- Gender -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="Gender" class="lbl widthSize100_per">Gender <span class="redstart">*</span> </label>
@@ -199,7 +201,7 @@
 
 			<!-- valid passport -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2 custom-checkbox">
-				<span class="me-5">Do you have a valid passport</span>
+				<span class="me-5">Do you have a valid passport ?</span>
 
 				<input id="radioIsPassportYes" name="ValidPassport" type="radio" class="form-check-input inputRadio" />
 				<label class="lbl">Yes</label>
@@ -302,8 +304,9 @@
 		<legend class="reset">Applicant Address</legend>
 
 		<div class="row mb-3">
-			<h4 class="k-header mb-3" >Permanent Address</h4>
+			<h4 class="k-header mb-3">Permanent Address</h4>
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnPermanentAddressId" value="0" />
 
 			<!-- Permanent Address -->
 			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
@@ -353,6 +356,8 @@
 		<div class="row mb-3">
 			<h4 class="k-header mb-3">Present Address </h4>
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnPresentAddressId" value="0" />
+
 			<!-- Present Address -->
 			<div class="col-xl-12 col-lg-12 col-md-6 col-12 mb-2 custom-checkbox">
 				<label for="DoPermanentAddress" class="form-check-label">Same as Permanent Address:</label>
@@ -406,20 +411,6 @@
 
 		</div>
 	</fieldset>
-@* 
-	<!-- Buttons -->
-	<div class="btnDiv mt-2">
-		<ul>
-			<li class="d-flex justify-content-end">
-				<button type="button" class="btn btn-success me-2" onclick="CRMCourseInformationHelper.fillDemoData()">ডেমো ডেটা পূরণ করুন</button>
-				<button type="button" class="btn btn-info me-2" onclick="CRMCourseInformationHelper.exportFormDataAsJSON()">JSON এ রূপান্তর</button>
-				<button type="button" class="btn btn-warning me-2" onclick="CRMCourseInformationHelper.validateCompleteForm()">ভ্যালিডেশন চেক</button>
-				<button type="button" class="btn btn-primary me-2" onclick="CRMCourseInformationHelper.submitApplication()">আবেদন সাবমিট</button>
-				<button type="button" class="btn btn-secondary me-2" onclick="CRMCourseInformationHelper.clearCRMApplicationForm()">পরিষ্কার করুন</button>
-				<button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow()'>বন্ধ করুন</button>
-			</li>
-		</ul>
-	</div> *@
 
 </div>
 

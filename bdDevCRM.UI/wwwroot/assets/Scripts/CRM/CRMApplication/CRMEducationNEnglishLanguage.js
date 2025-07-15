@@ -324,7 +324,8 @@ var CRMEducationNEnglishLanguagHelper = {
       resizable: true,
       width: "400px",
       columns: CRMEducationNEnglishLanguagHelper.generateEducationSummaryColumn(),
-      editable: { model: "inline" },
+      editable: { mode: "inline" },
+      //editable: { mode: "incell" },
       navigatable: true,
       selectable: true,
     };
@@ -333,20 +334,32 @@ var CRMEducationNEnglishLanguagHelper = {
     const gridInstance = $("#gridEducationSummary").data("kendoGrid");
     if (gridInstance) {
       //const dataSource = CRMEducationNEnglishLanguagManager.educationSummaryDataSource();
+
+      // //Auto put all rows into edit mode
+      //gridInstance.tbody.find("tr").each(function () {
+      //  grid.editRow($(this));
+      //});
     }
   },
 
   generateEducationSummaryColumn: function () {
     return [
       { field: "EducationHistoryId", title: "EducationHistoryId", hidden: true },
+      { field: "ApplicantId", title: "ApplicantId", hidden: true },
       { field: "Institution", title: "Name of Institution", width: "200px" },
       { field: "Qualification", title: "Qualification", width: "200px" },
-      { field: "PassingYear", title: "Year of Passing", width: "150px" },
-      { field: "Grade", title: "Grade", width: "150px" },
+      {
+        field: "PassingYear",
+        title: "Year of Passing",
+        width: "140px",
+        editor: CRMEducationNEnglishLanguagHelper.yearDropDownEditor
+      },
+      { field: "Grade", title: "Grade", width: "100px" },
       {
         field: "AttachedDocument",
         title: "Upload Document",
-        template: '#= CRMEducationNEnglishLanguagHelper.editorFileUpload(data) #',
+        //template: '#= CRMEducationNEnglishLanguagHelper.editorFileUpload(data) #',
+        editor: CRMEducationNEnglishLanguagHelper.editorFileUpload,
         filterable: false,
         width: "200px"
       },
@@ -358,26 +371,90 @@ var CRMEducationNEnglishLanguagHelper = {
         filterable: false,
         width: "200px"
       },
-      { command: "destroy", title: "Action", width: "100px" }
+      { command: ["edit", "destroy"], title: "Action", width: "200px" }
     ];
   },
 
-  editorFileUpload: function (data) {
-    // If document is already uploaded, show document name
-    if (data.AttachedDocument && data.DocumentName) {
-      return '<div class="document-info">' +
-        '<span class="document-name" title="' + data.DocumentName + '">' +
-        (data.DocumentName.length > 20 ? data.DocumentName.substring(0, 20) + '...' : data.DocumentName) +
-        '</span><br/>' +
-        '<input type="file" accept=".pdf" class="k-button form-control" ' +
-        'onchange="CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, \'' + data.uid + '\')" ' +
-        'title="Replace document"/>' +
+  yearDropDownEditor: function (container, options) {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = 0; i < 20; i++) {
+      years.push({ year: currentYear - i });
+    }
+
+    $('<input required name="' + options.field + '"/>')
+      .appendTo(container)
+      .kendoDropDownList({
+        dataTextField: "year",
+        dataValueField: "year",
+        dataSource: years,
+        optionLabel: "Select Year"
+      });
+  },
+
+  editorFileUpload: function (container, options) {
+    const dataItem = options.model;
+    const uid = dataItem.uid;
+
+    const wrapper = $('<div class="document-info"></div>').appendTo(container);
+
+    // Show document name always
+    if (dataItem.DocumentName) {
+      const shortName = dataItem.DocumentName.length > 20
+        ? dataItem.DocumentName.substring(0, 20) + '...'
+        : dataItem.DocumentName;
+
+      $('<span class="document-name" title="' + dataItem.DocumentName + '">' + shortName + '</span><br/>')
+        .appendTo(wrapper);
+    }
+
+    // Always allow file input for change
+    $('<input type="file" accept=".pdf" class="k-button form-control" />')
+      .attr("onchange", 'CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, "' + uid + '")')
+      .appendTo(wrapper);
+  },
+
+  //editorFileUpload: function (data) {
+  //  // If document is already uploaded, show document name
+  //  if (data.AttachedDocument && data.DocumentName) {
+  //    return '<div class="document-info">' +
+  //      '<span class="document-name" title="' + data.DocumentName + '">' +
+  //      (data.DocumentName.length > 20 ? data.DocumentName.substring(0, 20) + '...' : data.DocumentName) +
+  //      '</span><br/>' +
+  //      '<input type="file" accept=".pdf" class="k-button form-control" ' +
+  //      'onchange="CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, \'' + data.uid + '\')" ' +
+  //      'title="Replace document"/>' +
+  //      '</div>';
+  //  } else {
+  //    // If no document uploaded, show file input
+  //    return '<input type="file" accept=".pdf" value="Select PDF file" class="k-button form-control" ' +
+  //      'onchange="CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, \'' + data.uid + '\')" ' +
+  //      'title="Upload PDF document only"/>';
+  //  }
+  //},
+
+  ViewDetails: function (data) {
+    if (data.AttachedDocument != null && data.AttachedDocument != "") {
+      const fileName = data.DocumentName || data.AttachedDocument.split("/").pop();
+      const thumbnailSrc = data.PdfThumbnail || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+UERGPC90ZXh0Pgo8L3N2Zz4K';
+
+      return '<div class="document-preview" style="height: 100px; width: auto; text-align: center;">' +
+        '<img src="' + thumbnailSrc + '" alt="PDF" style="height: 100px; width: auto; cursor: pointer; border: 1px solid #ddd; border-radius: 4px;" ' +
+        'onclick="CRMEducationNEnglishLanguagHelper.openDocumentPreview(\'' + data.AttachedDocument + '\', \'' + data.uid + '\', \'' + fileName + '\')" ' +
+        'title="Click to preview: ' + fileName + '"/>' +
+        '<div style="font-size: 12px; text-align: center; margin-top: 5px; color: #666;">' + fileName + '</div>' +
         '</div>';
     } else {
-      // If no document uploaded, show file input
-      return '<input type="file" accept=".pdf" value="Select PDF file" class="k-button form-control" ' +
-        'onchange="CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, \'' + data.uid + '\')" ' +
-        'title="Upload PDF document only"/>';
+      return '<div style="text-align: center; color: #999; padding: 20px; height: 100px; display: flex; align-items: center; justify-content: center;">No document uploaded</div>';
+    }
+  },
+
+  SelectFileBrowser: function (docuid) {
+    debugger;
+    const uploadWindow = $("#windDocumentPhotoUpload").data('kendoWindow');
+    if (uploadWindow) {
+      uploadWindow.center().open();
+      CRMEducationNEnglishLanguagManager.fileUpload(docuid);
     }
   },
 
@@ -446,31 +523,6 @@ var CRMEducationNEnglishLanguagHelper = {
 
     // Refresh the grid to show updated data
     grid.refresh();
-  },
-
-  SelectFileBrowser: function (docuid) {
-    debugger;
-    const uploadWindow = $("#windDocumentPhotoUpload").data('kendoWindow');
-    if (uploadWindow) {
-      uploadWindow.center().open();
-      CRMEducationNEnglishLanguagManager.fileUpload(docuid);
-    }
-  },
-
-  ViewDetails: function (data) {
-    if (data.AttachedDocument != null && data.AttachedDocument != "") {
-      const fileName = data.DocumentName || data.AttachedDocument.split("/").pop();
-      const thumbnailSrc = data.PdfThumbnail || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+UERGPC90ZXh0Pgo8L3N2Zz4K';
-
-      return '<div class="document-preview" style="height: 100px; width: auto; text-align: center;">' +
-        '<img src="' + thumbnailSrc + '" alt="PDF" style="height: 100px; width: auto; cursor: pointer; border: 1px solid #ddd; border-radius: 4px;" ' +
-        'onclick="CRMEducationNEnglishLanguagHelper.openDocumentPreview(\'' + data.AttachedDocument + '\', \'' + data.uid + '\', \'' + fileName + '\')" ' +
-        'title="Click to preview: ' + fileName + '"/>' +
-        '<div style="font-size: 12px; text-align: center; margin-top: 5px; color: #666;">' + fileName + '</div>' +
-        '</div>';
-    } else {
-      return '<div style="text-align: center; color: #999; padding: 20px; height: 100px; display: flex; align-items: center; justify-content: center;">No document uploaded</div>';
-    }
   },
 
   // Open document preview using iframe (as requested)

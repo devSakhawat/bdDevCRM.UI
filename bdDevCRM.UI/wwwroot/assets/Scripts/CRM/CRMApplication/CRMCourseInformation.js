@@ -503,7 +503,7 @@ var CRMCourseInformationHelper = {
     $("#cmbGenderForCourse").kendoComboBox({
       placeholder: "Select Gender...",
       dataTextField: "GenderName",
-      dataValuseField: "GenderId",
+      dataValueField: "GenderId",
       dataSource: CRMCourseInformationManager.getGenderData(),
     });
   },
@@ -521,7 +521,7 @@ var CRMCourseInformationHelper = {
     $("#cmbTitleForCourse").kendoComboBox({
       placeholder: "Select Title",
       dataTextField: "TitleText",
-      dataValuesField: "TitleValue",
+      dataValueField: "TitleValue",
       filter: "contains",
       suggest: true,
       dataSource: CRMCourseInformationManager.getTitleData(),
@@ -545,7 +545,7 @@ var CRMCourseInformationHelper = {
     $("#cmbMaritalStatusForCourse").kendoComboBox({
       placeholder: "Select Title",
       dataTextField: "MaritalStatusName",
-      dataValuesField: "MaritalStatusId",
+      dataValueField: "MaritalStatusId",
       filter: "contains",
       suggest: true,
       dataSource: CRMCourseInformationManager.getMaritalStatusData(),
@@ -777,6 +777,8 @@ var CRMCourseInformationHelper = {
         personalDetails: this.createPersonalDetailsObject(),
         applicantAddress: this.createApplicantAddressObject()
       };
+      console.log(applicationCourseInformation);
+      debugger;
 
       console.log("Application Course Information object created:", applicationCourseInformation);
       return applicationCourseInformation;

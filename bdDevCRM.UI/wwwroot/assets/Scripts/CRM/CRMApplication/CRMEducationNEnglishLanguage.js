@@ -8,6 +8,14 @@
 let educationPdfFileData = {};
 let workExperienceFileData = {};
 
+// Global Variables for storing file data
+let ieltsFileData = null;
+let toeflFileData = null;
+let pteFileData = null;
+let gmatFileData = null;
+let othersFileData = null;
+
+
 var CRMEducationNEnglishLanguagManager = {
 
   fileUpload: function (docuid) {
@@ -267,6 +275,10 @@ var CRMEducationNEnglishLanguagHelper = {
   initEducationNEnglishtLanguage: function () {
     CRMEducationNEnglishLanguagHelper.initializeEducationSummaryGrid();
     CRMEducationNEnglishLanguagHelper.initializeWorkExperienceGrid();
+    CRMEducationNEnglishLanguagHelper.initializeDatePickers();
+
+
+    CRMEducationNEnglishLanguagHelper.initializeFileUploads();
 
     // Initialize Kendo Windows with controlled height
     CommonManager.initializeKendoWindow("#windDocumentPhotoUpload", "Upload Document", "60%");
@@ -783,7 +795,1037 @@ var CRMEducationNEnglishLanguagHelper = {
       console.error("Error opening work document preview:", error);
       window.open(documentPath, '_blank');
     }
-  }
+  },
+
+  /* =========================================================
+   Form Clearing and Data Object Creation Methods
+=========================================================*/
+
+  /* ------ Clear Form Methods ------ */
+  clearEducationNEnglishLanguageForm: function () {
+    try {
+      console.log("=== Clearing Education & English Language Form ===");
+
+      // Clear IELTS Information
+      this.clearIELTSInformation();
+
+      // Clear TOEFL Information
+      this.clearTOEFLInformation();
+
+      // Clear PTE Information  
+      this.clearPTEInformation();
+
+      // Clear GMAT Information
+      this.clearGMATInformation();
+
+      // Clear OTHERS Information
+      this.clearOTHERSInformation();
+
+      // Clear Education Grid
+      this.clearEducationGrid();
+
+      // Clear Work Experience Grid
+      this.clearWorkExperienceGrid();
+
+      console.log("Education & English Language form cleared successfully");
+
+    } catch (error) {
+      console.error("Error clearing Education & English Language form:", error);
+      if (typeof VanillaApiCallManager !== "undefined") {
+        VanillaApiCallManager.handleApiError(error);
+      }
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error clearing Education & English Language form: " + error.message, "Form Clear Error", 0);
+      }
+    }
+  },
+
+
+  /* ------ Updated Clear Methods with File Data ------ */
+  clearIELTSInformation: function () {
+    try {
+      // Text Fields
+      $("#txtIELTSListening").val("");
+      $("#txtIELTSReading").val("");
+      $("#txtIELTSWriting").val("");
+      $("#txtIELTSSpeaking").val("");
+      $("#txtIELTSOverallScore").val("");
+      $("#txtIELTSAdditionalInformation").val("");
+
+      // Date Fields
+      const ieltsDatePicker = $("#dateIELTSDate").data("kendoDatePicker");
+      if (ieltsDatePicker) ieltsDatePicker.value(null);
+
+      // File Fields
+      $("#fileIELTSScanCopy").val("");
+
+      // Clear file data and reset view button
+      ieltsFileData = null;
+      this.resetViewButton("#fileIELTSScannedCopyViewBtn", "IELTS");
+
+      console.log("IELTS Information section cleared");
+    } catch (error) {
+      console.error("Error clearing IELTS Information:", error);
+    }
+  },
+
+  clearTOEFLInformation: function () {
+    try {
+      // Text Fields
+      $("#txtTOEFLListening").val("");
+      $("#txtTOEFLReading").val("");
+      $("#txtTOEFLWriting").val("");
+      $("#txtTOEFLSpeaking").val("");
+      $("#txtTOEFLOverallScore").val("");
+      $("#txtTOEFLAdditionalInformation").val("");
+
+      // Date Fields
+      const toeflDatePicker = $("#dateTOEFLDate").data("kendoDatePicker");
+      if (toeflDatePicker) toeflDatePicker.value(null);
+
+      // File Fields
+      $("#fileTOEFLScanCopy").val("");
+
+      // Clear file data and reset view button
+      toeflFileData = null;
+      this.resetViewButton("#fileTOEFLScannedCopyViewBtn", "TOEFL");
+
+      console.log("TOEFL Information section cleared");
+    } catch (error) {
+      console.error("Error clearing TOEFL Information:", error);
+    }
+  },
+
+  clearPTEInformation: function () {
+    try {
+      // Text Fields
+      $("#txtPTEListening").val("");
+      $("#txtPTEReading").val("");
+      $("#txtPTEWriting").val("");
+      $("#txtPTESpeaking").val("");
+      $("#txtPTEOverallScore").val("");
+      $("#txtPTEAdditionalInformation").val("");
+
+      // Date Fields
+      const pteDatePicker = $("#datePTEDate").data("kendoDatePicker");
+      if (pteDatePicker) pteDatePicker.value(null);
+
+      // File Fields
+      $("#filePTEScanCopy").val("");
+
+      // Clear file data and reset view button
+      pteFileData = null;
+      this.resetViewButton("#filePTEScannedCopyViewBtn", "PTE");
+
+      console.log("PTE Information section cleared");
+    } catch (error) {
+      console.error("Error clearing PTE Information:", error);
+    }
+  },
+
+  clearGMATInformation: function () {
+    try {
+      // Text Fields
+      $("#txtGMATListening").val("");
+      $("#txtGMATReading").val("");
+      $("#txtGMATWriting").val("");
+      $("#txtGMATSpeaking").val("");
+      $("#txtGMATOverallScore").val("");
+      $("#txtGMATAdditionalInformation").val("");
+
+      // Date Fields
+      const gmatDatePicker = $("#dateGMATDate").data("kendoDatePicker");
+      if (gmatDatePicker) gmatDatePicker.value(null);
+
+      // File Fields
+      $("#fileGMATScanCopy").val("");
+
+      // Clear file data and reset view button
+      gmatFileData = null;
+      this.resetViewButton("#fileGMATScannedCopyViewBtn", "GMAT");
+
+      console.log("GMAT Information section cleared");
+    } catch (error) {
+      console.error("Error clearing GMAT Information:", error);
+    }
+  },
+
+  clearOTHERSInformation: function () {
+    try {
+      // Text Fields
+      $("#txtOTHERSAdditionalInformation").val("");
+
+      // File Fields
+      $("#fileOTHERSScannedCopy").val("");
+
+      // Clear file data and reset view button
+      othersFileData = null;
+      this.resetViewButton("#oTHERSScannedCopyViewBtn", "OTHERS");
+
+      console.log("OTHERS Information section cleared");
+    } catch (error) {
+      console.error("Error clearing OTHERS Information:", error);
+    }
+  },
+
+  clearEducationGrid: function () {
+    try {
+      const grid = $("#gridEducationSummary").data("kendoGrid");
+      if (grid) {
+        grid.dataSource.data([]);
+      }
+
+      // Clear global file data
+      educationPdfFileData = {};
+
+      console.log("Education Grid cleared");
+    } catch (error) {
+      console.error("Error clearing Education Grid:", error);
+    }
+  },
+
+  clearWorkExperienceGrid: function () {
+    try {
+      const grid = $("#gridWorkExperience").data("kendoGrid");
+      if (grid) {
+        grid.dataSource.data([]);
+      }
+
+      // Clear global file data
+      workExperienceFileData = {};
+
+      console.log("Work Experience Grid cleared");
+    } catch (error) {
+      console.error("Error clearing Work Experience Grid:", error);
+    }
+  },
+
+  /* ------ Reset View Button Helper ------ */
+  resetViewButton: function (buttonSelector, testType) {
+    const $button = $(buttonSelector);
+    if ($button.length) {
+      $button.prop("disabled", true);
+      $button.attr("title", "");
+      $button.html(`<i class="k-icon k-i-preview"></i> View ${testType} Document`);
+    }
+  },
+
+
+  /* ------ Date Picker Initialization Methods ------ */
+  initializeDatePickers: function () {
+    try {
+      // Initialize IELTS Date Picker
+      $("#dateIELTSDate").kendoDatePicker({
+        format: "dd-MMM-yyyy",
+        parseFormats: ["yyyy-MM-dd"],
+        max: new Date(),
+        placeholder: "Select IELTS Date"
+      });
+
+      // Initialize TOEFL Date Picker
+      $("#dateTOEFLDate").kendoDatePicker({
+        format: "dd-MMM-yyyy",
+        parseFormats: ["yyyy-MM-dd"],
+        max: new Date(),
+        placeholder: "Select TOEFL Date"
+      });
+
+      // Initialize PTE Date Picker
+      $("#datePTEDate").kendoDatePicker({
+        format: "dd-MMM-yyyy",
+        parseFormats: ["yyyy-MM-dd"],
+        max: new Date(),
+        placeholder: "Select PTE Date"
+      });
+
+      // Initialize GMAT Date Picker
+      $("#dateGMATDate").kendoDatePicker({
+        format: "dd-MMM-yyyy",
+        parseFormats: ["yyyy-MM-dd"],
+        max: new Date(),
+        placeholder: "Select GMAT Date"
+      });
+
+      console.log("Date pickers initialized successfully");
+    } catch (error) {
+      console.error("Error initializing date pickers:", error);
+    }
+  },
+
+  /* ------ File Upload Initialization Methods ------ */
+  initializeFileUploads: function () {
+    try {
+      console.log("=== Initializing File Uploads ===");
+
+      // Initialize IELTS file upload
+      this.initializeIELTSFileUpload();
+
+      // Initialize TOEFL file upload
+      this.initializeTOEFLFileUpload();
+
+      // Initialize PTE file upload
+      this.initializePTEFileUpload();
+
+      // Initialize GMAT file upload
+      this.initializeGMATFileUpload();
+
+      // Initialize OTHERS file upload
+      this.initializeOTHERSFileUpload();
+
+      console.log("File uploads initialized successfully");
+    } catch (error) {
+      console.error("Error initializing file uploads:", error);
+    }
+  },
+
+  initializeIELTSFileUpload: function () {
+    // Browse Scanned Copy - File Input
+    $("#fileIELTSScanCopy").on("change", function () {
+      CRMEducationNEnglishLanguagHelper.handleIELTSFileUpload(this);
+    });
+
+    // IELTS Scanned Copy - View Button (convert to button for viewing)
+    this.convertToViewButton("#fileIELTSScannedCopy", "IELTS", function () {
+      CRMEducationNEnglishLanguagHelper.viewIELTSDocument();
+    });
+  },
+
+  initializeTOEFLFileUpload: function () {
+    // Note: fileTOEFLScanCopy has incorrect attribute "file=type", should be "type=file"
+    $("#fileTOEFLScanCopy").attr("type", "file").on("change", function () {
+      CRMEducationNEnglishLanguagHelper.handleTOEFLFileUpload(this);
+    });
+
+    this.convertToViewButton("#fileTOEFLScannedCopy", "TOEFL", function () {
+      CRMEducationNEnglishLanguagHelper.viewTOEFLDocument();
+    });
+  },
+
+  initializePTEFileUpload: function () {
+    $("#filePTEScanCopy").on("change", function () {
+      CRMEducationNEnglishLanguagHelper.handlePTEFileUpload(this);
+    });
+
+    this.convertToViewButton("#filePTEScannedCopy", "PTE", function () {
+      CRMEducationNEnglishLanguagHelper.viewPTEDocument();
+    });
+  },
+
+  initializeGMATFileUpload: function () {
+    // Note: fileGMATScanCopy doesn't have type="file" attribute
+    $("#fileGMATScanCopy").attr("type", "file").on("change", function () {
+      CRMEducationNEnglishLanguagHelper.handleGMATFileUpload(this);
+    });
+
+    this.convertToViewButton("#fileGMATScannedCopy", "GMAT", function () {
+      CRMEducationNEnglishLanguagHelper.viewGMATDocument();
+    });
+  },
+
+  initializeOTHERSFileUpload: function () {
+    // Browse Scanned Copy - File Input (already has type="file")
+    $("#fileOTHERSScannedCopy").on("change", function () {
+      CRMEducationNEnglishLanguagHelper.handleOTHERSFileUpload(this);
+    });
+
+    // OTHERS Scanned Copy - View Button (convert to button for viewing)
+    this.convertToViewButton("#oTHERSScannedCopy", "OTHERS", function () {
+      CRMEducationNEnglishLanguagHelper.viewOTHERSDocument();
+    });
+  },
+
+
+  /* ------ Utility Method to Convert File Input to View Button ------ */
+  convertToViewButton: function (selector, testType, clickHandler) {
+    const $element = $(selector);
+    const $container = $element.parent();
+
+    // Create view button
+    const viewButton = $(`
+    <button type="button" class="btn btn-outline-primary w-100" id="${selector.substring(1)}ViewBtn" disabled>
+      <i class="k-icon k-i-preview"></i> View ${testType} Document
+    </button>
+  `);
+
+    // Replace file input with button
+    $element.replaceWith(viewButton);
+
+    // Add click handler
+    viewButton.on("click", clickHandler);
+  },
+
+  /* ------ File Upload Handlers ------ */
+  handleIELTSFileUpload: function (input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!this.validateTestFile(file)) {
+      alert("Only PDF, JPG, JPEG, PNG, and GIF files are allowed.");
+      input.value = '';
+      return;
+    }
+
+    ieltsFileData = file;
+    this.updateViewButton("#fileIELTSScannedCopyViewBtn", file.name);
+
+    if (typeof ToastrMessage !== "undefined") {
+      ToastrMessage.showSuccess("IELTS document uploaded successfully!");
+    }
+  },
+
+  handleTOEFLFileUpload: function (input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!this.validateTestFile(file)) {
+      alert("Only PDF, JPG, JPEG, PNG, and GIF files are allowed.");
+      input.value = '';
+      return;
+    }
+
+    toeflFileData = file;
+    this.updateViewButton("#fileTOEFLScannedCopyViewBtn", file.name);
+
+    if (typeof ToastrMessage !== "undefined") {
+      ToastrMessage.showSuccess("TOEFL document uploaded successfully!");
+    }
+  },
+
+  handlePTEFileUpload: function (input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!this.validateTestFile(file)) {
+      alert("Only PDF, JPG, JPEG, PNG, and GIF files are allowed.");
+      input.value = '';
+      return;
+    }
+
+    pteFileData = file;
+    this.updateViewButton("#filePTEScannedCopyViewBtn", file.name);
+
+    if (typeof ToastrMessage !== "undefined") {
+      ToastrMessage.showSuccess("PTE document uploaded successfully!");
+    }
+  },
+
+  handleGMATFileUpload: function (input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!this.validateTestFile(file)) {
+      alert("Only PDF, JPG, JPEG, PNG, and GIF files are allowed.");
+      input.value = '';
+      return;
+    }
+
+    gmatFileData = file; // This was correct
+    this.updateViewButton("#fileGMATScannedCopyViewBtn", file.name); // Fixed button selector
+
+    if (typeof ToastrMessage !== "undefined") {
+      ToastrMessage.showSuccess("GMAT document uploaded successfully!");
+    }
+  },
+
+  /* ------ File Upload Handler for OTHERS ------ */
+  handleOTHERSFileUpload: function (input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!this.validateTestFile(file)) {
+      alert("Only PDF, JPG, JPEG, PNG, and GIF files are allowed.");
+      input.value = '';
+      return;
+    }
+
+    othersFileData = file;
+    this.updateViewButton("#oTHERSScannedCopyViewBtn", file.name);
+
+    if (typeof ToastrMessage !== "undefined") {
+      ToastrMessage.showSuccess("OTHERS document uploaded successfully!");
+    }
+  },
+
+
+  /* ------ File Validation ------ */
+  validateTestFile: function (file) {
+    if (!file) return false;
+
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.gif'];
+
+    // Check MIME type
+    if (file.type && !allowedTypes.includes(file.type.toLowerCase())) {
+      return false;
+    }
+
+    // Check file extension
+    if (file.name) {
+      const fileName = file.name.toLowerCase();
+      const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+      if (!hasValidExtension) {
+        return false;
+      }
+    }
+
+    return true;
+  },
+
+  /* ------ View Button Update ------ */
+  updateViewButton: function (buttonSelector, fileName) {
+    const $button = $(buttonSelector);
+    if ($button.length) {
+      $button.prop("disabled", false);
+      $button.attr("title", "Click to view: " + fileName);
+
+      // Update button text to show file name
+      const maxLength = 30;
+      const displayName = fileName.length > maxLength ?
+        fileName.substring(0, maxLength) + '...' : fileName;
+
+      $button.html(`<i class="k-icon k-i-preview"></i> ${displayName}`);
+    }
+  },
+
+  /* ------ Document View Methods ------ */
+  viewIELTSDocument: function () {
+    if (ieltsFileData) {
+      if (typeof PreviewManger !== "undefined") {
+        PreviewManger.previewFileBlob(ieltsFileData, ieltsFileData.name);
+      } else {
+        alert("Preview functionality is not available");
+      }
+    } else {
+      alert("No IELTS document uploaded");
+    }
+  },
+
+  viewTOEFLDocument: function () {
+    if (toeflFileData) {
+      if (typeof PreviewManger !== "undefined") {
+        PreviewManger.previewFileBlob(toeflFileData, toeflFileData.name);
+      } else {
+        alert("Preview functionality is not available");
+      }
+    } else {
+      alert("No TOEFL document uploaded");
+    }
+  },
+
+  viewPTEDocument: function () {
+    if (pteFileData) {
+      if (typeof PreviewManger !== "undefined") {
+        PreviewManger.previewFileBlob(pteFileData, pteFileData.name);
+      } else {
+        alert("Preview functionality is not available");
+      }
+    } else {
+      alert("No PTE document uploaded");
+    }
+  },
+
+  viewGMATDocument: function () {
+    if (gmatFileData) {
+      if (typeof PreviewManger !== "undefined") {
+        PreviewManger.previewFileBlob(gmatFileData, gmatFileData.name);
+      } else {
+        alert("Preview functionality is not available");
+      }
+    } else {
+      alert("No GMAT document uploaded");
+    }
+  },
+
+  viewOTHERSDocument: function () {
+    if (othersFileData) {
+      if (typeof PreviewManger !== "undefined") {
+        PreviewManger.previewFileBlob(othersFileData, othersFileData.name);
+      } else {
+        alert("Preview functionality is not available");
+      }
+    } else {
+      alert("No OTHERS document uploaded");
+    }
+  },
+
+
+
+  /* ------ Data Object Creation Methods ------ */
+  createEducationNEnglishLanguageInformation: function () {
+    try {
+      const educationNEnglishLanguageInformation = {
+        ieltsInformation: this.createIELTSInformationObject(),
+        toeflInformation: this.createTOEFLInformationObject(),
+        pteInformation: this.createPTEInformationObject(),
+        gmatInformation: this.createGMATInformationObject(),
+        othersInformation: this.createOTHERSInformationObject(),
+        educationDetails: this.createEducationDetailsObject(),
+        workExperience: this.createWorkExperienceObject()
+      };
+
+      console.log("Education & English Language Information object created:", educationNEnglishLanguageInformation);
+      return educationNEnglishLanguageInformation;
+
+    } catch (error) {
+      console.log("Error creating Education & English Language Information object:" + error);
+      return null;
+    }
+  },
+
+  /* ------ Updated Object Creation with File Data ------ */
+  createIELTSInformationObject: function () {
+    try {
+      const ieltsDatePicker = $("#dateIELTSDate").data("kendoDatePicker");
+
+      return {
+        IELTSListening: $("#txtIELTSListening").val(),
+        IELTSReading: $("#txtIELTSReading").val(),
+        IELTSWriting: $("#txtIELTSWriting").val(),
+        IELTSSpeaking: $("#txtIELTSSpeaking").val(),
+        IELTSOverallScore: $("#txtIELTSOverallScore").val(),
+        IELTSDate: ieltsDatePicker ? ieltsDatePicker.value() : null,
+        IELTSScannedCopyFile: ieltsFileData,
+        IELTSScannedCopyFileName: ieltsFileData ? ieltsFileData.name : "",
+        IELTSAdditionalInformation: $("#txtIELTSAdditionalInformation").val()
+      };
+    } catch (error) {
+      console.error("Error creating IELTS Information object:", error);
+      return {};
+    }
+  },
+
+  createTOEFLInformationObject: function () {
+    try {
+      const toeflDatePicker = $("#dateTOEFLDate").data("kendoDatePicker");
+
+      return {
+        TOEFLListening: $("#txtTOEFLListening").val(),
+        TOEFLReading: $("#txtTOEFLReading").val(),
+        TOEFLWriting: $("#txtTOEFLWriting").val(),
+        TOEFLSpeaking: $("#txtTOEFLSpeaking").val(),
+        TOEFLOverallScore: $("#txtTOEFLOverallScore").val(),
+        TOEFLDate: toeflDatePicker ? toeflDatePicker.value() : null,
+        TOEFLScannedCopyFile: toeflFileData,
+        TOEFLScannedCopyFileName: toeflFileData ? toeflFileData.name : "",
+        TOEFLAdditionalInformation: $("#txtTOEFLAdditionalInformation").val()
+      };
+    } catch (error) {
+      console.error("Error creating TOEFL Information object:", error);
+      return {};
+    }
+  },
+
+  createPTEInformationObject: function () {
+    try {
+      const pteDatePicker = $("#datePTEDate").data("kendoDatePicker");
+
+      return {
+        PTEListening: $("#txtPTEListening").val(),
+        PTEReading: $("#txtPTEReading").val(),
+        PTEWriting: $("#txtPTEWriting").val(),
+        PTESpeaking: $("#txtPTESpeaking").val(),
+        PTEOverallScore: $("#txtPTEOverallScore").val(),
+        PTEDate: pteDatePicker ? pteDatePicker.value() : null,
+        PTEScannedCopyFile: pteFileData,
+        PTEScannedCopyFileName: pteFileData ? pteFileData.name : "",
+        PTEAdditionalInformation: $("#txtPTEAdditionalInformation").val()
+      };
+    } catch (error) {
+      console.error("Error creating PTE Information object:", error);
+      return {};
+    }
+  },
+
+  createGMATInformationObject: function () {
+    try {
+      const gmatDatePicker = $("#dateGMATDate").data("kendoDatePicker");
+
+      return {
+        GMATListening: $("#txtGMATListening").val(),
+        GMATReading: $("#txtGMATReading").val(),
+        GMATWriting: $("#txtGMATWriting").val(),
+        GMATSpeaking: $("#txtGMATSpeaking").val(),
+        GMATOverallScore: $("#txtGMATOverallScore").val(),
+        GMATDate: gmatDatePicker ? gmatDatePicker.value() : null,
+        GMATScannedCopyFile: gmatFileData,
+        GMATScannedCopyFileName: gmatFileData ? gmatFileData.name : "",
+        GMATAdditionalInformation: $("#txtGMATAdditionalInformation").val()
+      };
+    } catch (error) {
+      console.error("Error creating GMAT Information object:", error);
+      return {};
+    }
+  },
+
+  createOTHERSInformationObject: function () {
+    try {
+      return {
+        OTHERSAdditionalInformation: $("#txtOTHERSAdditionalInformation").val(),
+        OTHERSScannedCopyFile: othersFileData,
+        OTHERSScannedCopyFileName: othersFileData ? othersFileData.name : ""
+      };
+    } catch (error) {
+      console.error("Error creating OTHERS Information object:", error);
+      return {};
+    }
+  },
+
+  createEducationDetailsObject: function () {
+    try {
+      const grid = $("#gridEducationSummary").data("kendoGrid");
+      const educationData = [];
+
+      if (grid) {
+        const dataSource = grid.dataSource;
+        const data = dataSource.data();
+
+        data.forEach(function (item) {
+          educationData.push({
+            EducationHistoryId: item.EducationHistoryId,
+            Institution: item.Institution,
+            Qualification: item.Qualification,
+            PassingYear: item.PassingYear,
+            Grade: item.Grade,
+            AttachedDocument: item.AttachedDocument,
+            DocumentName: item.DocumentName,
+            PdfThumbnail: item.PdfThumbnail
+          });
+        });
+      }
+
+      return {
+        EducationHistory: educationData,
+        TotalEducationRecords: educationData.length
+      };
+    } catch (error) {
+      console.log("Error creating Education Details object:" + error);
+      return {};
+    }
+  },
+
+  createWorkExperienceObject: function () {
+    try {
+      const grid = $("#gridWorkExperience").data("kendoGrid");
+      const workExperienceData = [];
+
+      if (grid) {
+        const dataSource = grid.dataSource;
+        const data = dataSource.data();
+
+        data.forEach(function (item) {
+          workExperienceData.push({
+            WorkExperienceId: item.WorkExperienceId,
+            NameOfEmployer: item.NameOfEmployer,
+            Position: item.Position,
+            StartDate: item.StartDate,
+            EndDate: item.EndDate,
+            Period: item.Period,
+            MainResponsibility: item.MainResponsibility,
+            ScannedCopy: item.ScannedCopy,
+            DocumentName: item.DocumentName,
+            FileThumbnail: item.FileThumbnail
+          });
+        });
+      }
+
+      return {
+        WorkExperienceHistory: workExperienceData,
+        TotalWorkExperienceRecords: workExperienceData.length
+      };
+    } catch (error) {
+      console.log("Error creating Work Experience object:" + error);
+      return {};
+    }
+  },
+
+  /* ------ Utility Methods ------ */
+  exportEducationFormDataAsJSON: function () {
+    try {
+      const educationData = this.createEducationNEnglishLanguageInformation();
+      const jsonData = JSON.stringify(educationData, null, 2);
+
+      console.log("=== Education & English Language Form Data (JSON) ===");
+      console.log(jsonData);
+
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showSuccess("Education form data exported to console. Check browser console for JSON output.", "Export Successful", 3000);
+      }
+
+      return jsonData;
+    } catch (error) {
+      console.log("Error exporting education form data as JSON:" + error);
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error exporting education form data: " + error.message, "Export Error", 0);
+      }
+      return null;
+    }
+  },
+
+  validateEducationCompleteForm: function () {
+    try {
+      console.log("=== Validating Education & English Language Form ===");
+
+      const validationErrors = [];
+
+      // Validate IELTS Information (if any field is filled, validate all required fields)
+      const ieltsValidation = this.validateIELTSInformation();
+      if (ieltsValidation.length > 0) {
+        validationErrors.push(...ieltsValidation);
+      }
+
+      // Validate TOEFL Information
+      const toeflValidation = this.validateTOEFLInformation();
+      if (toeflValidation.length > 0) {
+        validationErrors.push(...toeflValidation);
+      }
+
+      // Validate PTE Information
+      const pteValidation = this.validatePTEInformation();
+      if (pteValidation.length > 0) {
+        validationErrors.push(...pteValidation);
+      }
+
+      // Validate GMAT Information
+      const gmatValidation = this.validateGMATInformation();
+      if (gmatValidation.length > 0) {
+        validationErrors.push(...gmatValidation);
+      }
+
+      if (validationErrors.length === 0) {
+        console.log("Education form validation passed successfully");
+        if (typeof ToastrMessage !== "undefined") {
+          ToastrMessage.showSuccess("Education form validation passed successfully!", "Validation Success", 3000);
+        }
+        return true;
+      } else {
+        console.log("Education form validation failed:", validationErrors);
+        if (typeof ToastrMessage !== "undefined") {
+          ToastrMessage.showError("Education form validation failed. Check console for details.", "Validation Error", 0);
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error("Error validating education form:", error);
+      return false;
+    }
+  },
+
+  validateIELTSInformation: function () {
+    const errors = [];
+
+    // Check if any IELTS field is filled
+    const hasIELTSData = $("#txtIELTSListening").val().trim() ||
+      $("#txtIELTSReading").val().trim() ||
+      $("#txtIELTSWriting").val().trim() ||
+      $("#txtIELTSSpeaking").val().trim() ||
+      $("#txtIELTSOverallScore").val().trim();
+
+    if (hasIELTSData) {
+      if (!$("#txtIELTSListening").val().trim()) {
+        errors.push("IELTS Listening is required when IELTS information is provided");
+      }
+      if (!$("#txtIELTSReading").val().trim()) {
+        errors.push("IELTS Reading is required when IELTS information is provided");
+      }
+      if (!$("#txtIELTSWriting").val().trim()) {
+        errors.push("IELTS Writing is required when IELTS information is provided");
+      }
+      if (!$("#txtIELTSSpeaking").val().trim()) {
+        errors.push("IELTS Speaking is required when IELTS information is provided");
+      }
+      if (!$("#txtIELTSOverallScore").val().trim()) {
+        errors.push("IELTS Overall Score is required when IELTS information is provided");
+      }
+    }
+
+    return errors;
+  },
+
+  validateTOEFLInformation: function () {
+    const errors = [];
+
+    // Check if any TOEFL field is filled
+    const hasTOEFLData = $("#txtTOEFLListening").val().trim() ||
+      $("#txtTOEFLReading").val().trim() ||
+      $("#txtTOEFLWriting").val().trim() ||
+      $("#txtTOEFLSpeaking").val().trim() ||
+      $("#txtTOEFLOverallScore").val().trim();
+
+    if (hasTOEFLData) {
+      if (!$("#txtTOEFLListening").val().trim()) {
+        errors.push("TOEFL Listening is required when TOEFL information is provided");
+      }
+      if (!$("#txtTOEFLReading").val().trim()) {
+        errors.push("TOEFL Reading is required when TOEFL information is provided");
+      }
+      if (!$("#txtTOEFLWriting").val().trim()) {
+        errors.push("TOEFL Writing is required when TOEFL information is provided");
+      }
+      if (!$("#txtTOEFLSpeaking").val().trim()) {
+        errors.push("TOEFL Speaking is required when TOEFL information is provided");
+      }
+      if (!$("#txtTOEFLOverallScore").val().trim()) {
+        errors.push("TOEFL Overall Score is required when TOEFL information is provided");
+      }
+    }
+
+    return errors;
+  },
+
+  validatePTEInformation: function () {
+    const errors = [];
+
+    // Check if any PTE field is filled
+    const hasPTEData = $("#txtPTEListening").val().trim() ||
+      $("#txtPTEReading").val().trim() ||
+      $("#txtPTEWriting").val().trim() ||
+      $("#txtPTESpeaking").val().trim() ||
+      $("#txtPTEOverallScore").val().trim();
+
+    if (hasPTEData) {
+      if (!$("#txtPTEListening").val().trim()) {
+        errors.push("PTE Listening is required when PTE information is provided");
+      }
+      if (!$("#txtPTEReading").val().trim()) {
+        errors.push("PTE Reading is required when PTE information is provided");
+      }
+      if (!$("#txtPTEWriting").val().trim()) {
+        errors.push("PTE Writing is required when PTE information is provided");
+      }
+      if (!$("#txtPTESpeaking").val().trim()) {
+        errors.push("PTE Speaking is required when PTE information is provided");
+      }
+      if (!$("#txtPTEOverallScore").val().trim()) {
+        errors.push("PTE Overall Score is required when PTE information is provided");
+      }
+    }
+
+    return errors;
+  },
+
+  validateGMATInformation: function () {
+    const errors = [];
+
+    // Check if any GMAT field is filled
+    const hasGMATData = $("#txtGMATListening").val().trim() ||
+      $("#txtGMATReading").val().trim() ||
+      $("#txtGMATWriting").val().trim() ||
+      $("#txtGMATSpeaking").val().trim() ||
+      $("#txtGMATOverallScore").val().trim();
+
+    if (hasGMATData) {
+      if (!$("#txtGMATListening").val().trim()) {
+        errors.push("GMAT Listening is required when GMAT information is provided");
+      }
+      if (!$("#txtGMATReading").val().trim()) {
+        errors.push("GMAT Reading is required when GMAT information is provided");
+      }
+      if (!$("#txtGMATWriting").val().trim()) {
+        errors.push("GMAT Writing is required when GMAT information is provided");
+      }
+      if (!$("#txtGMATSpeaking").val().trim()) {
+        errors.push("GMAT Speaking is required when GMAT information is provided");
+      }
+      if (!$("#txtGMATOverallScore").val().trim()) {
+        errors.push("GMAT Overall Score is required when GMAT information is provided");
+      }
+    }
+
+    return errors;
+  },
+
+  fillEducationDemoData: function () {
+    try {
+      console.log("=== Filling Education Demo Data ===");
+
+      // Fill IELTS Demo Data
+      this.fillIELTSDemoData();
+
+      // Fill TOEFL Demo Data
+      this.fillTOEFLDemoData();
+
+      // Fill PTE Demo Data
+      this.fillPTEDemoData();
+
+      // Fill GMAT Demo Data
+      this.fillGMATDemoData();
+
+      // Fill OTHERS Demo Data
+      this.fillOTHERSDemoData();
+
+      console.log("Education demo data filled successfully");
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showSuccess("Education demo data filled successfully!", "Demo Data", 3000);
+      }
+
+    } catch (error) {
+      console.error("Error filling education demo data:", error);
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error filling education demo data: " + error.message, "Demo Data Error", 0);
+      }
+    }
+  },
+
+  fillIELTSDemoData: function () {
+    $("#txtIELTSListening").val("7.5");
+    $("#txtIELTSReading").val("8.0");
+    $("#txtIELTSWriting").val("7.0");
+    $("#txtIELTSSpeaking").val("7.5");
+    $("#txtIELTSOverallScore").val("7.5");
+    $("#txtIELTSAdditionalInformation").val("Demo IELTS test taken for university admission");
+
+    const ieltsDatePicker = $("#dateIELTSDate").data("kendoDatePicker");
+    if (ieltsDatePicker) {
+      ieltsDatePicker.value(new Date(2024, 5, 15)); // June 15, 2024
+    }
+  },
+
+  fillTOEFLDemoData: function () {
+    $("#txtTOEFLListening").val("25");
+    $("#txtTOEFLReading").val("28");
+    $("#txtTOEFLWriting").val("24");
+    $("#txtTOEFLSpeaking").val("26");
+    $("#txtTOEFLOverallScore").val("103");
+    $("#txtTOEFLAdditionalInformation").val("Demo TOEFL test for graduate school application");
+
+    const toeflDatePicker = $("#dateTOEFLDate").data("kendoDatePicker");
+    if (toeflDatePicker) {
+      toeflDatePicker.value(new Date(2024, 4, 20)); // May 20, 2024
+    }
+  },
+
+  fillPTEDemoData: function () {
+    $("#txtPTEListening").val("75");
+    $("#txtPTEReading").val("80");
+    $("#txtPTEWriting").val("72");
+    $("#txtPTESpeaking").val("78");
+    $("#txtPTEOverallScore").val("76");
+    $("#txtPTEAdditionalInformation").val("Demo PTE Academic test for immigration purposes");
+
+    const pteDatePicker = $("#datePTEDate").data("kendoDatePicker");
+    if (pteDatePicker) {
+      pteDatePicker.value(new Date(2024, 3, 10)); // April 10, 2024
+    }
+  },
+
+  fillGMATDemoData: function () {
+    $("#txtGMATListening").val("35");
+    $("#txtGMATReading").val("38");
+    $("#txtGMATWriting").val("32");
+    $("#txtGMATSpeaking").val("36");
+    $("#txtGMATOverallScore").val("680");
+    $("#txtGMATAdditionalInformation").val("Demo GMAT test for MBA application");
+
+    const gmatDatePicker = $("#dateGMATDate").data("kendoDatePicker");
+    if (gmatDatePicker) {
+      gmatDatePicker.value(new Date(2024, 2, 25)); // March 25, 2024
+    }
+  },
+
+  fillOTHERSDemoData: function () {
+    $("#txtOTHERSAdditionalInformation").val("Demo additional information for other language certifications or entrance exams");
+  },
+
 }
 
 

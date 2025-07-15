@@ -648,8 +648,6 @@ var InstituteDetailsHelper = {
     });
   },
 
-
-
   prepareFormData: function() {
     const formData = new FormData();
 

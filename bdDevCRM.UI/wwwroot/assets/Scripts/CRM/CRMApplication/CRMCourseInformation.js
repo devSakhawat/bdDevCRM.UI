@@ -749,12 +749,421 @@ var CRMCourseInformationHelper = {
     }
   },
 
-  //openApplicantImagePreview: function () {
-  //  const imgSrc = $("#applicantImageThumb").attr("src");
-  //  if (imgSrc && imgSrc !== "#") {
-  //    PreviewManger.openGridImagePreview(imgSrc);
-  //  }
-  //},
+
+
+  //// Create first tab object.
+  clearCRMApplicationCourse: function () {
+    try {
+      // Form Fields Clear - Basic form elements and kendo widgets
+      CommonManager.clearFormFields("crmApplicationCourseInfo");
+      // Clear Applicant Picture containers
+      $("#applicantImageThumb").empty();
+      // Grid Data Clear - Remove all grid records
+      this.clearAllGrids();
+
+
+    } catch (error) {
+      VanillaApiCallManager.handleApiError(error);
+      ToastrMessage.showError("Error clearing in Course tab: " + error.message, "Applciation Course Clearing Error", 0);
+    }
+  },
+
+
+  /* ------ Data Object Creation Methods ------ */
+  createApplicationCourseInformation: function () {
+    try {
+      const applicationCourseInformation = {
+        courseDetails: this.createCourseDetailsObject(),
+        personalDetails: this.createPersonalDetailsObject(),
+        applicantAddress: this.createApplicantAddressObject()
+      };
+
+      console.log("Application Course Information object created:", applicationCourseInformation);
+      return applicationCourseInformation;
+
+    } catch (error) {
+      console.error("Error creating Application Course Information object:", error);
+      return null;
+    }
+  },
+
+  createCourseDetailsObject: function () {
+    try {
+      // Get ComboBox instances
+      const countryCombo = $("#cmbCountryForCourse").data("kendoComboBox");
+      const instituteCombo = $("#cmbInstituteForCourse").data("kendoComboBox");
+      const courseCombo = $("#cmbCourseForCourse").data("kendoComboBox");
+      const intakeMonthCombo = $("#cmbIntakeMonthForCourse").data("kendoComboBox");
+      const intakeYearCombo = $("#cmbIntakeYearForCourse").data("kendoComboBox");
+      const currencyCombo = $("#cmbCurrencyForCourse").data("kendoComboBox");
+      const paymentMethodCombo = $("#cmbPaymentMethodForCourse").data("kendoComboBox");
+      const paymentDatePicker = $("#datePickerPaymentDate").data("kendoDatePicker");
+
+      return {
+        // Hidden Fields
+        CountryId: $("#hdnCountryId").val(),
+
+        // Country Selection (dataValueField: "CountryId", dataTextField: "CountryName")
+        CountryId: countryCombo ? countryCombo.value() : "",
+        CountryName: countryCombo ? countryCombo.text() : "",
+
+        // Institute Selection (dataValueField: "InstituteId", dataTextField: "InstituteName")
+        InstituteId: instituteCombo ? instituteCombo.value() : "",
+        InstituteName: instituteCombo ? instituteCombo.text() : "",
+
+        // Course Selection (dataValueField: "CourseId", dataTextField: "CourseTitle")
+        CourseId: courseCombo ? courseCombo.value() : "",
+        CourseTitle: courseCombo ? courseCombo.text() : "",
+
+        // Intake Information (dataValueField: "IntakeMonthId", dataTextField: "IntakeMonth")
+        IntakeMonthId: intakeMonthCombo ? intakeMonthCombo.value() : "",
+        IntakeMonth: intakeMonthCombo ? intakeMonthCombo.text() : "",
+
+        // intek will be comes form database (for future report)
+        // Intake Year (dataValueField: "IntakeYearId", dataTextField: "IntakeYear")
+        IntakeYearId: intakeYearCombo ? intakeYearCombo.value() : "",
+        IntakeYear: intakeYearCombo ? intakeYearCombo.text() : "",
+
+        // Payment Information
+        ApplicationFee: $("#txtApplicationFeeForCourse").val(),
+
+        // Currency (dataValueField: "CurrencyId", dataTextField: "CurrencyName")
+        CurrencyId: currencyCombo ? currencyCombo.value() : 0,
+        CurrencyName: currencyCombo ? currencyCombo.text() : "",
+
+        // Payment Method (dataValueField: "PaymentMethodId", dataTextField: "PaymentMethod")
+        PaymentMethodId: paymentMethodCombo ? paymentMethodCombo.value() : "",
+        PaymentMethod: paymentMethodCombo ? paymentMethodCombo.text() : "",
+
+        PaymentReferenceNumber: $("#txtPaymentReferenceNumberCourse").val(),
+        PaymentDate: paymentDatePicker ? paymentDatePicker.value() : null,
+
+        // Additional Information
+        Remarks: $("#txtareaRemarks").val()
+      };
+    } catch (error) {
+      console.error("Error creating Course Details object:", error);
+      return {};
+    }
+  },
+
+  createPersonalDetailsObject: function () {
+    try {
+      // Get ComboBox instances
+      const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
+      const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
+      const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
+      const dateOfBirthPicker = $("#datePickerDateOfBirth").data("kendoDatePicker");
+      const passportIssuePicker = $("#datepickerPassportIssueDate").data("kendoDatePicker");
+      const passportExpiryPicker = $("#datepickerPassportExpiryDate").data("kendoDatePicker");
+
+      return {
+        // Basic Information
+        // Gender (dataValueField: "GenderId", dataTextField: "GenderName")
+        GenderId: genderCombo ? genderCombo.value() : "",
+        GenderName: genderCombo ? genderCombo.text() : "",
+
+        // Title (dataValueField: "TitleValue", dataTextField: "TitleText")
+        TitleValue: titleCombo ? titleCombo.value() : "",
+        TitleText: titleCombo ? titleCombo.text() : "",
+
+        // Personal Info
+        FirstName: $("#txtFirstName").val(),
+        LastName: $("#txtLastName").val(),
+        DateOfBirth: dateOfBirthPicker ? dateOfBirthPicker.value() : null,
+
+        // Marital Status (dataValueField: "MaritalStatusId", dataTextField: "MaritalStatusName")
+        MaritalStatusId: maritalStatusCombo ? maritalStatusCombo.value() : "",
+        MaritalStatusName: maritalStatusCombo ? maritalStatusCombo.text() : "",
+
+        Nationality: $("#txtNationality").val(),
+
+        // Passport Information
+        HasValidPassport: $("input[name='ValidPassport']:checked").val() || "",
+        PassportNumber: $("#txtPassportNumberForCourse").val(),
+        PassportIssueDate: passportIssuePicker ? passportIssuePicker.value() : null,
+        PassportExpiryDate: passportExpiryPicker ? passportExpiryPicker.value() : null,
+
+        // Contact Information
+        PhoneCountryCode: $("#txtPhoneCountrycodeForCourse").val(),
+        PhoneAreaCode: $("#txtPhoneAreacodeForCourse").val(),
+        PhoneNumber: $("#txtPhoneNumberForCourse").val(),
+        Mobile: $("#txtMobileForCourse").val(),
+        EmailAddress: $("#txtEmailAddressForCourse").val(),
+        SkypeId: $("#txtSkypeIDForCourse").val(),
+
+        // Applicant Image
+        ApplicantImageFile: $("#ApplicantImageFile")[0].files[0] || null,
+        ApplicantImagePreview: $("#applicantImageThumb").attr("src") || ""
+      };
+    } catch (error) {
+      //console.error("Error creating Personal Details object:", error);
+      ToastrMessage.showError("Error creating Personal Details object:" + error, "Creating Personal Details",);
+      VanillaApiCallManager.handleApiError(error);
+      return {};
+    }
+  },
+
+  createApplicantAddressObject: function () {
+    try {
+      // Get ComboBox instances
+      const permanentCountryCombo = $("#cmbCountryForPermanentAddress").data("kendoComboBox");
+      const presentCountryCombo = $("#cmbCountryForAddress").data("kendoComboBox");
+
+      return {
+        // Permanent Address
+        PermanentAddress: {
+          Address: $("#txtPermanentAddress").val(),
+          City: $("#txtPermanentCity").val(),
+          State: $("#txtPermanentState").val(),
+
+          // Country (dataValueField: "CountryId", dataTextField: "CountryName")
+          CountryId: permanentCountryCombo ? permanentCountryCombo.value() : "",
+          CountryName: permanentCountryCombo ? permanentCountryCombo.text() : "",
+
+          PostalCode: $("#txtPostalCode_PermanenetAddress").val()
+        },
+
+        // Present Address
+        PresentAddress: {
+          SameAsPermanentAddress: $("#chkDoPermanentAddress").is(":checked"),
+          Address: $("#txtPresentAddress").val(),
+          City: $("#txtPresentCity").val(),
+          State: $("#txtPresentState").val(),
+
+          // Country (dataValueField: "CountryId", dataTextField: "CountryName")
+          CountryId: presentCountryCombo ? presentCountryCombo.value() : "",
+          CountryName: presentCountryCombo ? presentCountryCombo.text() : "",
+
+          PostalCode: $("#txtPostalCode").val()
+        }
+      };
+    } catch (error) {
+      console.error("Error creating Applicant Address object:", error);
+      return {};
+    }
+  },
+
+
+  /* ------ Utility Methods ------ */
+  exportFormDataAsJSON: function () {
+    try {
+      const applicationData = this.createApplicationCourseInformation();
+      const jsonData = JSON.stringify(applicationData, null, 2);
+
+      console.log("=== Course Information Form Data (JSON) ===");
+      console.log(jsonData);
+
+      // You can also display in modal or download as file
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showSuccess("Form data exported to console. Check browser console for JSON output.", "Export Successful", 3000);
+      }
+
+      return jsonData;
+    } catch (error) {
+      console.log("Error exporting form data as JSON:", error);
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error exporting form data: " + error.message, "Export Error", 0);
+      }
+      return null;
+    }
+  },
+
+  validateCompleteForm: function () {
+    try {
+      console.log("=== Validating Course Information Form ===");
+
+      const validationErrors = [];
+
+      // Validate Course Details
+      const courseValidation = this.validateCourseDetails();
+      if (courseValidation.length > 0) {
+        validationErrors.push(...courseValidation);
+      }
+
+      // Validate Personal Details
+      const personalValidation = this.validatePersonalDetails();
+      if (personalValidation.length > 0) {
+        validationErrors.push(...personalValidation);
+      }
+
+      // Validate Address
+      const addressValidation = this.validateApplicantAddress();
+      if (addressValidation.length > 0) {
+        validationErrors.push(...addressValidation);
+      }
+
+      if (validationErrors.length === 0) {
+        console.log("Form validation passed successfully");
+        if (typeof ToastrMessage !== "undefined") {
+          ToastrMessage.showSuccess("Form validation passed successfully!", "Validation Success", 3000);
+        }
+        return true;
+      } else {
+        console.log("Form validation failed:", validationErrors);
+        if (typeof ToastrMessage !== "undefined") {
+          ToastrMessage.showError("Form validation failed. Check console for details.", "Validation Error", 0);
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error("Error validating form:", error);
+      return false;
+    }
+  },
+
+  validateCourseDetails: function () {
+    const errors = [];
+
+    const countryCombo = $("#cmbCountryForCourse").data("kendoComboBox");
+    if (!countryCombo || !countryCombo.value()) {
+      errors.push("Country is required");
+    }
+
+    return errors;
+  },
+
+  validatePersonalDetails: function () {
+    const errors = [];
+
+    const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
+    if (!genderCombo || !genderCombo.value()) {
+      errors.push("Gender is required");
+    }
+
+    const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
+    if (!titleCombo || !titleCombo.value()) {
+      errors.push("Title is required");
+    }
+
+    if (!$("#txtFirstName").val().trim()) {
+      errors.push("First Name is required");
+    }
+
+    if (!$("#txtLastName").val().trim()) {
+      errors.push("Last Name is required");
+    }
+
+    const dateOfBirthPicker = $("#datePickerDateOfBirth").data("kendoDatePicker");
+    if (!dateOfBirthPicker || !dateOfBirthPicker.value()) {
+      errors.push("Date of Birth is required");
+    }
+
+    const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
+    if (!maritalStatusCombo || !maritalStatusCombo.value()) {
+      errors.push("Marital Status is required");
+    }
+
+    if (!$("#txtNationality").val().trim()) {
+      errors.push("Nationality is required");
+    }
+
+    return errors;
+  },
+
+  validateApplicantAddress: function () {
+    const errors = [];
+
+    const permanentCountryCombo = $("#cmbCountryForPermanentAddress").data("kendoComboBox");
+    if (!permanentCountryCombo || !permanentCountryCombo.value()) {
+      errors.push("Permanent Address Country is required");
+    }
+
+    const presentCountryCombo = $("#cmbCountryForAddress").data("kendoComboBox");
+    if (!presentCountryCombo || !presentCountryCombo.value()) {
+      errors.push("Present Address Country is required");
+    }
+
+    return errors;
+  },
+
+  fillDemoData: function () {
+    try {
+      console.log("=== Filling Demo Data ===");
+
+      // Fill Course Details Demo Data
+      this.fillCourseDetailsDemo();
+
+      // Fill Personal Details Demo Data
+      this.fillPersonalDetailsDemo();
+
+      // Fill Address Demo Data
+      this.fillAddressDemo();
+
+      console.log("Demo data filled successfully");
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showSuccess("Demo data filled successfully!", "Demo Data", 3000);
+      }
+
+    } catch (error) {
+      console.error("Error filling demo data:", error);
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error filling demo data: " + error.message, "Demo Data Error", 0);
+      }
+    }
+  },
+
+  fillCourseDetailsDemo: function () {
+    // Demo data for Course Details
+    $("#txtApplicationFeeForCourse").val("500");
+    $("#txtPaymentReferenceNumberCourse").val("REF123456789");
+    $("#txtareaRemarks").val("Demo application for testing purposes");
+
+    // Set payment date to today
+    const paymentDatePicker = $("#datePickerPaymentDate").data("kendoDatePicker");
+    if (paymentDatePicker) {
+      paymentDatePicker.value(new Date());
+    }
+  },
+
+  fillPersonalDetailsDemo: function () {
+    // Demo data for Personal Details
+    $("#txtFirstName").val("John");
+    $("#txtLastName").val("Doe");
+    $("#txtNationality").val("American");
+    $("#txtPassportNumberForCourse").val("A12345678");
+    $("#txtPhoneCountrycodeForCourse").val("+1");
+    $("#txtPhoneAreacodeForCourse").val("555");
+    $("#txtPhoneNumberForCourse").val("1234567");
+    $("#txtMobileForCourse").val("9876543210");
+    $("#txtEmailAddressForCourse").val("john.doe@example.com");
+    $("#txtSkypeIDForCourse").val("john.doe.skype");
+
+    // Set date of birth
+    const dateOfBirthPicker = $("#datePickerDateOfBirth").data("kendoDatePicker");
+    if (dateOfBirthPicker) {
+      dateOfBirthPicker.value(new Date(1995, 5, 15)); // June 15, 1995
+    }
+
+    // Set passport dates
+    const passportIssuePicker = $("#datepickerPassportIssueDate").data("kendoDatePicker");
+    const passportExpiryPicker = $("#datepickerPassportExpiryDate").data("kendoDatePicker");
+
+    if (passportIssuePicker) {
+      passportIssuePicker.value(new Date(2020, 0, 1)); // Jan 1, 2020
+    }
+
+    if (passportExpiryPicker) {
+      passportExpiryPicker.value(new Date(2030, 0, 1)); // Jan 1, 2030
+    }
+
+    // Set passport radio button
+    $("#radioIsPassportYes").prop("checked", true).trigger("change");
+  },
+
+  fillAddressDemo: function () {
+    // Demo data for Permanent Address
+    $("#txtPermanentAddress").val("123 Main Street, Apartment 4B");
+    $("#txtPermanentCity").val("New York");
+    $("#txtPermanentState").val("NY");
+    $("#txtPostalCode_PermanenetAddress").val("10001");
+
+    // Demo data for Present Address
+    $("#txtPresentAddress").val("456 Oak Avenue, Suite 2A");
+    $("#txtPresentCity").val("Boston");
+    $("#txtPresentState").val("MA");
+    $("#txtPostalCode").val("02101");
+  }
 
 
 }

@@ -37,10 +37,10 @@
           <button type="button" class="btn btn-success me-2" onclick="CRMCourseInformationHelper.fillDemoData()">ডেমো ডেটা পূরণ করুন</button>
           <button type="button" class="btn btn-info me-2" onclick="CRMCourseInformationHelper.exportFormDataAsJSON()">JSON এ রূপান্তর</button>
           <button type="button" class="btn btn-warning me-2" onclick="CRMCourseInformationHelper.validateCompleteForm()">ভ্যালিডেশন চেক</button>
-          <button type="button" class="btn btn-primary me-2" onclick="CRMCourseInformationHelper.submitApplication()">আবেদন সাবমিট</button>
+          <button type="button" class="btn btn-primary me-2" onclick="CRMApplicationManager.saveOrUpdateItem()">+ Add Item</button>
           <button type="button" class="btn btn-secondary me-2" onclick="CRMCourseInformationHelper.clearCRMApplicationForm()">পরিষ্কার করুন</button>
           <button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow()'>বন্ধ করুন</button>
-          <button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
+          <button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="CRMApplicationManager.saveOrUpdateItem()">+ Add Item</button>
           <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearStateForm()">Clear</button>
         </li>
       </ul>

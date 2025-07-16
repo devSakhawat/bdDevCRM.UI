@@ -308,6 +308,7 @@ var CRMEducationNEnglishLanguagHelper = {
             id: "EducationHistoryId",
             fields: {
               EducationHistoryId: { type: "number", editable: false, nullable: true },
+              ApplicantId: { type: "number", editable: false, nullable: true },
               Institution: { type: "string" },
               Qualification: { type: "string" },
               PassingYear: { type: "number" },
@@ -690,6 +691,7 @@ var CRMEducationNEnglishLanguagHelper = {
             id: "WorkExperienceId",
             fields: {
               WorkExperienceId: { type: "number", editable: false, nullable: true },
+              ApplicantId: { type: "number", editable: false, nullable: true },
               NameOfEmployer: { type: "string" },
               Position: { type: "string" },
               StartDate: { type: "date" },
@@ -719,6 +721,7 @@ var CRMEducationNEnglishLanguagHelper = {
   generateWorkExperienceColumn: function () {
     return [
       { field: "WorkExperienceId", title: "WorkExperienceId", hidden: true },
+      { field: "ApplicantId", title: "ApplicantId", hidden: true },
       { field: "NameOfEmployer", title: "Name of Employer", width: "200px" },
       { field: "Position", title: "Position", width: "150px" },
       { field: "StartDate", title: "Start Date", width: "120px", format: "{0:dd/MM/yyyy}" },
@@ -740,7 +743,8 @@ var CRMEducationNEnglishLanguagHelper = {
         filterable: false,
         width: "200px"
       },
-      { command: "destroy", title: "Action", width: "100px" }
+      { command: ["edit", "destroy"], title: "Action", width: "100px" }
+      //{ command: "destroy", title: "Action", width: "100px" }
     ];
   },
 

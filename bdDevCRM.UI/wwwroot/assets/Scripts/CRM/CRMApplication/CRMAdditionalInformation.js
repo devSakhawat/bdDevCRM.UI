@@ -213,6 +213,7 @@ var CRMAdditionalInformationHelper = {
             id: "ApplicantRefferenceId",
             fields: {
               ApplicantRefferenceId: { type: "number", editable: false, nullable: true },
+              ApplicantId: { type: "number", editable: false, nullable: true },
               Name: { type: "string" },
               Designation: { type: "string" },
               Institution: { type: "string" },
@@ -293,7 +294,7 @@ var CRMAdditionalInformationHelper = {
   generateAdditionalDocumentsSummaryColumn: function () {
     return [
       { field: "DocumentId", title: "DocumentId", hidden: true },
-      { field: "HrrecordId", title: "HrrecordId", hidden: true },
+      { field: "ApplicantId", title: "ApplicantId", hidden: true },
       { field: "Title", title: "Title", width: "400px" },
       {
         field: "UploadFile",

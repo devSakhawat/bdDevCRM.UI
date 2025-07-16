@@ -803,7 +803,7 @@ var CRMCourseInformationHelper = {
 
       return {
         // Hidden Fields
-        CountryId: $("#hdnCountryId").val(),
+        ApplicantCourseId: $("#hdnApplicantCourseId").val() || 0,
 
         // Country Selection (dataValueField: "CountryId", dataTextField: "CountryName")
         CountryId: countryCombo ? countryCombo.value() : "",
@@ -861,6 +861,10 @@ var CRMCourseInformationHelper = {
 
       return {
         // Basic Information
+
+        // Hidden Fields
+        ApplicantId: $("#hdnApplicantId").val() || 0,
+
         // Gender (dataValueField: "GenderId", dataTextField: "GenderName")
         GenderId: genderCombo ? genderCombo.value() : "",
         GenderName: genderCombo ? genderCombo.text() : "",
@@ -915,6 +919,9 @@ var CRMCourseInformationHelper = {
       return {
         // Permanent Address
         PermanentAddress: {
+          // Hidden Fields
+          PermanentAddressId: $("#hdnPermanentAddressId").val(),
+
           Address: $("#txtPermanentAddress").val(),
           City: $("#txtPermanentCity").val(),
           State: $("#txtPermanentState").val(),
@@ -928,6 +935,9 @@ var CRMCourseInformationHelper = {
 
         // Present Address
         PresentAddress: {
+          // Hidden Fields
+          PermanentAddressId: $("#hdnPermanentAddressId").val(),
+
           SameAsPermanentAddress: $("#chkDoPermanentAddress").is(":checked"),
           Address: $("#txtPresentAddress").val(),
           City: $("#txtPresentCity").val(),

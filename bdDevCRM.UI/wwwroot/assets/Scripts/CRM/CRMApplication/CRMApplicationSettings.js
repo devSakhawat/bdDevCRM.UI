@@ -7,45 +7,13 @@ $(document).ready(function () {
   console.log("=== CRM Application System Initializing ===");
   console.log("Bangladesh Development CRM System - Managing Institute and Course Information from Various Countries");
 
-  CRMApplicationelper.createTabstrip();
+  CRMApplicationHelper.createTabstrip();
 
   CRMCourseInformationHelper.intCourse();
   CRMEducationNEnglishLanguagHelper.initEducationNEnglishtLanguage();
   CRMAdditionalInformationHelper.initAdditionalInformation();
 
 });
-
-var CRMApplicationManager = {
-
-}
-
-var CRMApplicationelper = {
-
-  createTabstrip: function () {
-    console.log("Creating Kendo TabStrip...");
-
-    $("#tabstrip").kendoTabStrip({
-      select: function (e) {
-        // Ensure only one tab has the 'k-state-active' class
-        $("#tabstrip ul li").removeClass("k-state-active");
-        $(e.item).addClass("k-state-active");
-
-        var selectedTabText = $(e.item).find("a").text().trim();
-        console.log("Selected Tab:", selectedTabText);
-      }
-    });
-
-    var tabStrip = $("#tabstrip").data("kendoTabStrip");
-    if (tabStrip) {
-      tabStrip.select(0); // Ensure the first tab is selected by default
-      console.log("TabStrip Successfully Created - First Tab Selected");
-    } else {
-      console.log("Kendo TabStrip Failed to Initialize.");
-    }
-  },
-
-
-}
 
 /* =========================================================
    CRMApplicationManager : Save/Update Application Form
@@ -69,7 +37,7 @@ var CRMApplicationManager = {
       //}
 
       // Create comprehensive application object from all three sections
-      const applicationData = CRMApplicationManager.createCompleteApplicationObject();
+      const applicationData = CRMApplicationHelper.createCompleteApplicationObject();
 
       if (!applicationData) {
         throw new Error("Failed to create application data object");
@@ -119,7 +87,7 @@ var CRMApplicationManager = {
                 ToastrMessage.showSuccess(successMsg);
 
                 // Clear all form sections
-                CRMApplicationManager.clearAllForms();
+                CRMApplicationHelper.clearAllForms();
 
                 // Close any open windows
                 if (typeof CommonManager !== "undefined") {
@@ -157,12 +125,148 @@ var CRMApplicationManager = {
     }
   },
 
+  /* -------- Validate All Sections -------- */
+  validateAllSections: function () {
+    try {
+      let isValid = true;
+      const validationErrors = [];
+
+      // Validate Course Information
+      if (typeof CRMCourseInformationHelper !== "undefined" &&
+        typeof CRMCourseInformationHelper.validateCompleteForm === "function") {
+        const courseValid = CRMCourseInformationHelper.validateCompleteForm();
+        if (!courseValid) {
+          isValid = false;
+          validationErrors.push("Course Information validation failed");
+        }
+      }
+
+      // Validate Education & English Language
+      if (typeof CRMEducationNEnglishLanguagHelper !== "undefined" &&
+        typeof CRMEducationNEnglishLanguagHelper.validateEducationCompleteForm === "function") {
+        const educationValid = CRMEducationNEnglishLanguagHelper.validateEducationCompleteForm();
+        if (!educationValid) {
+          isValid = false;
+          validationErrors.push("Education & English Language validation failed");
+        }
+      }
+
+      // Validate Additional Information
+      if (typeof CRMAdditionalInformationHelper !== "undefined" &&
+        typeof CRMAdditionalInformationHelper.validateAdditionalInformationForm === "function") {
+        const additionalValid = CRMAdditionalInformationHelper.validateAdditionalInformationForm();
+        if (!additionalValid) {
+          isValid = false;
+          validationErrors.push("Additional Information validation failed");
+        }
+      }
+
+      if (!isValid) {
+        console.log("Application validation errors:", validationErrors);
+      }
+
+      return isValid;
+
+    } catch (error) {
+      console.error("Error validating application sections:", error);
+      return false;
+    }
+  },
+
+  /* -------- Export Complete Application Data -------- */
+  exportCompleteApplicationDataAsJSON: function () {
+    try {
+      const completeApplicationData = this.createCompleteApplicationObject();
+      const jsonData = JSON.stringify(completeApplicationData, null, 2);
+
+      console.log("=== Complete Application Data (JSON) ===");
+      console.log(jsonData);
+
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showSuccess("Complete application data exported to console. Check browser console for JSON output.", "Export Successful", 3000);
+      }
+
+      return jsonData;
+    } catch (error) {
+      console.error("Error exporting complete application data as JSON:", error);
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error exporting complete application data: " + error.message, "Export Error", 0);
+      }
+      return null;
+    }
+  },
+
+  /* -------- Fill Demo Data for All Sections -------- */
+  fillCompleteApplicationDemoData: function () {
+    try {
+      console.log("=== Filling Complete Application Demo Data ===");
+
+      // Fill Course Information Demo Data
+      if (typeof CRMCourseInformationHelper !== "undefined" &&
+        typeof CRMCourseInformationHelper.fillDemoData === "function") {
+        CRMCourseInformationHelper.fillDemoData();
+      }
+
+      // Fill Education & English Language Demo Data
+      if (typeof CRMEducationNEnglishLanguagHelper !== "undefined" &&
+        typeof CRMEducationNEnglishLanguagHelper.fillEducationDemoData === "function") {
+        CRMEducationNEnglishLanguagHelper.fillEducationDemoData();
+      }
+
+      // Fill Additional Information Demo Data
+      if (typeof CRMAdditionalInformationHelper !== "undefined" &&
+        typeof CRMAdditionalInformationHelper.fillAdditionalInfoDemoData === "function") {
+        CRMAdditionalInformationHelper.fillAdditionalInfoDemoData();
+      }
+
+      console.log("Complete application demo data filled successfully");
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showSuccess("Complete application demo data filled successfully!", "Demo Data", 3000);
+      }
+
+    } catch (error) {
+      console.error("Error filling complete application demo data:", error);
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error filling complete application demo data: " + error.message, "Demo Data Error", 0);
+      }
+    }
+  }
+};
+
+
+
+
+var CRMApplicationHelper = {
+
+  createTabstrip: function () {
+    console.log("Creating Kendo TabStrip...");
+
+    $("#tabstrip").kendoTabStrip({
+      select: function (e) {
+        // Ensure only one tab has the 'k-state-active' class
+        $("#tabstrip ul li").removeClass("k-state-active");
+        $(e.item).addClass("k-state-active");
+
+        var selectedTabText = $(e.item).find("a").text().trim();
+        console.log("Selected Tab:", selectedTabText);
+      }
+    });
+
+    var tabStrip = $("#tabstrip").data("kendoTabStrip");
+    if (tabStrip) {
+      tabStrip.select(0); // Ensure the first tab is selected by default
+      console.log("TabStrip Successfully Created - First Tab Selected");
+    } else {
+      console.log("Kendo TabStrip Failed to Initialize.");
+    }
+  },
+
   /* -------- Create Complete Application Object -------- */
   createCompleteApplicationObject: function () {
     try {
       const completeApplication = {
         // Basic Application Info
-        ApplicationId: $("#applicationId").val() || 0,
+        ApplicationId: $("#hdnApplicationId").val() || 0,
         ApplicationDate: new Date().toISOString(),
         ApplicationStatus: "Draft", // or get from form if available
 
@@ -255,54 +359,6 @@ var CRMApplicationManager = {
     }
   },
 
-  /* -------- Validate All Sections -------- */
-  validateAllSections: function () {
-    try {
-      let isValid = true;
-      const validationErrors = [];
-
-      // Validate Course Information
-      if (typeof CRMCourseInformationHelper !== "undefined" &&
-        typeof CRMCourseInformationHelper.validateCompleteForm === "function") {
-        const courseValid = CRMCourseInformationHelper.validateCompleteForm();
-        if (!courseValid) {
-          isValid = false;
-          validationErrors.push("Course Information validation failed");
-        }
-      }
-
-      // Validate Education & English Language
-      if (typeof CRMEducationNEnglishLanguagHelper !== "undefined" &&
-        typeof CRMEducationNEnglishLanguagHelper.validateEducationCompleteForm === "function") {
-        const educationValid = CRMEducationNEnglishLanguagHelper.validateEducationCompleteForm();
-        if (!educationValid) {
-          isValid = false;
-          validationErrors.push("Education & English Language validation failed");
-        }
-      }
-
-      // Validate Additional Information
-      if (typeof CRMAdditionalInformationHelper !== "undefined" &&
-        typeof CRMAdditionalInformationHelper.validateAdditionalInformationForm === "function") {
-        const additionalValid = CRMAdditionalInformationHelper.validateAdditionalInformationForm();
-        if (!additionalValid) {
-          isValid = false;
-          validationErrors.push("Additional Information validation failed");
-        }
-      }
-
-      if (!isValid) {
-        console.log("Application validation errors:", validationErrors);
-      }
-
-      return isValid;
-
-    } catch (error) {
-      console.error("Error validating application sections:", error);
-      return false;
-    }
-  },
-
   /* -------- Clear All Forms -------- */
   clearAllForms: function () {
     try {
@@ -335,64 +391,5 @@ var CRMApplicationManager = {
       console.error("Error clearing application forms:", error);
     }
   },
-
-  /* -------- Export Complete Application Data -------- */
-  exportCompleteApplicationDataAsJSON: function () {
-    try {
-      const completeApplicationData = this.createCompleteApplicationObject();
-      const jsonData = JSON.stringify(completeApplicationData, null, 2);
-
-      console.log("=== Complete Application Data (JSON) ===");
-      console.log(jsonData);
-
-      if (typeof ToastrMessage !== "undefined") {
-        ToastrMessage.showSuccess("Complete application data exported to console. Check browser console for JSON output.", "Export Successful", 3000);
-      }
-
-      return jsonData;
-    } catch (error) {
-      console.error("Error exporting complete application data as JSON:", error);
-      if (typeof ToastrMessage !== "undefined") {
-        ToastrMessage.showError("Error exporting complete application data: " + error.message, "Export Error", 0);
-      }
-      return null;
-    }
-  },
-
-  /* -------- Fill Demo Data for All Sections -------- */
-  fillCompleteApplicationDemoData: function () {
-    try {
-      console.log("=== Filling Complete Application Demo Data ===");
-
-      // Fill Course Information Demo Data
-      if (typeof CRMCourseInformationHelper !== "undefined" &&
-        typeof CRMCourseInformationHelper.fillDemoData === "function") {
-        CRMCourseInformationHelper.fillDemoData();
-      }
-
-      // Fill Education & English Language Demo Data
-      if (typeof CRMEducationNEnglishLanguagHelper !== "undefined" &&
-        typeof CRMEducationNEnglishLanguagHelper.fillEducationDemoData === "function") {
-        CRMEducationNEnglishLanguagHelper.fillEducationDemoData();
-      }
-
-      // Fill Additional Information Demo Data
-      if (typeof CRMAdditionalInformationHelper !== "undefined" &&
-        typeof CRMAdditionalInformationHelper.fillAdditionalInfoDemoData === "function") {
-        CRMAdditionalInformationHelper.fillAdditionalInfoDemoData();
-      }
-
-      console.log("Complete application demo data filled successfully");
-      if (typeof ToastrMessage !== "undefined") {
-        ToastrMessage.showSuccess("Complete application demo data filled successfully!", "Demo Data", 3000);
-      }
-
-    } catch (error) {
-      console.error("Error filling complete application demo data:", error);
-      if (typeof ToastrMessage !== "undefined") {
-        ToastrMessage.showError("Error filling complete application demo data: " + error.message, "Demo Data Error", 0);
-      }
-    }
-  }
-};
+}
 

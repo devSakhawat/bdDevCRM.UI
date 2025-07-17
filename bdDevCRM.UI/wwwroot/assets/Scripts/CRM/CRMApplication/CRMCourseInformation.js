@@ -773,9 +773,9 @@ var CRMCourseInformationHelper = {
   createApplicationCourseInformation: function () {
     try {
       const applicationCourseInformation = {
-        courseDetails: this.createCourseDetailsObject(),
-        personalDetails: this.createPersonalDetailsObject(),
-        applicantAddress: this.createApplicantAddressObject()
+        ApplicantCourse: this.createCourseDetailsObject(),
+        PersonalDetails: this.createPersonalDetailsObject(),
+        ApplicantAddress: this.createApplicantAddressObject()
       };
       console.log(applicationCourseInformation);
       debugger;
@@ -791,7 +791,7 @@ var CRMCourseInformationHelper = {
 
   createCourseDetailsObject: function () {
     try {
-      // Get ComboBox instances
+      // Get Kendo ComboBox and DatePicker instances
       const countryCombo = $("#cmbCountryForCourse").data("kendoComboBox");
       const instituteCombo = $("#cmbInstituteForCourse").data("kendoComboBox");
       const courseCombo = $("#cmbCourseForCourse").data("kendoComboBox");
@@ -801,48 +801,45 @@ var CRMCourseInformationHelper = {
       const paymentMethodCombo = $("#cmbPaymentMethodForCourse").data("kendoComboBox");
       const paymentDatePicker = $("#datePickerPaymentDate").data("kendoDatePicker");
 
-      return {
-        // Hidden Fields
-        ApplicantCourseId: $("#hdnApplicantCourseId").val() || 0,
+      const applicantCourseDetails = {
+        ApplicantCourseId: parseInt($("#hdnApplicantCourseId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
 
-        // Country Selection (dataValueField: "CountryId", dataTextField: "CountryName")
-        CountryId: countryCombo ? countryCombo.value() : "",
+        CountryId: countryCombo && countryCombo.value() ? parseInt(countryCombo.value()) : 0,
         CountryName: countryCombo ? countryCombo.text() : "",
 
-        // Institute Selection (dataValueField: "InstituteId", dataTextField: "InstituteName")
-        InstituteId: instituteCombo ? instituteCombo.value() : "",
+        InstituteId: instituteCombo && instituteCombo.value() ? parseInt(instituteCombo.value()) : 0,
         InstituteName: instituteCombo ? instituteCombo.text() : "",
 
-        // Course Selection (dataValueField: "CourseId", dataTextField: "CourseTitle")
-        CourseId: courseCombo ? courseCombo.value() : "",
+        CourseId: courseCombo && courseCombo.value() ? parseInt(courseCombo.value()) : 0,
         CourseTitle: courseCombo ? courseCombo.text() : "",
 
-        // Intake Information (dataValueField: "IntakeMonthId", dataTextField: "IntakeMonth")
-        IntakeMonthId: intakeMonthCombo ? intakeMonthCombo.value() : "",
+        IntakeMonthId: intakeMonthCombo && intakeMonthCombo.value() ? parseInt(intakeMonthCombo.value()) : 0,
         IntakeMonth: intakeMonthCombo ? intakeMonthCombo.text() : "",
 
-        // intek will be comes form database (for future report)
-        // Intake Year (dataValueField: "IntakeYearId", dataTextField: "IntakeYear")
-        IntakeYearId: intakeYearCombo ? intakeYearCombo.value() : "",
+        IntakeYearId: intakeYearCombo && intakeYearCombo.value() ? parseInt(intakeYearCombo.value()) : 0,
         IntakeYear: intakeYearCombo ? intakeYearCombo.text() : "",
 
-        // Payment Information
-        ApplicationFee: $("#txtApplicationFeeForCourse").val(),
+        ApplicationFee: $("#txtApplicationFeeForCourse").val() || "0", // string in DTO
 
-        // Currency (dataValueField: "CurrencyId", dataTextField: "CurrencyName")
-        CurrencyId: currencyCombo ? currencyCombo.value() : 0,
+        CurrencyId: currencyCombo && currencyCombo.value() ? parseInt(currencyCombo.value()) : 0,
         CurrencyName: currencyCombo ? currencyCombo.text() : "",
 
-        // Payment Method (dataValueField: "PaymentMethodId", dataTextField: "PaymentMethod")
-        PaymentMethodId: paymentMethodCombo ? paymentMethodCombo.value() : "",
+        PaymentMethodId: paymentMethodCombo && paymentMethodCombo.value() ? parseInt(paymentMethodCombo.value()) : 0,
         PaymentMethod: paymentMethodCombo ? paymentMethodCombo.text() : "",
 
-        PaymentReferenceNumber: $("#txtPaymentReferenceNumberCourse").val(),
+        PaymentReferenceNumber: $("#txtPaymentReferenceNumberCourse").val() || "",
         PaymentDate: paymentDatePicker ? paymentDatePicker.value() : null,
 
-        // Additional Information
-        Remarks: $("#txtareaRemarks").val()
+        Remarks: $("#txtareaRemarks").val() || "",
+
+        CreatedDate: new Date().toISOString(),  // Required in C# DTO
+        CreatedBy: 0,                            // You should set actual userId from session
+        UpdatedDate: null,
+        UpdatedBy: null
       };
+
+      return applicantCourseDetails;
     } catch (error) {
       console.error("Error creating Course Details object:", error);
       return {};
@@ -851,7 +848,6 @@ var CRMCourseInformationHelper = {
 
   createPersonalDetailsObject: function () {
     try {
-      // Get ComboBox instances
       const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
       const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
       const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
@@ -859,95 +855,96 @@ var CRMCourseInformationHelper = {
       const passportIssuePicker = $("#datepickerPassportIssueDate").data("kendoDatePicker");
       const passportExpiryPicker = $("#datepickerPassportExpiryDate").data("kendoDatePicker");
 
-      return {
-        // Basic Information
+      const passportIssueDate = passportIssuePicker ? passportIssuePicker.value() : null;
+      let passportExpiryDate = passportExpiryPicker ? passportExpiryPicker.value() : null;
+      if (!passportIssueDate || isNaN(new Date(passportIssueDate).getTime())) {
+        passportExpiryDate = null;
+      }
 
-        // Hidden Fields
-        ApplicantId: $("#hdnApplicantId").val() || 0,
+      const now = new Date().toISOString();
 
-        // Gender (dataValueField: "GenderId", dataTextField: "GenderName")
-        GenderId: genderCombo ? genderCombo.value() : "",
+      const personalDetails = {
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
+        ApplicationId: 0, // Will be set later in backend
+        GenderId: genderCombo && genderCombo.value() ? parseInt(genderCombo.value()) : 0,
         GenderName: genderCombo ? genderCombo.text() : "",
 
-        // Title (dataValueField: "TitleValue", dataTextField: "TitleText")
         TitleValue: titleCombo ? titleCombo.value() : "",
         TitleText: titleCombo ? titleCombo.text() : "",
 
-        // Personal Info
-        FirstName: $("#txtFirstName").val(),
-        LastName: $("#txtLastName").val(),
+        FirstName: $("#txtFirstName").val() || "",
+        LastName: $("#txtLastName").val() || "",
         DateOfBirth: dateOfBirthPicker ? dateOfBirthPicker.value() : null,
 
-        // Marital Status (dataValueField: "MaritalStatusId", dataTextField: "MaritalStatusName")
-        MaritalStatusId: maritalStatusCombo ? maritalStatusCombo.value() : "",
+        MaritalStatusId: maritalStatusCombo && maritalStatusCombo.value() ? parseInt(maritalStatusCombo.value()) : 0,
         MaritalStatusName: maritalStatusCombo ? maritalStatusCombo.text() : "",
 
-        Nationality: $("#txtNationality").val(),
-
-        // Passport Information
+        Nationality: $("#txtNationality").val() || "",
         HasValidPassport: $("input[name='ValidPassport']:checked").val() || "",
-        PassportNumber: $("#txtPassportNumberForCourse").val(),
-        PassportIssueDate: passportIssuePicker ? passportIssuePicker.value() : null,
-        PassportExpiryDate: passportExpiryPicker ? passportExpiryPicker.value() : null,
+        PassportNumber: $("#txtPassportNumberForCourse").val() || "",
+        assportIssueDate: passportIssueDate,
+        PassportExpiryDate: passportExpiryDate,
 
-        // Contact Information
-        PhoneCountryCode: $("#txtPhoneCountrycodeForCourse").val(),
-        PhoneAreaCode: $("#txtPhoneAreacodeForCourse").val(),
-        PhoneNumber: $("#txtPhoneNumberForCourse").val(),
-        Mobile: $("#txtMobileForCourse").val(),
-        EmailAddress: $("#txtEmailAddressForCourse").val(),
-        SkypeId: $("#txtSkypeIDForCourse").val(),
+        PhoneCountryCode: $("#txtPhoneCountrycodeForCourse").val() || "",
+        PhoneAreaCode: $("#txtPhoneAreacodeForCourse").val() || "",
+        PhoneNumber: $("#txtPhoneNumberForCourse").val() || "",
+        Mobile: $("#txtMobileForCourse").val() || "",
+        EmailAddress: $("#txtEmailAddressForCourse").val() || "",
+        SkypeId: $("#txtSkypeIDForCourse").val() || "",
 
-        // Applicant Image
-        ApplicantImageFile: $("#ApplicantImageFile")[0].files[0] || null,
-        ApplicantImagePreview: $("#applicantImageThumb").attr("src") || ""
+        ApplicantImagePath: "", // Will be set in backend after file upload
+
+        CreatedDate: now,
+        CreatedBy: 0, // Set from backend after login
+        UpdatedDate: null,
+        UpdatedBy: null
       };
+
+      return personalDetails;
     } catch (error) {
-      //console.error("Error creating Personal Details object:", error);
-      ToastrMessage.showError("Error creating Personal Details object:" + error, "Creating Personal Details",);
-      VanillaApiCallManager.handleApiError(error);
+      ToastrMessage.showError("Error creating Personal Details object: " + error, "Error");
       return {};
     }
   },
 
   createApplicantAddressObject: function () {
     try {
-      // Get ComboBox instances
       const permanentCountryCombo = $("#cmbCountryForPermanentAddress").data("kendoComboBox");
       const presentCountryCombo = $("#cmbCountryForAddress").data("kendoComboBox");
 
+      const now = new Date().toISOString();
+      const applicantId = parseInt($("#hdnApplicantId").val()) || 0;
+
       return {
-        // Permanent Address
         PermanentAddress: {
-          // Hidden Fields
-          PermanentAddressId: $("#hdnPermanentAddressId").val(),
-
-          Address: $("#txtPermanentAddress").val(),
-          City: $("#txtPermanentCity").val(),
-          State: $("#txtPermanentState").val(),
-
-          // Country (dataValueField: "CountryId", dataTextField: "CountryName")
-          CountryId: permanentCountryCombo ? permanentCountryCombo.value() : "",
+          PermanentAddressId: parseInt($("#hdnPermanentAddressId").val()) || 0,
+          ApplicantId: applicantId,
+          Address: $("#txtPermanentAddress").val() || "",
+          City: $("#txtPermanentCity").val() || "",
+          State: $("#txtPermanentState").val() || "",
+          CountryId: permanentCountryCombo && permanentCountryCombo.value() ? parseInt(permanentCountryCombo.value()) : 0,
           CountryName: permanentCountryCombo ? permanentCountryCombo.text() : "",
-
-          PostalCode: $("#txtPostalCode_PermanenetAddress").val()
+          PostalCode: $("#txtPostalCode_PermanenetAddress").val() || "",
+          CreatedDate: now,
+          CreatedBy: 0,
+          UpdatedDate: null,
+          UpdatedBy: null
         },
 
-        // Present Address
         PresentAddress: {
-          // Hidden Fields
-          PermanentAddressId: $("#hdnPermanentAddressId").val(),
-
+          PresentAddressId: parseInt($("#hdnPresentAddressId").val()) || 0,
+          ApplicantId: applicantId,
           SameAsPermanentAddress: $("#chkDoPermanentAddress").is(":checked"),
-          Address: $("#txtPresentAddress").val(),
-          City: $("#txtPresentCity").val(),
-          State: $("#txtPresentState").val(),
-
-          // Country (dataValueField: "CountryId", dataTextField: "CountryName")
-          CountryId: presentCountryCombo ? presentCountryCombo.value() : "",
+          Address: $("#txtPresentAddress").val() || "",
+          City: $("#txtPresentCity").val() || "",
+          State: $("#txtPresentState").val() || "",
+          CountryId: presentCountryCombo && presentCountryCombo.value() ? parseInt(presentCountryCombo.value()) : 0,
           CountryName: presentCountryCombo ? presentCountryCombo.text() : "",
-
-          PostalCode: $("#txtPostalCode").val()
+          PostalCode: $("#txtPostalCode").val() || "",
+          CreatedDate: now,
+          CreatedBy: 0,
+          UpdatedDate: null,
+          UpdatedBy: null
         }
       };
     } catch (error) {
@@ -955,6 +952,116 @@ var CRMCourseInformationHelper = {
       return {};
     }
   },
+
+
+  //createPersonalDetailsObject: function () {
+  //  try {
+  //    // Get ComboBox instances
+  //    const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
+  //    const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
+  //    const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
+  //    const dateOfBirthPicker = $("#datePickerDateOfBirth").data("kendoDatePicker");
+  //    const passportIssuePicker = $("#datepickerPassportIssueDate").data("kendoDatePicker");
+  //    const passportExpiryPicker = $("#datepickerPassportExpiryDate").data("kendoDatePicker");
+
+  //    const applicantPersonalInfo = {
+  //      // Basic Information
+
+  //      // Hidden Fields
+  //      ApplicantId: $("#hdnApplicantId").val() || 0,
+
+  //      // Gender (dataValueField: "GenderId", dataTextField: "GenderName")
+  //      GenderId: genderCombo ? genderCombo.value() : "",
+  //      GenderName: genderCombo ? genderCombo.text() : "",
+
+  //      // Title (dataValueField: "TitleValue", dataTextField: "TitleText")
+  //      TitleValue: titleCombo ? titleCombo.value() : "",
+  //      TitleText: titleCombo ? titleCombo.text() : "",
+
+  //      // Personal Info
+  //      FirstName: $("#txtFirstName").val(),
+  //      LastName: $("#txtLastName").val(),
+  //      DateOfBirth: dateOfBirthPicker ? dateOfBirthPicker.value() : null,
+
+  //      // Marital Status (dataValueField: "MaritalStatusId", dataTextField: "MaritalStatusName")
+  //      MaritalStatusId: maritalStatusCombo ? maritalStatusCombo.value() : "",
+  //      MaritalStatusName: maritalStatusCombo ? maritalStatusCombo.text() : "",
+
+  //      Nationality: $("#txtNationality").val(),
+
+  //      // Passport Information
+  //      HasValidPassport: $("input[name='ValidPassport']:checked").val() || "",
+  //      PassportNumber: $("#txtPassportNumberForCourse").val(),
+  //      PassportIssueDate: passportIssuePicker ? passportIssuePicker.value() : null,
+  //      PassportExpiryDate: passportExpiryPicker ? passportExpiryPicker.value() : null,
+
+  //      // Contact Information
+  //      PhoneCountryCode: $("#txtPhoneCountrycodeForCourse").val(),
+  //      PhoneAreaCode: $("#txtPhoneAreacodeForCourse").val(),
+  //      PhoneNumber: $("#txtPhoneNumberForCourse").val(),
+  //      Mobile: $("#txtMobileForCourse").val(),
+  //      EmailAddress: $("#txtEmailAddressForCourse").val(),
+  //      SkypeId: $("#txtSkypeIDForCourse").val(),
+
+  //      // Applicant Image
+  //      ApplicantImageFile: $("#ApplicantImageFile")[0].files[0] || null,
+  //      ApplicantImagePreview: $("#applicantImageThumb").attr("src") || ""
+  //    };
+  //    return applicantPersonalInfo;
+
+  //  } catch (error) {
+  //    //console.error("Error creating Personal Details object:", error);
+  //    ToastrMessage.showError("Error creating Personal Details object:" + error, "Creating Personal Details",);
+  //    VanillaApiCallManager.handleApiError(error);
+  //    return {};
+  //  }
+  //},
+
+  //createApplicantAddressObject: function () {
+  //  try {
+  //    // Get ComboBox instances
+  //    const permanentCountryCombo = $("#cmbCountryForPermanentAddress").data("kendoComboBox");
+  //    const presentCountryCombo = $("#cmbCountryForAddress").data("kendoComboBox");
+
+  //    return {
+  //      // Permanent Address
+  //      PermanentAddress: {
+  //        // Hidden Fields
+  //        PermanentAddressId: $("#hdnPermanentAddressId").val(),
+
+  //        Address: $("#txtPermanentAddress").val(),
+  //        City: $("#txtPermanentCity").val(),
+  //        State: $("#txtPermanentState").val(),
+
+  //        // Country (dataValueField: "CountryId", dataTextField: "CountryName")
+  //        CountryId: permanentCountryCombo ? permanentCountryCombo.value() : "",
+  //        CountryName: permanentCountryCombo ? permanentCountryCombo.text() : "",
+
+  //        PostalCode: $("#txtPostalCode_PermanenetAddress").val()
+  //      },
+
+  //      // Present Address
+  //      PresentAddress: {
+  //        // Hidden Fields
+  //        PermanentAddressId: $("#hdnPermanentAddressId").val(),
+
+  //        SameAsPermanentAddress: $("#chkDoPermanentAddress").is(":checked"),
+  //        Address: $("#txtPresentAddress").val(),
+  //        City: $("#txtPresentCity").val(),
+  //        State: $("#txtPresentState").val(),
+
+  //        // Country (dataValueField: "CountryId", dataTextField: "CountryName")
+  //        CountryId: presentCountryCombo ? presentCountryCombo.value() : "",
+  //        CountryName: presentCountryCombo ? presentCountryCombo.text() : "",
+
+  //        PostalCode: $("#txtPostalCode").val()
+  //      }
+  //    };
+  //  } catch (error) {
+  //    console.error("Error creating Applicant Address object:", error);
+  //    return {};
+  //  }
+  //},
 
 
   /* ------ Utility Methods ------ */

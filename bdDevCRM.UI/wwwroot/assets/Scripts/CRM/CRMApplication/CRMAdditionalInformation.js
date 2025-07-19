@@ -1,134 +1,4 @@
-﻿///// <reference path="../../common/common.js" />
-
-///// <reference path="CRMCourseInformation.js" />
-///// <reference path="CRMEducationNEnglishLanguage.js" />
-///// <reference path="CRMApplicationSettings.js" />
-
-//let statementOfPurposeFileData = null;
-//let additionalDocumentsFileData = {};
-
-
-//var CRMAdditionalInformationManager = {
-
-
-//}
-
-//var CRMAdditionalInformationHelper = {
-
-//  initAdditionalInformation: function () {
-//    CRMAdditionalInformationHelper.initializeAdditionalReferenceSummaryGrid();
-//    CRMAdditionalInformationHelper.initializeAdditionalDocumentsSummaryGrid();
-//  },
-
-//  initializeAdditionalReferenceSummaryGrid: function () {
-//    const gridOption = {
-//      dataSource: new kendo.data.DataSource({
-//        data: [],
-//        schema: {
-//          model: {
-//            id: "ApplicantRefferenceId",
-//            fields: {
-//              ApplicantRefferenceId: { type: "number", editable: false, nullable: true },
-//              Name: { type: "string" },
-//              Designation: { type: "string" },
-//              EmailID: { type: "email" },
-//              PhoneNo: { type: "string" },
-//              FaxNo: { type: "string" },
-//              Address: { type: "string" },
-//              City: { type: "string" },
-//              State: { type: "string" },
-//              Country: { type: "string" },
-//              PostOrZipCode: { type: "string" },
-//            }
-//          }
-//        }
-//      }),
-//      toolbar: ["create"],
-//      scrollable: true,
-//      resizable: true,
-//      width: "400px",
-//      columns: CRMAdditionalInformationHelper.generateAdditionalReferenceSummaryColumn(),
-//      editable: { model: "inline" },
-//      navigatable: true,
-//      selectable: true,
-//    };
-
-//    $("#gridAdditionalReferenceSummary").kendoGrid(gridOption);
-//    const gridInstance = $("#gridAdditionalReferenceSummary").data("kendoGrid");
-//    if (gridInstance) {
-//      //const dataSource = CRMEducationNEnglishLanguagManager.educationSummaryDataSource();
-//    }
-//  },
-
-//  generateAdditionalReferenceSummaryColumn: function () {
-//    return [
-//      { field: "ApplicantRefferenceId", title: "ApplicantRefferenceId", hidden: true },
-//      { field: "Name", title: "Name", width: "200px" },
-//      { field: "Designation", title: "Designation", width: "200px" },
-//      { field: "Institution", title: "Institution", width: "200px" },
-//      { field: "EmailID", title: "Email ID", width: "150px" },
-//      { field: "PhoneNo", title: "Phone No", width: "150px" },
-//      { field: "FaxNo", title: "Fax No", width: "150px" },
-//      { field: "Address", title: "Address", width: "150px" },
-//      { field: "City", title: "City", width: "150px" },
-//      { field: "State", title: "State", width: "150px" },
-//      { field: "Country", title: "Country", width: "150px" },
-//      { field: "PostOrZipCode", title: "Post/Zip Code", width: "150px" },
-//      { command: "destroy", title: "Action", width: "100px" }
-//    ];
-//  },
-
-//  initializeAdditionalDocumentsSummaryGrid: function () {
-//    const gridOption = {
-//      dataSource: new kendo.data.DataSource({
-//        data: [],
-//        schema: {
-//          model: {
-//            id: "DocumentId",
-//            fields: {
-//              DocumentId: { type: "number", editable: false, nullable: true },
-//              HrrecordId: { type: "number" },
-//              Title: { type: "string" },
-//              UploadFile: { type: "string" },
-//            }
-//          }
-//        }
-//      }),
-//      toolbar: ["create"],
-//      scrollable: true,
-//      resizable: true,
-//      width: "400px",
-//      columns: CRMAdditionalInformationHelper.generateAdditionalDocumentsSummaryColumn(),
-//      editable: { model: "inline" },
-//      navigatable: true,
-//      selectable: true,
-//    };
-
-//    $("#griAdditionalDocumentsSummary").kendoGrid(gridOption);
-//    const gridInstance = $("#gridAdditionalReferenceSummary").data("kendoGrid");
-//    if (gridInstance) {
-//      //const dataSource = CRMEducationNEnglishLanguagManager.educationSummaryDataSource();
-//    }
-//  },
-
-//  generateAdditionalDocumentsSummaryColumn: function () {
-//    return [
-//      { field: "DocumentId", title: "DocumentId", hidden: true },
-//      { field: "HrrecordId", title: "HrrecordId", hidden: true },
-//      { field: "Title", title: "Title", width: "400px" },
-//      { field: "UploadFile", title: "UploadFile", width: "200px" },
-//      { command: "destroy", title: "Action", width: "100px" }
-//    ];
-//  },
-
-//}
-
-
-// <reference path="CRMCourseInformation.js" />
-// <reference path="CRMEducationNEnglishLanguage.js" />
-// <reference path="CRMApplicationSettings.js" />
-
-// Global Variables for file handling
+﻿
 let statementOfPurposeFileData = null;
 let additionalDocumentsFileData = {};
 
@@ -245,6 +115,7 @@ var CRMAdditionalInformationHelper = {
   generateAdditionalReferenceSummaryColumn: function () {
     return [
       { field: "ApplicantRefferenceId", title: "ApplicantRefferenceId", hidden: true },
+      { field: "ApplicantId", title: "ApplicantId", hidden: true },
       { field: "Name", title: "Name", width: "200px" },
       { field: "Designation", title: "Designation", width: "200px" },
       { field: "Institution", title: "Institution", width: "200px" },
@@ -256,7 +127,7 @@ var CRMAdditionalInformationHelper = {
       { field: "State", title: "State", width: "150px" },
       { field: "Country", title: "Country", width: "150px" },
       { field: "PostOrZipCode", title: "Post/Zip Code", width: "150px" },
-      { command: "destroy", title: "Action", width: "100px" }
+      { command: ["edit", "destroy"], title: "Action", width: "180px" }
     ];
   },
 
@@ -269,7 +140,7 @@ var CRMAdditionalInformationHelper = {
             id: "DocumentId",
             fields: {
               DocumentId: { type: "number", editable: false, nullable: true },
-              HrrecordId: { type: "number" },
+              ApplicantId: { type: "number", editable: false, nullable: true },
               Title: { type: "string" },
               UploadFile: { type: "string" },
               DocumentName: { type: "string" },
@@ -708,10 +579,10 @@ var CRMAdditionalInformationHelper = {
   createAdditionalInformationObject: function () {
     try {
       const additionalInformation = {
-        referenceDetails: this.createReferenceDetailsObject(),
-        statementOfPurpose: this.createStatementOfPurposeObject(),
-        additionalInformation: this.createAdditionalInfoObject(),
-        additionalDocuments: this.createAdditionalDocumentsObject()
+        ReferenceDetails: this.createReferenceDetailsObject(),
+        StatementOfPurpose: this.createStatementOfPurposeObject(),
+        AdditionalInformation: this.createAdditionalInfoObject(),
+        AdditionalDocuments: this.createAdditionalDocumentsObject()
       };
 
       console.log("Additional Information object created:", additionalInformation);
@@ -763,6 +634,8 @@ var CRMAdditionalInformationHelper = {
   createStatementOfPurposeObject: function () {
     try {
       return {
+        StatementOfPurposeId: parseInt($("#hdnStatementOfPurposeId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
         StatementOfPurposeRemarks: $("#txtStatementOfPurposeRemarks").val(),
         StatementOfPurposeFile: statementOfPurposeFileData,
         StatementOfPurposeFileName: statementOfPurposeFileData ? statementOfPurposeFileData.name : ""
@@ -799,7 +672,7 @@ var CRMAdditionalInformationHelper = {
         data.forEach(function (item) {
           documentsData.push({
             DocumentId: item.DocumentId,
-            HrrecordId: item.HrrecordId,
+            ApplicantId: item.ApplicantId,
             Title: item.Title,
             UploadFile: item.UploadFile,
             DocumentName: item.DocumentName,
@@ -813,7 +686,7 @@ var CRMAdditionalInformationHelper = {
         TotalDocumentRecords: documentsData.length
       };
     } catch (error) {
-      console.error("Error creating Additional Documents object:", error);
+      console.log("Error creating Additional Documents object:", error);
       return {};
     }
   },

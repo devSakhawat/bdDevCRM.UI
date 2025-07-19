@@ -309,13 +309,14 @@ var CRMEducationNEnglishLanguagHelper = {
             fields: {
               EducationHistoryId: { type: "number", editable: false, nullable: true },
               ApplicantId: { type: "number", editable: false, nullable: true },
+              AttachedDocumentFile: { type: "object", editable: false, nullable: true },
               Institution: { type: "string" },
               Qualification: { type: "string" },
               PassingYear: { type: "number" },
               Grade: { type: "string" },
-              AttachedDocument: { type: "string" },
               DocumentName: { type: "string" },
-              PdfThumbnail: { type: "string" }
+              AttachedDocument: { type: "string" },
+              PdfThumbnail: { type: "string" },
             }
           }
         }
@@ -347,6 +348,7 @@ var CRMEducationNEnglishLanguagHelper = {
     return [
       { field: "EducationHistoryId", title: "EducationHistoryId", hidden: true },
       { field: "ApplicantId", title: "ApplicantId", hidden: true },
+      { field: "AttachedDocumentFile", title: "AttachedDocumentFile", hidden: true },
       { field: "Institution", title: "Name of Institution", width: "200px" },
       { field: "Qualification", title: "Qualification", width: "200px" },
       {
@@ -483,7 +485,6 @@ var CRMEducationNEnglishLanguagHelper = {
     // Generate PDF thumbnail and update grid
     CRMEducationNEnglishLanguagManager.generatePdfThumbnail(file, docuid, function (thumbnailUrl) {
       // For now, simulate successful upload and update grid
-      // In real implementation, you would upload to server here
       const fileName = file.name;
       const filePath = "/uploads/education/" + fileName; // This would come from server response
 
@@ -491,7 +492,8 @@ var CRMEducationNEnglishLanguagHelper = {
       CRMEducationNEnglishLanguagHelper.updateGridRowWithDocument(docuid, {
         name: fileName,
         response: filePath,
-        thumbnail: thumbnailUrl
+        thumbnail: thumbnailUrl,
+        file: file // Store the file for later preview
       });
 
       // Show success message
@@ -501,10 +503,12 @@ var CRMEducationNEnglishLanguagHelper = {
         alert("Document uploaded successfully!");
       }
     });
+
   },
 
   // Update grid row with document information
   updateGridRowWithDocument: function (docuid, fileInfo) {
+    debugger;
     const grid = $("#gridEducationSummary").data("kendoGrid");
     if (!grid) return;
 
@@ -518,9 +522,20 @@ var CRMEducationNEnglishLanguagHelper = {
         data[i].set("AttachedDocument", fileInfo.response || fileInfo.name);
         data[i].set("DocumentName", fileInfo.name);
         data[i].set("PdfThumbnail", fileInfo.thumbnail || "");
+
+        try {
+          // assign directly as Object
+          data[i].AttachedDocumentFile = fileInfo.file || null;
+        } catch (e) {
+          // Fallback: assign directly if set() fails
+          // Preferred: try set() if model is observable
+          data[i].set("AttachedDocumentFile", fileInfo.file || "");
+        }
+
         break;
       }
     }
+    console.log(data);
 
     // Refresh the grid to show updated data
     grid.refresh();
@@ -692,6 +707,7 @@ var CRMEducationNEnglishLanguagHelper = {
             fields: {
               WorkExperienceId: { type: "number", editable: false, nullable: true },
               ApplicantId: { type: "number", editable: false, nullable: true },
+              ScannedCopyFile: { type: "oobject", editable: false, nullable: true },
               NameOfEmployer: { type: "string" },
               Position: { type: "string" },
               StartDate: { type: "date" },
@@ -722,6 +738,7 @@ var CRMEducationNEnglishLanguagHelper = {
     return [
       { field: "WorkExperienceId", title: "WorkExperienceId", hidden: true },
       { field: "ApplicantId", title: "ApplicantId", hidden: true },
+      { field: "ScannedCopyFile", title: "ScannedCopyFile", hidden: true },
       { field: "NameOfEmployer", title: "Name of Employer", width: "200px" },
       { field: "Position", title: "Position", width: "150px" },
       { field: "StartDate", title: "Start Date", width: "120px", format: "{0:dd/MM/yyyy}" },
@@ -789,7 +806,8 @@ var CRMEducationNEnglishLanguagHelper = {
       CRMEducationNEnglishLanguagHelper.updateWorkGridRowWithDocument(docuid, {
         name: fileName,
         response: filePath,
-        thumbnail: thumbnailUrl
+        thumbnail: thumbnailUrl,
+        file: file
       });
 
       if (typeof ToastrMessage !== 'undefined') {
@@ -812,6 +830,14 @@ var CRMEducationNEnglishLanguagHelper = {
         data[i].set("ScannedCopy", fileInfo.response || fileInfo.name);
         data[i].set("DocumentName", fileInfo.name);
         data[i].set("FileThumbnail", fileInfo.thumbnail || "");
+        try {
+          // assign directly as Object
+          data[i].ScannedCopyFile = fileInfo.file || null;
+        } catch (e) {
+          // Preferred: try set() if model is observable
+          data[i].set("ScannedCopyFile", fileInfo.file || "");
+        }
+
         break;
       }
     }
@@ -1410,36 +1436,87 @@ var CRMEducationNEnglishLanguagHelper = {
   createEducationNEnglishLanguageInformation: function () {
     try {
       const educationNEnglishLanguageInformation = {
-        ieltsInformation: this.createIELTSInformationObject(),
-        toeflInformation: this.createTOEFLInformationObject(),
-        pteInformation: this.createPTEInformationObject(),
-        gmatInformation: this.createGMATInformationObject(),
-        othersInformation: this.createOTHERSInformationObject(),
-        educationDetails: this.createEducationDetailsObject(),
-        workExperience: this.createWorkExperienceObject()
+        EducationDetails: this.createEducationDetailsObject(),
+        IELTSInformation: this.createIELTSInformationObject(),
+        TOEFLInformation: this.createTOEFLInformationObject(),
+        PTEInformation: this.createPTEInformationObject(),
+        GMATInformation: this.createGMATInformationObject(),
+        OTHERSInformation: this.createOTHERSInformationObject(),
+        WorkExperience: this.createWorkExperienceObject()
       };
 
       console.log("Education & English Language Information object created:", educationNEnglishLanguageInformation);
       return educationNEnglishLanguageInformation;
 
     } catch (error) {
-      console.log("Error creating Education & English Language Information object:" + error);
+      console.error("Error creating Education & English Language Information object:", error);
       return null;
     }
   },
 
-  /* ------ Updated Object Creation with File Data ------ */
+  /* ------ Object Creation with File Data ------ */
+
+  createEducationDetailsObject: function () {
+    try {
+      const grid = $("#gridEducationSummary").data("kendoGrid");
+      const educationData = [];
+      const attachedFiles = [];
+
+      if (grid) {
+        const data = grid.dataSource.data();
+        console.log(data);
+        data.forEach(function (item) {
+          educationData.push({
+            EducationHistoryId: item.EducationHistoryId,
+            ApplicantId: item.ApplicantId,
+            Institution: item.Institution,
+            Qualification: item.Qualification,
+            PassingYear: item.PassingYear,
+            Grade: item.Grade,
+            DocumentName: item.DocumentName,
+            AttachedDocument: item.AttachedDocument,
+            PdfThumbnail: item.PdfThumbnail,
+            AttachedDocumentFile: item.AttachedDocumentFile ? item.AttachedDocumentFile : null,
+          });
+
+          if (item.AttachedDocumentFile) {
+            attachedFiles.push(item.AttachedDocumentFile);
+          }
+
+        });
+      }
+
+      return {
+        EducationHistory: educationData,
+        TotalEducationRecords: educationData.length,
+        AttachedDocumentFileList: attachedFiles // attached files for education here.
+      };
+
+      //AttachedDocumentFileList:
+      //The return object of the createEducationDetailsObject() function correctly contains the AttachedDocumentFileList, 
+      //but it cannot be sent directly to the server as JSON, because the File object is not serializable.
+      //For this, a separate file needs to be added to the FormData.
+
+    } catch (error) {
+      console.log("Error creating Education Details object:" + error);
+      return {};
+    }
+  },
+
   createIELTSInformationObject: function () {
     try {
       const ieltsDatePicker = $("#dateIELTSDate").data("kendoDatePicker");
 
       return {
+        IELTSInformationId: parseInt($("#hdnIELTSInformationId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
         IELTSListening: $("#txtIELTSListening").val(),
         IELTSReading: $("#txtIELTSReading").val(),
         IELTSWriting: $("#txtIELTSWriting").val(),
         IELTSSpeaking: $("#txtIELTSSpeaking").val(),
         IELTSOverallScore: $("#txtIELTSOverallScore").val(),
         IELTSDate: ieltsDatePicker ? ieltsDatePicker.value() : null,
+        //IELTSScannedCopy: ieltsFileData,
         IELTSScannedCopyFile: ieltsFileData,
         IELTSScannedCopyFileName: ieltsFileData ? ieltsFileData.name : "",
         IELTSAdditionalInformation: $("#txtIELTSAdditionalInformation").val()
@@ -1455,6 +1532,8 @@ var CRMEducationNEnglishLanguagHelper = {
       const toeflDatePicker = $("#dateTOEFLDate").data("kendoDatePicker");
 
       return {
+        TOEFLInformationId: parseInt($("#hdnTOEFLInformationId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
         TOEFLListening: $("#txtTOEFLListening").val(),
         TOEFLReading: $("#txtTOEFLReading").val(),
         TOEFLWriting: $("#txtTOEFLWriting").val(),
@@ -1466,7 +1545,7 @@ var CRMEducationNEnglishLanguagHelper = {
         TOEFLAdditionalInformation: $("#txtTOEFLAdditionalInformation").val()
       };
     } catch (error) {
-      console.error("Error creating TOEFL Information object:", error);
+      console.log("Error creating TOEFL Information object:", error);
       return {};
     }
   },
@@ -1476,6 +1555,8 @@ var CRMEducationNEnglishLanguagHelper = {
       const pteDatePicker = $("#datePTEDate").data("kendoDatePicker");
 
       return {
+        PTEInformationId: parseInt($("#hdnPTEInformationId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
         PTEListening: $("#txtPTEListening").val(),
         PTEReading: $("#txtPTEReading").val(),
         PTEWriting: $("#txtPTEWriting").val(),
@@ -1497,6 +1578,8 @@ var CRMEducationNEnglishLanguagHelper = {
       const gmatDatePicker = $("#dateGMATDate").data("kendoDatePicker");
 
       return {
+        GMATInformationId: parseInt($("#hdnGMATInformationId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
         GMATListening: $("#txtGMATListening").val(),
         GMATReading: $("#txtGMATReading").val(),
         GMATWriting: $("#txtGMATWriting").val(),
@@ -1516,6 +1599,8 @@ var CRMEducationNEnglishLanguagHelper = {
   createOTHERSInformationObject: function () {
     try {
       return {
+        OTHERSInformationId: parseInt($("#hdnOTHERSInformationId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
         OTHERSAdditionalInformation: $("#txtOTHERSAdditionalInformation").val(),
         OTHERSScannedCopyFile: othersFileData,
         OTHERSScannedCopyFileName: othersFileData ? othersFileData.name : ""
@@ -1526,51 +1611,19 @@ var CRMEducationNEnglishLanguagHelper = {
     }
   },
 
-  createEducationDetailsObject: function () {
-    try {
-      const grid = $("#gridEducationSummary").data("kendoGrid");
-      const educationData = [];
-
-      if (grid) {
-        const dataSource = grid.dataSource;
-        const data = dataSource.data();
-
-        data.forEach(function (item) {
-          educationData.push({
-            EducationHistoryId: item.EducationHistoryId,
-            Institution: item.Institution,
-            Qualification: item.Qualification,
-            PassingYear: item.PassingYear,
-            Grade: item.Grade,
-            AttachedDocument: item.AttachedDocument,
-            DocumentName: item.DocumentName,
-            PdfThumbnail: item.PdfThumbnail
-          });
-        });
-      }
-
-      return {
-        EducationHistory: educationData,
-        TotalEducationRecords: educationData.length
-      };
-    } catch (error) {
-      console.log("Error creating Education Details object:" + error);
-      return {};
-    }
-  },
-
   createWorkExperienceObject: function () {
     try {
       const grid = $("#gridWorkExperience").data("kendoGrid");
       const workExperienceData = [];
+      const scannedCopyFiles = [];
 
       if (grid) {
-        const dataSource = grid.dataSource;
-        const data = dataSource.data();
+        const data = grid.dataSource.data();
 
         data.forEach(function (item) {
           workExperienceData.push({
             WorkExperienceId: item.WorkExperienceId,
+            ApplicantId: item.ApplicantId,
             NameOfEmployer: item.NameOfEmployer,
             Position: item.Position,
             StartDate: item.StartDate,
@@ -1579,20 +1632,62 @@ var CRMEducationNEnglishLanguagHelper = {
             MainResponsibility: item.MainResponsibility,
             ScannedCopy: item.ScannedCopy,
             DocumentName: item.DocumentName,
-            FileThumbnail: item.FileThumbnail
+            FileThumbnail: item.FileThumbnail,
+            ScannedCopyFile: item.ScannedCopyFile,
           });
+          if (item.ScannedCopyFile) {
+            scannedCopyFiles.push(item.ScannedCopyFile);
+          }
+
         });
       }
 
       return {
         WorkExperienceHistory: workExperienceData,
-        TotalWorkExperienceRecords: workExperienceData.length
+        TotalWorkExperienceRecords: workExperienceData.length,
+        ScannedCopyFileList: scannedCopyFiles,
       };
     } catch (error) {
       console.log("Error creating Work Experience object:" + error);
       return {};
     }
   },
+
+
+  //createWorkExperienceObject: function () {
+  //  try {
+  //    const grid = $("#gridWorkExperience").data("kendoGrid");
+  //    const workExperienceData = [];
+
+  //    if (grid) {
+  //      const dataSource = grid.dataSource;
+  //      const data = dataSource.data();
+
+  //      data.forEach(function (item) {
+  //        workExperienceData.push({
+  //          WorkExperienceId: item.WorkExperienceId,
+  //          NameOfEmployer: item.NameOfEmployer,
+  //          Position: item.Position,
+  //          StartDate: item.StartDate,
+  //          EndDate: item.EndDate,
+  //          Period: item.Period,
+  //          MainResponsibility: item.MainResponsibility,
+  //          ScannedCopy: item.ScannedCopy,
+  //          DocumentName: item.DocumentName,
+  //          FileThumbnail: item.FileThumbnail
+  //        });
+  //      });
+  //    }
+
+  //    return {
+  //      WorkExperienceHistory: workExperienceData,
+  //      TotalWorkExperienceRecords: workExperienceData.length
+  //    };
+  //  } catch (error) {
+  //    console.log("Error creating Work Experience object:" + error);
+  //    return {};
+  //  }
+  //},
 
   /* ------ Utility Methods ------ */
   exportEducationFormDataAsJSON: function () {

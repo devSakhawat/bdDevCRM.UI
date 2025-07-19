@@ -3059,7 +3059,7 @@ var CommonManager = {
   },
 
   /// all about kendo gird.
-  // Grid responsive করার জন্য common functions
+  // Grid responsive common functions
 
   // Store active resize handlers for cleanup
   _activeResizeHandlers: {},
@@ -3081,13 +3081,7 @@ var CommonManager = {
     return totalWidthOfTheGrid;
   },
 
-  /**
-    * Grid এর responsive width calculate করার জন্য generic method
-    * @param {string} gridId - Grid এর ID (যেমন: "gridSummaryInstitute")
-    * @param {Array} columnsArray - Grid এর columns array
-    * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
-    * @returns {string} - Calculated width in pixels
-    */
+
   calculateGridResponsiveWidth: function (gridId, columnsArray, marginOffset = 323) {
     const containerElement = $("#" + gridId).parent();
     let availableWidth;
@@ -3106,12 +3100,7 @@ var CommonManager = {
     return totalColumnsWidth > availableWidth ? availableWidth + "px" : totalColumnsWidth + "px";
   },
 
-  /**
-    * Grid এর জন্য zoom এবং resize handlers attach করার generic method
-    * @param {string} gridId - Grid এর ID
-    * @param {Array} columnsArray - Grid এর columns array
-    * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
-    */
+
   attachGridZoomAndResizeHandlers: function (gridId, columnsArray, marginOffset = 323) {
     let resizeTimeout;
     const self = this;
@@ -3150,51 +3139,42 @@ var CommonManager = {
     }, 500); // প্রতি 500ms এ check করুন
   },
 
-  /**
-   * Grid width adjust করার generic method
-   * @param {string} gridId - Grid এর ID
-   * @param {Array} columnsArray - Grid এর columns array
-   * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
-   */
   adjustGridWidth: function (gridId, columnsArray, marginOffset = 323) {
     const grid = $("#" + gridId).data("kendoGrid");
     if (grid) {
       const newWidth = this.calculateGridResponsiveWidth(gridId, columnsArray, marginOffset);
 
-      // Grid এর wrapper element এর width update করুন
+      // Grid wrapper element  width update 
       grid.wrapper.width(newWidth);
 
-      // Grid এর table element এর width update করুন
+      // Grid  table element  width update 
       grid.table.width("100%");
 
-      // Optional: Grid header এর width ও update করুন
+      // Optional: Grid header  width  update 
       if (grid.thead) {
         grid.thead.width("100%");
       }
 
-      // Grid কে refresh করুন layout এর জন্য (কিন্তু data reload না করে)
+      //  refresh Grid layout 
       setTimeout(function () {
         grid.resize();
       }, 50);
     }
   },
 
-  /**
-   * Grid এর সব event listeners এবং intervals cleanup করার method
-   * @param {string} gridId - Grid এর ID
-   */
+
   destroyGridHandlers: function (gridId) {
-    // Event listeners remove করুন
+    // Event listeners remove
     const eventNamespace = 'resize.kendoGrid_' + gridId;
     $(window).off(eventNamespace);
 
-    // Zoom detection interval clear করুন
+    // Zoom detection interval clear 
     if (window.gridZoomIntervals && window.gridZoomIntervals[gridId]) {
       clearInterval(window.gridZoomIntervals[gridId]);
       delete window.gridZoomIntervals[gridId];
     }
 
-    // Grid destroy করুন (optional)
+    // Grid destroy (optional)
     const grid = $("#" + gridId).data("kendoGrid");
     if (grid) {
       grid.destroy();
@@ -3202,8 +3182,8 @@ var CommonManager = {
   },
 
   /**
-   * Multiple grids এর জন্য bulk cleanup
-   * @param {Array} gridIds - Grid IDs এর array
+   * Multiple grids bulk cleanup
+   * @param {Array} gridIds - Grid IDs array
    */
   destroyMultipleGridHandlers: function (gridIds) {
     const self = this;
@@ -3212,22 +3192,13 @@ var CommonManager = {
     });
   },
 
-  /**
-   * Grid initialize করার সময় responsive setup করার helper method
-   * @param {string} gridId - Grid এর ID
-   * @param {Object} gridOptions - Kendo Grid options
-   * @param {Array} columnsArray - Grid এর columns array
-   * @param {number} marginOffset - Container থেকে margin/padding (default: 323)
-   * @returns {Object} - Updated grid options with responsive width
-   */
+
   setupResponsiveGrid: function (gridId, gridOptions, columnsArray, marginOffset = 323) {
-    // Grid options এর width set করুন
+
     gridOptions.width = this.calculateGridResponsiveWidth(gridId, columnsArray, marginOffset);
 
-    // Grid initialize করুন
     $("#" + gridId).kendoGrid(gridOptions);
 
-    // Responsive handlers attach করুন
     this.attachGridZoomAndResizeHandlers(gridId, columnsArray, marginOffset);
 
     return gridOptions;
@@ -3578,231 +3549,11 @@ var CommonManager = {
     return items;
   },
 
-  getCountryNames: function () {
-    var states = [
-      ["Afghanistan"],
-      ["Albania"],
-      ["Algeria"],
-      ["Andorra"],
-      ["Angola"],
-      ["Antarctica"],
-      ["Antigua and Barbuda"],
-      ["Argentina"],
-      ["Armenia"],
-      ["Australia"],
-      ["Austria"],
-      ["Azerbaijan"],
-      ["Bahamas"],
-      ["Bahrain"],
-      ["Bangladesh"],
-      ["Barbados"],
-      ["Belarus"],
-      ["Belgium"],
-      ["Belize"],
-      ["Benin"],
-      ["Bermuda"],
-      ["Bhutan"],
-      ["Bolivia"],
-      ["Bosnia and Herzegovina"],
-      ["Botswana"],
-      ["Brazil"],
-      ["Brunei"],
-      ["Bulgaria"],
-      ["Burkina Faso"],
-      ["Burma"],
-      ["Burundi"],
-      ["Cambodia"],
-      ["Cameroon"],
-      ["Canada"],
-      ["Cape Verde"],
-      ["Central African Republic"],
-      ["Chad"],
-      ["Chile"],
-      ["China"],
-      ["Colombia"],
-      ["Comoros"],
-      ["Congo"], ["Democratic Republic"],
-      ["Congo"], ["Republic of the"],
-      ["Costa Rica"],
-      ["Cote d'Ivoire"],
-      ["Croatia"],
-      ["Cuba"],
-      ["Cyprus"],
-      ["Czech Republic"],
-      ["Denmark"],
-      ["Djibouti"],
-      ["Dominica"],
-      ["Dominican Republic"],
-      ["East Timor"],
-      ["Ecuador"],
-      ["Egypt"],
-      ["El Salvador"],
-      ["Equatorial Guinea"],
-      ["Eritrea"],
-      ["Estonia"],
-      ["Ethiopia"],
-      ["Fiji"],
-      ["Finland"],
-      ["France"],
-      ["Gabon"],
-      ["Gambia"],
-      ["Georgia"],
-      ["Germany"],
-      ["Ghana"],
-      ["Greece"],
-      ["Greenland"],
-      ["Grenada"],
-      ["Guatemala"],
-      ["Guinea"],
-      ["Guinea-Bissau"],
-      ["Guyana"],
-      ["Haiti"],
-      ["Honduras"],
-      ["Hong Kong"],
-      ["Hungary"],
-      ["Iceland"],
-      ["India"],
-      ["Indonesia"],
-      ["Iran"],
-      ["Iraq"],
-      ["Ireland"],
-      ["Israel"],
-      ["Italy"],
-      ["Jamaica"],
-      ["Japan"],
-      ["Jordan"],
-      ["Kazakhstan"],
-      ["Kenya"],
-      ["Kiribati"],
-      ["Korea North"],
-      ["Korea South"],
-      ["Kuwait"],
-      ["Kyrgyzstan"],
-      ["Laos"],
-      ["Latvia"],
-      ["Lebanon"],
-      ["Lesotho"],
-      ["Liberia"],
-      ["Libya"],
-      ["Liechtenstein"],
-      ["Lithuania"],
-      ["Luxembourg"],
-      ["Macedonia"],
-      ["Madagascar"],
-      ["Malawi"],
-      ["Malaysia"],
-      ["Maldives"],
-      ["Mali"],
-      ["Malta"],
-      ["Marshall Islands"],
-      ["Mauritania"],
-      ["Mauritius"],
-      ["Mexico"],
-      ["Micronesia"],
-      ["Moldova"],
-      ["Mongolia"],
-      ["Morocco"],
-      ["Monaco"],
-      ["Mozambique"],
-      ["Namibia"],
-      ["Nauru"],
-      ["Nepal"],
-      ["Netherlands"],
-      ["New Zealand"],
-      ["Nicaragua"],
-      ["Niger"],
-      ["Nigeria"],
-      ["Norway"],
-      ["Oman"],
-      ["Pakistan"],
-      ["Panama"],
-      ["Papua New Guinea"],
-      ["Paraguay"],
-      ["Peru"],
-      ["Philippines"],
-      ["Poland"],
-      ["Portugal"],
-      ["Qatar"],
-      ["Romania"],
-      ["Russia"],
-      ["Rwanda"],
-      ["Samoa"],
-      ["San Marino"],
-      ["Sao Tome"],
-      ["Saudi Arabia"],
-      ["Senegal"],
-      ["Serbia and Montenegro"],
-      ["Seychelles"],
-      ["Sierra Leone"],
-      ["Singapore"],
-      ["Slovakia"],
-      ["Slovenia"],
-      ["Solomon Islands"],
-      ["Somalia"],
-      ["South Africa"],
-      ["Spain"],
-      ["Sri Lanka"],
-      ["Sudan"],
-      ["Suriname"],
-      ["Swaziland"],
-      ["Sweden"],
-      ["Switzerland"],
-      ["Syria"],
-      ["Taiwan"],
-      ["Tajikistan"],
-      ["Tanzania"],
-      ["Thailand"],
-      ["Togo"],
-      ["Tonga"],
-      ["Trinidad and Tobago"],
-      ["Tunisia"],
-      ["Turkey"],
-      ["Turkmenistan"],
-      ["Uganda"],
-      ["Ukraine"],
-      ["United Arab Emirates"],
-      ["United Kingdom"],
-      ["United States"],
-      ["Uruguay"],
-      ["Uzbekistan"],
-      ["Vanuatu"],
-      ["Venezuela"],
-      ["Vietnam"],
-      ["Yemen"],
-      ["Zambia"],
-      ["Zimbabwe"]
-    ];
+  getCountryNames: function () { return [["Afghanistan"], ["Albania"], ["Algeria"], ["Andorra"], ["Angola"], ["Antarctica"], ["Antigua and Barbuda"], ["Argentina"], ["Armenia"], ["Australia"], ["Austria"], ["Azerbaijan"], ["Bahamas"], ["Bahrain"], ["Bangladesh"], ["Barbados"], ["Belarus"], ["Belgium"], ["Belize"], ["Benin"], ["Bermuda"], ["Bhutan"], ["Bolivia"], ["Bosnia and Herzegovina"], ["Botswana"], ["Brazil"], ["Brunei"], ["Bulgaria"], ["Burkina Faso"], ["Burma"], ["Burundi"], ["Cambodia"], ["Cameroon"], ["Canada"], ["Cape Verde"], ["Central African Republic"], ["Chad"], ["Chile"], ["China"], ["Colombia"], ["Comoros"], ["Congo"], ["Democratic Republic"], ["Congo"], ["Republic of the"], ["Costa Rica"], ["Cote d'Ivoire"], ["Croatia"], ["Cuba"], ["Cyprus"], ["Czech Republic"], ["Denmark"], ["Djibouti"], ["Dominica"], ["Dominican Republic"], ["East Timor"], ["Ecuador"], ["Egypt"], ["El Salvador"], ["Equatorial Guinea"], ["Eritrea"], ["Estonia"], ["Ethiopia"], ["Fiji"], ["Finland"], ["France"], ["Gabon"], ["Gambia"], ["Georgia"], ["Germany"], ["Ghana"], ["Greece"], ["Greenland"], ["Grenada"], ["Guatemala"], ["Guinea"], ["Guinea-Bissau"], ["Guyana"], ["Haiti"], ["Honduras"], ["Hong Kong"], ["Hungary"], ["Iceland"], ["India"], ["Indonesia"], ["Iran"], ["Iraq"], ["Ireland"], ["Israel"], ["Italy"], ["Jamaica"], ["Japan"], ["Jordan"], ["Kazakhstan"], ["Kenya"], ["Kiribati"], ["Korea North"], ["Korea South"], ["Kuwait"], ["Kyrgyzstan"], ["Laos"], ["Latvia"], ["Lebanon"], ["Lesotho"], ["Liberia"], ["Libya"], ["Liechtenstein"], ["Lithuania"], ["Luxembourg"], ["Macedonia"], ["Madagascar"], ["Malawi"], ["Malaysia"], ["Maldives"], ["Mali"], ["Malta"], ["Marshall Islands"], ["Mauritania"], ["Mauritius"], ["Mexico"], ["Micronesia"], ["Moldova"], ["Mongolia"], ["Morocco"], ["Monaco"], ["Mozambique"], ["Namibia"], ["Nauru"], ["Nepal"], ["Netherlands"], ["New Zealand"], ["Nicaragua"], ["Niger"], ["Nigeria"], ["Norway"], ["Oman"], ["Pakistan"], ["Panama"], ["Papua New Guinea"], ["Paraguay"], ["Peru"], ["Philippines"], ["Poland"], ["Portugal"], ["Qatar"], ["Romania"], ["Russia"], ["Rwanda"], ["Samoa"], ["San Marino"], ["Sao Tome"], ["Saudi Arabia"], ["Senegal"], ["Serbia and Montenegro"], ["Seychelles"], ["Sierra Leone"], ["Singapore"], ["Slovakia"], ["Slovenia"], ["Solomon Islands"], ["Somalia"], ["South Africa"], ["Spain"], ["Sri Lanka"], ["Sudan"], ["Suriname"], ["Swaziland"], ["Sweden"], ["Switzerland"], ["Syria"], ["Taiwan"], ["Tajikistan"], ["Tanzania"], ["Thailand"], ["Togo"], ["Tonga"], ["Trinidad and Tobago"], ["Tunisia"], ["Turkey"], ["Turkmenistan"], ["Uganda"], ["Ukraine"], ["United Arab Emirates"], ["United Kingdom"], ["United States"], ["Uruguay"], ["Uzbekistan"], ["Vanuatu"], ["Venezuela"], ["Vietnam"], ["Yemen"], ["Zambia"], ["Zimbabwe"]]; },
 
-    return states;
-  },
 
   getCountryArray: function () {
-    var countryList = [
-      "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antarctica", "Antigua and Barbuda",
-      "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
-      "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia",
-      "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burma",
-      "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad",
-      "Chile", "China", "Colombia", "Comoros", "Congo", "Democratic Republic", "Republic of the Congo",
-      "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
-      "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
-      "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany",
-      "Ghana", "Greece", "Greenland", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti",
-      "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
-      "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea North", "Korea South",
-      "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
-      "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
-      "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Mongolia", "Morocco",
-      "Monaco", "Mozambique", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger",
-      "Nigeria", "Norway", "Oman", "Pakistan", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
-      "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Samoa", "San Marino", "Sao Tome",
-      "Saudi Arabia", "Senegal", "Serbia and Montenegro", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
-      "Slovenia", "Solomon Islands", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan", "Suriname",
-      "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo",
-      "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda", "Ukraine",
-      "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu",
-      "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-    ];
+    var countryList = [["Barguna"], ["Barishal"], ["Bhola"], ["Jhalokati"], ["Patuakhali"], ["Pirojpur"], ["Bandarban"], ["Brahmanbaria"], ["Chandpur"], ["Chittagong"], ["Comilla"], ["Coxs Bazar"], ["Feni"], ["Khagrachhari"], ["Lakshmipur"], ["Noakhali"], ["Rangamati"], ["Dhaka"], ["Faridpur"], ["Gazipur"], ["Gopalganj"], ["Jamalpur"], ["Kishoreganj"], ["Madaripur"], ["Manikganj"], ["Munshiganj"], ["Mymensingh"], ["Narayanganj"], ["Narsingdi"], ["Netrakona"], ["Rajbari"], ["Shariatpur"], ["Sherpur"], ["Tangail"], ["Bagerhat"], ["Chuadanga"], ["Jessore"], ["Jhenaidah"], ["Khulna"], ["Kushtia"], ["Magura"], ["Meherpur"], ["Narail"], ["Satkhira"], ["Bogra"], ["Joypurhat"], ["Naogaon"], ["Natore"], ["Nawabganj"], ["Pabna"], ["Rajshahi"], ["Sirajganj"], ["Dinajpur"], ["Gaibandha"], ["Kurigram"], ["Lalmonirhat"], ["Nilphamari"], ["Panchagarh"], ["Rangpur"], ["Thakurgaon"], ["Habiganj"], ["Moulvibazar"], ["Sunamganj"], ["Sylhet"]];
 
     let countryDictionary = {};
 
@@ -3858,6 +3609,100 @@ var CommonManager = {
     str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
     str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'only ' : '';
     return str;
+  },
+
+
+  /* -------- Processing Overlay Functions -------- */
+  showProcessingOverlay: function (message = "Processing... Please wait.") {
+    // Remove existing overlay if any
+    this.hideProcessingOverlay();
+
+    // Create overlay HTML
+    const overlayHtml = `
+      <div id="crmProcessingOverlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 99999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+      ">
+        <div style="
+          background: white;
+          padding: 30px 40px;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+          text-align: center;
+          min-width: 300px;
+        ">
+          <div style="
+            margin-bottom: 20px;
+          ">
+            <div style="
+              width: 40px;
+              height: 40px;
+              border: 4px solid #f3f3f3;
+              border-top: 4px solid #007bff;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+              margin: 0 auto 15px auto;
+            "></div>
+            <style>
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            </style>
+          </div>
+          <div style="
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.4;
+          ">
+            ${message}
+          </div>
+          <div style="
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+          ">
+            Please do not close or refresh the page
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Add overlay to body
+    $("body").append(overlayHtml);
+
+    // Disable scrolling
+    $("body").css("overflow", "hidden");
+
+    // Disable all form inputs to prevent user interaction
+    $("input, button, select, textarea").prop("disabled", true);
+    $("a").css("pointer-events", "none");
+
+    console.log("Processing overlay shown:", message);
+  },
+
+  hideProcessingOverlay: function () {
+    // Remove overlay
+    $("#crmProcessingOverlay").remove();
+
+    // Re-enable scrolling
+    $("body").css("overflow", "");
+
+    // Re-enable all form inputs
+    $("input, button, select, textarea").prop("disabled", false);
+    $("a").css("pointer-events", "");
+
+    console.log("Processing overlay hidden");
   },
 
 };

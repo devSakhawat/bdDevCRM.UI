@@ -66,7 +66,7 @@ var CRMApplicationManager = {
             $noty.close();
 
             // Show loading indicator and lock screen
-            CRMApplicationHelper.showProcessingOverlay("Saving application... Please wait.");
+            CommonManager.showProcessingOverlay("Saving application... Please wait.");
 
             try {
               const response = await VanillaApiCallManager.SendRequestVanilla(
@@ -80,9 +80,6 @@ var CRMApplicationManager = {
                   requireAuth: true
                 }
               );
-
-              // Hide loading indicator
-              CRMApplicationHelper.hideProcessingOverlay();
 
               if (response && response.IsSuccess === true) {
                 ToastrMessage.showSuccess(successMsg, "Success", 3000);
@@ -117,6 +114,10 @@ var CRMApplicationManager = {
 
               VanillaApiCallManager.handleApiError(err);
               ToastrMessage.showError("Failed to save application. Please try again.", "Save Error", 0);
+            }
+            finally {
+              // Hide loading indicator
+              CommonManager.hideProcessingOverlay();
             }
           }
         },
@@ -268,16 +269,15 @@ var CRMApplicationManager2 = {
       // Create FormData for file uploads
       const formData = new FormData();
 
-      // Append all files from different sections
-      CRMApplicationHelper.appendAllFilesToFormData(formData);
 
       // Append application data as JSON string (for complex nested objects)
       formData.append("ApplicationData", JSON.stringify(applicationData));
 
-      // Alternatively, if the API expects flat structure, append each section separately:
-      // formData.append("CourseInformation", JSON.stringify(applicationData.courseInformation));
-      // formData.append("EducationInformation", JSON.stringify(applicationData.educationInformation));
-      // formData.append("AdditionalInformation", JSON.stringify(applicationData.additionalInformation));
+      files = new FormData();
+      files = CRMApplicationHelper.appendAllFilesToFormData(files);
+
+      console.log(formData);
+      console.log(files);
 
       // Confirmation popup before sending
       CommonManager.MsgBox("info", "center", "Confirmation", confirmMsg, [
@@ -481,99 +481,6 @@ var CRMApplicationHelper = {
     } else {
       console.log("Kendo TabStrip Failed to Initialize.");
     }
-  },
-
-  /* -------- Processing Overlay Functions -------- */
-  showProcessingOverlay: function (message = "Processing... Please wait.") {
-    // Remove existing overlay if any
-    this.hideProcessingOverlay();
-
-    // Create overlay HTML
-    const overlayHtml = `
-      <div id="crmProcessingOverlay" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 99999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: Arial, sans-serif;
-      ">
-        <div style="
-          background: white;
-          padding: 30px 40px;
-          border-radius: 8px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-          text-align: center;
-          min-width: 300px;
-        ">
-          <div style="
-            margin-bottom: 20px;
-          ">
-            <div style="
-              width: 40px;
-              height: 40px;
-              border: 4px solid #f3f3f3;
-              border-top: 4px solid #007bff;
-              border-radius: 50%;
-              animation: spin 1s linear infinite;
-              margin: 0 auto 15px auto;
-            "></div>
-            <style>
-              @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-              }
-            </style>
-          </div>
-          <div style="
-            font-size: 16px;
-            color: #333;
-            font-weight: 500;
-            line-height: 1.4;
-          ">
-            ${message}
-          </div>
-          <div style="
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
-          ">
-            Please do not close or refresh the page
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Add overlay to body
-    $("body").append(overlayHtml);
-
-    // Disable scrolling
-    $("body").css("overflow", "hidden");
-
-    // Disable all form inputs to prevent user interaction
-    $("input, button, select, textarea").prop("disabled", true);
-    $("a").css("pointer-events", "none");
-
-    console.log("Processing overlay shown:", message);
-  },
-
-  hideProcessingOverlay: function () {
-    // Remove overlay
-    $("#crmProcessingOverlay").remove();
-
-    // Re-enable scrolling
-    $("body").css("overflow", "");
-
-    // Re-enable all form inputs
-    $("input, button, select, textarea").prop("disabled", false);
-    $("a").css("pointer-events", "");
-
-    console.log("Processing overlay hidden");
   },
 
   /* -------- Create Complete Application Object -------- */

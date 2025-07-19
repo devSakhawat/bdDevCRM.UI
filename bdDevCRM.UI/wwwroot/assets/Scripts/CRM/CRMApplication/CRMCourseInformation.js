@@ -11,6 +11,7 @@
 
 // Global Variable
 var isCountryDataLoaded = false;
+var applicantImageFile = null;
 
 /* =========================================================
    CRMCourseInformationManager : API Calls Management
@@ -207,7 +208,6 @@ var CRMCourseInformationHelper = {
     CRMCourseInformationHelper.generateMeritalStatusCombo();
 
     // Passport
-
     CRMCourseInformationHelper.initializePaymentDate();
     CRMCourseInformationHelper.initializeDateOfBirth();
     CRMCourseInformationHelper.initializePassportIssueDate();
@@ -704,7 +704,12 @@ var CRMCourseInformationHelper = {
   initApplicantImagePreview: function () {
     $("#ApplicantImageFile").on("change", function () {
       const file = this.files[0];
+      // Clear previous image file
+      applicantImageFile = null;
+
       if (file && file.type.startsWith("image/")) {
+        applicantImageFile = file;
+
         const reader = new FileReader();
         reader.onload = e =>
           $("#applicantImageThumb").attr("src", e.target.result).removeClass("d-none");
@@ -778,7 +783,6 @@ var CRMCourseInformationHelper = {
         ApplicantAddress: this.createApplicantAddressObject()
       };
       console.log(applicationCourseInformation);
-      debugger;
 
       console.log("Application Course Information object created:", applicationCourseInformation);
       return applicationCourseInformation;
@@ -869,22 +873,25 @@ var CRMCourseInformationHelper = {
         GenderId: genderCombo && genderCombo.value() ? parseInt(genderCombo.value()) : 0,
         GenderName: genderCombo ? genderCombo.text() : "",
 
+        // Personal Info
         TitleValue: titleCombo ? titleCombo.value() : "",
         TitleText: titleCombo ? titleCombo.text() : "",
-
         FirstName: $("#txtFirstName").val() || "",
         LastName: $("#txtLastName").val() || "",
         DateOfBirth: dateOfBirthPicker ? dateOfBirthPicker.value() : null,
 
+        // Marital Status (dataValueField: "MaritalStatusId", dataTextField: "MaritalStatusName")
         MaritalStatusId: maritalStatusCombo && maritalStatusCombo.value() ? parseInt(maritalStatusCombo.value()) : 0,
         MaritalStatusName: maritalStatusCombo ? maritalStatusCombo.text() : "",
 
+        // Passport Information
         Nationality: $("#txtNationality").val() || "",
         HasValidPassport: $("input[name='ValidPassport']:checked").val() || "",
         PassportNumber: $("#txtPassportNumberForCourse").val() || "",
         assportIssueDate: passportIssueDate,
         PassportExpiryDate: passportExpiryDate,
 
+        // Contact Information
         PhoneCountryCode: $("#txtPhoneCountrycodeForCourse").val() || "",
         PhoneAreaCode: $("#txtPhoneAreacodeForCourse").val() || "",
         PhoneNumber: $("#txtPhoneNumberForCourse").val() || "",
@@ -892,14 +899,18 @@ var CRMCourseInformationHelper = {
         EmailAddress: $("#txtEmailAddressForCourse").val() || "",
         SkypeId: $("#txtSkypeIDForCourse").val() || "",
 
+        // Applicant Image
+        //ApplicantImageFile: $("#ApplicantImageFile")[0].files[0] || null,
+        ApplicantImageFile: applicantImageFile,
         ApplicantImagePath: "", // Will be set in backend after file upload
+        ApplicantImagePreview: $("#applicantImageThumb").attr("src") || "",
 
-        CreatedDate: now,
-        CreatedBy: 0, // Set from backend after login
-        UpdatedDate: null,
-        UpdatedBy: null
+        //CreatedDate: now,
+        //CreatedBy: 0, // Set from backend after login
+        //UpdatedDate: null,
+        //UpdatedBy: null
       };
-
+      debugger
       return personalDetails;
     } catch (error) {
       ToastrMessage.showError("Error creating Personal Details object: " + error, "Error");

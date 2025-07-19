@@ -12,6 +12,7 @@ let prospectusFileData = null;
 =========================================================*/
 
 var InstituteDetailsManager = {
+
   /* -------- DataSource:  DDL -------- */
   fetchInstituteTypeComboBoxData: async function () {
     const serviceUrl = "/crm-institutetype-ddl";

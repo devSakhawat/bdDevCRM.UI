@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson; // Add this using directive
+//using Microsoft.AspNetCore.Mvc.NewtonsoftJson; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +20,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddMvc().AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix).AddDataAnnotationsLocalization();
+
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
   var supportedCultures = new[]

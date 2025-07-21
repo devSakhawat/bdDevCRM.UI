@@ -309,11 +309,11 @@ var CRMEducationNEnglishLanguagHelper = {
             fields: {
               EducationHistoryId: { type: "number", editable: false, nullable: true },
               ApplicantId: { type: "number", editable: false, nullable: true },
-              AttachedDocumentFile: { type: "object", editable: false, nullable: true },
               Institution: { type: "string" },
               Qualification: { type: "string" },
               PassingYear: { type: "number" },
               Grade: { type: "string" },
+              AttachedDocumentFile: { type: "object", editable: false, nullable: true },
               DocumentName: { type: "string" },
               AttachedDocument: { type: "string" },
               PdfThumbnail: { type: "string" },
@@ -707,14 +707,16 @@ var CRMEducationNEnglishLanguagHelper = {
             fields: {
               WorkExperienceId: { type: "number", editable: false, nullable: true },
               ApplicantId: { type: "number", editable: false, nullable: true },
-              ScannedCopyFile: { type: "oobject", editable: false, nullable: true },
               NameOfEmployer: { type: "string" },
               Position: { type: "string" },
               StartDate: { type: "date" },
               EndDate: { type: "date" },
               Period: { type: "string" },
               MainResponsibility: { type: "string" },
-              ScannedCopy: { type: "string" },
+              ScannedCopyFile: { type: "object", editable: false, nullable: true },
+              ScannedCopyFileName: item.ScannedCopyFileName,
+              ScannedCopyPath: item.ScannedCopyPath,
+              //ScannedCopy: { type: "string" },
               DocumentName: { type: "string" },
               FileThumbnail: { type: "string" }
             }
@@ -739,6 +741,10 @@ var CRMEducationNEnglishLanguagHelper = {
       { field: "WorkExperienceId", title: "WorkExperienceId", hidden: true },
       { field: "ApplicantId", title: "ApplicantId", hidden: true },
       { field: "ScannedCopyFile", title: "ScannedCopyFile", hidden: true },
+      { field: "ScannedCopyFileName", title: "ScannedCopyFileName", hidden: true },
+      { field: "ScannedCopyPath", title: "ScannedCopyPath", hidden: true },
+      { field: "DocumentName", title: "DocumentName", hidden: true },
+      { field: "FileThumbnail", title: "FileThumbnail", hidden: true },
       { field: "NameOfEmployer", title: "Name of Employer", width: "200px" },
       { field: "Position", title: "Position", width: "150px" },
       { field: "StartDate", title: "Start Date", width: "120px", format: "{0:dd/MM/yyyy}" },
@@ -761,7 +767,6 @@ var CRMEducationNEnglishLanguagHelper = {
         width: "200px"
       },
       { command: ["edit", "destroy"], title: "Action", width: "100px" }
-      //{ command: "destroy", title: "Action", width: "100px" }
     ];
   },
 
@@ -1489,7 +1494,7 @@ var CRMEducationNEnglishLanguagHelper = {
       return {
         EducationHistory: educationData,
         TotalEducationRecords: educationData.length,
-        AttachedDocumentFileList: attachedFiles // attached files for education here.
+        //AttachedDocumentFileList: attachedFiles // attached files for education here.
       };
 
       //AttachedDocumentFileList:
@@ -1630,10 +1635,12 @@ var CRMEducationNEnglishLanguagHelper = {
             EndDate: item.EndDate,
             Period: item.Period,
             MainResponsibility: item.MainResponsibility,
-            ScannedCopy: item.ScannedCopy,
+            ScannedCopyFile: item.ScannedCopyFile,
+            ScannedCopyFileName: item.ScannedCopyFileName,
+            ScannedCopyPath: item.ScannedCopyPath,
+            //ScannedCopy: item.ScannedCopy,
             DocumentName: item.DocumentName,
             FileThumbnail: item.FileThumbnail,
-            ScannedCopyFile: item.ScannedCopyFile,
           });
           if (item.ScannedCopyFile) {
             scannedCopyFiles.push(item.ScannedCopyFile);

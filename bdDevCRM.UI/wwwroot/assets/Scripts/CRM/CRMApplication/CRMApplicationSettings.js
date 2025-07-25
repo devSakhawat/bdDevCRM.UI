@@ -124,7 +124,7 @@ var CRMApplicationManager = {
                 throw new Error(response.Message || "Unknown error occurred while saving application");
               }
             } catch (err) {
-              console.error("=== Application Save Error ===", err);
+             /* console.error("=== Application Save Error ===", err);*/
               VanillaApiCallManager.handleApiError(err);
               ToastrMessage.showError("Failed to save application. Please try again.", "Save Error", 0);
             }

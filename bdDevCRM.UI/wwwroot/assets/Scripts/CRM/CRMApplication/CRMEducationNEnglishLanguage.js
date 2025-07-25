@@ -714,8 +714,8 @@ var CRMEducationNEnglishLanguagHelper = {
               Period: { type: "string" },
               MainResponsibility: { type: "string" },
               ScannedCopyFile: { type: "object", editable: false, nullable: true },
-              ScannedCopyFileName: item.ScannedCopyFileName,
-              ScannedCopyPath: item.ScannedCopyPath,
+              ScannedCopyFileName: { type: "string" },
+              ScannedCopyPath: { type: "string" },
               //ScannedCopy: { type: "string" },
               DocumentName: { type: "string" },
               FileThumbnail: { type: "string" }

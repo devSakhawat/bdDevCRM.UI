@@ -2672,7 +2672,7 @@ var CommonManager = {
         focusConfirm: false,
         // Add the didOpen hook here
         didOpen: () => {
-          document.querySelector('.swal2-container').style.zIndex = '9999'; // Set z-index dynamically
+          document.querySelector('.swal2-container').style.zIndex = '20000'; // Set z-index dynamically
         }
       };
 

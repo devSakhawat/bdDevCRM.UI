@@ -8,6 +8,7 @@ $(document).ready(function () {
   console.log("Bangladesh Development CRM System - Managing Institute and Course Information from Various Countries");
 
   CRMApplicationHelper.createTabstrip();
+  CRMApplicationHelper.initCrmApplicationSummary();
 
   CRMCourseInformationHelper.intCourse();
   CRMEducationNEnglishLanguagHelper.initEducationNEnglishtLanguage();
@@ -21,6 +22,27 @@ $(document).ready(function () {
    CRMApplicationManager : Save/Update Application Form
 =========================================================*/
 var CRMApplicationManager = {
+
+
+  /* ------- Application Summary Grid Data Source -------- */
+  getApplicationGridDataSource: function () {
+    return VanillaApiCallManager.GenericGridDataSource({
+      apiUrl: baseApi + "/crm-application-summary",
+      requestType: "POST",
+      async: true,
+      modelFields: { createdDate: { type: "date" } },
+      pageSize: 20,
+      serverPaging: true,
+      serverSorting: true,
+      serverFiltering: true,
+      allowUnsort: true,
+      schemaData: "Data.Items",
+      schemaTotal: "Data.TotalCount"
+    });
+  },
+
+
+
 
   /* -------- Save ⬌ Update -------- */
   saveOrUpdateItem: async function () {
@@ -102,12 +124,12 @@ var CRMApplicationManager = {
                 ToastrMessage.showSuccess(successMsg, "Success", 3000);
 
                 // Clear all form sections
-                CRMApplicationHelper.clearAllForms();
+                CRMApplicationHelper.clearForm();
 
-                // Close any open windows
-                if (typeof CommonManager !== "undefined") {
-                  CommonManager.closeKendoWindow("ApplicationWindow");
-                }
+                //// Close any open windows
+                //if (typeof CommonManager !== "undefined") {
+                //  CommonManager.closeKendoWindow("ApplicationWindow");
+                //}
 
                 // Refresh any related grids if they exist
                 const applicationGrid = $("#gridApplicationSummary").data("kendoGrid");
@@ -283,6 +305,320 @@ var CRMApplicationHelper = {
     }
   },
 
+  /* -------- CRM Application Grid -------- */
+
+  initCrmApplicationSummary: function () {
+    this.initializeSummaryGrid();
+  },
+
+  initializeSummaryGrid: function () {
+    var Columns = this.generateColumns();
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(this.generateColumns());
+    var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
+
+    const gridOptions = {
+      toolbar: [
+/*        { template: '<button type="button" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base" onclick="InstituteDetailsHelper.openInistitutePopUp();"><span class="k-button-text"> + Create New </span></button>' },*/
+        { name: "excel" },
+        { name: "pdf" },
+        { template: '<button type="button" id="btnExportApplicationCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
+      ],
+      excel: {
+        fileName: "Application_List_" + Date.now() + ".xlsx",
+        filterable: true,
+        allPages: true,
+        columnInfo: true,
+      },
+      pdf: {
+        fileName: "Application_List_" + Date.now() + ".pdf",
+        allPages: true,
+        paperSize: "A4",
+        landscape: true,
+        margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
+        scale: 0.9,
+        repeatHeaders: true,
+        //columns: [
+        //  { field: "InstituteName", width: 200 }
+        //]
+      },
+      dataSource: [],
+      autoBind: true,
+      navigatable: true,
+      scrollable: true,
+      resizable: true,
+      width: gridWidth,
+      filterable: true,
+      sortable: true,
+      pageable: {
+        refresh: true,
+        pageSizes: [10, 50, 100,500,1000],
+        buttonCount: 5,
+        input: false,
+        numeric: true,
+        serverPaging: true,
+        serverFiltering: true,
+        serverSorting: true
+      },
+      columns: Columns,
+      editable: false,
+      selectable: "row",
+
+      error: function (e) {
+        VanillaApiCallManager.handleApiError(error);
+        //console.error("Grid Error:", e);
+        //kendo.alert("Grid Error: " + e.errors);
+      }
+    };
+
+    // Initialize the Kendo Grid
+    $("#gridSummaryCrmApplication").kendoGrid(gridOptions);
+
+    // CSV Export button event
+    $("#btnExportApplicationCsv").on("click", function () {
+      // quing file name will be generate in below function
+      CommonManager.GenerateCSVFileAllPages("gridSummaryCrmApplication", "Application", "Actions");
+    });
+
+    const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
+    if (grid) {
+      const ds = CRMApplicationManager.getApplicationGridDataSource();
+
+      // Add data source error handling
+      ds.bind("error", function (error) {
+        VanillaApiCallManager.handleApiError(error);
+      });
+
+      // Add data source success handling
+      ds.bind("requestEnd", function (e) {
+        console.log(ds);
+        if (e.response && e.response.isSuccess === false) {
+          VanillaApiCallManager.handleApiError(e.response);
+          //console.error("API returned error:", e.response.message);
+          //kendo.alert("Error: " + e.response.message);
+        }
+      });
+
+      grid.setDataSource(ds);
+    }
+  },
+
+  ///* Grid Columns */
+  //generateColumns: function () {
+  //  return [
+  //    // hidden fields
+  //    { field: "ApplicationId", hidden: true },
+  //    { field: "ApplicantId", hidden: true },
+
+  //    // ApplicantImage
+  //    {
+  //      field: "ApplicantImagePath",
+  //      title: "Photo",
+  //      width: "100px",
+  //      template: function (dataItem) {
+  //        if (!dataItem.ApplicantImagePath) return `<span style="color:#888">No Photo</span>`;
+  //        // baseApiFilePath from common js
+  //        const fullUrl = `${baseApiFilePath}${dataItem.ApplicantImagePath}`;
+  //        return `<img src="${fullUrl}" 
+  //               style="height:50px; max-width:100px; object-fit:contain; cursor:pointer;"
+  //               onclick="PreviewManger.openGridImagePreview('${dataItem.ApplicantImagePath}')" />`;
+  //      }
+  //    },
+
+  //    //// InstitutionProspectus as PDF link
+  //    //{
+  //    //  field: "InstitutionProspectus",
+  //    //  title: "Prospectus",
+  //    //  width: 150,
+  //    //  template: function (dataItem) {
+  //    //    if (dataItem.InstitutionProspectus) {
+  //    //      return `<a href="#" style= "contain; cursor:pointer;"
+  //    //      onclick="PreviewManger.openPreview('${dataItem.InstitutionProspectus}'); ">📄 View PDF</a>`;
+  //    //    } else {
+  //    //      return `<span style="color:#888">No File</span>`;
+  //    //    }
+  //    //  }
+  //    //},
+
+  //    // Basic Info fields
+  //    { field: "EmailAddress", title: "Email", width: "200px" },
+  //    { field: "Mobile", title: "Mobile", width: "200px" },
+  //    { field: "PassportNumber", title: "Passport", width: "200px" },
+  //    { field: "MaritalStatusName", title: "Marital Status", width: "200px" },
+  //    { field: "GenderName", title: "GenderName", width: "200px" },
+  //    { field: "PermanentFullAddress", title: "Address", width: "200px" },
+
+
+
+  //    // Action buttons
+  //    {
+  //      field: "Action", title: "#", filterable: false, width: "230px",
+  //      template: `
+  //      <input type="button" class="btn btn-outline-success widthSize30_per"
+  //             value="View" onClick="CRMApplicationHelper.clickEventForViewButton(event)" />
+  //      <input type="button" class="btn btn-outline-dark me-1 widthSize30_per"
+  //             value="Edit" onClick="CRMApplicationHelper.clickEventForEditButton(event)" />
+  //      <input type="button" class="btn btn-outline-danger widthSize33_per"
+  //             value="Delete" onClick="CRMApplicationHelper.clickEventForDeleteButton(event)" />
+  //    `
+  //    }
+  //  ];
+  //},
+
+  /* -------- Generate Grid Columns -------- */
+  generateColumns: function () {
+    return [
+      // Hidden ID Fields
+      { field: "ApplicationId", hidden: true },
+      { field: "ApplicantId", hidden: true },
+      { field: "ApplicantCourseId", hidden: true },
+      { field: "CountryId", hidden: true },
+      { field: "InstituteId", hidden: true },
+      { field: "CourseId", hidden: true },
+      { field: "CurrencyId", hidden: true },
+      { field: "PaymentMethodId", hidden: true },
+      { field: "GenderId", hidden: true },
+      { field: "MaritalStatusId", hidden: true },
+      { field: "PermanentAddressId", hidden: true },
+      { field: "PresentAddressId", hidden: true },
+
+      //// ApplicantImage
+      //{
+      //  field: "ApplicantImagePath",
+      //  title: "Photo",
+      //  width: "100px",
+      //  template: function (dataItem) {
+      //    if (!dataItem.ApplicantImagePath) return `<span style="color:#888">No Photo</span>`;
+      //    // baseApiFilePath from common js
+      //    const fullUrl = `${baseApiFilePath}${dataItem.ApplicantImagePath}`;
+      //    return `<img src="${fullUrl}" 
+      //           style="height:50px; max-width:100px; object-fit:contain; cursor:pointer;"
+      //           onclick="PreviewManger.openGridImagePreview('${dataItem.ApplicantImagePath}')" />`;
+      //  }
+      //}
+
+
+      // File Indicators
+      {
+        field: "ApplicantImagePath",
+        title: "Photo",
+        width: "80px",
+        template: function (dataItem) {
+          if (dataItem.ApplicantImagePath) `return <span style="color:#888">No Photo</span>`;
+          // baseApiFilePath from common js
+          const fullUrl = `${baseApiFilePath}${dataItem.ApplicantImagePath}`;
+            return `<img src="${fullUrl}" 
+                   style="height:40px; width:40px; object-fit:cover; border-radius:50%; cursor:pointer;"
+                   onclick="PreviewManger.openGridImagePreview('${dataItem.ApplicantImagePath}')" />`;
+         
+          
+        }
+      },
+
+
+      // Basic Application Info
+      { field: "ApplicationDate", title: "Application<br/>Date", width: "120px", template: "#= ApplicationDate ? kendo.toString(new Date(ApplicationDate), 'dd-MMM-yyyy') : '' #" },
+      { field: "ApplicationStatus", title: "Status", width: "100px" },
+
+      // Personal Details
+      {
+        field: "ApplicantName",
+          title: "Applicant Name",
+            width: "180px",
+              template: "#= (TitleText || '') + ' ' + (FirstName || '') + ' ' + (LastName || '') #"
+      },
+      { field: "EmailAddress", title: "Email", width: "160px" },
+      { field: "Mobile", title: "Mobile", width: "120px" },
+      { field: "DateOfBirth", title: "Date of Birth", width: "120px", template: "#= DateOfBirth ? kendo.toString(new Date(DateOfBirth), 'dd-MMM-yyyy') : '' #" },
+      { field: "GenderName", title: "Gender", width: "80px" },
+      { field: "Nationality", title: "Nationality", width: "100px" },
+
+      // Passport Information
+      { field: "HasValidPassport", title: "Valid<br/>Passport", width: "80px" },
+      { field: "PassportNumber", title: "Passport No", width: "120px" },
+      { field: "PassportExpiryDate", title: "Passport<br/>Expiry", width: "120px", template: "#= PassportExpiryDate ? kendo.toString(new Date(PassportExpiryDate), 'dd-MMM-yyyy') : '' #" },
+
+      // Course Information
+      { field: "CountryName", title: "Country", width: "120px" },
+      { field: "InstituteName", title: "Institute", width: "200px" },
+      { field: "CourseTitle", title: "Course", width: "200px" },
+      { field: "IntakeMonth", title: "Intake<br/>Month", width: "100px" },
+      { field: "IntakeYear", title: "Intake<br/>Year", width: "80px" },
+
+      // Financial Information
+      { field: "ApplicationFee", title: "Application<br/>Fee", width: "100px" },
+      { field: "CurrencyName", title: "Currency", width: "90px" },
+      { field: "PaymentMethod", title: "Payment<br/>Method", width: "120px" },
+      { field: "PaymentDate", title: "Payment<br/>Date", width: "120px", template: "#= PaymentDate ? kendo.toString(new Date(PaymentDate), 'dd-MMM-yyyy') : '' #" },
+      { field: "PaymentReferenceNumber", title: "Payment<br/>Reference", width: "140px" },
+
+      // Address Information
+      { field: "PermanentCountryName", title: "Permanent<br/>Country", width: "120px" },
+      { field: "PermanentCity", title: "Permanent<br/>City", width: "100px" },
+      { field: "PresentCountryName", title: "Present<br/>Country", width: "120px" },
+      { field: "PresentCity", title: "Present<br/>City", width: "100px" },
+
+      // English Language Tests (Summary)
+      { field: "IELTSOverallBand", title: "IELTS<br/>Band", width: "80px" },
+      { field: "TOEFLOverallScore", title: "TOEFL<br/>Score", width: "80px" },
+      { field: "PTEOverallScore", title: "PTE<br/>Score", width: "80px" },
+
+      // Education Summary
+      { field: "HighestEducationLevel", title: "Highest<br/>Education", width: "140px" },
+      { field: "EducationGPA", title: "GPA", width: "70px" },
+
+      // Work Experience
+      { field: "TotalWorkExperience", title: "Work<br/>Experience", width: "100px" },
+
+      // Additional Information
+      { field: "HasStatementOfPurpose", title: "Statement<br/>of Purpose", width: "100px", template: "#= HasStatementOfPurpose ? 'Yes' : 'No' #" },
+      { field: "AdditionalDocumentsCount", title: "Additional<br/>Documents", width: "100px" },
+
+
+    ]
+  },
+
+  /* -------- Populate Object from Grid Item -------- */
+
+  /* --- Action Handlers --- */
+  _getGridItem: function (event) {
+    const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
+    const tr = $(event.target).closest("tr");
+    return grid.dataItem(tr);
+  },
+
+  clickEventForViewButton: function (event) {
+    debugger;
+    const item = this._getGridItem(event);
+    console.log(item);
+    if (item) {
+      CRMApplicationHelper.clearForm();
+
+      CRMApplicationHelper.populateObject(item);
+      CommonManager.MakeFormReadOnly("#CRMApplicationForm");
+      //$("#btnSaveOrUpdate").prop("disabled", "disabled");
+      $("#btnSaveOrUpdate").hide();
+      CommonManager.formShowGridHide("CrmApplcationFormShowHide" ,"CrmApplicationGridShowHide");
+    }
+  },
+
+  clickEventForEditButton: function (event) {
+    const item = this._getGridItem(event);
+    if (item) {
+      CRMApplicationHelper.clearForm();
+      CommonManager.formShowGridHide("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
+      CRMApplicationHelper.populateObject(item);
+      CommonManager.MakeFormEditable("#CRMApplicationForm");
+    }
+  },
+
+  clickEventForDeleteButton: function (event) {
+    const item = this._getGridItem(event);
+    if (item) {
+      CRMApplicationHelper.deleteItem(item);
+    }
+  },
+
+
   /* -------- Create Complete Application Object -------- */
   createCompleteApplicationObject: function () {
     try {
@@ -310,8 +646,6 @@ var CRMApplicationHelper = {
       return null;
     }
   },
-
-
 
   /* -------- NEW: Convert Nested Object to FormData with Files Integration -------- */
   convertNestedObjectToFormData: function (obj, formData, prefix) {
@@ -470,7 +804,7 @@ var CRMApplicationHelper = {
 
 
   /* -------- Clear All Forms -------- */
-  clearAllForms: function () {
+  clearForm: function () {
     try {
       console.log("=== Clearing All Application Forms ===");
 

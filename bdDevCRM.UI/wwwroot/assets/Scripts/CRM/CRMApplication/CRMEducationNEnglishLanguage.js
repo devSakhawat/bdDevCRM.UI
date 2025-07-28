@@ -327,7 +327,6 @@ var CRMEducationNEnglishLanguagHelper = {
       width: "400px",
       columns: CRMEducationNEnglishLanguagHelper.generateEducationSummaryColumn(),
       editable: { mode: "inline" },
-      //editable: { mode: "incell" },
       navigatable: true,
       selectable: true,
     };
@@ -361,7 +360,7 @@ var CRMEducationNEnglishLanguagHelper = {
       {
         field: "AttachedDocument",
         title: "Upload Document",
-        //template: '#= CRMEducationNEnglishLanguagHelper.editorFileUpload(data) #',
+        template: "",
         editor: CRMEducationNEnglishLanguagHelper.editorFileUpload,
         filterable: false,
         width: "200px"
@@ -394,6 +393,7 @@ var CRMEducationNEnglishLanguagHelper = {
         optionLabel: "Select Year"
       });
   },
+
 
   editorFileUpload: function (container, options) {
     const dataItem = options.model;
@@ -646,7 +646,6 @@ var CRMEducationNEnglishLanguagHelper = {
 
     $("#previewWindow").data("kendoWindow").center().open();
 
-    // Iframe দিয়ে PDF show করুন - CORS issue হবে না
     $("#preview").html(`
           <iframe
               src="${fullUrl}"
@@ -728,7 +727,7 @@ var CRMEducationNEnglishLanguagHelper = {
       resizable: true,
       width: "400px",
       columns: CRMEducationNEnglishLanguagHelper.generateWorkExperienceColumn(),
-      editable: { model: "inline" },
+      editable: { mode: "inline" },
       navigatable: true,
       selectable: true,
     };
@@ -747,17 +746,51 @@ var CRMEducationNEnglishLanguagHelper = {
       { field: "FileThumbnail", title: "FileThumbnail", hidden: true },
       { field: "NameOfEmployer", title: "Name of Employer", width: "200px" },
       { field: "Position", title: "Position", width: "150px" },
-      { field: "StartDate", title: "Start Date", width: "120px", format: "{0:dd/MM/yyyy}" },
-      { field: "EndDate", title: "End Date", width: "120px", format: "{0:dd/MM/yyyy}" },
+      //{ field: "StartDate", title: "Start Date", width: "120px", format: "{0:dd/MM/yyyy}" },
+      //{ field: "EndDate", title: "End Date", width: "120px", format: "{0:dd/MM/yyyy}" },
+      {
+        field: "StartDate",
+        title: "Start Date",
+        width: "230px",
+        format: "{0:dd/MMM/yyyy}",
+        editor: CommonManager.datePickerEditor
+      },
+      {
+        field: "EndDate",
+        title: "End Date",
+        width: "230px",
+        format: "{0:dd/MMM/yyyy}",
+        editor: CommonManager.datePickerEditor
+      },
       { field: "Period", title: "Period", width: "100px" },
-      { field: "MainResponsibility", title: "Main Responsibility", width: "250px" },
+      {
+        field: "MainResponsibility",
+        title: "Main Responsibility",
+        width: "250px",
+        editor: CommonManager.textareaEditor
+      },
       {
         field: "ScannedCopy",
         title: "Scanned Copy",
-        template: '#= CRMEducationNEnglishLanguagHelper.editorWorkFileUpload(data) #',
+        template: "", // prevent default rendering
+        editor: CRMEducationNEnglishLanguagHelper.editorWorkFileUpload,
         filterable: false,
         width: "200px"
       },
+      //{
+      //  field: "ScannedCopy",
+      //  title: "Scanned Copy",
+      //  editor: CRMEducationNEnglishLanguagHelper.editorWorkFileUpload,
+      //  filterable: false,
+      //  width: "200px"
+      //},
+      //{
+      //  field: "ScannedCopy",
+      //  title: "Scanned Copy",
+      //  template: '#= CRMEducationNEnglishLanguagHelper.editorWorkFileUpload2(data) #',
+      //  filterable: false,
+      //  width: "200px"
+      //},
       {
         field: "ViewScanned",
         title: "View Scanned Copy",
@@ -766,11 +799,40 @@ var CRMEducationNEnglishLanguagHelper = {
         filterable: false,
         width: "200px"
       },
-      { command: ["edit", "destroy"], title: "Action", width: "100px" }
+      { command: ["edit", "destroy"], title: "Action", width: "200px" }
     ];
   },
 
-  editorWorkFileUpload: function (data) {
+  editorWorkFileUpload: function (container, options) {
+    const dataItem = options.model;
+    const uid = dataItem.uid;
+
+    $('<input type="file" accept=".pdf,.jpg,.jpeg,.png,.gif" class="form-control" />')
+      .attr("onchange", 'CRMEducationNEnglishLanguagHelper.handleDirectWorkFileUpload(this, "' + uid + '")')
+      .appendTo(container);
+
+
+    //const wrapper = $('<div class="document-info"></div>').appendTo(container);
+
+    //// Show document name if exists (optional info display)
+    //if (dataItem.DocumentName) {
+    //  const shortName = dataItem.DocumentName.length > 20
+    //    ? dataItem.DocumentName.substring(0, 20) + '...'
+    //    : dataItem.DocumentName;
+
+    //  $('<div class="document-name" style="font-size: 11px; color: #666; margin-bottom: 4px;" title="' + dataItem.DocumentName + '">' +
+    //    '<i class="k-icon k-i-file" style="margin-right: 4px;"></i>' + shortName +
+    //    '</div>')
+    //    .appendTo(wrapper);
+    //}
+    //// Always show file input - regardless of whether document exists or not
+    //$('<input type="file" accept=".pdf,.jpg,.jpeg,.png,.gif" class="k-button form-control" />')
+    //  .attr("onchange", 'CRMEducationNEnglishLanguagHelper.handleDirectWorkFileUpload(this, "' + uid + '")')
+    //  .attr("title", dataItem.DocumentName ? "Replace document" : "Upload PDF or Image document")
+    //  .appendTo(wrapper);
+  },
+
+  editorWorkFileUpload2: function (data) {
     if (data.ScannedCopy && data.DocumentName) {
       return '<div class="document-info">' +
         '<span class="document-name" title="' + data.DocumentName + '">' +

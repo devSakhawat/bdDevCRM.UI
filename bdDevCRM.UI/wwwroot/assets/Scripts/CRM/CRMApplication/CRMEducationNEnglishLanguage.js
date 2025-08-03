@@ -1522,7 +1522,6 @@ var CRMEducationNEnglishLanguagHelper = {
   },
 
   /* ------ Object Creation with File Data ------ */
-
   createEducationDetailsObject: function () {
     try {
       const grid = $("#gridEducationSummary").data("kendoGrid");
@@ -1721,7 +1720,6 @@ var CRMEducationNEnglishLanguagHelper = {
       return {};
     }
   },
-
 
   //createWorkExperienceObject: function () {
   //  try {
@@ -2044,6 +2042,328 @@ var CRMEducationNEnglishLanguagHelper = {
 
   fillOTHERSDemoData: function () {
     $("#txtOTHERSAdditionalInformation").val("Demo additional information for other language certifications or entrance exams");
+  },
+
+
+  /* -------- Populate Education Information Tab -------- */
+  /* -------- Populate Education Information Tab -------- */
+  /* -------- Populate Education Information Tab -------- */
+  populateEducationInformation: function (educationData) {
+    try {
+      console.log("=== Populating Education Information ===");
+
+      // Populate IELTS Information
+      if (educationData.IELTSInformation) {
+        this.populateIELTSInformation(educationData.IELTSInformation);
+      }
+
+      // Populate TOEFL Information
+      if (educationData.TOEFLInformation) {
+        this.populateTOEFLInformation(educationData.TOEFLInformation);
+      }
+
+      // Populate PTE Information
+      if (educationData.PTEInformation) {
+        this.populatePTEInformation(educationData.PTEInformation);
+      }
+
+      // Populate GMAT Information
+      if (educationData.GMATInformation) {
+        this.populateGMATInformation(educationData.GMATInformation);
+      }
+
+      // Populate OTHERS Information
+      if (educationData.OTHERSInformation) {
+        this.populateOTHERSInformation(educationData.OTHERSInformation);
+      }
+
+      // Populate Education History
+      if (educationData.EducationDetails && educationData.EducationDetails.EducationHistory) {
+        this.populateEducationHistory(educationData.EducationDetails.EducationHistory);
+      }
+
+      // Populate Work Experience
+      if (educationData.WorkExperience && educationData.WorkExperience.WorkExperienceHistory) {
+        this.populateWorkExperience(educationData.WorkExperience.WorkExperienceHistory);
+      }
+
+      console.log("Education Information populated successfully");
+    } catch (error) {
+      console.error("Error populating Education Information:", error);
+    }
+  },
+
+  /* -------- Populate IELTS Information -------- */
+  populateIELTSInformation: function (ieltsData) {
+    try {
+      if (!ieltsData) return;
+
+      // Set hidden fields
+      $("#hdnIELTSInformationId").val(ieltsData.IELTSInformationId || 0);
+
+      // Populate IELTS scores
+      $("#txtIELTSListening").val(ieltsData.IELTSListening || "");
+      $("#txtIELTSReading").val(ieltsData.IELTSReading || "");
+      $("#txtIELTSWriting").val(ieltsData.IELTSWriting || "");
+      $("#txtIELTSSpeaking").val(ieltsData.IELTSSpeaking || "");
+      $("#txtIELTSOverallScore").val(ieltsData.IELTSOverallScore || "");
+      $("#txtIELTSAdditionalInformation").val(ieltsData.IELTSAdditionalInformation || "");
+
+      // Populate IELTS Date
+      if (ieltsData.IELTSDate) {
+        const ieltsDatePicker = $("#dateIELTSDate").data("kendoDatePicker");
+        if (ieltsDatePicker) {
+          ieltsDatePicker.value(new Date(ieltsData.IELTSDate));
+        }
+      }
+
+      // Handle IELTS file if exists
+      if (ieltsData.IELTSScannedCopyPath && ieltsData.IELTSScannedCopyFileName) {
+        const viewButton = $("#fileIELTSScannedCopyViewBtn");
+        if (viewButton.length) {
+          viewButton.prop("disabled", false);
+          viewButton.attr("title", "Click to view: " + ieltsData.IELTSScannedCopyFileName);
+          viewButton.html(`<i class="k-icon k-i-preview"></i> ${ieltsData.IELTSScannedCopyFileName}`);
+
+          // Store file path for viewing
+          viewButton.data("filePath", ieltsData.IELTSScannedCopyPath);
+          viewButton.data("fileName", ieltsData.IELTSScannedCopyFileName);
+        }
+      }
+
+      console.log("IELTS Information populated");
+    } catch (error) {
+      console.error("Error populating IELTS Information:", error);
+    }
+  },
+
+  /* -------- Populate TOEFL Information -------- */
+  populateTOEFLInformation: function (toeflData) {
+    try {
+      if (!toeflData) return;
+
+      // Set hidden fields
+      $("#hdnTOEFLInformationId").val(toeflData.TOEFLInformationId || 0);
+
+      // Populate TOEFL scores
+      $("#txtTOEFLListening").val(toeflData.TOEFLListening || "");
+      $("#txtTOEFLReading").val(toeflData.TOEFLReading || "");
+      $("#txtTOEFLWriting").val(toeflData.TOEFLWriting || "");
+      $("#txtTOEFLSpeaking").val(toeflData.TOEFLSpeaking || "");
+      $("#txtTOEFLOverallScore").val(toeflData.TOEFLOverallScore || "");
+      $("#txtTOEFLAdditionalInformation").val(toeflData.TOEFLAdditionalInformation || "");
+
+      // Populate TOEFL Date
+      if (toeflData.TOEFLDate) {
+        const toeflDatePicker = $("#dateTOEFLDate").data("kendoDatePicker");
+        if (toeflDatePicker) {
+          toeflDatePicker.value(new Date(toeflData.TOEFLDate));
+        }
+      }
+
+      // Handle TOEFL file if exists
+      if (toeflData.TOEFLScannedCopyPath && toeflData.TOEFLScannedCopyFileName) {
+        const viewButton = $("#fileTOEFLScannedCopyViewBtn");
+        if (viewButton.length) {
+          viewButton.prop("disabled", false);
+          viewButton.attr("title", "Click to view: " + toeflData.TOEFLScannedCopyFileName);
+          viewButton.html(`<i class="k-icon k-i-preview"></i> ${toeflData.TOEFLScannedCopyFileName}`);
+
+          // Store file path for viewing
+          viewButton.data("filePath", toeflData.TOEFLScannedCopyPath);
+          viewButton.data("fileName", toeflData.TOEFLScannedCopyFileName);
+        }
+      }
+
+      console.log("TOEFL Information populated");
+    } catch (error) {
+      console.error("Error populating TOEFL Information:", error);
+    }
+  },
+
+  /* -------- Populate PTE Information -------- */
+  populatePTEInformation: function (pteData) {
+    try {
+      if (!pteData) return;
+
+      // Set hidden fields
+      $("#hdnPTEInformationId").val(pteData.PTEInformationId || 0);
+
+      // Populate PTE scores
+      $("#txtPTEListening").val(pteData.PTEListening || "");
+      $("#txtPTEReading").val(pteData.PTEReading || "");
+      $("#txtPTEWriting").val(pteData.PTEWriting || "");
+      $("#txtPTESpeaking").val(pteData.PTESpeaking || "");
+      $("#txtPTEOverallScore").val(pteData.PTEOverallScore || "");
+      $("#txtPTEAdditionalInformation").val(pteData.PTEAdditionalInformation || "");
+
+      // Populate PTE Date
+      if (pteData.PTEDate) {
+        const pteDatePicker = $("#datePTEDate").data("kendoDatePicker");
+        if (pteDatePicker) {
+          pteDatePicker.value(new Date(pteData.PTEDate));
+        }
+      }
+
+      // Handle PTE file if exists
+      if (pteData.PTEScannedCopyPath && pteData.PTEScannedCopyFileName) {
+        const viewButton = $("#filePTEScannedCopyViewBtn");
+        if (viewButton.length) {
+          viewButton.prop("disabled", false);
+          viewButton.attr("title", "Click to view: " + pteData.PTEScannedCopyFileName);
+          viewButton.html(`<i class="k-icon k-i-preview"></i> ${pteData.PTEScannedCopyFileName}`);
+
+          // Store file path for viewing
+          viewButton.data("filePath", pteData.PTEScannedCopyPath);
+          viewButton.data("fileName", pteData.PTEScannedCopyFileName);
+        }
+      }
+
+      console.log("PTE Information populated");
+    } catch (error) {
+      console.error("Error populating PTE Information:", error);
+    }
+  },
+
+  /* -------- Populate GMAT Information -------- */
+  populateGMATInformation: function (gmatData) {
+    try {
+      if (!gmatData) return;
+
+      // Set hidden fields
+      $("#hdnGMATInformationId").val(gmatData.GMATInformationId || 0);
+
+      // Populate GMAT scores
+      $("#txtGMATListening").val(gmatData.GMATListening || "");
+      $("#txtGMATReading").val(gmatData.GMATReading || "");
+      $("#txtGMATWriting").val(gmatData.GMATWriting || "");
+      $("#txtGMATSpeaking").val(gmatData.GMATSpeaking || "");
+      $("#txtGMATOverallScore").val(gmatData.GMATOverallScore || "");
+      $("#txtGMATAdditionalInformation").val(gmatData.GMATAdditionalInformation || "");
+
+      // Populate GMAT Date
+      if (gmatData.GMATDate) {
+        const gmatDatePicker = $("#dateGMATDate").data("kendoDatePicker");
+        if (gmatDatePicker) {
+          gmatDatePicker.value(new Date(gmatData.GMATDate));
+        }
+      }
+
+      // Handle GMAT file if exists
+      if (gmatData.GMATScannedCopyPath && gmatData.GMATScannedCopyFileName) {
+        const viewButton = $("#fileGMATScannedCopyViewBtn");
+        if (viewButton.length) {
+          viewButton.prop("disabled", false);
+          viewButton.attr("title", "Click to view: " + gmatData.GMATScannedCopyFileName);
+          viewButton.html(`<i class="k-icon k-i-preview"></i> ${gmatData.GMATScannedCopyFileName}`);
+
+          // Store file path for viewing
+          viewButton.data("filePath", gmatData.GMATScannedCopyPath);
+          viewButton.data("fileName", gmatData.GMATScannedCopyFileName);
+        }
+      }
+
+      console.log("GMAT Information populated");
+    } catch (error) {
+      console.error("Error populating GMAT Information:", error);
+    }
+  },
+
+  /* -------- Populate OTHERS Information -------- */
+  populateOTHERSInformation: function (othersData) {
+    try {
+      if (!othersData) return;
+
+      // Set hidden fields
+      $("#hdnOTHERSInformationId").val(othersData.OTHERSInformationId || 0);
+
+      // Populate OTHERS information
+      $("#txtOTHERSAdditionalInformation").val(othersData.OTHERSAdditionalInformation || "");
+
+      // Handle OTHERS file if exists
+      if (othersData.OTHERSScannedCopyPath && othersData.OTHERSScannedCopyFileName) {
+        const viewButton = $("#oTHERSScannedCopyViewBtn");
+        if (viewButton.length) {
+          viewButton.prop("disabled", false);
+          viewButton.attr("title", "Click to view: " + othersData.OTHERSScannedCopyFileName);
+          viewButton.html(`<i class="k-icon k-i-preview"></i> ${othersData.OTHERSScannedCopyFileName}`);
+
+          // Store file path for viewing
+          viewButton.data("filePath", othersData.OTHERSScannedCopyPath);
+          viewButton.data("fileName", othersData.OTHERSScannedCopyFileName);
+        }
+      }
+
+      console.log("OTHERS Information populated");
+    } catch (error) {
+      console.error("Error populating OTHERS Information:", error);
+    }
+  },
+
+  /* -------- Populate Education History Grid -------- */
+  populateEducationHistory: function (educationHistory) {
+    try {
+      if (!educationHistory || !Array.isArray(educationHistory)) return;
+
+      const grid = $("#gridEducationSummary").data("kendoGrid");
+      if (!grid) return;
+
+      // Clear existing data
+      grid.dataSource.data([]);
+
+      // Add education records to grid
+      educationHistory.forEach(education => {
+        grid.dataSource.add({
+          EducationHistoryId: education.EducationHistoryId || 0,
+          ApplicantId: education.ApplicantId || 0,
+          Institution: education.Institution || "",
+          Qualification: education.Qualification || "",
+          PassingYear: education.PassingYear || new Date().getFullYear(),
+          Grade: education.Grade || "",
+          AttachedDocument: education.AttachedDocument || "",
+          DocumentName: education.DocumentName || "",
+          PdfThumbnail: education.PdfThumbnail || ""
+        });
+      });
+
+      console.log("Education History populated:", educationHistory.length, "records");
+    } catch (error) {
+      console.error("Error populating Education History:", error);
+    }
+  },
+
+  /* -------- Populate Work Experience Grid -------- */
+  populateWorkExperience: function (workExperience) {
+    try {
+      if (!workExperience || !Array.isArray(workExperience)) return;
+
+      const grid = $("#gridWorkExperience").data("kendoGrid");
+      if (!grid) return;
+
+      // Clear existing data
+      grid.dataSource.data([]);
+
+      // Add work experience records to grid
+      workExperience.forEach(work => {
+        grid.dataSource.add({
+          WorkExperienceId: work.WorkExperienceId || 0,
+          ApplicantId: work.ApplicantId || 0,
+          NameOfEmployer: work.NameOfEmployer || "",
+          Position: work.Position || "",
+          StartDate: work.StartDate ? new Date(work.StartDate) : null,
+          EndDate: work.EndDate ? new Date(work.EndDate) : null,
+          Period: work.Period || "",
+          MainResponsibility: work.MainResponsibility || "",
+          ScannedCopy: work.ScannedCopy || "",
+          DocumentName: work.DocumentName || "",
+          FileThumbnail: work.FileThumbnail || ""
+        });
+      });
+
+      console.log("Work Experience populated:", workExperience.length, "records");
+    } catch (error) {
+      console.error("Error populating Work Experience:", error);
+    }
   },
 
 }

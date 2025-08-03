@@ -17,7 +17,6 @@ $(document).ready(function () {
 });
 
 
-
 /* =========================================================
    CRMApplicationManager : Save/Update Application Form
 =========================================================*/
@@ -41,8 +40,26 @@ var CRMApplicationManager = {
     });
   },
 
+  getApplicationByApplicationId: async function (applicationId) {
+    debugger;
+    if (!applicationId) {
+      return Promise.resolve([]);
+    }
 
-
+    const serviceUrl = `/crm-application-by-applicationId/${applicationId}`;
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load institute data");
+      }
+    } catch (error) {
+      console.log("Error loading institute data:" + error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
+  },
 
   /* -------- Save ⬌ Update -------- */
   saveOrUpdateItem: async function () {
@@ -309,6 +326,7 @@ var CRMApplicationHelper = {
 
   initCrmApplicationSummary: function () {
     this.initializeSummaryGrid();
+    this.setGridDataSource();
   },
 
   initializeSummaryGrid: function () {
@@ -318,7 +336,7 @@ var CRMApplicationHelper = {
 
     const gridOptions = {
       toolbar: [
-/*        { template: '<button type="button" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base" onclick="InstituteDetailsHelper.openInistitutePopUp();"><span class="k-button-text"> + Create New </span></button>' },*/
+        { template: '<button type="button" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base" onclick="CRMApplicationHelper.showForm();"><span class="k-button-text"> + Create New </span></button>' },
         { name: "excel" },
         { name: "pdf" },
         { template: '<button type="button" id="btnExportApplicationCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
@@ -378,6 +396,9 @@ var CRMApplicationHelper = {
       // quing file name will be generate in below function
       CommonManager.GenerateCSVFileAllPages("gridSummaryCrmApplication", "Application", "Actions");
     });
+  },
+
+  setGridDataSource: function () {
 
     const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
     if (grid) {
@@ -402,67 +423,16 @@ var CRMApplicationHelper = {
     }
   },
 
-  ///* Grid Columns */
-  //generateColumns: function () {
-  //  return [
-  //    // hidden fields
-  //    { field: "ApplicationId", hidden: true },
-  //    { field: "ApplicantId", hidden: true },
+  showForm: function () {
+    debugger;
+    CommonManager.formShowGridHide("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
+  },
+  
 
-  //    // ApplicantImage
-  //    {
-  //      field: "ApplicantImagePath",
-  //      title: "Photo",
-  //      width: "100px",
-  //      template: function (dataItem) {
-  //        if (!dataItem.ApplicantImagePath) return `<span style="color:#888">No Photo</span>`;
-  //        // baseApiFilePath from common js
-  //        const fullUrl = `${baseApiFilePath}${dataItem.ApplicantImagePath}`;
-  //        return `<img src="${fullUrl}" 
-  //               style="height:50px; max-width:100px; object-fit:contain; cursor:pointer;"
-  //               onclick="PreviewManger.openGridImagePreview('${dataItem.ApplicantImagePath}')" />`;
-  //      }
-  //    },
-
-  //    //// InstitutionProspectus as PDF link
-  //    //{
-  //    //  field: "InstitutionProspectus",
-  //    //  title: "Prospectus",
-  //    //  width: 150,
-  //    //  template: function (dataItem) {
-  //    //    if (dataItem.InstitutionProspectus) {
-  //    //      return `<a href="#" style= "contain; cursor:pointer;"
-  //    //      onclick="PreviewManger.openPreview('${dataItem.InstitutionProspectus}'); ">📄 View PDF</a>`;
-  //    //    } else {
-  //    //      return `<span style="color:#888">No File</span>`;
-  //    //    }
-  //    //  }
-  //    //},
-
-  //    // Basic Info fields
-  //    { field: "EmailAddress", title: "Email", width: "200px" },
-  //    { field: "Mobile", title: "Mobile", width: "200px" },
-  //    { field: "PassportNumber", title: "Passport", width: "200px" },
-  //    { field: "MaritalStatusName", title: "Marital Status", width: "200px" },
-  //    { field: "GenderName", title: "GenderName", width: "200px" },
-  //    { field: "PermanentFullAddress", title: "Address", width: "200px" },
-
-
-
-  //    // Action buttons
-  //    {
-  //      field: "Action", title: "#", filterable: false, width: "230px",
-  //      template: `
-  //      <input type="button" class="btn btn-outline-success widthSize30_per"
-  //             value="View" onClick="CRMApplicationHelper.clickEventForViewButton(event)" />
-  //      <input type="button" class="btn btn-outline-dark me-1 widthSize30_per"
-  //             value="Edit" onClick="CRMApplicationHelper.clickEventForEditButton(event)" />
-  //      <input type="button" class="btn btn-outline-danger widthSize33_per"
-  //             value="Delete" onClick="CRMApplicationHelper.clickEventForDeleteButton(event)" />
-  //    `
-  //    }
-  //  ];
-  //},
+  closeForm: function () {
+    debugger;
+    CommonManager.formHideGridShow("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
+  },
 
   /* -------- Generate Grid Columns -------- */
   generateColumns: function () {
@@ -573,7 +543,18 @@ var CRMApplicationHelper = {
       { field: "HasStatementOfPurpose", title: "Statement<br/>of Purpose", width: "100px", template: "#= HasStatementOfPurpose ? 'Yes' : 'No' #" },
       { field: "AdditionalDocumentsCount", title: "Additional<br/>Documents", width: "100px" },
 
-
+      // Action buttons
+      {
+        field: "Action", title: "#", filterable: false, width: "230px",
+        template: `
+        <input type="button" class="btn btn-outline-success widthSize30_per"
+               value="View" onClick="CRMApplicationHelper.clickEventForViewButton(event)" />
+        <input type="button" class="btn btn-outline-dark me-1 widthSize30_per"
+               value="Edit" onClick="CRMApplicationHelper.clickEventForEditButton(event)" />
+        <input type="button" class="btn btn-outline-danger widthSize33_per"
+               value="Delete" onClick="CRMApplicationHelper.clickEventForDeleteButton(event)" />
+      `
+      }
     ]
   },
 
@@ -586,18 +567,19 @@ var CRMApplicationHelper = {
     return grid.dataItem(tr);
   },
 
-  clickEventForViewButton: function (event) {
+  clickEventForViewButton: async function (event) {
     debugger;
     const item = this._getGridItem(event);
     console.log(item);
     if (item) {
+      CommonManager.formShowGridHide("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
       CRMApplicationHelper.clearForm();
-
-      CRMApplicationHelper.populateObject(item);
+      const applicationData = await CRMApplicationManager.getApplicationByApplicationId(item.ApplicationId);
+      console.log(applicationData);
+      CRMApplicationHelper.populateObject(applicationData);
       CommonManager.MakeFormReadOnly("#CRMApplicationForm");
       //$("#btnSaveOrUpdate").prop("disabled", "disabled");
       $("#btnSaveOrUpdate").hide();
-      CommonManager.formShowGridHide("CrmApplcationFormShowHide" ,"CrmApplicationGridShowHide");
     }
   },
 
@@ -617,7 +599,6 @@ var CRMApplicationHelper = {
       CRMApplicationHelper.deleteItem(item);
     }
   },
-
 
   /* -------- Create Complete Application Object -------- */
   createCompleteApplicationObject: function () {
@@ -647,7 +628,7 @@ var CRMApplicationHelper = {
     }
   },
 
-  /* -------- NEW: Convert Nested Object to FormData with Files Integration -------- */
+  /* -------- Convert Nested Object to FormData with Files Integration -------- */
   convertNestedObjectToFormData: function (obj, formData, prefix) {
     try {
       if (!formData) {
@@ -708,7 +689,7 @@ var CRMApplicationHelper = {
     }
   },
 
-  /* -------- UPDATED: Integrate All Files into Complete FormData -------- */
+  /* -------- Integrate All Files into Complete FormData -------- */
   integrateAllFilesIntoApplicationData: function (applicationData) {
     try {
       console.log("=== Integrating All Files into Application Data ===");
@@ -802,7 +783,6 @@ var CRMApplicationHelper = {
     }
   },
 
-
   /* -------- Clear All Forms -------- */
   clearForm: function () {
     try {
@@ -835,6 +815,55 @@ var CRMApplicationHelper = {
       console.error("Error clearing application forms:", error);
     }
   },
+
+  /* -------- Populate Object from applicationData -------- */
+  populateObject: function (applicationData) {
+    try {
+      debugger;
+      console.log("=== Populating Application Object ===", applicationData);
+
+      if (!applicationData) {
+        console.warn("No application data provided for population");
+        return;
+      }
+
+      // Set application ID
+      if (applicationData.ApplicationId) {
+        $("#hdnApplicationId").val(applicationData.ApplicationId);
+      }
+
+      // Populate Course Information tab
+      if (applicationData.CourseInformation || applicationData.PersonalDetails) {
+        CRMCourseInformationHelper.populateCourseInformation(applicationData);
+      }
+
+      // Populate Education & English Language tab  
+      if (applicationData.EducationInformation) {
+        CRMEducationNEnglishLanguagHelper.populateEducationInformation(applicationData.EducationInformation);
+      }
+
+      // Populate Additional Information tab
+      if (applicationData.AdditionalInformation || applicationData.ReferenceDetails || applicationData.StatementOfPurpose) {
+        CRMAdditionalInformationHelper.populateAdditionalInformation(applicationData);
+      }
+
+      console.log("Application object populated successfully");
+
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showSuccess("Application data loaded successfully!", "Data Loaded", 3000);
+      }
+
+    } catch (error) {
+      console.error("Error populating application object:", error);
+      if (typeof VanillaApiCallManager !== "undefined") {
+        VanillaApiCallManager.handleApiError(error);
+      }
+      if (typeof ToastrMessage !== "undefined") {
+        ToastrMessage.showError("Error loading application data: " + error.message, "Data Load Error", 0);
+      }
+    }
+  },
+
 
 
 }

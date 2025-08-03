@@ -2860,6 +2860,7 @@ var CommonManager = {
     $Container.find(".hint").text('');
   },
 
+  // use d-none class to initially hide content.
   formShowGridHide: function(formId, gridId){
     const formIdSelector = formId.startsWith('#') ? formId : '#' + formId;
     const gridIdSelector = gridId.startsWith('#') ? gridId : '#' + gridId;
@@ -2876,11 +2877,12 @@ var CommonManager = {
       return;
     }
 
-    $formIdSelector.show();
-    $gridIdSelector.hide();
-
+    // Show form and hide grid
+    $formIdSelector.removeClass("d-none");
+    $gridIdSelector.addClass("d-none");
   },
 
+  // use d-none class to initially hide content.
   formHideGridShow: function(formId, gridId){
     const formIdSelector = formId.startsWith('#') ? formId : '#' + formId;
     const gridIdSelector = gridId.startsWith('#') ? gridId : '#' + gridId;
@@ -2897,8 +2899,9 @@ var CommonManager = {
       return;
     }
 
-    $formIdSelector.hide();
-    $gridIdSelector.show();
+    // Show form and hide grid
+    $formIdSelector.addClass("d-none");
+    $gridIdSelector.removeClass("d-none");
 
   },
 

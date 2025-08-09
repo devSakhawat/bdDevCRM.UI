@@ -5,15 +5,16 @@
 
 
 $(document).ready(async function () {
-  await UserSummaryHelper.populateCompany();
-  await UserInfoHelper.initUserInfo();
   UserSummaryHelper.initSummary();
+  await UserInfoHelper.initUserInfo();
+  await UserSummaryHelper.populateCompany();
   UserDetailsHelper.initDetails();
   await GroupMembershipHelper.initGroupMembers();
+  UserSummaryHelper.setGridDataSource();
 
-  $("#cmbDepartmentNameDetails").change(function () {
-    UserInfoHelper.changeDepartmentNamechangeDepartmentNamechangeDepartmentName();
-  });
+  //$("#cmbDepartmentNameDetails").change(function () {
+  //  UserInfoHelper.changeDepartmentNamechangeDepartmentNamechangeDepartmentName();
+  //});
   //userInfoHelper.populateCompany();
 
 

@@ -852,6 +852,7 @@ var CRMCourseInformationHelper = {
 
   createPersonalDetailsObject: function () {
     try {
+      debugger;
       const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
       const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
       const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
@@ -888,7 +889,7 @@ var CRMCourseInformationHelper = {
         Nationality: $("#txtNationality").val() || "",
         HasValidPassport: $("input[name='ValidPassport']:checked").val() || "",
         PassportNumber: $("#txtPassportNumberForCourse").val() || "",
-        assportIssueDate: passportIssueDate,
+        PssportIssueDate: passportIssueDate,
         PassportExpiryDate: passportExpiryDate,
 
         // Contact Information

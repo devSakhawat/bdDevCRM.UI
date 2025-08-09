@@ -71,11 +71,11 @@ var CRMApplicationManager = {
       const confirmMsg = isCreate ? "Do you want to save the application?" : "Do you want to update the application?";
       const successMsg = isCreate ? "Application saved successfully." : "Application updated successfully.";
 
-      // Validate all form sections before proceeding
-      if (!CRMApplicationManager.validateAllSections()) {
-        ToastrMessage.showError("Please complete all required fields before saving.", "Validation Error", 0);
-        return;
-      }
+      //// Validate all form sections before proceeding
+      //if (!CRMApplicationManager.validateAllSections()) {
+      //  ToastrMessage.showError("Please complete all required fields before saving.", "Validation Error", 0);
+      //  return;
+      //}
 
       // Create comprehensive application object from all three sections
       const applicationData = CRMApplicationHelper.createCompleteApplicationObject();
@@ -431,7 +431,9 @@ var CRMApplicationHelper = {
 
   closeForm: function () {
     debugger;
+    this.clearForm();
     CommonManager.formHideGridShow("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
+    CommonManager.MakeFormEditable("#CRMApplicationForm");
   },
 
   /* -------- Generate Grid Columns -------- */
@@ -618,8 +620,6 @@ var CRMApplicationHelper = {
         // Additional Information Section
         AdditionalInformation: CRMAdditionalInformationHelper.createAdditionalInformationObject()
       };
-
-      console.log("=== Complete Application Object Created ===", completeApplication);
       return completeApplication;
 
     } catch (error) {

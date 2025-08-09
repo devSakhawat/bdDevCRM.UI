@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\assets\Scripts\CRMSolution\Core\Login\" />
+    <Folder Include="wwwroot\assets\Scripts\Dashboard\" />
     <Folder Include="wwwroot\assets\Scripts\Test\" />
   </ItemGroup>
 

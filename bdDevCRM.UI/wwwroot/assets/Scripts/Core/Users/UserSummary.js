@@ -23,50 +23,85 @@ var UserSummaryManager = {
     }
   },
 
-  GetMotherCompany: function () {
-    var companies = [];
-    var jsonParams = "";
-    var serviceUrl = "/mother-companies";
+  //GetMotherCompany: function () {
+  //  var companies = [];
+  //  var jsonParams = "";
+  //  var serviceUrl = "/mother-companies";
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        companies = jsonData;
-        resolve(companies);
+  //  return new Promise(function (resolve, reject) {
+  //    function onSuccess(jsonData) {
+  //      companies = jsonData;
+  //      resolve(companies);
+  //    }
+
+  //    function onFailed(jqXHR, textStatus, errorThrown) {
+  //      ToastrMessage.showToastrNotification({
+  //        preventDuplicates: true,
+  //        closeButton: true,
+  //        timeOut: 0,
+  //        message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+  //        type: 'error',
+  //      });
+  //      reject(errorThrown);
+  //    }
+
+  //    AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+  //  });
+  //},
+
+
+  GetMotherCompany: async function () {
+    const serviceUrl = "/mother-companies";
+
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load country data");
       }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-    });
-
-
+    } catch (error) {
+      console.error("Error loading country data:", error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
-  getSummaryGridDataSource: function () {
-    return AjaxManager.GenericGridDataSource({
-      apiUrl: baseApi + "/user-summary",
+
+  //getSummaryGridDataSource: function () {
+  //  return AjaxManager.GenericGridDataSource({
+  //    apiUrl: baseApi + "/user-summary",
+  //    requestType: "POST",
+  //    async: true,
+  //    modelFields: {
+  //      //createdDate: { type: "date" }
+  //    },
+  //    pageSize: 15,
+  //    serverPaging: true,
+  //    serverSorting: true,
+  //    serverFiltering: true,
+  //    allowUnsort: true,
+  //    schemaData: "Items",
+  //    schemaTotal: "TotalCount",
+  //    buttonCount: 3  // Add this explicitly
+  //  });
+  //},
+
+  getSummaryGridDataSource: function (companyId) {
+    const serviceUrl = `/user-summary?companyId=${companyId}`;
+
+    return VanillaApiCallManager.GenericGridDataSource({
+      apiUrl: baseApi + serviceUrl,
       requestType: "POST",
       async: true,
-      modelFields: {
-        //createdDate: { type: "date" }
-      },
-      pageSize: 15,
+      modelFields: { createdDate: { type: "date" } },
+      pageSize: 20,
       serverPaging: true,
       serverSorting: true,
       serverFiltering: true,
       allowUnsort: true,
-      schemaData: "Items",
-      schemaTotal: "TotalCount",
-      buttonCount: 3  // Add this explicitly
+      schemaData: "Data.Items",
+      schemaTotal: "Data.TotalCount"
     });
   },
 
@@ -75,9 +110,7 @@ var UserSummaryManager = {
 var UserSummaryHelper = {
 
   initSummary: async function () {
-    // I am use this code into settings file directly because Userinfo file code has dependancy on populateCompany.
-    // So I need to load populateCompany data first and then grid data
-    //await UserSummaryHelper.populateCompany();
+    this.generateCompany();
     UserSummaryHelper.initializeSummaryGrid();
   },
 
@@ -147,9 +180,10 @@ var UserSummaryHelper = {
 
     const gridInstance = $("#gridSummary").data("kendoGrid");
     if (gridInstance) {
-      const dataSource = UserSummaryManager.getSummaryGridDataSource();
+      //const dataSource = UserSummaryManager.getSummaryGridDataSource();
       //console.log(dataSource);
-      gridInstance.setDataSource(dataSource);
+      //gridInstance.setDataSource(dataSource);
+      gridInstance.setDataSource([]);
     }
 
   },
@@ -192,33 +226,62 @@ var UserSummaryHelper = {
       dataTextField: "CompanyName",
       dataValueField: "CompanyId",
       dataSource: [],
+      //change: CRMCourseInformationHelper.onCountryChange
     });
   },
 
   populateCompany: async function () {
-    
-    try {
-      let companies = await UserSummaryManager.GetMotherCompany();
-      $("#cmbCompanyNameForSummary").kendoComboBox({
-        placeHolder: "All",
-        dataTextField: "CompanyName",
-        dataValueField: "CompanyId",
-        dataSource: companies,
-      });
-      if (CurrentUser.CompanyId != null) {
-        var companyComboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
+    var companyComboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
+    // details part company dropdown instance.
+    var companyComboBoxForDetials = $("#cmbCompanyNameDetails").data("kendoComboBox");
+    if (companyComboBox) {
+      await UserSummaryManager.GetMotherCompany().then(data => {
+        companyComboBox.setDataSource(data);
         companyComboBox.value(CurrentUser.CompanyId);
-      }
-    } catch (e) {
-      ToastrMessage.showToastrNotification({
-        preventDuplicates: true,
-        closeButton: true,
-        timeOut: 0,
-        message: "Failed to load company data" + ": " + e,
-        type: 'error',
+
+        // populate mother companies to details part company dropdown.
+        if (companyComboBoxForDetials) {
+          companyComboBoxForDetials.setDataSource(data);
+        }
+
+      }).catch(error => {
+        console.error("Error loading company data:", error);
+        companyComboBox.setDataSource([]);
       });
     }
   },
+
+
+  setGridDataSource: function () {
+    let companyId = 0;
+    let comboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
+    if (comboBox) {
+      companyId = comboBox.value();
+    }
+
+    const grid = $("#gridSummary").data("kendoGrid");
+    if (grid) {
+      const ds = UserSummaryManager.getSummaryGridDataSource(companyId);
+
+      // Add data source error handling
+      ds.bind("error", function (error) {
+        VanillaApiCallManager.handleApiError(error);
+      });
+
+      // Add data source success handling
+      ds.bind("requestEnd", function (e) {
+        console.log(ds);
+        if (e.response && e.response.isSuccess === false) {
+          VanillaApiCallManager.handleApiError(e.response);
+          //console.error("API returned error:", e.response.message);
+          //kendo.alert("Error: " + e.response.message);
+        }
+      });
+
+      grid.setDataSource(ds);
+    }
+  },
+
 
   clickEventForEditButton: async function (e) {
     debugger;

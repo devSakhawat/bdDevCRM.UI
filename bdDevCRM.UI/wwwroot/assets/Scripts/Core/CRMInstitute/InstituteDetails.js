@@ -70,7 +70,7 @@ var InstituteDetailsManager = {
     }
   },
 
-  /* -------- Save ⬌ Update -------- */
+  /* -------- Save <=> Update -------- */
   saveOrUpdateItem: async function () {
     try {
       const id = $("#instituteId").val() || 0;
@@ -147,7 +147,6 @@ var InstituteDetailsManager = {
       VanillaApiCallManager.handleApiError(error);
     }
   },
-
 
   deleteItem: function (gridItem) {
     if (!gridItem) return;

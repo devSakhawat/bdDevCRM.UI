@@ -1,52 +1,52 @@
 ﻿
 var MenuDetailsManager = {
 
-  saveOrUpdateItem: async function () {
-    const id = $("#hdMenuId").val() || 0;
-    const isCreate = id == 0;
-    const serviceUrl = isCreate ? "/menu" : `//menu//${id}`;
-    const httpType = isCreate ? "POST" : "PUT";
-    const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
-    const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
+  //saveOrUpdateItem: async function () {
+  //  const id = $("#hdMenuId").val() || 0;
+  //  const isCreate = id == 0;
+  //  const serviceUrl = isCreate ? "/menu" : `/menu/${id}`;
+  //  const httpType = isCreate ? "POST" : "PUT";
+  //  const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+  //  const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
 
-    const modelDto = MenuDetailsHelper.CreateObject();
-    if (!modelDto) {
-      throw new Error("Failed to create DTO object");
-    }
-    debugger;
+  //  const modelDto = MenuDetailsHelper.CreateObject();
+  //  if (!modelDto) {
+  //    throw new Error("Failed to create DTO object");
+  //  }
+  //  debugger;
 
-    CommonManager.MsgBox(
-      "info",
-      "center",
-      "Confirmation",
-      confirmMsg,
-      [{
-        addClass: "btn btn-primary",
-        text: "Yes",
-        onClick: async function ($noty) {
-          $noty.close();
-          var jsonObject = JSON.stringify(modelDto);
-          try {
-            const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
-            if (response && (response.IsSuccess === true || response === "Success")) {
-              ToastrMessage.showSuccess(successMsg);
-              CourseDetailsHelper.clearForm();
-              const windowId = "CoursePopUp";
-              CommonManager.closeKendoWindow(windowId);
-              $("#gridSummaryCourse").data("kendoGrid").dataSource.read();
-            } else {
-              throw new Error(response.Message || response || "Unknown error occurred");
-            }
-          } catch (err) {
-            console.log(err);
-            VanillaApiCallManager?.handleApiError?.(err);
-          }
-        }
-      },
-      { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
-      0
-    );
-  },
+  //  CommonManager.MsgBox(
+  //    "info",
+  //    "center",
+  //    "Confirmation",
+  //    confirmMsg,
+  //    [{
+  //      addClass: "btn btn-primary",
+  //      text: "Yes",
+  //      onClick: async function ($noty) {
+  //        $noty.close();
+  //        var jsonObject = JSON.stringify(modelDto);
+  //        try {
+  //          const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+  //          if (response && (response.IsSuccess === true || response === "Success")) {
+  //            ToastrMessage.showSuccess(successMsg);
+  //            CourseDetailsHelper.clearForm();
+  //            const windowId = "divDetails";
+  //            CommonManager.closeKendoWindow(windowId);
+  //            $("#gridSummary").data("kendoGrid").dataSource.read();
+  //          } else {
+  //            throw new Error(response.Message || response || "Unknown error occurred");
+  //          }
+  //        } catch (err) {
+  //          console.log(err);
+  //          VanillaApiCallManager?.handleApiError?.(err);
+  //        }
+  //      }
+  //    },
+  //    { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
+  //    0
+  //  );
+  //},
 
 
   SaveData: async function () {
@@ -109,7 +109,59 @@ var MenuDetailsManager = {
     );
   },
 
+  saveOrUpdateItem: async function () {
+    try {
+      const id = $("#hdMenuId").val() || 0;
+      const isCreate = id == 0;
+      const serviceUrl = isCreate ? "/menu" : `/menu/${id}`;
+      const httpType = isCreate ? "POST" : "PUT";
+      const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+      const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
 
+      const modelDto = MenuDetailsHelper.CreateObject();
+      if (!modelDto) {
+        throw new Error("Failed to create DTO object");
+      }
+
+      CommonManager.MsgBox("info", "center", "Confirmation", confirmMsg, [
+        {
+          addClass: "btn btn-primary",
+          text: "Yes",
+          onClick: async function ($noty) {
+            $noty.close();
+            try {
+              var jsonObject = JSON.stringify(modelDto);
+              const response = await VanillaApiCallManager.SendRequestVanilla(
+                baseApi,
+                serviceUrl,
+                jsonObject,
+                httpType,
+                //{
+                //  skipContentTypeHeader: true,
+                //  timeout: 300000,
+                //  requireAuth: true
+                //}
+              );
+
+              if (response && response.IsSuccess === true) {
+                ToastrMessage.showSuccess(successMsg);
+                MenuDetailsHelper.ClearInformation();
+                CommonManager.closeKendoWindow("divDetails");
+                $("#gridSummary").data("kendoGrid").dataSource.read();
+              } else {
+                throw new Error(response.Message || "Unknown error occurred");
+              }
+            } catch (err) {
+              VanillaApiCallManager.handleApiError(err);
+            }
+          }
+        },
+        { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }
+      ], 0);
+    } catch (error) {
+      VanillaApiCallManager.handleApiError(error);
+    }
+  },
 
   DeleteData: function (dataFromGrid) {
     debugger;

@@ -776,5 +776,139 @@ var CRMAdditionalInformationHelper = {
         ToastrMessage.showError("Error filling Additional Information demo data: " + error.message, "Demo Data Error", 0);
       }
     }
+  },
+
+  /* -------- Populate Additional Information Tab -------- */
+/* -------- Populate Additional Information Tab -------- */
+/* -------- Populate Additional Information Tab -------- */
+  populateAdditionalInformation: function (applicationData) {
+    try {
+      console.log("=== Populating Additional Information ===");
+
+      // Populate Reference Details
+      if (applicationData.ReferenceDetails && applicationData.ReferenceDetails.References) {
+        this.populateReferenceDetails(applicationData.ReferenceDetails.References);
+      }
+
+      // Populate Statement of Purpose
+      if (applicationData.StatementOfPurpose) {
+        this.populateStatementOfPurpose(applicationData.StatementOfPurpose);
+      }
+
+      // Populate Additional Information Fields
+      if (applicationData.AdditionalInformation) {
+        this.populateAdditionalInfoFields(applicationData.AdditionalInformation);
+      }
+
+      console.log("Additional Information populated successfully");
+    } catch (error) {
+      console.error("Error populating Additional Information:", error);
+    }
+  },
+
+  /* -------- Populate Reference Details Grid -------- */
+  populateReferenceDetails: function (references) {
+    try {
+      if (!references || !Array.isArray(references)) return;
+
+      const grid = $("#gridAdditionalReferenceSummary").data("kendoGrid");
+      if (!grid) return;
+
+      // Clear existing data
+      grid.dataSource.data([]);
+
+      // Add reference records to grid
+      references.forEach(reference => {
+        grid.dataSource.add({
+          ApplicantRefferenceId: reference.ApplicantReferenceId || 0,
+          ApplicantId: reference.ApplicantId || 0,
+          Name: reference.Name || "",
+          Designation: reference.Designation || "",
+          Institution: reference.Institution || "",
+          EmailID: reference.EmailID || "",
+          PhoneNo: reference.PhoneNo || "",
+          FaxNo: reference.FaxNo || "",
+          Address: reference.Address || "",
+          City: reference.City || "",
+          State: reference.State || "",
+          Country: reference.Country || "",
+          PostOrZipCode: reference.PostOrZipCode || ""
+        });
+      });
+
+      console.log("Reference Details populated:", references.length, "records");
+    } catch (error) {
+      console.error("Error populating Reference Details:", error);
+    }
+  },
+
+  /* -------- Populate Statement of Purpose -------- */
+  populateStatementOfPurpose: function (statementData) {
+    try {
+      if (!statementData) return;
+
+      // Set hidden fields
+      $("#hdnStatementOfPurposeId").val(statementData.StatementOfPurposeId || 0);
+
+      // Populate Statement of Purpose text
+      $("#txtStatementOfPurposeRemarks").val(statementData.StatementOfPurposeRemarks || "");
+
+      // Handle Statement of Purpose file if exists
+      if (statementData.StatementOfPurposeFilePath && statementData.StatementOfPurposeFileName) {
+        const viewButton = $("#statementOfPurposeViewBtn");
+        if (viewButton.length) {
+          viewButton.prop("disabled", false);
+          viewButton.attr("title", "Click to view: " + statementData.StatementOfPurposeFileName);
+          viewButton.html(`<i class="k-icon k-i-preview"></i> ${statementData.StatementOfPurposeFileName}`);
+
+          // Store file path for viewing
+          viewButton.data("filePath", statementData.StatementOfPurposeFilePath);
+          viewButton.data("fileName", statementData.StatementOfPurposeFileName);
+        }
+      }
+
+      console.log("Statement of Purpose populated");
+    } catch (error) {
+      console.error("Error populating Statement of Purpose:", error);
+    }
+  },
+
+  /* -------- Populate Additional Information Fields -------- */
+  populateAdditionalInfoFields: function (additionalInfo) {
+    try {
+      if (!additionalInfo) return;
+
+      // Populate Accommodation requirement
+      if (additionalInfo.RequireAccommodation) {
+        $(`input[name='RequireAccommodation'][value='${additionalInfo.RequireAccommodation}']`).prop("checked", true);
+      }
+
+      // Populate Health & Medical Needs
+      if (additionalInfo.HealthNMedicalNeeds) {
+        $(`input[name='HealthNMedicalNeeds'][value='${additionalInfo.HealthNMedicalNeeds}']`).prop("checked", true);
+
+        // Trigger change event to enable/disable remarks field
+        $(`input[name='HealthNMedicalNeeds'][value='${additionalInfo.HealthNMedicalNeeds}']`).trigger("change");
+      }
+
+      // Populate Health & Medical Needs Remarks
+      $("#txtHealthNMedicalNeedsRemarks").val(additionalInfo.HealthNMedicalNeedsRemarks || "");
+
+      // Populate Additional Information Remarks
+      $("#txtAdditionalInformationRemarks").val(additionalInfo.AdditionalInformationRemarks || "");
+
+      console.log("Additional Information fields populated");
+    } catch (error) {
+      console.error("Error populating Additional Information fields:", error);
+    }
   }
+
+
+
+
+
+
+
+
+
 } 

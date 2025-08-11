@@ -72,13 +72,6 @@ var GroupMembershipHelper = {
 
     //GetGroupByCompanyId
     var groups = await GroupMembershipManager.getGroups();
-    //var link = "<div class=\"row\">";
-
-    //for (var i = 0; i < groups.length; i++) {
-    //  link += "<div><input type=\"checkbox\" class=\"form-check-input\" id=\"chkGroup" + groups[i].GroupId + "\" onclick=\"GroupMembershipHelper.populateGroupPermisionArray(" + groups[i].GroupId + ", '" + groups[i].GroupName + "', this.id)\"/> " + groups[i].GroupName + "</div>";
-    //  groupArray.push(groups[i]);
-    //}
-
     var link = "<div class='row'>";
 
     for (var i = 0; i < groups.length; i++) {

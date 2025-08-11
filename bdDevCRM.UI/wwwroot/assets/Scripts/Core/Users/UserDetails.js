@@ -93,7 +93,6 @@ var UserDetailsManager = {
           }]);
       }
     }
-
     function onFailed(error) {
       AjaxManager.MsgBox('error', 'center', 'Failed', error.statusText,
         [{
@@ -102,7 +101,82 @@ var UserDetailsManager = {
           }
         }]);
     }
-  }
+  },
+
+    /* -------- Save Or Update -------- */
+  saveOrUpdateItem: async function () {
+    try {
+      const id = $("#hdnUserId").val() || 0;
+      const isCreate = id == 0;
+      const serviceUrl = isCreate ? "/user" : `/user/${id}`;
+      const httpType = isCreate ? "POST" : "PUT";
+      const confirmMsg = isCreate ? "Do you want to save the date?" : "Do you want to update the date?";
+      const successMsg = isCreate ? "New data saved successfully." : "Updated data successfully.";
+
+      //// Validate all form sections before proceeding
+      //if (!CRMApplicationManager.validateAllSections()) {
+      //  ToastrMessage.showError("Please complete all required fields before saving.", "Validation Error", 0);
+      //  return;
+      //}
+
+      var modelDto = UserInfoHelper.createUserInformationForSaveData();
+      modelDto = GroupMembershipHelper.createGroupMemberForSaveData(modelDto);
+
+      if (!modelDto) {
+        throw new Error("Failed to create data object");
+      }
+
+      // Confirmation popup before sending
+      CommonManager.MsgBox("info", "center", "Confirmation", confirmMsg, [
+        {
+          addClass: "btn btn-primary",
+          text: "Yes",
+          onClick: async function ($noty) {
+            $noty.close();
+            // Show loading indicator and lock screen
+            CommonManager.showProcessingOverlay("Saving new data... Please wait.");
+
+            try {
+              var jsonObject = JSON.stringify(modelDto);
+              const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+
+              if (response && response.IsSuccess === true) {
+                ToastrMessage.showSuccess(successMsg, "Success", 3000);
+
+                await UserInfoHelper.clearUserInfoForm();
+
+                // Refresh any related grids if they exist
+                const grid = $("#gridSummary").data("kendoGrid");
+                if (grid) {
+                  grid.dataSource.read();
+                }
+
+                // Store application ID for future updates
+                if (isCreate && response.Data && response.Data.ApplicationId) {
+                  $("#hdnUserId").val(response.Data.ApplicationId);
+                }
+
+              } else {
+                throw new Error(response.Message || "Unknown error occurred while saving application");
+              }
+            } catch (err) {
+              VanillaApiCallManager.handleApiError(err);
+              ToastrMessage.showError("Failed to save data. Please try again.", "Save Error", 0);
+            }
+            finally {
+              // Hide loading indicator
+              CommonManager.hideProcessingOverlay();
+            }
+          }
+        },
+        { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }
+      ], 0);
+
+    } catch (error) {
+      VanillaApiCallManager.handleApiError(error);
+      //ToastrMessage.showError("Error preparing data: " + error.message, "Preparation Error", 0);
+    }
+  },
 };
 
 var UserDetailsHelper = {

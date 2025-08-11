@@ -64,6 +64,7 @@ var CRMCourseInformationManager = {
     try {
       const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
       if (response && response.IsSuccess === true) {
+        console.log(response);
         return Promise.resolve(response.Data);
       } else {
         throw new Error("Failed to load course data");
@@ -431,6 +432,17 @@ var CRMCourseInformationHelper = {
     }
   },
 
+  //generateCourseCombo: function () {
+  //  $("#cmbCourseForCourse").kendoComboBox({
+  //    placeholder: "Select Course...",
+  //    dataTextField: "CourseTitle",
+  //    dataValueField: "CourseId",
+  //    filter: "contains",
+  //    suggest: true,
+  //    dataSource: [],
+  //  });
+  //},
+
   generateCourseCombo: function () {
     $("#cmbCourseForCourse").kendoComboBox({
       placeholder: "Select Course...",
@@ -439,8 +451,32 @@ var CRMCourseInformationHelper = {
       filter: "contains",
       suggest: true,
       dataSource: [],
+      change: function (e) {
+        const courseCombo = this; 
+        const selectedItem = courseCombo.dataItem();
+        console.log("Selected course:", selectedItem);
+
+        // populate application fee
+        if (selectedItem && selectedItem.ApplicationFee) {
+          $("#txtApplicationFeeForCourse").val(selectedItem.ApplicationFee);
+        } else {
+          $("#txtApplicationFeeForCourse").val("");
+        }
+
+        // populate currency value
+        const currencyCombo = $("#cmbCurrencyForCourse").data("kendoComboBox");
+        if (currencyCombo) {
+          if (selectedItem && selectedItem.CurrencyId) {
+            currencyCombo.value(selectedItem.CurrencyId);
+          } else {
+            currencyCombo.value(""); // clear if no value
+          }
+        }
+
+      }
     });
   },
+
 
   generateIntakeMonthCombo: function () {
     $("#cmbIntakeMonthForCourse").kendoComboBox({
@@ -764,7 +800,7 @@ var CRMCourseInformationHelper = {
       // Clear Applicant Picture containers
       $("#applicantImageThumb").empty();
       // Grid Data Clear - Remove all grid records
-      this.clearAllGrids();
+      //this.clearAllGrids();
 
 
     } catch (error) {
@@ -852,6 +888,7 @@ var CRMCourseInformationHelper = {
 
   createPersonalDetailsObject: function () {
     try {
+      debugger;
       const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
       const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
       const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
@@ -888,7 +925,7 @@ var CRMCourseInformationHelper = {
         Nationality: $("#txtNationality").val() || "",
         HasValidPassport: $("input[name='ValidPassport']:checked").val() || "",
         PassportNumber: $("#txtPassportNumberForCourse").val() || "",
-        assportIssueDate: passportIssueDate,
+        PssportIssueDate: passportIssueDate,
         PassportExpiryDate: passportExpiryDate,
 
         // Contact Information
@@ -1293,7 +1330,367 @@ var CRMCourseInformationHelper = {
     $("#txtPresentCity").val("Boston");
     $("#txtPresentState").val("MA");
     $("#txtPostalCode").val("02101");
-  }
+  },
+
+
+  /* ----------------- Populate information ----------------------- */
+  /* ----------------- Populate information ----------------------- */
+  /* ----------------- Populate information ----------------------- */
+populateCourseInformation: function (applicationData) {
+    try {
+      console.log("=== Populating Course Information ===");
+
+      // Populate Course Details
+      if (applicationData.CourseInformation && applicationData.CourseInformation.ApplicantCourse) {
+        this.populateApplicantCourse(applicationData.CourseInformation.ApplicantCourse);
+      }
+
+      // Populate Personal Details
+      if (applicationData.PersonalDetails) {
+        this.populatePersonalDetails(applicationData.PersonalDetails);
+      }
+
+      // Populate Address Information
+      if (applicationData.CourseInformation && applicationData.CourseInformation.ApplicantAddress) {
+        this.populateApplicantAddress(applicationData.CourseInformation.ApplicantAddress);
+      }
+
+      console.log("Course Information populated successfully");
+    } catch (error) {
+      console.error("Error populating Course Information:", error);
+    }
+  },
+
+  /* -------- Populate Applicant Course Details -------- */
+  populateApplicantCourse: function (courseData) {
+    try {
+      debugger;
+      debugger;
+      if (!courseData) return;
+
+      // Set hidden fields
+      $("#hdnApplicantCourseId").val(courseData.ApplicantCourseId || 0);
+
+      // Populate Country ComboBox
+      // Populate Country ComboBox with data source validation
+      if (courseData.CountryId && courseData.CountryName) {
+        const countryCombo = $("#cmbCountryForCourse").data("kendoComboBox");
+        if (countryCombo) {
+
+          // Function to check if combo has valid data source
+          const hasValidDataSource = (combo) => {
+            const dataSource = combo.dataSource;
+            return dataSource &&
+              dataSource.data &&
+              dataSource.data().length > 0;
+          };
+
+          // Function to set combo value and text
+          const setComboValue = (combo, id, text) => {
+            combo.value(id);
+            combo.text(text);
+          };
+
+          // Check if combo already has valid data source
+          if (hasValidDataSource(countryCombo)) {
+            // Data source exists, set value directly
+            setComboValue(countryCombo, courseData.CountryId, courseData.CountryName);
+            console.log("Country combo populated from existing data source");
+          } else {
+            // No valid data source, create one from courseData
+            const countryDataSource = new kendo.data.DataSource({
+              data: [{
+                value: courseData.CountryId,
+                text: courseData.CountryName
+              }]
+            });
+
+            // Set the data source and then set the value
+            countryCombo.setDataSource(countryDataSource);
+
+            // Wait for data source to be applied
+            setTimeout(() => {
+              setComboValue(countryCombo, courseData.CountryId, courseData.CountryName);
+              console.log("Country combo populated with new data source from courseData");
+            }, 100);
+          }
+        }
+      }
+
+      // Populate Institute ComboBox
+      if (courseData.InstituteId && courseData.InstituteName) {
+        const instituteCombo = $("#cmbInstituteForCourse").data("kendoComboBox");
+        if (instituteCombo) {
+          setTimeout(() => {
+            // Load institutes by country first
+            if (courseData.CountryId) {
+              CRMCourseInformationManager.fetchInstituteComboBoxDataByCountryId(courseData.CountryId)
+                .then(data => {
+                  instituteCombo.setDataSource(data);
+                  instituteCombo.value(courseData.InstituteId);
+                  instituteCombo.text(courseData.InstituteName);
+                });
+            }
+          }, 800);
+        }
+      }
+
+      // Populate Course ComboBox
+      if (courseData.CourseId && courseData.CourseTitle) {
+        const courseCombo = $("#cmbCourseForCourse").data("kendoComboBox");
+        if (courseCombo) {
+          setTimeout(() => {
+            // Load courses by institute first
+            if (courseData.InstituteId) {
+              CRMCourseInformationManager.fetchCourseByInstituteIdData(courseData.InstituteId)
+                .then(data => {
+                  courseCombo.setDataSource(data);
+                  courseCombo.value(courseData.CourseId);
+                  courseCombo.text(courseData.CourseTitle);
+                });
+            }
+          }, 1200);
+        }
+      }
+
+      // Populate Intake Month
+      if (courseData.IntakeMonthId) {
+        const intakeMonthCombo = $("#cmbIntakeMonthForCourse").data("kendoComboBox");
+        if (intakeMonthCombo) {
+          intakeMonthCombo.value(courseData.IntakeMonthId);
+        }
+      }
+
+      // Populate Intake Year
+      if (courseData.IntakeYearId) {
+        const intakeYearCombo = $("#cmbIntakeYearForCourse").data("kendoComboBox");
+        if (intakeYearCombo) {
+          intakeYearCombo.value(courseData.IntakeYearId);
+        }
+      }
+
+      // Populate Application Fee
+      $("#txtApplicationFeeForCourse").val(courseData.ApplicationFee || "");
+
+      // Populate Currency
+      if (courseData.CurrencyId) {
+        const currencyCombo = $("#cmbCurrencyForCourse").data("kendoComboBox");
+        if (currencyCombo) {
+          setTimeout(() => {
+            currencyCombo.value(courseData.CurrencyId);
+          }, 300);
+        }
+      }
+
+      // Populate Payment Method
+      if (courseData.PaymentMethodId) {
+        const paymentMethodCombo = $("#cmbPaymentMethodForCourse").data("kendoComboBox");
+        if (paymentMethodCombo) {
+          paymentMethodCombo.value(courseData.PaymentMethodId);
+        }
+      }
+
+      // Populate Payment Reference Number
+      $("#txtPaymentReferenceNumberCourse").val(courseData.PaymentReferenceNumber || "");
+
+      // Populate Payment Date
+      if (courseData.PaymentDate) {
+        const paymentDatePicker = $("#datePickerPaymentDate").data("kendoDatePicker");
+        if (paymentDatePicker) {
+          paymentDatePicker.value(new Date(courseData.PaymentDate));
+        }
+      }
+
+      // Populate Remarks
+      $("#txtareaRemarks").val(courseData.Remarks || "");
+
+      console.log("Applicant Course data populated");
+    } catch (error) {
+      console.error("Error populating Applicant Course:", error);
+    }
+  },
+
+  /* -------- Populate Personal Details -------- */
+  populatePersonalDetails: function (personalData) {
+    try {
+      if (!personalData) return;
+
+      // Set hidden fields
+      $("#hdnApplicantId").val(personalData.ApplicantId || 0);
+
+      // Populate Gender
+      if (personalData.GenderId) {
+        const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
+        if (genderCombo) {
+          genderCombo.value(personalData.GenderId);
+        }
+      }
+
+      // Populate Title
+      if (personalData.TitleValue) {
+        const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
+        if (titleCombo) {
+          titleCombo.value(personalData.TitleValue);
+        }
+      }
+
+      // Populate Name Fields
+      $("#txtFirstName").val(personalData.FirstName || "");
+      $("#txtLastName").val(personalData.LastName || "");
+
+      // Populate Date of Birth
+      if (personalData.DateOfBirth) {
+        const dobPicker = $("#datePickerDateOfBirth").data("kendoDatePicker");
+        if (dobPicker) {
+          dobPicker.value(new Date(personalData.DateOfBirth));
+        }
+      }
+
+      // Populate Marital Status
+      if (personalData.MaritalStatusId) {
+        const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
+        if (maritalStatusCombo) {
+          maritalStatusCombo.value(personalData.MaritalStatusId);
+        }
+      }
+
+      // Populate Nationality
+      $("#txtNationality").val(personalData.Nationality || "");
+
+      // Populate Passport Information
+      if (personalData.HasValidPassport) {
+        if (personalData.HasValidPassport === "on" || personalData.HasValidPassport === "Yes") {
+          $("#radioIsPassportYes").prop("checked", true);
+        } else {
+          $("#radioIsPassportNo").prop("checked", true);
+        }
+        // Trigger change event to enable/disable passport fields
+        $("input[name='ValidPassport']:checked").trigger("change");
+      }
+
+      $("#txtPassportNumberForCourse").val(personalData.PassportNumber || "");
+
+      // Populate Passport Issue Date
+      if (personalData.PassportIssueDate) {
+        const passportIssuePicker = $("#datepickerPassportIssueDate").data("kendoDatePicker");
+        if (passportIssuePicker) {
+          passportIssuePicker.value(new Date(personalData.PassportIssueDate));
+        }
+      }
+
+      // Populate Passport Expiry Date
+      if (personalData.PassportExpiryDate) {
+        const passportExpiryPicker = $("#datepickerPassportExpiryDate").data("kendoDatePicker");
+        if (passportExpiryPicker) {
+          passportExpiryPicker.value(new Date(personalData.PassportExpiryDate));
+        }
+      }
+
+      // Populate Contact Information
+      $("#txtPhoneCountrycodeForCourse").val(personalData.PhoneCountryCode || "");
+      $("#txtPhoneAreacodeForCourse").val(personalData.PhoneAreaCode || "");
+      $("#txtPhoneNumberForCourse").val(personalData.PhoneNumber || "");
+      $("#txtMobileForCourse").val(personalData.Mobile || "");
+      $("#txtEmailAddressForCourse").val(personalData.EmailAddress || "");
+      $("#txtSkypeIDForCourse").val(personalData.SkypeId || "");
+
+      // Populate Applicant Image
+      if (personalData.ApplicantImagePath) {
+        const imageUrl = `${baseApiFilePath}${personalData.ApplicantImagePath}`;
+        $("#applicantImageThumb").attr("src", imageUrl).removeClass("d-none");
+      }
+
+      console.log("Personal Details populated");
+    } catch (error) {
+      console.error("Error populating Personal Details:", error);
+    }
+  },
+
+  /* -------- Populate Applicant Address -------- */
+  populateApplicantAddress: function (addressData) {
+    try {
+      if (!addressData) return;
+
+      // Populate Permanent Address
+      if (addressData.PermanentAddress) {
+        this.populatePermanentAddress(addressData.PermanentAddress);
+      }
+
+      // Populate Present Address
+      if (addressData.PresentAddress) {
+        this.populatePresentAddress(addressData.PresentAddress);
+      }
+
+      console.log("Applicant Address populated");
+    } catch (error) {
+      console.error("Error populating Applicant Address:", error);
+    }
+  },
+
+  /* -------- Populate Permanent Address -------- */
+  populatePermanentAddress: function (permanentData) {
+    try {
+      if (!permanentData) return;
+
+      // Set hidden fields
+      $("#hdnPermanentAddressId").val(permanentData.PermanentAddressId || 0);
+
+      // Populate Address Fields
+      $("#txtPermanentAddress").val(permanentData.Address || "");
+      $("#txtPermanentCity").val(permanentData.City || "");
+      $("#txtPermanentState").val(permanentData.State || "");
+      $("#txtPostalCode_PermanenetAddress").val(permanentData.PostalCode || "");
+
+      // Populate Country
+      if (permanentData.CountryId) {
+        const permanentCountryCombo = $("#cmbCountryForPermanentAddress").data("kendoComboBox");
+        if (permanentCountryCombo) {
+          setTimeout(() => {
+            permanentCountryCombo.value(permanentData.CountryId);
+          }, 300);
+        }
+      }
+
+      console.log("Permanent Address populated");
+    } catch (error) {
+      console.error("Error populating Permanent Address:", error);
+    }
+  },
+
+  /* -------- Populate Present Address -------- */
+  populatePresentAddress: function (presentData) {
+    try {
+      if (!presentData) return;
+
+      // Set hidden fields
+      $("#hdnPresentAddressId").val(presentData.PresentAddressId || 0);
+
+      // Check if same as permanent address
+      if (presentData.SameAsPermanentAddress) {
+        $("#chkDoPermanentAddress").prop("checked", true).trigger("change");
+      } else {
+        // Populate Present Address Fields
+        $("#txtPresentAddress").val(presentData.Address || "");
+        $("#txtPresentCity").val(presentData.City || "");
+        $("#txtPresentState").val(presentData.State || "");
+        $("#txtPostalCode").val(presentData.PostalCode || "");
+
+        // Populate Country
+        if (presentData.CountryId) {
+          const presentCountryCombo = $("#cmbCountryForAddress").data("kendoComboBox");
+          if (presentCountryCombo) {
+            setTimeout(() => {
+              presentCountryCombo.value(presentData.CountryId);
+            }, 300);
+          }
+        }
+      }
+
+      console.log("Present Address populated");
+    } catch (error) {
+      console.error("Error populating Present Address:", error);
+    }
+  },
 
 
 }

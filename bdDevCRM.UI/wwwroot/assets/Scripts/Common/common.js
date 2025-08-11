@@ -2733,7 +2733,7 @@ var CommonManager = {
     const containerSelector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
     const $c = $(containerSelector);
     if ($c.length === 0) {
-      console.error("Container '" + containerSelector + "' not found.");
+      console.log("Container '" + containerSelector + "' not found.");
       return;
     }
 
@@ -2774,7 +2774,7 @@ var CommonManager = {
     const containerSelector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
     const $c = $(containerSelector);
     if ($c.length === 0) {
-      console.error("Container '" + containerSelector + "' not found.");
+      console.log("Container '" + containerSelector + "' not found.");
       return;
     }
 
@@ -2860,6 +2860,51 @@ var CommonManager = {
     $Container.find(".hint").text('');
   },
 
+  // use d-none class to initially hide content.
+  formShowGridHide: function(formId, gridId){
+    const formIdSelector = formId.startsWith('#') ? formId : '#' + formId;
+    const gridIdSelector = gridId.startsWith('#') ? gridId : '#' + gridId;
+    const $formIdSelector = $(formIdSelector);
+    const $gridIdSelector = $(gridIdSelector);
+
+    if ($formIdSelector.length === 0) {
+      console.log($formIdSelector + "' not found.");
+      return;
+    }
+
+    if ($gridIdSelector.length === 0) {
+      console.log( $gridIdSelector + "' not found.");
+      return;
+    }
+
+    // Show form and hide grid
+    $formIdSelector.removeClass("d-none");
+    $gridIdSelector.addClass("d-none");
+  },
+
+  // use d-none class to initially hide content.
+  formHideGridShow: function(formId, gridId){
+    const formIdSelector = formId.startsWith('#') ? formId : '#' + formId;
+    const gridIdSelector = gridId.startsWith('#') ? gridId : '#' + gridId;
+    const $formIdSelector = $(formIdSelector);
+    const $gridIdSelector = $(gridIdSelector);
+
+    if ($formIdSelector.length === 0) {
+      console.log($formIdSelector + "' not found.");
+      return;
+    }
+
+    if ($gridIdSelector.length === 0) {
+      console.log( $gridIdSelector + "' not found.");
+      return;
+    }
+
+    // Show form and hide grid
+    $formIdSelector.addClass("d-none");
+    $gridIdSelector.removeClass("d-none");
+
+  },
+
   initializeKendoWindow: function (windowSelector, kendowWindowTitle = "", kendowWindowWidth = "50%") {
     const gridSelector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
     $(gridSelector).kendoWindow({
@@ -2911,9 +2956,10 @@ var CommonManager = {
   },
 
   // three parameters need, (gridId, filename and actions column name to remove from file)
-  GenerateCSVFileAllPages: function (htmlId, fileName, actionsColumnName) {
+  GenerateCSVFileAllPages: function (htmlId, willBeGeneratedfileName, actionsColumnName) {
     debugger;
     var grid = $("#" + htmlId).data("kendoGrid");
+    var fileName = CommonManager.getFileNameWithDateTime(willBeGeneratedfileName);
 
     if (!grid) {
       console.error("Grid not initialized");
@@ -3058,6 +3104,19 @@ var CommonManager = {
 
   },
 
+  getFileNameWithDateTime: function (baseName) {
+    const now = new Date();
+    const yyyy = now.getUTCFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mi = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+
+    const timestamp = `${yyyy}${mm}${dd}${hh}${mi}${ss}`;
+    return `${baseName}${timestamp}`;
+  },
+
   /// all about kendo gird.
   // Grid responsive common functions
 
@@ -3105,10 +3164,9 @@ var CommonManager = {
     let resizeTimeout;
     const self = this;
 
-    // Unique namespace তৈরি করুন প্রতিটি grid এর জন্য
+    // Unique namespace 
     const eventNamespace = 'resize.kendoGrid_' + gridId;
 
-    // আগের event listener remove করুন (যদি থাকে)
     $(window).off(eventNamespace);
 
     // Window resize handler
@@ -3119,24 +3177,24 @@ var CommonManager = {
       }, 250); // 250ms delay
     });
 
-    // Zoom detection এর জন্য interval clear করুন (যদি আগে set করা থাকে)
+    // Zoom detection
     if (window.gridZoomIntervals && window.gridZoomIntervals[gridId]) {
       clearInterval(window.gridZoomIntervals[gridId]);
     }
 
-    // Initialize zoom intervals object যদি না থাকে
+    // Initialize zoom intervals object
     if (!window.gridZoomIntervals) {
       window.gridZoomIntervals = {};
     }
 
-    // Zoom detection interval set করুন
+    // Zoom detection interval set 
     let currentZoom = window.devicePixelRatio;
     window.gridZoomIntervals[gridId] = setInterval(function () {
       if (window.devicePixelRatio !== currentZoom) {
         currentZoom = window.devicePixelRatio;
         self.adjustGridWidth(gridId, columnsArray, marginOffset);
       }
-    }, 500); // প্রতি 500ms এ check করুন
+    }, 500); 
   },
 
   adjustGridWidth: function (gridId, columnsArray, marginOffset = 323) {
@@ -3611,6 +3669,21 @@ var CommonManager = {
     return str;
   },
 
+  /* -------- Grid Date time input field -------- */
+  datePickerEditor: function (container, options) {
+    $('<input data-text-field="' + options.field + '" data-value-field="' + options.field + '" data-bind="value:' + options.field + '"/>')
+      .appendTo(container)
+      .kendoDatePicker({
+        format: "dd-MMM-yyyy",
+        parseFormats: ["yyyy-MM-dd", "dd/MM/yyyy", "dd-MMM-yyyy"],
+        placeholder: "Select Date"
+      });
+  },
+  /* -------- Grid Textarea editor -------- */
+  textareaEditor: function (container, options) {
+    $('<textarea data-bind="value:' + options.field + '" rows="3" style="width: 100%; resize: vertical;"></textarea>')
+      .appendTo(container);
+  },
 
   /* -------- Processing Overlay Functions -------- */
   showProcessingOverlay: function (message = "Processing... Please wait.") {

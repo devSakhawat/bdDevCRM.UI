@@ -1,12 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace bdDevCRM.UI.Controllers.CRM
+namespace bdDevCRM.UI.Controllers.CRM;
+
+public class CRMController : Controller
 {
-  public class CRMController : Controller
+  public IActionResult Application()
   {
-    public IActionResult Application()
-    {
-      return View("CRMApplication/Application");
-    }
+    return View("CRMApplication/Application");
   }
+
+
+  public IActionResult Contacts()
+  {
+    return View("CRMApplication/Application");
+  }
+
 }

@@ -31,83 +31,84 @@ var UserInfoManager = {
       AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
     });
   },
-  
-  fetchBranchData: function (companyId) {
-    let branches = [];
-    var jsonParams = "companyId=" + companyId;
-    var serviceUrl = "/branches-by-compnayId-for-combo/companyId/";
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        branches = jsonData;
-        resolve(branches);
+  fetchBranchData: async function (companyId) {
+    //let comboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
+    //let companyId = comboBox.value();
+
+    const serviceUrl = `/branches-by-compnayId-for-combo/companyId?companyId=${companyId}`;
+
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load country data");
       }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-    });
+    } catch (error) {
+      console.error("Error loading country data:", error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
-  fetchDepartmentData: function (companyId) {
-    let departments = [];
-    var jsonParams = "companyId=" + companyId;
-    var serviceUrl = "/departments-by-compnayId-for-combo/companyId/";
+  fetchDepartmentData: async function (companyId) {
+    var serviceUrl = `/departments-by-compnayId-for-combo/companyId?companyId=${companyId}`;
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        departments = jsonData;
-        resolve(departments);
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load country data");
       }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-    });
+    } catch (error) {
+      console.error("Error loading country data:", error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
-  fetchEmployeeByCompanyAndBranchAndDepartment: function (companyId, branchId, departmentId) {
-    let groups = [];
-    var jsonParams = "companyId=" + companyId + "&branchId=" + branchId + "&departmentId=" + departmentId;
-    var serviceUrl = "/employees-by-indentities";
+  fetchEmployeeByCompanyAndBranchAndDepartment: async function (companyId, branchId, departmentId) {
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        groups = jsonData;
-        resolve(groups);
+    //let groups = [];
+    //var jsonParams = "companyId=" + companyId + "&branchId=" + branchId + "&departmentId=" + departmentId;
+    //var serviceUrl = `/employees-by-indentities`;
+
+    //return new Promise(function (resolve, reject) {
+    //  function onSuccess(jsonData) {
+    //    groups = jsonData;
+    //    resolve(groups);
+    //  }
+
+    //  function onFailed(jqXHR, textStatus, errorThrown) {
+    //    ToastrMessage.showToastrNotification({
+    //      preventDuplicates: true,
+    //      closeButton: true,
+    //      timeOut: 0,
+    //      message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+    //      type: 'error',
+    //    });
+    //    reject(errorThrown);
+    //  }
+    //  AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+    //});
+
+
+    var serviceUrl = `/employees-by-indentities?companyid=${companyId}&branchId=${branchId}&departmentId=${departmentId}`;
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load country data");
       }
+    } catch (error) {
+      console.error("Error loading country data:", error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
 
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-    });
   },
 
   // will be deleted after emplementation of these alternative function
@@ -171,9 +172,6 @@ var UserInfoHelper = {
     // this is static so, need to pupulate datasource
     UserInfoHelper.generateDashboardDropdown();
     UserInfoHelper.generateEmployeeCombo();
-
-    // populate dataSource to combo box.
-    await UserInfoHelper.populateUserDetailsBasedOnSummaryCompanyId();
   },
 
   // initialize all combo box.
@@ -229,7 +227,7 @@ var UserInfoHelper = {
     $("#cmbEmployee").kendoComboBox({
       placeholder: "All",
       dataTextField: "FullName",
-      dataValueField: "HRRecordId",
+      dataValueField: "HrRecordId",
       dataSource: []
     });
   },
@@ -238,7 +236,11 @@ var UserInfoHelper = {
     let comboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
     let companyId = comboBox.value();
     if (companyId > 0) {
-      await this.populateCompanyCombo();
+      let companyComboBox = $("#cmbCompanyNameDetails").data("kendoComboBox");
+      // Check if companyComboBox dataSource has data before populating
+      if (companyComboBox && companyComboBox.dataSource.data().length === 0) {
+        await this.populateCompanyCombo();
+      }
       await this.populateBranchCombo(companyId);
       await this.populateDepartmentCombo(companyId);
     }
@@ -264,68 +266,42 @@ var UserInfoHelper = {
   },
 
   populateBranchCombo: async function (companyId) {
-    try {
-      const branches = await UserInfoManager.fetchBranchData(companyId);
-
-      let comboBox = $("#cmbBranchDetails").data("kendoComboBox");
-      if (comboBox) {
-        comboBox.setDataSource(branches);
-      }
-    } catch (e) {
-      ToastrMessage.showToastrNotification({
-        preventDuplicates: true,
-        closeButton: true,
-        timeOut: 0,
-        message: "Failed to load company data" + ": " + e,
-        type: 'error',
+    let comboBox = $("#cmbBranchDetails").data("kendoComboBox");
+    if (comboBox) {
+      await UserInfoManager.fetchBranchData(companyId).then(data => {
+        comboBox.setDataSource(data);
+      }).catch(error => {
+        console.error("Error loading country data:", error);
+        comboBox.setDataSource([]);
       });
     }
   },
 
-
-
   populateDepartmentCombo: async function (companyId) {
-    try {
-      const department = await UserInfoManager.fetchDepartmentData(companyId);
-
-      let comboBox = $("#cmbDepartmentNameDetails").data("kendoComboBox");
-      if (comboBox) {
-        comboBox.setDataSource(department);
-      }
-    } catch (e) {
-      ToastrMessage.showToastrNotification({
-        preventDuplicates: true,
-        closeButton: true,
-        timeOut: 0,
-        message: "Failed to load company data" + ": " + e,
-        type: 'error',
+    let comboBox = $("#cmbDepartmentNameDetails").data("kendoComboBox");
+    if (comboBox) {
+      await UserInfoManager.fetchDepartmentData(companyId).then(data => {
+        comboBox.setDataSource(data);
+      }).catch(error => {
+        console.error("Error loading country data:", error);
+        comboBox.setDataSource([]);
       });
     }
   },
 
   populateEmployeeByCompanyBranchDepartment: async function (companyId, branchId, departmentId) {
-    try {
-      var objEmp = new Object();
-      if (branchId == 0) {
-        objEmp = null;
-      }
-      else {
-        objEmp = UserInfoManager.fetchEmployeeByCompanyAndBranchAndDepartment(companyId, branchId, departmentId);
-      }
-
-      let comboBox = $("#cmbEmployee").data("kendoComboBox");
-      if (comboBox) {
-        comboBox.setDataSource(objEmp);
-      }
-    } catch (e) {
-      ToastrMessage.showToastrNotification({
-        preventDuplicates: true,
-        closeButton: true,
-        timeOut: 0,
-        message: "Failed to load company data" + ": " + e,
-        type: 'error',
+    let comboBox = $("#cmbEmployee").data("kendoComboBox");
+    if (comboBox) {
+      await UserInfoManager.fetchEmployeeByCompanyAndBranchAndDepartment(companyId, branchId, departmentId).then(data => {
+        console.log(data);
+        comboBox.setDataSource(data);
+      }).catch(error => {
+        console.error("Error loading country data:", error);
+        comboBox.setDataSource([]);
       });
     }
+    
+    
   },
 
   populateUserInformationDetails: async function (selectedItem) {
@@ -558,7 +534,7 @@ var UserInfoHelper = {
   },
 
   clearUserInfoForm: async function () {
-    $("#btnSave").text("Save");
+    $("#btnSave").text("+ Add New Item");
 
     $("#hdnUserId").val("0");
     $("#cmbCompanyName").val("");
@@ -571,19 +547,38 @@ var UserInfoHelper = {
     $("#txtIMEI").val('');
 
     
-    await UserInfoHelper.populateCompanyCombo();
+    //await UserInfoHelper.populateCompanyCombo();
+
+    let comboBox = $("#cmbCompanyNameDetails").data("kendoComboBox");
+    if (comboBox) {
+      comboBox.value("");
+      comboBox.text("")
+      //comboBox.trigger("change");
+    }
+
 
     var branch = $("#cmbBranchDetails").data("kendoComboBox");
-    branch.destroy();
+    if (branch) {
+      branch.destroy();
+      // Remove leftover HTML
+      $("#cmbBranchDetails").empty();
+    }
     UserInfoHelper.generateBranchCombo();
 
     var department = $("#cmbDepartmentNameDetails").data("kendoComboBox");
-    department.destroy();
+    if (department) {
+      department.destroy();
+      $("#cmbDepartmentNameDetails").empty();
+    }
     UserInfoHelper.generateDepartmentCombo();
 
     var combobox = $("#cmbEmployee").data("kendoComboBox");
-    combobox.destroy();
+    if (combobox) {
+      combobox.destroy();
+      $("#cmbEmployee").empty();
+    }
     UserInfoHelper.generateEmployeeCombo();
+
 
     $('.chkBox').attr('checked', false);
 

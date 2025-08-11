@@ -1,0 +1,15 @@
+@{
+  ViewBag.Title = "Intake Month Info";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+<div class="row">
+  <partial name="CRMIntakeMonth/_IntakeMonthSummary" />
+  <div class="row">
+    <div id="IntakeMonthPopUp" style="display: none">
+      <partial name="CRMIntakeMonth/_IntakeMonthDetails" />
+    </div>
+  </div>
+</div>
+
+<script src="~/assets/scripts/core/crmintakemonth/intakemonth.js"></script>

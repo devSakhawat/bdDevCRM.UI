@@ -148,7 +148,6 @@ var InstituteSummaryHelper = {
   },
 
 
-
   /* Grid Columns */
   generateColumns: function () {
     return [
@@ -241,7 +240,6 @@ var InstituteSummaryHelper = {
   },
 
 
-
   /* --- Action Handlers --- */
   _getGridItem: function (event) {
     const grid = $("#gridSummaryInstitute").data("kendoGrid");
@@ -287,7 +285,6 @@ var InstituteSummaryHelper = {
       InstituteDetailsManager.deleteItem(item);
     }
   },
-
 
 
   // Helper functions

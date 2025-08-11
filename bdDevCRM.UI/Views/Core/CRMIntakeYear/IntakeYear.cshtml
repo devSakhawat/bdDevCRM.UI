@@ -1,0 +1,15 @@
+@{
+  ViewBag.Title = "Intake Year Info";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+<div class="row">
+  <partial name="CRMIntakeYear/_IntakeYearSummary" />
+  <div class="row">
+    <div id="IntakeYearPopUp" style="display: none">
+      <partial name="CRMIntakeYear/_IntakeYearDetails" />
+    </div>
+  </div>
+</div>
+
+<script src="~/assets/scripts/core/crmintakeyear/intakeyear.js"></script>

@@ -117,6 +117,42 @@ namespace bdDevCRM.UI.Controllers.SystemAdmin
       //}
     }
 
+    public ActionResult IntakeMonth()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("CRMIntakeMonth/IntakeMonth");
+      //}
+      //else
+      //{
+      //    return RedirectToAction("Logoff", "Home");
+      //}
+    }
+
+    public ActionResult IntakeYear()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("CRMIntakeYear/IntakeYear");
+      //}
+      //else
+      //{
+      //    return RedirectToAction("Logoff", "Home");
+      //}
+    }
+
+    public ActionResult PaymentMethod()
+    {
+      //if (Session["CurrentUser"] != null)
+      //{
+      return View("CRMPaymentMethod/PaymentMethod");
+      //}
+      //else
+      //{
+      //    return RedirectToAction("Logoff", "Home");
+      //}
+    }
+
     public ActionResult BoardInformation()
     {
       //if (Session["CurrentUser"] != null)

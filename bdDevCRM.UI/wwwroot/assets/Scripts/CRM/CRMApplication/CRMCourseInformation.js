@@ -64,6 +64,7 @@ var CRMCourseInformationManager = {
     try {
       const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
       if (response && response.IsSuccess === true) {
+        console.log(response);
         return Promise.resolve(response.Data);
       } else {
         throw new Error("Failed to load course data");
@@ -431,6 +432,17 @@ var CRMCourseInformationHelper = {
     }
   },
 
+  //generateCourseCombo: function () {
+  //  $("#cmbCourseForCourse").kendoComboBox({
+  //    placeholder: "Select Course...",
+  //    dataTextField: "CourseTitle",
+  //    dataValueField: "CourseId",
+  //    filter: "contains",
+  //    suggest: true,
+  //    dataSource: [],
+  //  });
+  //},
+
   generateCourseCombo: function () {
     $("#cmbCourseForCourse").kendoComboBox({
       placeholder: "Select Course...",
@@ -439,8 +451,32 @@ var CRMCourseInformationHelper = {
       filter: "contains",
       suggest: true,
       dataSource: [],
+      change: function (e) {
+        const courseCombo = this; 
+        const selectedItem = courseCombo.dataItem();
+        console.log("Selected course:", selectedItem);
+
+        // populate application fee
+        if (selectedItem && selectedItem.ApplicationFee) {
+          $("#txtApplicationFeeForCourse").val(selectedItem.ApplicationFee);
+        } else {
+          $("#txtApplicationFeeForCourse").val("");
+        }
+
+        // populate currency value
+        const currencyCombo = $("#cmbCurrencyForCourse").data("kendoComboBox");
+        if (currencyCombo) {
+          if (selectedItem && selectedItem.CurrencyId) {
+            currencyCombo.value(selectedItem.CurrencyId);
+          } else {
+            currencyCombo.value(""); // clear if no value
+          }
+        }
+
+      }
     });
   },
+
 
   generateIntakeMonthCombo: function () {
     $("#cmbIntakeMonthForCourse").kendoComboBox({

@@ -19,7 +19,6 @@ var LoggedInUserName = '';
 var serviceRoot = "..";
 // CurrentUser from common.js file > getCurrentUser function
 var CurrentUser = null;
-//var coreManagement = "http://localhost:7290";
 var baseApiFilePath = "https://localhost:7290"
 var baseApi = "https://localhost:7290/bdDevs-crm";
 var baseUI = "https://localhost:7145/"
@@ -2213,7 +2212,6 @@ const VanillaApiCallManager = {
           return JSON.stringify(transformedOptions);
         }
       },
-
       schema: {
 
         data: function (response) {
@@ -2588,6 +2586,7 @@ const VanillaApiCallManager = {
       );
     }
   }
+
 };
 // Vanilla Api Call Machanism end
 
@@ -2630,91 +2629,55 @@ var TokenManger = {
 
 var CommonManager = {
 
-  // Enhanced MsgBox (placeholder - implement based on your notification system)
+  // High z-index সহ SweetAlert2 নিশ্চিত করা
   MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
     try {
-      // Map Noty message types to SweetAlert2 types
-      const typeMap = {
-        'success': 'success',
-        'error': 'error',
-        'warning': 'warning',
-        'info': 'info',
-        'information': 'info',
-        'alert': 'question'
-      };
-      // Get the appropriate icon type
+      const typeMap = { success: 'success', error: 'error', warning: 'warning', info: 'info', information: 'info', alert: 'question' };
       const iconType = typeMap[messageBoxType] || 'info';
-      // Set up the SweetAlert2 configuration
       const swalConfig = {
         title: messageBoxHeaderText || '',
         html: messageText || '',
         icon: iconType,
-        timer: autoHideDelay, // Auto-close after specified delay (default 3000ms)
-        timerProgressBar: true, // Show a progress bar
-        showClass: {
-          popup: 'swal2-show',
-          backdrop: 'swal2-backdrop-show',
-          icon: 'swal2-icon-show'
-        },
-        hideClass: {
-          popup: 'swal2-hide',
-          backdrop: 'swal2-backdrop-hide',
-          icon: 'swal2-icon-hide'
-        },
-        customClass: {
-          container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
-        },
+        timer: autoHideDelay,
+        timerProgressBar: autoHideDelay > 0,
+        customClass: { container: 'custom-swal-zindex' },
         showConfirmButton: false,
         showCancelButton: false,
         allowOutsideClick: false,
         allowEscapeKey: false,
         allowEnterKey: false,
         focusConfirm: false,
-        // Add the didOpen hook here
         didOpen: () => {
-          document.querySelector('.swal2-container').style.zIndex = '20000'; // Set z-index dynamically
+          const z = 2147483000; // খুবই হাই z-index
+          const c = document.querySelector('.swal2-container');
+          if (c) {
+            c.style.zIndex = z.toString();
+            const p = c.querySelector('.swal2-popup');
+            if (p) p.style.zIndex = (z + 1).toString();
+          }
         }
       };
 
-      // Handle auto-hide delay
-      if (autoHideDelay > 0) {
-        swalConfig.timer = autoHideDelay; // Auto-close after specified delay
-        swalConfig.timerProgressBar = true; // Show a progress bar
-      }
+      if (displayPosition.includes('top')) swalConfig.position = 'top';
+      else if (displayPosition.includes('bottom')) swalConfig.position = 'bottom';
+      else swalConfig.position = 'center';
 
-      // Handle positioning
-      if (displayPosition.includes('top')) {
-        swalConfig.position = 'top';
-      } else if (displayPosition.includes('bottom')) {
-        swalConfig.position = 'bottom';
-      } else {
-        swalConfig.position = 'center';
-      }
-      // Process buttons
       if (Array.isArray(buttonsArray) && buttonsArray.length > 0) {
         const primaryButton = buttonsArray.find(btn => btn.addClass && btn.addClass.includes('btn-primary'));
         const cancelButton = buttonsArray.find(btn => btn.text === 'Cancel' || btn.text === 'No');
         if (primaryButton) {
           swalConfig.showConfirmButton = true;
           swalConfig.confirmButtonText = primaryButton.text || 'OK';
-          swalConfig.customClass = swalConfig.customClass || {};
-          swalConfig.customClass.confirmButton = primaryButton.addClass || 'btn btn-primary';
         }
-
         if (cancelButton) {
           swalConfig.showCancelButton = true;
           swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
-          swalConfig.customClass = swalConfig.customClass || {};
-          swalConfig.customClass.cancelButton = cancelButton.addClass || 'btn';
         }
       }
-      // Fire the SweetAlert2 dialog
+
       return Swal.fire(swalConfig).then((result) => {
-        // Check if auto-closed by timer
-        if (result.dismiss === Swal.DismissReason.timer) {
-          // Optional: Handle timer-based dismissal if needed
-          console.log('Message box was closed by the timer');
-        } else if (result.isConfirmed && buttonsArray[0] && typeof buttonsArray[0].onClick === 'function') {
+        if (result.dismiss === Swal.DismissReason.timer) { /* ignore */ }
+        else if (result.isConfirmed && buttonsArray[0] && typeof buttonsArray[0].onClick === 'function') {
           const notyMock = { close: () => { } };
           buttonsArray[0].onClick(notyMock);
         } else if (result.isDismissed && buttonsArray[1] && typeof buttonsArray[1].onClick === 'function') {
@@ -2728,6 +2691,140 @@ var CommonManager = {
       return Promise.resolve();
     }
   },
+
+  // ইউনিফাইড কনফার্ম: Kendo Window খোলা থাকলে Kendo Dialog, নতুবা SweetAlert2
+  showConfirm: function (title, message, onYes, onCancel) {
+    const anyKendoOverlay = $(".k-overlay").length > 0 || $(".k-window:visible").length > 0;
+
+    if (anyKendoOverlay) {
+      const $dlg = $("<div></div>").kendoDialog({
+        width: "450px",
+        title: title || "Confirmation",
+        modal: true,
+        closable: false,
+        content: message || "",
+        actions: [
+          { text: "Cancel", action: function () { if (onCancel) onCancel(); return true; } },
+          { text: "Yes", primary: true, action: function () { if (onYes) onYes(); return true; } }
+        ],
+        open: function () {
+          const z = 2147482000; // যথেষ্ট হাই z-index
+          const w = this.wrapper;
+          w.css("z-index", z + 1);
+          $(".k-animation-container:has(.k-dialog)").css("z-index", z);
+          $(".k-overlay").last().css("z-index", z - 1);
+        },
+        close: function () { this.destroy(); }
+      }).data("kendoDialog");
+      $dlg.open();
+      return;
+    }
+
+    // Fallback: SweetAlert2
+    this.MsgBox("info", "center", title || "Confirmation", message || "", [
+      { addClass: "btn btn-primary", text: "Yes", onClick: () => onYes && onYes() },
+      { addClass: "btn", text: "Cancel", onClick: () => onCancel && onCancel() }
+    ], 0);
+  },
+
+  //// Enhanced MsgBox (placeholder - implement based on your notification system)
+  //MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
+  //  try {
+  //    // Map Noty message types to SweetAlert2 types
+  //    const typeMap = {
+  //      'success': 'success',
+  //      'error': 'error',
+  //      'warning': 'warning',
+  //      'info': 'info',
+  //      'information': 'info',
+  //      'alert': 'question'
+  //    };
+  //    // Get the appropriate icon type
+  //    const iconType = typeMap[messageBoxType] || 'info';
+  //    // Set up the SweetAlert2 configuration
+  //    const swalConfig = {
+  //      title: messageBoxHeaderText || '',
+  //      html: messageText || '',
+  //      icon: iconType,
+  //      timer: autoHideDelay, // Auto-close after specified delay (default 3000ms)
+  //      timerProgressBar: true, // Show a progress bar
+  //      showClass: {
+  //        popup: 'swal2-show',
+  //        backdrop: 'swal2-backdrop-show',
+  //        icon: 'swal2-icon-show'
+  //      },
+  //      hideClass: {
+  //        popup: 'swal2-hide',
+  //        backdrop: 'swal2-backdrop-hide',
+  //        icon: 'swal2-icon-hide'
+  //      },
+  //      customClass: {
+  //        container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
+  //      },
+  //      showConfirmButton: false,
+  //      showCancelButton: false,
+  //      allowOutsideClick: false,
+  //      allowEscapeKey: false,
+  //      allowEnterKey: false,
+  //      focusConfirm: false,
+  //      // Add the didOpen hook here
+  //      didOpen: () => {
+  //        document.querySelector('.swal2-container').style.zIndex = '20000'; // Set z-index dynamically
+  //      }
+  //    };
+
+  //    // Handle auto-hide delay
+  //    if (autoHideDelay > 0) {
+  //      swalConfig.timer = autoHideDelay; // Auto-close after specified delay
+  //      swalConfig.timerProgressBar = true; // Show a progress bar
+  //    }
+
+  //    // Handle positioning
+  //    if (displayPosition.includes('top')) {
+  //      swalConfig.position = 'top';
+  //    } else if (displayPosition.includes('bottom')) {
+  //      swalConfig.position = 'bottom';
+  //    } else {
+  //      swalConfig.position = 'center';
+  //    }
+  //    // Process buttons
+  //    if (Array.isArray(buttonsArray) && buttonsArray.length > 0) {
+  //      const primaryButton = buttonsArray.find(btn => btn.addClass && btn.addClass.includes('btn-primary'));
+  //      const cancelButton = buttonsArray.find(btn => btn.text === 'Cancel' || btn.text === 'No');
+  //      if (primaryButton) {
+  //        swalConfig.showConfirmButton = true;
+  //        swalConfig.confirmButtonText = primaryButton.text || 'OK';
+  //        swalConfig.customClass = swalConfig.customClass || {};
+  //        swalConfig.customClass.confirmButton = primaryButton.addClass || 'btn btn-primary';
+  //      }
+
+  //      if (cancelButton) {
+  //        swalConfig.showCancelButton = true;
+  //        swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
+  //        swalConfig.customClass = swalConfig.customClass || {};
+  //        swalConfig.customClass.cancelButton = cancelButton.addClass || 'btn';
+  //      }
+  //    }
+  //    // Fire the SweetAlert2 dialog
+  //    return Swal.fire(swalConfig).then((result) => {
+  //      // Check if auto-closed by timer
+  //      if (result.dismiss === Swal.DismissReason.timer) {
+  //        // Optional: Handle timer-based dismissal if needed
+  //        console.log('Message box was closed by the timer');
+  //      } else if (result.isConfirmed && buttonsArray[0] && typeof buttonsArray[0].onClick === 'function') {
+  //        const notyMock = { close: () => { } };
+  //        buttonsArray[0].onClick(notyMock);
+  //      } else if (result.isDismissed && buttonsArray[1] && typeof buttonsArray[1].onClick === 'function') {
+  //        const notyMock = { close: () => { } };
+  //        buttonsArray[1].onClick(notyMock);
+  //      }
+  //    });
+  //  } catch (error) {
+  //    console.error("Error in SweetAlert MsgBox:", error);
+  //    alert(messageText || "Operation confirmation required");
+  //    return Promise.resolve();
+  //  }
+  //},
 
   MakeFormReadOnly: function (formSelector) {
     const containerSelector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
@@ -2856,6 +2953,28 @@ var CommonManager = {
       }
     });
 
+    // ========= Enhanced File Preview Cleanup =========
+    // Clear image thumbnails/previews
+    $Container.find("img[id*='thumb'], img[id*='Thumb'], img[id*='thumbnail'], img[id*='Thumbnail'], img[id*='preview'], img[id*='Preview']").each(function() {
+      $(this).addClass("d-none").attr("src", "#").off("click");
+    });
+    
+    // Clear PDF/document previews
+    $Container.find("button[id*='preview'], button[id*='Preview']").addClass("d-none").off("click");
+    
+    // Clear file name displays
+    $Container.find("span[id*='Name'], span[id*='name']").text("");
+    
+    // Clear global prospectus file data variable if exists
+    if (typeof prospectusFileData !== 'undefined') {
+      prospectusFileData = null;
+    }
+    
+    // Clear any other file-related global variables
+    if (typeof logoFileData !== 'undefined') {
+      logoFileData = null;
+    }
+
     // Remove validation messages
     $Container.find(".hint").text('');
   },
@@ -2928,7 +3047,23 @@ var CommonManager = {
       popUp.title = kendowWindowTitle;
     }
     popUp.center().open();
+    if (typeof popUp.toFront === "function") {
+      popUp.toFront(); // নতুন উইন্ডো টপে আনুন
+    }
   },
+
+  //openKendoWindow: function (windowSelector, kendowWindowTitle, kendowWindowWidth = "50%") {
+  //  const gridSelector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+  //  var popUp = $(gridSelector).data("kendoWindow");
+  //  if (!popUp) {
+  //    this.initializeKendoWindow(windowSelector, kendowWindowTitle, kendowWindowWidth);
+  //  }
+  //  if (kendowWindowTitle && kendowWindowTitle != "") {
+  //    popUp = $(gridSelector).data("kendoWindow");
+  //    popUp.title = kendowWindowTitle;
+  //  }
+  //  popUp.center().open();
+  //},
 
   closeKendoWindow: function (windowSelector) {
 
@@ -2944,15 +3079,28 @@ var CommonManager = {
     }
   },
 
+  //appandCloseButton: function (windowSelector) {
+  //  const windowId = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+  //  // Append Close button dynamically if not already added
+  //  const buttonContainer = $(".btnDiv ul li");
+  //  if (buttonContainer.find(".btn-close-generic")) {
+  //    buttonContainer.find(".btn-close-generic").remove();
+  //  }
+  //  const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('${windowId}')">Close</button>`;
+  //  buttonContainer.append(closeBtn);
+  //},
+
   appandCloseButton: function (windowSelector) {
     const windowId = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
-    // Append Close button dynamically if not already added
-    const buttonContainer = $(".btnDiv ul li");
-    if (buttonContainer.find(".btn-close-generic")) {
-      buttonContainer.find(".btn-close-generic").remove();
-    }
+
+    const $context = $(windowId);
+    const $buttonContainer = $context.find(".btnDiv ul li").first();
+    if ($buttonContainer.length === 0) return;
+
+    $buttonContainer.find(".btn-close-generic").remove();
+
     const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('${windowId}')">Close</button>`;
-    buttonContainer.append(closeBtn);
+    $buttonContainer.append(closeBtn);
   },
 
   // three parameters need, (gridId, filename and actions column name to remove from file)
@@ -3117,9 +3265,6 @@ var CommonManager = {
     return `${baseName}${timestamp}`;
   },
 
-  /// all about kendo gird.
-  // Grid responsive common functions
-
   // Store active resize handlers for cleanup
   _activeResizeHandlers: {},
 
@@ -3140,7 +3285,6 @@ var CommonManager = {
     return totalWidthOfTheGrid;
   },
 
-
   calculateGridResponsiveWidth: function (gridId, columnsArray, marginOffset = 323) {
     const containerElement = $("#" + gridId).parent();
     let availableWidth;
@@ -3159,7 +3303,6 @@ var CommonManager = {
     return totalColumnsWidth > availableWidth ? availableWidth + "px" : totalColumnsWidth + "px";
   },
 
-
   attachGridZoomAndResizeHandlers: function (gridId, columnsArray, marginOffset = 323) {
     let resizeTimeout;
     const self = this;
@@ -3174,7 +3317,7 @@ var CommonManager = {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(function () {
         self.adjustGridWidth(gridId, columnsArray, marginOffset);
-      }, 250); // 250ms delay
+      }, 250);
     });
 
     // Zoom detection
@@ -3220,7 +3363,6 @@ var CommonManager = {
     }
   },
 
-
   destroyGridHandlers: function (gridId) {
     // Event listeners remove
     const eventNamespace = 'resize.kendoGrid_' + gridId;
@@ -3250,7 +3392,6 @@ var CommonManager = {
     });
   },
 
-
   setupResponsiveGrid: function (gridId, gridOptions, columnsArray, marginOffset = 323) {
 
     gridOptions.width = this.calculateGridResponsiveWidth(gridId, columnsArray, marginOffset);
@@ -3263,8 +3404,9 @@ var CommonManager = {
   },
 
   // Clean up when Grid destroy 
-  cleanup: function () {
-    CommonManager.destroyGridHandlers("gridSummaryInstitute");
+  cleanup: function (gridSelector) {
+    const containerSelector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    CommonManager.destroyGridHandlers(containerSelector);
   },
 
   // Helper function to get combobox values safely
@@ -3308,7 +3450,6 @@ var CommonManager = {
     return dataItem ? dataItem.text || dataItem[dropdownlist.options.dataTextField] || defaultValue : defaultValue;
   },
 
-
   getMultiSelectValues: function (multiselect, defaultValue = []) {
     if (!multiselect) return defaultValue;
 
@@ -3319,7 +3460,6 @@ var CommonManager = {
 
     return filteredValues.length > 0 ? filteredValues.map(v => parseInt(v)) : defaultValue;
   },
-
 
   getMultiSelectTexts: function (multiselect, defaultValue = []) {
     if (!multiselect) return defaultValue;
@@ -3609,7 +3749,6 @@ var CommonManager = {
 
   getCountryNames: function () { return [["Afghanistan"], ["Albania"], ["Algeria"], ["Andorra"], ["Angola"], ["Antarctica"], ["Antigua and Barbuda"], ["Argentina"], ["Armenia"], ["Australia"], ["Austria"], ["Azerbaijan"], ["Bahamas"], ["Bahrain"], ["Bangladesh"], ["Barbados"], ["Belarus"], ["Belgium"], ["Belize"], ["Benin"], ["Bermuda"], ["Bhutan"], ["Bolivia"], ["Bosnia and Herzegovina"], ["Botswana"], ["Brazil"], ["Brunei"], ["Bulgaria"], ["Burkina Faso"], ["Burma"], ["Burundi"], ["Cambodia"], ["Cameroon"], ["Canada"], ["Cape Verde"], ["Central African Republic"], ["Chad"], ["Chile"], ["China"], ["Colombia"], ["Comoros"], ["Congo"], ["Democratic Republic"], ["Congo"], ["Republic of the"], ["Costa Rica"], ["Cote d'Ivoire"], ["Croatia"], ["Cuba"], ["Cyprus"], ["Czech Republic"], ["Denmark"], ["Djibouti"], ["Dominica"], ["Dominican Republic"], ["East Timor"], ["Ecuador"], ["Egypt"], ["El Salvador"], ["Equatorial Guinea"], ["Eritrea"], ["Estonia"], ["Ethiopia"], ["Fiji"], ["Finland"], ["France"], ["Gabon"], ["Gambia"], ["Georgia"], ["Germany"], ["Ghana"], ["Greece"], ["Greenland"], ["Grenada"], ["Guatemala"], ["Guinea"], ["Guinea-Bissau"], ["Guyana"], ["Haiti"], ["Honduras"], ["Hong Kong"], ["Hungary"], ["Iceland"], ["India"], ["Indonesia"], ["Iran"], ["Iraq"], ["Ireland"], ["Israel"], ["Italy"], ["Jamaica"], ["Japan"], ["Jordan"], ["Kazakhstan"], ["Kenya"], ["Kiribati"], ["Korea North"], ["Korea South"], ["Kuwait"], ["Kyrgyzstan"], ["Laos"], ["Latvia"], ["Lebanon"], ["Lesotho"], ["Liberia"], ["Libya"], ["Liechtenstein"], ["Lithuania"], ["Luxembourg"], ["Macedonia"], ["Madagascar"], ["Malawi"], ["Malaysia"], ["Maldives"], ["Mali"], ["Malta"], ["Marshall Islands"], ["Mauritania"], ["Mauritius"], ["Mexico"], ["Micronesia"], ["Moldova"], ["Mongolia"], ["Morocco"], ["Monaco"], ["Mozambique"], ["Namibia"], ["Nauru"], ["Nepal"], ["Netherlands"], ["New Zealand"], ["Nicaragua"], ["Niger"], ["Nigeria"], ["Norway"], ["Oman"], ["Pakistan"], ["Panama"], ["Papua New Guinea"], ["Paraguay"], ["Peru"], ["Philippines"], ["Poland"], ["Portugal"], ["Qatar"], ["Romania"], ["Russia"], ["Rwanda"], ["Samoa"], ["San Marino"], ["Sao Tome"], ["Saudi Arabia"], ["Senegal"], ["Serbia and Montenegro"], ["Seychelles"], ["Sierra Leone"], ["Singapore"], ["Slovakia"], ["Slovenia"], ["Solomon Islands"], ["Somalia"], ["South Africa"], ["Spain"], ["Sri Lanka"], ["Sudan"], ["Suriname"], ["Swaziland"], ["Sweden"], ["Switzerland"], ["Syria"], ["Taiwan"], ["Tajikistan"], ["Tanzania"], ["Thailand"], ["Togo"], ["Tonga"], ["Trinidad and Tobago"], ["Tunisia"], ["Turkey"], ["Turkmenistan"], ["Uganda"], ["Ukraine"], ["United Arab Emirates"], ["United Kingdom"], ["United States"], ["Uruguay"], ["Uzbekistan"], ["Vanuatu"], ["Venezuela"], ["Vietnam"], ["Yemen"], ["Zambia"], ["Zimbabwe"]]; },
 
-
   getCountryArray: function () {
     var countryList = [["Barguna"], ["Barishal"], ["Bhola"], ["Jhalokati"], ["Patuakhali"], ["Pirojpur"], ["Bandarban"], ["Brahmanbaria"], ["Chandpur"], ["Chittagong"], ["Comilla"], ["Coxs Bazar"], ["Feni"], ["Khagrachhari"], ["Lakshmipur"], ["Noakhali"], ["Rangamati"], ["Dhaka"], ["Faridpur"], ["Gazipur"], ["Gopalganj"], ["Jamalpur"], ["Kishoreganj"], ["Madaripur"], ["Manikganj"], ["Munshiganj"], ["Mymensingh"], ["Narayanganj"], ["Narsingdi"], ["Netrakona"], ["Rajbari"], ["Shariatpur"], ["Sherpur"], ["Tangail"], ["Bagerhat"], ["Chuadanga"], ["Jessore"], ["Jhenaidah"], ["Khulna"], ["Kushtia"], ["Magura"], ["Meherpur"], ["Narail"], ["Satkhira"], ["Bogra"], ["Joypurhat"], ["Naogaon"], ["Natore"], ["Nawabganj"], ["Pabna"], ["Rajshahi"], ["Sirajganj"], ["Dinajpur"], ["Gaibandha"], ["Kurigram"], ["Lalmonirhat"], ["Nilphamari"], ["Panchagarh"], ["Rangpur"], ["Thakurgaon"], ["Habiganj"], ["Moulvibazar"], ["Sunamganj"], ["Sylhet"]];
 
@@ -3634,9 +3773,8 @@ var CommonManager = {
     });
   },
 
-  replaceSingleQoute: function (id) {
-
-    var checkString = $("#" + id).val();
+  replaceSingleQoute: function (formSelector) {
+    const checkString = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
     checkString = checkString.replace(/'/g, "''");
     return checkString;
 
@@ -3653,7 +3791,7 @@ var CommonManager = {
 
   AmountInWord: function (number) {
 
-    var a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen '];
+    var a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
     var b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
 
@@ -3944,6 +4082,7 @@ var ValidatorManager = {
 
 };
 
+
 var currencyConverter = {
 
   add_commas: function (nStr) {
@@ -4105,6 +4244,8 @@ var FileManager = {
     jQuery(container).dialog("close");
     jQuery(container).dialog("destroy");
   }
+
+
 };
 
 // Universal FormData Helper - Works with any object
@@ -4306,43 +4447,44 @@ const UniversalFormDataHelper = {
   }
 };
 
-// Example usage for your Institute form:
-const InstituteFormDataHelper = {
+//// Example usage for your Institute form:
+//const InstituteFormDataHelper = {
 
-  // Institute-specific configuration
-  getInstituteConfig: function () {
-    return {
-      excludeFields: ['CountryName', 'InstituteType', 'CurrencyName'],
-      includeEmptyFields: [
-        'InstituteCode', 'InstituteEmail', 'InstituteAddress',
-        'Campus', 'Website', 'FundsRequirementforVisa',
-        'LanguagesRequirement', 'InstitutionalBenefits',
-        'PartTimeWorkDetails', 'ScholarshipsPolicy',
-        'InstitutionStatusNotes', 'InstitutionLogo', 'InstitutionProspectus'
-      ],
-      requiredFields: ['InstituteName', 'CountryId'],
-      customHandlers: {
-        // Custom handler for specific fields if needed
-        'ApplicationFee': function (key, value, formData, opts) {
-          // Custom logic for ApplicationFee
-          if (value === 0 || value === '0') {
-            formData.append(key, '0');
-            return true;
-          }
-          return UniversalFormDataHelper.appendToFormData(key, value, formData, opts);
-        }
-      }
-    };
-  },
+//  // Institute-specific configuration
+//  getInstituteConfig: function () {
+//    return {
+//      excludeFields: ['CountryName', 'InstituteType', 'CurrencyName'],
+//      includeEmptyFields: [
+//        'InstituteCode', 'InstituteEmail', 'InstituteAddress',
+//        'Campus', 'Website', 'FundsRequirementforVisa',
+//        'LanguagesRequirement', 'InstitutionalBenefits',
+//        'PartTimeWorkDetails', 'ScholarshipsPolicy',
+//        'InstitutionStatusNotes', 'InstitutionLogo', 'InstitutionProspectus'
+//      ],
+//      requiredFields: ['InstituteName', 'CountryId'],
+//      customHandlers: {
+//        // Custom handler for specific fields if needed
+//        'ApplicationFee': function (key, value, formData, opts) {
+//          // Custom logic for ApplicationFee
+//          if (value === 0 || value === '0') {
+//            formData.append(key, '0');
+//            return true;
+//          }
+//          return UniversalFormDataHelper.appendToFormData(key, value, formData, opts);
+//        }
+//      }
+//    };
+//  },
 
-  // Convert Institute DTO to FormData
-  convertInstituteToFormData: function (dto) {
-    const config = this.getInstituteConfig();
-    return UniversalFormDataHelper.advancedConvert(dto, config);
-  }
-};
+//  // Convert Institute DTO to FormData
+//  convertInstituteToFormData: function (dto) {
+//    const config = this.getInstituteConfig();
+//    return UniversalFormDataHelper.advancedConvert(dto, config);
+//  }
+//};
 
 // Updated saveOrUpdateItem function using the universal helper
+
 const UpdatedInstituteHelper = {
   saveOrUpdateItem: async function () {
     debugger;
@@ -4748,4 +4890,6 @@ const Examples = {
       console.error('Batch error:', error);
     }
   }
+
+
 };

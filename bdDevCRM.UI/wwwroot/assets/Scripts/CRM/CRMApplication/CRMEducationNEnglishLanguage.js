@@ -437,6 +437,7 @@ var CRMEducationNEnglishLanguagHelper = {
   //},
 
   ViewDetails: function (data) {
+    debugger;
     if (data.AttachedDocument != null && data.AttachedDocument != "") {
       const fileName = data.DocumentName || data.AttachedDocument.split("/").pop();
       const thumbnailSrc = data.PdfThumbnail || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+UERGPC90ZXh0Pgo8L3N2Zz4K';
@@ -484,6 +485,7 @@ var CRMEducationNEnglishLanguagHelper = {
 
     // Generate PDF thumbnail and update grid
     CRMEducationNEnglishLanguagManager.generatePdfThumbnail(file, docuid, function (thumbnailUrl) {
+      debugger;
       // For now, simulate successful upload and update grid
       const fileName = file.name;
       const filePath = "/uploads/education/" + fileName; // This would come from server response

@@ -73,6 +73,8 @@ var InstituteDetailsManager = {
   /* -------- Save <=> Update -------- */
   saveOrUpdateItem: async function () {
     try {
+      if (!this.validateForm()) return;
+
       const id = $("#instituteId").val() || 0;
       const isCreate = id == 0;
       const serviceUrl = isCreate ? "/crm-institute" : `/crm-institute/${id}`;
@@ -80,73 +82,157 @@ var InstituteDetailsManager = {
       const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
       const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
 
-      // Create model object from form
       let modelDto = InstituteDetailsHelper.createItem();
-
-      if (!modelDto) {
-        throw new Error("Failed to create DTO object");
-      }
+      if (!modelDto) throw new Error("Failed to create DTO object");
 
       const formData = new FormData();
-
-      // Append files
       const logoFileInput = document.getElementById('institutionLogoFile');
       const prospectusFileInput = document.getElementById('prospectusFile');
-
-      if (logoFileInput && logoFileInput.files.length > 0) {
-        formData.append("InstitutionLogoFile", logoFileInput.files[0]);
-      }
-
-      if (prospectusFileInput && prospectusFileInput.files.length > 0) {
-        formData.append("InstitutionProspectusFile", prospectusFileInput.files[0]);
-      }
-
-      // Append each field separately for model binding
+      if (logoFileInput && logoFileInput.files.length > 0) formData.append("InstitutionLogoFile", logoFileInput.files[0]);
+      if (prospectusFileInput && prospectusFileInput.files.length > 0) formData.append("InstitutionProspectusFile", prospectusFileInput.files[0]);
       for (const key in modelDto) {
-        if (modelDto.hasOwnProperty(key) && modelDto[key] !== null && modelDto[key] !== undefined) {
+        if (Object.prototype.hasOwnProperty.call(modelDto, key) && modelDto[key] !== null && modelDto[key] !== undefined) {
           formData.append(key, modelDto[key]);
         }
       }
 
-      // Confirmation popup before sending
-      CommonManager.MsgBox("info", "center", "Confirmation", confirmMsg, [
-        {
-          addClass: "btn btn-primary",
-          text: "Yes",
-          onClick: async function ($noty) {
-            $noty.close();
-            try {
-              const response = await VanillaApiCallManager.SendRequestVanilla(
-                baseApi,
-                serviceUrl,
-                formData,
-                httpType,
-                {
-                  skipContentTypeHeader: true,
-                  timeout: 300000,
-                  requireAuth: true
-                }
-              );
+      CommonManager.showConfirm("Confirmation", confirmMsg,
+        async () => {
+          // Yes
+          CommonManager.showProcessingOverlay("Saving institute information...");
+          try {
+            const response = await VanillaApiCallManager.SendRequestVanilla(
+              baseApi, serviceUrl, formData, httpType,
+              { skipContentTypeHeader: true, timeout: 300000, requireAuth: true }
+            );
+            CommonManager.hideProcessingOverlay();
 
-              if (response && response.IsSuccess === true) {
-                ToastrMessage.showSuccess(successMsg);
-                InstituteDetailsHelper.clearForm();
-                CommonManager.closeKendoWindow("InstitutePopUp");
-                $("#gridSummaryInstitute").data("kendoGrid").dataSource.read();
-              } else {
-                throw new Error(response.Message || "Unknown error occurred");
-              }
-            } catch (err) {
-              VanillaApiCallManager.handleApiError(err);
+            if (response && response.IsSuccess === true) {
+              ToastrMessage.showSuccess(successMsg);
+              InstituteDetailsHelper.clearForm();
+              CommonManager.closeKendoWindow("InstitutePopUp");
+              const grid = $("#gridSummaryInstitute").data("kendoGrid");
+              if (grid) grid.dataSource.read();
+            } else {
+              throw new Error(response.Message || "Unknown error occurred");
             }
+          } catch (err) {
+            CommonManager.hideProcessingOverlay();
+            VanillaApiCallManager.handleApiError(err);
           }
         },
-        { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }
-      ], 0);
+        () => {
+          // Cancel
+          CommonManager.hideProcessingOverlay(); // সেফটি: overlay খোলা থাকলে বন্ধ হবে
+          $("#btnInstituteSaveOrUpdate").prop("disabled", false).focus();
+          ToastrMessage.showInfo("Operation cancelled", "Cancelled", 2000);
+        }
+      );
     } catch (error) {
+      CommonManager.hideProcessingOverlay();
       VanillaApiCallManager.handleApiError(error);
     }
   },
+
+
+  //saveOrUpdateItem: async function () {
+  //  try {
+  //    // ========= Enhanced Form Validation =========
+  //    if (!this.validateForm()) {
+  //      return; // Stop if validation fails
+  //    }
+
+  //    const id = $("#instituteId").val() || 0;
+  //    const isCreate = id == 0;
+  //    const serviceUrl = isCreate ? "/crm-institute" : `/crm-institute/${id}`;
+  //    const httpType = isCreate ? "POST" : "PUT";
+  //    const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+  //    const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
+
+  //    // Create model object from form
+  //    let modelDto = InstituteDetailsHelper.createItem();
+
+  //    if (!modelDto) {
+  //      throw new Error("Failed to create DTO object");
+  //    }
+
+  //    const formData = new FormData();
+
+  //    // Append files
+  //    const logoFileInput = document.getElementById('institutionLogoFile');
+  //    const prospectusFileInput = document.getElementById('prospectusFile');
+
+  //    if (logoFileInput && logoFileInput.files.length > 0) {
+  //      formData.append("InstitutionLogoFile", logoFileInput.files[0]);
+  //    }
+
+  //    if (prospectusFileInput && prospectusFileInput.files.length > 0) {
+  //      formData.append("InstitutionProspectusFile", prospectusFileInput.files[0]);
+  //    }
+
+  //    // Append each field separately for model binding
+  //    for (const key in modelDto) {
+  //      if (modelDto.hasOwnProperty(key) && modelDto[key] !== null && modelDto[key] !== undefined) {
+  //        formData.append(key, modelDto[key]);
+  //      }
+  //    }
+
+  //    // Confirmation popup before sending using SweetAlert2 
+  //    CommonManager.MsgBox("info", "center", "Confirmation", confirmMsg, [
+  //      {
+  //        addClass: "btn btn-primary",
+  //        text: "Yes",
+  //        onClick: async function ($noty) {
+  //          $noty.close();
+            
+  //          // Show processing overlay
+  //          CommonManager.showProcessingOverlay("Saving institute information...");
+            
+  //          try {
+  //            const response = await VanillaApiCallManager.SendRequestVanilla(
+  //              baseApi,
+  //              serviceUrl,
+  //              formData,
+  //              httpType,
+  //              {
+  //                skipContentTypeHeader: true,
+  //                timeout: 300000,
+  //                requireAuth: true
+  //              }
+  //            );
+
+  //            // Hide processing overlay
+  //            CommonManager.hideProcessingOverlay();
+
+  //            if (response && response.IsSuccess === true) {
+  //              ToastrMessage.showSuccess(successMsg);
+                
+  //              // Enhanced cleanup after successful save
+  //              InstituteDetailsHelper.clearForm();
+  //              CommonManager.closeKendoWindow("InstitutePopUp");
+                
+  //              // Refresh grid if it exists
+  //              const grid = $("#gridSummaryInstitute").data("kendoGrid");
+  //              if (grid) {
+  //                grid.dataSource.read();
+  //              }
+  //            } else {
+  //              throw new Error(response.Message || "Unknown error occurred");
+  //            }
+  //          } catch (err) {
+  //            // Hide processing overlay on error
+  //            CommonManager.hideProcessingOverlay();
+  //            VanillaApiCallManager.handleApiError(err);
+  //          }
+  //        }
+  //      },
+  //      { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }
+  //    ], 0);
+  //  } catch (error) {
+  //    CommonManager.hideProcessingOverlay();
+  //    VanillaApiCallManager.handleApiError(error);
+  //  }
+  //},
 
   deleteItem: function (gridItem) {
     if (!gridItem) return;
@@ -189,7 +275,90 @@ var InstituteDetailsManager = {
       { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
       0
     );
-  }
+  },
+
+  /* -------- Enhanced Form Validation -------- */
+  validateForm: function() {
+    let isValid = true;
+    const errors = [];
+
+    // Required field validation
+    const instituteName = $("#instituteName").val().trim();
+    if (!instituteName) {
+      this.showFieldError("#instituteName", "Institute Name is required");
+      errors.push("Institute Name is required");
+      isValid = false;
+    }
+
+    // ComboBox validation
+    const countryCombo = $("#cmbCountry_Institute").data("kendoComboBox");
+    if (!countryCombo || !countryCombo.value()) {
+      this.showFieldError("#cmbCountry_Institute_wrapper", "Please select a country");
+      errors.push("Country is required");
+      isValid = false;
+    }
+
+    // Email validation if provided
+    const email = $("#instituteEmail").val().trim();
+    if (email && !this.isValidEmail(email)) {
+      this.showFieldError("#instituteEmail", "Please enter a valid email address");
+      errors.push("Invalid email format");
+      isValid = false;
+    }
+
+    // Website URL validation if provided
+    const website = $("#website").val().trim();
+    if (website && !this.isValidUrl(website)) {
+      this.showFieldError("#website", "Please enter a valid website URL");
+      errors.push("Invalid website URL");
+      isValid = false;
+    }
+
+    // Show summary error message if validation fails
+    if (!isValid) {
+      ToastrMessage.showError(
+        "Please correct the following errors:<br>• " + errors.join("<br>• "),
+        "Validation Error",
+        5000
+      );
+    }
+
+    return isValid;
+  },
+
+  /* -------- Validation Helper Functions -------- */
+  showFieldError: function(fieldSelector, message) {
+    const $field = $(fieldSelector);
+    $field.addClass("is-invalid");
+    
+    // Remove existing error message
+    $field.next(".invalid-feedback").remove();
+    
+    // Add error message
+    $field.after(`<div class="invalid-feedback">${message}</div>`);
+    
+    // Clear error on input change
+    $field.one("input change", function() {
+      $(this).removeClass("is-invalid");
+      $(this).next(".invalid-feedback").remove();
+    });
+  },
+
+  isValidEmail: function(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  },
+
+  isValidUrl: function(url) {
+    try {
+      const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+      return urlPattern.test(url) || url.startsWith('http://') || url.startsWith('https://');
+    } catch {
+      return false;
+    }
+  },
+
+
 };
 
 /* =========================================================
@@ -227,11 +396,13 @@ var InstituteDetailsHelper = {
     // Initialize summary
     InstituteTypeSummaryHelper.initInstituteTypeSummary();
 
-    // Append Close button dynamically if not already added
-    const buttonContainer = $(".btnDiv ul li");
-    buttonContainer.find(".btn-close-generic").remove();
-    const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
-    buttonContainer.append(closeBtn);
+    //// Append Close button dynamically if not already added
+    //const buttonContainer = $(".btnDiv ul li");
+    //buttonContainer.find(".btn-close-generic").remove();
+    //const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
+    //buttonContainer.append(closeBtn);
+
+    CommonManager.appandCloseButton(windowId);
   },
 
   openCountryPopup: function () {
@@ -239,11 +410,13 @@ var InstituteDetailsHelper = {
     CommonManager.openKendoWindow(windowId, "Country Info", "80%");
     CountrySummaryHelper.initCountrySummary();
 
-    // Append Close button dynamically if not already added
-    const buttonContainer = $(".btnDiv ul li");
-    buttonContainer.find(".btn-close-generic").remove();
-    const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
-    buttonContainer.append(closeBtn);
+    //// Append Close button dynamically if not already added
+    //const buttonContainer = $(".btnDiv ul li");
+    //buttonContainer.find(".btn-close-generic").remove();
+    //const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
+    //buttonContainer.append(closeBtn);
+
+    CommonManager.appandCloseButton(windowId);
   },
 
   openCurrencyPopup: function () {
@@ -251,11 +424,13 @@ var InstituteDetailsHelper = {
     CommonManager.openKendoWindow(windowId, "Currency Info", "80%");
     CurrencySummaryHelper.initCurrencySummary();
 
-    // Append Close button dynamically if not already added
-    const buttonContainer = $(".btnDiv ul li");
-    buttonContainer.find(".btn-close-generic").remove();
-    const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
-    buttonContainer.append(closeBtn);
+    //// Append Close button dynamically if not already added
+    //const buttonContainer = $(".btnDiv ul li");
+    //buttonContainer.find(".btn-close-generic").remove();
+    //const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('#${windowId}')">Close</button>`;
+    //buttonContainer.append(closeBtn);
+
+    CommonManager.appandCloseButton(windowId);
   },
 
   /* ------ ComboBox ------ */
@@ -322,12 +497,33 @@ var InstituteDetailsHelper = {
   /* ------ Clear Form ------ */
   clearForm: function () {
     debugger;
+    // Use enhanced common clearFormFields 
     CommonManager.clearFormFields("#InstituteForm");
+    
     $("#btnInstituteSaveOrUpdate").text("+ Add Institute");
     $("#instituteId").val(0);
     $("#btnInstituteSaveOrUpdate").prop("disabled", false);
-    $("#logoThumb").val("");
-    $("#pdfThumbnail").val("");
+    
+    // ========= Enhanced File Cleanup =========
+    // Clear logo preview completely
+    $("#logoThumb").addClass("d-none").attr("src", "#").off("click");
+    
+    // Clear PDF preview completely  
+    $("#pdfThumbnail").addClass("d-none").attr("src", "#").off("click");
+    $("#pdfPreviewBtn").addClass("d-none").off("click");
+    $("#pdfName").text("");
+    
+    // Clear file inputs
+    $("#institutionLogoFile").val("");
+    $("#prospectusFile").val("");
+    
+    // Reset global file data variables
+    if (typeof prospectusFileData !== 'undefined') {
+      prospectusFileData = null;
+    }
+    
+    // Clear any validation errors
+    $(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid").text("");
   },
 
   /* ------ Create DTO Object ------ */
@@ -473,244 +669,441 @@ var InstituteDetailsHelper = {
 
   /* ------ Populate Grid Item ------ */
   populateObject: function (item) {
+    // Clear form first with enhanced cleanup
     this.clearForm();
     $("#btnInstituteSaveOrUpdate").text("Update Institute");
 
-    $("#instituteId").val(item.InstituteId);
+    // ========= Primary Key =========
+    $("#instituteId").val(item.InstituteId || 0);
 
-    $("#instituteName").val(item.InstituteName);
-    $("#instituteCode").val(item.InstituteCode);
-    $("#instituteEmail").val(item.InstituteEmail);
-    $("#instituteAddress").val(item.InstituteAddress);
-    $("#institutePhoneNo").val(item.InstitutePhoneNo);
-    $("#instituteMobileNo").val(item.InstituteMobileNo);
-    $("#campus").val(item.Campus);
-    $("#website").val(item.Website);
+    // ========= Basic Information =========
+    $("#instituteName").val(item.InstituteName || "");
+    $("#instituteCode").val(item.InstituteCode || "");
+    $("#instituteEmail").val(item.InstituteEmail || "");
+    $("#instituteAddress").val(item.InstituteAddress || "");
+    $("#institutePhoneNo").val(item.InstitutePhoneNo || "");
+    $("#instituteMobileNo").val(item.InstituteMobileNo || "");
+    $("#campus").val(item.Campus || "");
+    $("#website").val(item.Website || "");
 
-    $("#monthlyLivingCost").val(item.MonthlyLivingCost);
-    $("#fundsRequirementforVisa").val(item.FundsRequirementforVisa);
-    $("#applicationFee").val(item.ApplicationFee);
+    // ========= Financial Information =========
+    $("#monthlyLivingCost").val(item.MonthlyLivingCost || "");
+    $("#applicationFee").val(item.ApplicationFee || "");
 
-    // checkbox setting
-    $("#isLanguageMandatory").prop("checked", item.IsLanguageMandatory);
-    $("#languagesRequirement").val(item.LanguagesRequirement);
+    // ========= Language Requirements =========
+    $("#isLanguageMandatory").prop("checked", item.IsLanguageMandatory || false);
+    $("#languagesRequirement").val(item.LanguagesRequirement || "");
 
-    $("#institutionalBenefits").val(item.InstitutionalBenefits);
-    $("#partTimeWorkDetails").val(item.PartTimeWorkDetails);
-    $("#scholarshipsPolicy").val(item.ScholarshipsPolicy);
-    $("#institutionStatusNotes").val(item.InstitutionStatusNotes);
+    // ========= Descriptive Information =========
+    $("#institutionalBenefits").val(item.InstitutionalBenefits || "");
+    $("#partTimeWorkDetails").val(item.PartTimeWorkDetails || "");
+    $("#scholarshipsPolicy").val(item.ScholarshipsPolicy || "");
+    $("#institutionStatusNotes").val(item.InstitutionStatusNotes || "");
 
-    /* Combo value set */
-    $("#cmbCountry_Institute").data("kendoComboBox")?.value(item.CountryId);
-    $("#cmbCurrency_Institute").data("kendoComboBox")?.value(item.CurrencyId);
-    $("#cmbInstituteType").data("kendoComboBox")?.value(item.InstituteTypeId);
+    // ========= Status =========
+    $("#chkStatusInstitute").prop("checked", item.Status || false);
 
-    //Files
-    //$('#institutionLogoFile').val(item.InstitutionLogo);
-    //$('#prospectusFile').val(item.InstitutionProspectus);
+    // ========= Enhanced ComboBox Population =========
+    // Set values after a small delay to ensure data is loaded
+    setTimeout(() => {
+      const countryCombo = $("#cmbCountry_Institute").data("kendoComboBox");
+      const currencyCombo = $("#cmbCurrency_Institute").data("kendoComboBox");
+      const typeCombo = $("#cmbInstituteType").data("kendoComboBox");
+      
+      if (countryCombo && item.CountryId) {
+        countryCombo.value(item.CountryId);
+        // Force trigger change event if needed for cascading
+        countryCombo.trigger("change");
+      }
+      
+      if (currencyCombo && item.CurrencyId) {
+        currencyCombo.value(item.CurrencyId);
+      }
+      
+      if (typeCombo && item.InstituteTypeId) {
+        typeCombo.value(item.InstituteTypeId);
+      }
+    }, 100);
 
-    // --- Logo Preview ---
-    if (item.InstitutionLogo) {
+    // ========= Enhanced File Preview Handling =========
+    // Logo Preview
+    if (item.InstitutionLogo && item.InstitutionLogo.trim() !== "") {
+      // Check if the URL is valid (starts with http/https or relative path)
+      const logoUrl = item.InstitutionLogo.startsWith('http') ? item.InstitutionLogo : 
+                      item.InstitutionLogo.startsWith('/') ? item.InstitutionLogo : 
+                      '/' + item.InstitutionLogo;
+      
       $("#logoThumb")
-        .attr("src", item.InstitutionLogo)
+        .attr("src", logoUrl)
         .removeClass("d-none")
-        .css("cursor", "pointer")
+        .css({
+          "cursor": "pointer",
+          "width": "200px",
+          "height": "200px",
+          "object-fit": "contain",
+          "border": "1px solid #ddd"
+        })
         .off("click")
         .on("click", function () {
-          PreviewManger.openGridImagePreview(item.InstitutionLogo);
+          // Open preview in modal or new window
+          if (typeof PreviewManger !== 'undefined' && PreviewManger.openGridImagePreview) {
+            PreviewManger.openGridImagePreview(logoUrl);
+          } else {
+            // Fallback: open in new window
+            window.open(logoUrl, '_blank');
+          }
+        })
+        .on("error", function() {
+          // Handle broken image
+          $(this).addClass("d-none").attr("src", "#");
+          console.warn("Failed to load institution logo:", logoUrl);
         });
     } else {
-      $("#logoThumb").addClass("d-none").attr("src", "#");
+      $("#logoThumb").addClass("d-none").attr("src", "#").off("click");
     }
 
-    // --- Prospectus Preview (PDF) ---
-    if (item.InstitutionProspectus) {
-      const fileName = item.InstitutionProspectus.split("/").pop();
+    // Prospectus Preview (PDF)
+    if (item.InstitutionProspectus && item.InstitutionProspectus.trim() !== "") {
+      const prospectusUrl = item.InstitutionProspectus.startsWith('http') ? item.InstitutionProspectus : 
+                           item.InstitutionProspectus.startsWith('/') ? item.InstitutionProspectus : 
+                           '/' + item.InstitutionProspectus;
+      
+      // Extract filename from URL
+      const fileName = prospectusUrl.split("/").pop() || "Prospectus.pdf";
       $("#pdfName").text(fileName);
 
+      // Show preview button
       $("#pdfPreviewBtn")
         .removeClass("d-none")
         .off("click")
         .on("click", function () {
-          PreviewManger.openPreview(item.InstitutionProspectus);
+          if (typeof PreviewManger !== 'undefined') {
+            PreviewManger.openPreview(prospectusUrl);
+          } else {
+            // Fallback: open in new window
+            window.open(prospectusUrl, '_blank');
+          }
         });
 
+      // Show PDF thumbnail (can be a static PDF icon or generated thumbnail)
       $("#pdfThumbnail")
         .removeClass("d-none")
-        .attr("src", "/images/pdf-thumbnail.png") // optional static thumbnail or use canvas preview
+        .attr("src", "/assets/images/pdf-thumbnail.png") // was: /images/pdf-thumbnail.png
+        .css({
+          "cursor": "pointer",
+          "width": "200px", 
+          "height": "200px",
+          "object-fit": "cover",
+          "border": "1px solid #ddd"
+        })
         .off("click")
         .on("click", function () {
-          PreviewManger.openPreview(item.InstitutionProspectus);
+          if (typeof PreviewManger !== 'undefined' && PreviewManger.openPreview) {
+            PreviewManger.openPreview(prospectusUrl);
+          } else {
+            window.open(prospectusUrl, '_blank');
+          }
+        })
+        // Stop 404 spam: single error handler + inline SVG fallback
+        .off("error").one("error", function () {
+          $(this).off("error").attr("src",
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNmMWYxZjEiLz48dGV4dCB4PSIxMDAiIHk9IjEwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNl bSI+RE9DPC90ZXh0Pjwvc3ZnPg=="
+          );
         });
     } else {
       $("#pdfName").text("");
-      $("#pdfPreviewBtn").addClass("d-none");
-      $("#pdfThumbnail").addClass("d-none").attr("src", "#");
+      $("#pdfPreviewBtn").addClass("d-none").off("click");
+      $("#pdfThumbnail").addClass("d-none").attr("src", "#").off("click");
     }
 
-    $("#chkStatusInstitute").prop("checked", item.Status);
+    // ========= Form Validation State Reset =========
+    // Remove any existing validation classes
+    $("#InstituteForm .field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid");
+    
+    // Enable form for editing
+    $("#btnInstituteSaveOrUpdate").prop("disabled", false);
+    
+    console.log("Institute data populated successfully:", item.InstituteName);
   },
 
-  openPreview: function (type) {
-    PreviewManger.cleanupPreviewResources();
-    debugger;
-    if (!prospectusFileData) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const blob = new Blob([e.target.result], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-
-      if (!$("#previewWindow").data("kendoWindow")) {
-        $("#previewWindow").kendoWindow({
-          width: "80%",
-          height: "80vh",
-          title: "Prospectus Preview",
-          modal: true,
-          visible: false,
-          close: function () {
-            $("#preview").empty();
-          }
-        });
-      }
-
-      $("#previewWindow").data("kendoWindow").center().open();
-
-      $("#preview").kendoPDFViewer({
-        pdfjsProcessing: { file: url },
-        width: "100%",
-        height: "100%",
-        toolbar: {
-          items: ["pager", "spacer", "zoomIn", "zoomOut", "toggleSelection", "download"]
-        }
-      });
-    };
-
-    reader.readAsArrayBuffer(prospectusFileData);
-  },
-
-  /* ---------- Preview Handler ---------- */
+  /* ---------- Enhanced Preview Handlers ---------- */
   initLogoPreviewHandler: function () {
-    $("#institutionLogoFile").on("change", function () {
+    $("#institutionLogoFile").on("change", function (event) {
       const file = this.files[0];
+      const $logoThumb = $("#logoThumb");
+      
       if (file && file.type.startsWith("image/")) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          ToastrMessage.showError("Logo file size should not exceed 5MB", "File Size Error");
+          $(this).val('');
+          $logoThumb.addClass("d-none").attr("src", "#");
+          return;
+        }
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+          ToastrMessage.showError("Only JPEG, PNG, GIF and WebP files are allowed for logo", "Invalid File Type");
+          $(this).val('');
+          $logoThumb.addClass("d-none").attr("src", "#");
+          return;
+        }
+
         const reader = new FileReader();
-        reader.onload = e =>
-          $("#logoThumb").attr("src", e.target.result).removeClass("d-none");
+        reader.onload = function(e) {
+          $logoThumb
+            .attr("src", e.target.result)
+            .removeClass("d-none")
+            .css({
+              "cursor": "pointer",
+              "width": "200px",
+              "height": "200px", 
+              "object-fit": "contain",
+              "border": "1px solid #ddd",
+              "border-radius": "4px"
+            })
+            .off("click")
+            .on("click", function() {
+              // Use PreviewWindow.js modal
+              if (typeof PreviewManger !== 'undefined' && PreviewManger.openGridImagePreview) {
+                PreviewManger.openGridImagePreview(e.target.result);
+              } else {
+                window.open(e.target.result, '_blank');
+              }
+            });
+        };
+        
+        reader.onerror = function() {
+          ToastrMessage.showError("Error reading logo file", "File Read Error");
+          $logoThumb.addClass("d-none").attr("src", "#");
+        };
+        
         reader.readAsDataURL(file);
+        
       } else {
-        $("#logoThumb").addClass("d-none").attr("src", "#");
+        $logoThumb.addClass("d-none").attr("src", "#").off("click");
+        if (file) {
+          ToastrMessage.showError("Please select a valid image file for logo", "Invalid File Type");
+          $(this).val('');
+        }
       }
     });
   },
 
-  // pdf viewer
+  // Enhanced PDF preview handler
   initProspectusPreviewHandler: function () {
-    debugger;
-    $("#prospectusFile").on("change", function () {
+    $("#prospectusFile").on("change", function (event) {
       const file = this.files[0];
-      if (!file || file.type !== "application/pdf") {
-        $("#pdfThumbnail").addClass("d-none").attr("src", "#");
-        $("#pdfName").text("");
+      const $pdfThumbnail = $("#pdfThumbnail");
+      const $pdfName = $("#pdfName");
+      const $pdfPreviewBtn = $("#pdfPreviewBtn");
+      
+      if (!file) {
+        // Clear preview when no file selected
+        $pdfThumbnail.addClass("d-none").attr("src", "#").off("click");
+        $pdfName.text("");
+        $pdfPreviewBtn.addClass("d-none").off("click");
         prospectusFileData = null;
         return;
       }
 
+      if (file.type !== "application/pdf") {
+        ToastrMessage.showError("Only PDF files are allowed for prospectus", "Invalid File Type");
+        $(this).val('');
+        $pdfThumbnail.addClass("d-none").attr("src", "#");
+        $pdfName.text("");
+        $pdfPreviewBtn.addClass("d-none");
+        prospectusFileData = null;
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        ToastrMessage.showError("Prospectus file size should not exceed 10MB", "File Size Error");
+        $(this).val('');
+        $pdfThumbnail.addClass("d-none").attr("src", "#");
+        $pdfName.text("");
+        $pdfPreviewBtn.addClass("d-none");
+        prospectusFileData = null;
+        return;
+      }
+
+      // Store file data globally
       prospectusFileData = file;
-      $("#pdfName").text(file.name);
+      $pdfName.text(file.name);
 
-      const reader = new FileReader();
-      reader.onload = function () {
-        const typedArray = new Uint8Array(this.result);
-
-        pdfjsLib.getDocument(typedArray).promise.then(pdf => {
-          pdf.getPage(1).then(page => {
-            /* rander first page in canvas → dataURL */
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
-            const scale = 200 / page.getViewport({ scale: 1 }).width;
-            const viewport = page.getViewport({ scale });
-
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-
-            page.render({ canvasContext: context, viewport })
-              .promise.then(() => {
-                const imgUrl = canvas.toDataURL("image/png");
-                $("#pdfThumbnail")
-                  .attr("src", imgUrl)
-                  .removeClass("d-none");
-              });
-          });
+      // Show preview button
+      $pdfPreviewBtn
+        .removeClass("d-none")
+        .off("click")
+        .on("click", function() {
+          if (typeof PreviewManger !== 'undefined' && PreviewManger.previewFileBlob) {
+            PreviewManger.previewFileBlob(file, "Prospectus Preview");
+          } else {
+            // Fallback
+            const url = URL.createObjectURL(file);
+            window.open(url, '_blank');
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+          }
         });
-      };
-      reader.readAsArrayBuffer(file);
+
+      // Generate PDF thumbnail using PDF.js if available
+      if (typeof pdfjsLib !== 'undefined') {
+        const reader = new FileReader();
+        reader.onload = function() {
+          try {
+            const typedArray = new Uint8Array(this.result);
+            
+            pdfjsLib.getDocument(typedArray).promise.then(pdf => {
+              pdf.getPage(1).then(page => {
+                // Render first page as thumbnail
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
+                const scale = 200 / page.getViewport({ scale: 1 }).width;
+                const viewport = page.getViewport({ scale });
+
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                page.render({ canvasContext: context, viewport })
+                  .promise.then(() => {
+                    const imgUrl = canvas.toDataURL("image/png");
+                    $pdfThumbnail
+                      .attr("src", imgUrl)
+                      .removeClass("d-none")
+                      .css({
+                        "cursor": "pointer",
+                        "width": "200px",
+                        "height": "200px",
+                        "object-fit": "cover",
+                        "border": "1px solid #ddd",
+                        "border-radius": "4px"
+                      })
+                      .off("click")
+                      .on("click", function() {
+                        if (typeof PreviewManger !== 'undefined' && PreviewManger.previewFileBlob) {
+                          PreviewManger.previewFileBlob(file, "Prospectus Preview");
+                        } else {
+                          const url = URL.createObjectURL(file);
+                          window.open(url, '_blank');
+                          setTimeout(() => URL.revokeObjectURL(url), 10000);
+                        }
+                      });
+                  })
+                  .catch(error => {
+                    console.error("Error rendering PDF thumbnail:", error);
+                    InstituteDetailsHelper.showStaticPdfThumbnail($pdfThumbnail, file);
+                  });
+              });
+            }).catch(error => {
+              console.error("Error loading PDF:", error);
+              InstituteDetailsHelper.showStaticPdfThumbnail($pdfThumbnail, file);
+            });
+          } catch (error) {
+            console.error("Error processing PDF:", error);
+            InstituteDetailsHelper.showStaticPdfThumbnail($pdfThumbnail, file);
+          }
+        };
+        
+        reader.onerror = function() {
+          ToastrMessage.showError("Error reading PDF file", "File Read Error");
+          InstituteDetailsHelper.showStaticPdfThumbnail($pdfThumbnail, file);
+        };
+        
+        reader.readAsArrayBuffer(file);
+      } else {
+        // Fallback: show static PDF icon
+        InstituteDetailsHelper.showStaticPdfThumbnail($pdfThumbnail, file);
+      }
     });
   },
 
-  prepareFormData: function() {
-    const formData = new FormData();
+  /* ---------- Preview Helper Functions ---------- */
+  showStaticPdfThumbnail: function ($pdfThumbnail, file) {
+    $pdfThumbnail
+      .removeClass("d-none")
+      .attr("src", "/images/pdf-thumbnail.png")
+      .css({
+        "cursor": "pointer",
+        "width": "200px",
+        "height": "200px",
+        "object-fit": "cover",
+        "border": "1px solid #ddd",
+        "border-radius": "4px"
+      })
+      .off("click")
+      .on("click", function () {
+        if (typeof PreviewManger !== 'undefined' && PreviewManger.previewFileBlob) {
+          PreviewManger.previewFileBlob(file, "Prospectus Preview");
+        } else {
+          // Fallback
+          const url = URL.createObjectURL(file);
+          window.open(url, '_blank');
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }
+      })
+      .on("error", function () {
+        // Ultimate fallback
+        $(this).attr("src", "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjFmMWYxIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2NjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QREYgRmlsZTwvdGV4dD4KPHN2Zz4=");
+      });
+  },
 
-    // Add basic fields
-    formData.append('InstituteId', this.currentInstituteId || 0);
-    formData.append('InstituteName', document.getElementById('instituteName').value);
-    formData.append('InstituteCode', document.getElementById('instituteCode').value);
-    formData.append('Campus', document.getElementById('campus').value);
-    formData.append('Website', document.getElementById('website').value);
-    formData.append('InstituteEmail', document.getElementById('instituteEmail').value);
-    formData.append('InstitutePhoneNo', document.getElementById('institutePhoneNo').value);
-    formData.append('InstituteMobileNo', document.getElementById('instituteMobileNo').value);
-    formData.append('InstituteAddress', document.getElementById('instituteAddress').value);
+  openImagePreview: function(imageSrc, fileName) {
+    const modalHtml = `
+      <div id="imagePreviewModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Image Preview: ${fileName || 'Institute Logo'}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+              <img src="${imageSrc}" class="img-fluid" alt="Image Preview" style="max-height: 500px;">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Remove existing modal
+    $("#imagePreviewModal").remove();
+    
+    // Add modal to body and show
+    $("body").append(modalHtml);
+    $("#imagePreviewModal").modal("show");
+    
+    // Clean up when modal is hidden
+    $("#imagePreviewModal").on("hidden.bs.modal", function() {
+      $(this).remove();
+    });
+  },
 
-    // Add numeric fields
-    const monthlyLivingCost = document.getElementById('monthlyLivingCost').value;
-    if (monthlyLivingCost) {
-      formData.append('MonthlyLivingCost', monthlyLivingCost);
+  openPdfPreview: function(file) {
+    if (!file) return;
+    
+    // Create a blob URL for the PDF
+    const blobUrl = URL.createObjectURL(file);
+    
+    // Open in new window/tab
+    const newWindow = window.open(blobUrl, '_blank');
+    
+    if (!newWindow) {
+      ToastrMessage.showError("Please allow popups to preview PDF files", "Popup Blocked");
+      // Fallback: create download link
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = file.name;
+      link.click();
     }
+    
+    // Clean up blob URL after some time
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 10000);
+  },
 
-    const applicationFee = document.getElementById('applicationFee').value;
-    if (applicationFee) {
-      formData.append('ApplicationFee', applicationFee);
-    }
-
-    // Add dropdown values
-    const instituteTypeCombo = $("#cmbInstituteType").data("kendoComboBox");
-    if (instituteTypeCombo && instituteTypeCombo.value()) {
-      formData.append('InstituteTypeId', instituteTypeCombo.value());
-    }
-
-    const countryCombo = $("#cmbCountry_Institute").data("kendoComboBox");
-    if (countryCombo && countryCombo.value()) {
-      formData.append('CountryId', countryCombo.value());
-    }
-
-    const currencyCombo = $("#cmbCurrency_Institute").data("kendoComboBox");
-    if (currencyCombo && currencyCombo.value()) {
-      formData.append('CurrencyId', currencyCombo.value());
-    }
-
-    // Add textarea fields
-    formData.append('LanguagesRequirement', document.getElementById('languagesRequirement').value);
-    formData.append('InstitutionalBenefits', document.getElementById('institutionalBenefits').value);
-    formData.append('PartTimeWorkDetails', document.getElementById('partTimeWorkDetails').value);
-    formData.append('ScholarshipsPolicy', document.getElementById('scholarshipsPolicy').value);
-    formData.append('InstitutionStatusNotes', document.getElementById('institutionStatusNotes').value);
-
-    // Add checkbox values
-    formData.append('Status', document.getElementById('chkStatusInstitute').checked);
-    formData.append('IsLanguageMandatory', document.getElementById('isLanguageMandatory').checked);
-
-    // Add files
-    const logoFile = document.getElementById('institutionLogoFile').files[0];
-    if (logoFile) {
-      formData.append('InstitutionLogoFile', logoFile);
-    }
-
-    const prospectusFile = document.getElementById('prospectusFile').files[0];
-    if (prospectusFile) {
-      formData.append('InstitutionProspectusFile', prospectusFile);
-    }
-
-    return formData;
-  }
 };

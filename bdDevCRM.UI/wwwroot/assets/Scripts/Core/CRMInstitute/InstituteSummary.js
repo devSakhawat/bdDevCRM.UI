@@ -255,13 +255,14 @@ var InstituteSummaryHelper = {
       InstituteDetailsHelper.clearForm();
       const windowId = "InstitutePopUp";
       CommonManager.openKendoWindow(windowId, "View Institute", "80%");
-      // Append Close button dynamically if not already added
-      CommonManager.appandCloseButton(windowId);
 
 
       InstituteDetailsHelper.populateObject(item);
       CommonManager.MakeFormReadOnly("#InstituteForm");
       $("#btnInstituteSaveOrUpdate").prop("disabled", "disabled");
+
+      // Append Close button dynamically if not already added
+      CommonManager.appandCloseButton(windowId);
     }
   },
 
@@ -271,11 +272,11 @@ var InstituteSummaryHelper = {
       InstituteDetailsHelper.clearForm();
       const windowId = "InstitutePopUp";
       CommonManager.openKendoWindow(windowId, "View Institute", "80%");
-      // Append Close button dynamically if not already added
-      CommonManager.appandCloseButton(windowId);
 
       InstituteDetailsHelper.populateObject(item);
       CommonManager.MakeFormEditable("#InstituteForm");
+      // Append Close button dynamically if not already added
+      CommonManager.appandCloseButton(windowId);
     }
   },
 

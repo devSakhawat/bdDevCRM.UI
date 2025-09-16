@@ -272,7 +272,7 @@ var ModuleSummaryHelper = {
       var dataItem = grid.dataItem(row);
 
       if (dataItem) {
-         AjaxManager.MakeFormEditable("#divdetailsForDetails");
+         CommonManager.MakeFormEditable("#divdetailsForDetails");
          ModuleDetailsHelper.PopulateObject(dataItem);
       }
    },

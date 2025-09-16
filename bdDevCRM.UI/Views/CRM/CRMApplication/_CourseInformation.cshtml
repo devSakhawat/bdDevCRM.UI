@@ -3,9 +3,9 @@
 <div id="crmApplicationCourseInfo">
 
 	<!-- Course Details -->
-	<fieldset class="reset">
-		<legend class="reset">Applicant Course Details</legend>
-		<div class="row">
+	<fieldset class="border p-3 fieldsetCommon">
+		<legend class="legendCommon topAfterDiv_Backgorup">Applicant Course Details</legend>
+		<div class="row mt-1">
 			<!-- Hidden Fields -->
 			<input type="hidden" id="hdnApplicantCourseId" value="0" />
 
@@ -20,7 +20,6 @@
 					</button>
 				</div>
 			</div>
-
 
 			<!-- Institute with Add Icon -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
@@ -46,10 +45,9 @@
 				</div>
 			</div>
 
-
 			<!-- Intake Month -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
-				<label for="IntakeMonth" class="lbl widthSize100_per">Intake Month</label>				
+				<label for="IntakeMonth" class="lbl widthSize100_per">Intake Month</label>
 				<!-- icon-wrapper class for add-new-ddl-item-btn -->
 				<div class="d-flex align-items-start icon-wrapper">
 					<input id="cmbIntakeMonthForCourse" name="IntakeMonth" required validationMessage="Please Select Intake Month" class="flex-grow-1 border-right-strait" />
@@ -58,7 +56,6 @@
 					</button>
 				</div>
 			</div>
-
 
 			<!-- Intake Year  -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
@@ -69,7 +66,6 @@
 				</div>
 			</div>
 
-
 			<!-- Application Fee -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="ApplicationFee" class="lbl widthSize100_per">Application Fee (if applicable)</label>
@@ -78,7 +74,6 @@
 					<input type="text" id="txtApplicationFeeForCourse" name="ApplicationFee" required validationMessage="Please Select Application Fee" class="w-100" />
 				</div>
 			</div>
-
 
 			<!-- Currency -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
@@ -89,7 +84,6 @@
 				</div>
 			</div>
 
-
 			<!-- Payment Method -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PaymentMethod" class="lbl widthSize100_per">Payment Method</label>
@@ -98,7 +92,6 @@
 					<input id="cmbPaymentMethodForCourse" name="PaymentMethod" required validationMessage="Please Select Payment Method" class="w-100" />
 				</div>
 			</div>
-
 
 			<!-- Payment Reference Number -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
@@ -109,7 +102,6 @@
 				</div>
 			</div>
 
-
 			<!-- Payment Date -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PaymentDate" class="lbl widthSize100_per">Payment Date</label>
@@ -119,9 +111,8 @@
 				</div>
 			</div>
 
-
 			<!-- Remarks -->
-			<div class="col-12 mb-2">
+			<div class="col-12">
 				<label for="Remarks" class="lbl widthSize100_per">Remarks</label>
 				<!-- icon-wrapper class for add-new-ddl-item-btn -->
 				<div class="">
@@ -131,11 +122,11 @@
 
 		</div>
 	</fieldset>
-	
+
 	<!-- Personal Details -->
-	<fieldset class="reset">
-		<legend class="reset">Personal Details</legend>
-		<div class="row">
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Personal Details</legend>
+		<div class="row mt-1">
 			<!-- Hidden Fields -->
 			<input type="hidden" id="hdnApplicantId" value="0" />
 
@@ -203,10 +194,10 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2 custom-checkbox">
 				<span class="me-5">Do you have a valid passport ?</span>
 
-				<input id="radioIsPassportYes" name="ValidPassport" type="radio" class="form-check-input inputRadio" />
+				<input id="radioIsPassportYes" name="ValidPassport" type="radio" value=true class="form-check-input inputRadio" />
 				<label class="lbl">Yes</label>
 
-				<input id="radioIsPassportNo" name="ValidPassport" type="radio" class="form-check-input inputRadio" />
+				<input id="radioIsPassportNo" name="ValidPassport" type="radio" value=false class="form-check-input inputRadio" />
 				<label class="lbl">No</label>
 			</div>
 
@@ -270,14 +261,9 @@
 			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
 				<label for="Phone Number" class="lbl widthSize100_per">Email Address</label>
 				<div class="">
-					<input type="email" id="txtEmailAddressForCourse" name="Phone Number" placeholder="Email Address Number (a@a.com)" class="w-100" />
+					<input type="email" id="txtEmailAddressForCourse" name="Phone Number" placeholder="Email Address Number (a@a.com)" class="w-100" -->
 				</div>
 			</div>
-
-@* 			<!-- Email hints -->
-			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
-
-			</div> *@
 
 			<!-- Skype ID -->
 			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
@@ -289,16 +275,31 @@
 
 			<!-- Applicant Image Upload -->
 			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
-				<label for="ApplicantImage" class="lbl widthSize100_per">Applicant Image</label>
+				<label for="ApplicantImage" class="lbl widthSize100_per">
+					Applicant Image
+					<span class="redstart">*</span>
+					<small class="text-muted">(Max 2MB, JPG/PNG/GIF/WebP)</small>
+				</label>
 				<div class="">
-					<input type="file" class="form-control w-100" id="ApplicantImageFile" name="ApplicantImage" placeholder="Applicant Image" accept="image/*" />
+					<input type="file"
+								 class="form-control w-100"
+								 id="ApplicantImageFile"
+								 name="ApplicantImage"
+								 placeholder="Applicant Image"
+								 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" />
+					<small class="form-text text-muted">
+						Supported formats: JPEG, PNG, GIF, WebP. Maximum file size: 2MB
+					</small>
 				</div>
 			</div>
 
 			<!-- Applicant Image preview -->
-			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12">
 				<div class="">
-					<img id="applicantImageThumb" class="d-none border mt-1" style="height:100px;width:auto;object-fit:contain;cursor:pointer" />
+					<img id="applicantImageThumb" 
+							class="d-none border mt-1" 
+							style="height:100px;width:auto;object-fit:contain;cursor:pointer" 
+							onclick="CRMCourseInformationHelper.openApplicantImagePreview()" />
 				</div>
 			</div>
 
@@ -306,11 +307,11 @@
 	</fieldset>
 
 	<!-- Address -->
-	<fieldset class="reset">
-		<legend class="reset">Applicant Address</legend>
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Applicant Address</legend>
 
-		<div class="row mb-3">
-			<h4 class="k-header mb-3">Permanent Address</h4>
+		<h4 class="k-header mt-1 mb-3">Permanent Address</h4>
+		<div class="row ">
 			<!-- Hidden Fields -->
 			<input type="hidden" id="hdnPermanentAddressId" value="0" />
 
@@ -359,8 +360,10 @@
 			</div>
 		</div>
 
-		<div class="row mb-3">
-			<h4 class="k-header mb-3">Present Address </h4>
+
+
+		<h4 class="k-header mt-1 mb-3">Present Address </h4>
+		<div class="row">
 			<!-- Hidden Fields -->
 			<input type="hidden" id="hdnPresentAddressId" value="0" />
 
@@ -408,7 +411,7 @@
 			</div>
 
 			<!-- Pin/Zip/Postal Code -->
-			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
+			<div class="col-xl-3 col-lg-3 col-md-6 col-12">
 				<label for="PostalCode" class="lbl widthSize100_per">Pin/Zip/Postal Code</label>
 				<div class="">
 					<input id="txtPostalCode" name="PostalCode" placeholder="Pin/Zip/Postal Code" class="w-100" />
@@ -446,7 +449,6 @@
 
 @* Course PopUp *@
 <div style="display:none" id="course_CoursePopUp" class="">
-
 </div>
 
 

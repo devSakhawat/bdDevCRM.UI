@@ -10,9 +10,10 @@ $(document).ready(function () {
   CRMApplicationHelper.createTabstrip();
   CRMApplicationHelper.initCrmApplicationSummary();
 
-  CRMCourseInformationHelper.intCourse();
   CRMEducationNEnglishLanguagHelper.initEducationNEnglishtLanguage();
   CRMAdditionalInformationHelper.initAdditionalInformation();
+
+  CRMCourseInformationHelper.intCourse();
 
 });
 
@@ -64,7 +65,7 @@ var CRMApplicationManager = {
   /* -------- Save ⬌ Update -------- */
   saveOrUpdateItem: async function () {
     try {
-      const id = $("#applicationId").val() || 0;
+      const id = $("#hdnApplicationId").val() || 0;
       const isCreate = id == 0;
       const serviceUrl = isCreate ? "/crm-application" : `/crm-application/${id}`;
       const httpType = isCreate ? "POST" : "PUT";
@@ -298,6 +299,8 @@ var CRMApplicationManager = {
    CRMApplicationHelper : Application Form
 =========================================================*/
 var CRMApplicationHelper = {
+  _busy: false,
+  _loadRunId: 0,
 
   createTabstrip: function () {
     console.log("Creating Kendo TabStrip...");
@@ -355,9 +358,6 @@ var CRMApplicationHelper = {
         margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
         scale: 0.9,
         repeatHeaders: true,
-        //columns: [
-        //  { field: "InstituteName", width: 200 }
-        //]
       },
       dataSource: [],
       autoBind: true,
@@ -379,12 +379,10 @@ var CRMApplicationHelper = {
       },
       columns: Columns,
       editable: false,
-      selectable: "row",
-
+      /*selectable: "row",*/
+      selectable: true,
       error: function (e) {
         VanillaApiCallManager.handleApiError(error);
-        //console.error("Grid Error:", e);
-        //kendo.alert("Grid Error: " + e.errors);
       }
     };
 
@@ -393,7 +391,6 @@ var CRMApplicationHelper = {
 
     // CSV Export button event
     $("#btnExportApplicationCsv").on("click", function () {
-      // quing file name will be generate in below function
       CommonManager.GenerateCSVFileAllPages("gridSummaryCrmApplication", "Application", "Actions");
     });
   },
@@ -427,7 +424,6 @@ var CRMApplicationHelper = {
     debugger;
     CommonManager.formShowGridHide("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
   },
-  
 
   closeForm: function () {
     debugger;
@@ -469,6 +465,7 @@ var CRMApplicationHelper = {
       //}
 
 
+      { field: "RowIndex", title: "SL", width: "60px", filterable: false },
       // File Indicators
       {
         field: "ApplicantImagePath",
@@ -486,18 +483,13 @@ var CRMApplicationHelper = {
         }
       },
 
+      { field: "ApplicantName", title: "Name", width: "180px" },
 
       // Basic Application Info
       { field: "ApplicationDate", title: "Application<br/>Date", width: "120px", template: "#= ApplicationDate ? kendo.toString(new Date(ApplicationDate), 'dd-MMM-yyyy') : '' #" },
       { field: "ApplicationStatus", title: "Status", width: "100px" },
 
       // Personal Details
-      {
-        field: "ApplicantName",
-          title: "Applicant Name",
-            width: "180px",
-              template: "#= (TitleText || '') + ' ' + (FirstName || '') + ' ' + (LastName || '') #"
-      },
       { field: "EmailAddress", title: "Email", width: "160px" },
       { field: "Mobile", title: "Mobile", width: "120px" },
       { field: "DateOfBirth", title: "Date of Birth", width: "120px", template: "#= DateOfBirth ? kendo.toString(new Date(DateOfBirth), 'dd-MMM-yyyy') : '' #" },
@@ -566,32 +558,111 @@ var CRMApplicationHelper = {
   _getGridItem: function (event) {
     const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
     const tr = $(event.target).closest("tr");
-    return grid.dataItem(tr);
+    //return grid.dataItem(tr);
+    let selectedItem = grid.dataItem(tr);
+    console.log(selectedItem);
+    const selectedRows = grid.select();
+    if (selectedRows.length > 0) {
+      selectedItem = grid.dataItem(selectedRows[0]);
+      console.log(selectedItem);
+    }
+
+    return selectedItem;
   },
 
   clickEventForViewButton: async function (event) {
-    debugger;
-    const item = this._getGridItem(event);
-    console.log(item);
-    if (item) {
+    if (this._busy) return;
+    this._busy = true;
+    const runId = ++this._loadRunId;
+    try {
+      const item = this._getGridItem(event);
+      if (!item) return;
+
       CommonManager.formShowGridHide("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
-      CRMApplicationHelper.clearForm();
+      //this.clearForm();
+      this.clearCRMApplicationCourse();
+
       const applicationData = await CRMApplicationManager.getApplicationByApplicationId(item.ApplicationId);
-      console.log(applicationData);
-      CRMApplicationHelper.populateObject(applicationData);
+      if (runId !== this._loadRunId) return; // stale response
+
+      this.populateObject(applicationData);
       CommonManager.MakeFormReadOnly("#CRMApplicationForm");
-      //$("#btnSaveOrUpdate").prop("disabled", "disabled");
       $("#btnSaveOrUpdate").hide();
+    } catch (err) {
+      VanillaApiCallManager?.handleApiError?.(err);
+    } finally {
+      this._busy = false;
     }
   },
 
-  clickEventForEditButton: function (event) {
-    const item = this._getGridItem(event);
-    if (item) {
-      CRMApplicationHelper.clearForm();
+  // clearCRMApplicationCourse function টা modify করুন:
+  clearCRMApplicationCourse: function () {
+    try {
+      console.log("=== Clearing Course Information Form ===");
+
+      // Clear form fields but preserve combo box data sources
+      $("input[type='text'], input[type='number'], input[type='email'], textarea").val("");
+      $("input[type='checkbox'], input[type='radio']").prop("checked", false);
+
+      // Clear date pickers
+      const datePickerIds = ["#datePickerPaymentDate", "#datePickerDateOfBirth", "#datepickerPassportIssueDate", "#datepickerPassportExpiryDate"];
+      datePickerIds.forEach(id => {
+        const picker = $(id).data("kendoDatePicker");
+        if (picker) picker.value(null);
+      });
+
+      // Clear combo box VALUES but keep DATA SOURCES intact
+      const comboBoxIds = [
+        "#cmbCountryForCourse", "#cmbInstituteForCourse", "#cmbCourseForCourse",
+        "#cmbIntakeMonthForCourse", "#cmbIntakeYearForCourse", "#cmbCurrencyForCourse",
+        "#cmbPaymentMethodForCourse", "#cmbGenderForCourse", "#cmbTitleForCourse",
+        "#cmbMaritalStatusForCourse", "#cmbCountryForPermanentAddress", "#cmbCountryForAddress"
+      ];
+
+      comboBoxIds.forEach(id => {
+        const combo = $(id).data("kendoComboBox");
+        if (combo) {
+          combo.value(""); // Clear value but keep data source
+        }
+      });
+
+      // Clear hidden fields
+      $("input[type='hidden']").val(0);
+
+      // Clear applicant image
+      $("#applicantImageThumb").addClass("d-none").attr("src", "#");
+      applicantImageFile = null;
+
+      $("#btnSaveOrUpdate").text("+ Add Item");
+
+      console.log("Course Information form cleared successfully");
+    } catch (error) {
+      console.error("Error clearing Course Information form:", error);
+      VanillaApiCallManager.handleApiError(error);
+    }
+  },
+
+  clickEventForEditButton: async function (event) {
+    if (this._busy) return;
+    this._busy = true;
+    const runId = ++this._loadRunId;
+    try {
+      const item = this._getGridItem(event);
+      if (!item) return;
+
       CommonManager.formShowGridHide("CrmApplcationFormShowHide", "CrmApplicationGridShowHide");
-      CRMApplicationHelper.populateObject(item);
+      this.clearForm();
+
+      const applicationData = await CRMApplicationManager.getApplicationByApplicationId(item.ApplicationId);
+      if (runId !== this._loadRunId) return; // stale response
+
+      this.populateObject(applicationData);
       CommonManager.MakeFormEditable("#CRMApplicationForm");
+      $("#btnSaveOrUpdate").text("Update Item");
+    } catch (err) {
+      VanillaApiCallManager?.handleApiError?.(err);
+    } finally {
+      this._busy = false;
     }
   },
 
@@ -740,14 +811,21 @@ var CRMApplicationHelper = {
           });
         }
 
-        // Work Experience Files
-        if (applicationData.EducationInformation.WorkExperience &&
-          applicationData.EducationInformation.WorkExperience.WorkExperienceHistory) {
-          applicationData.EducationInformation.WorkExperience.WorkExperienceHistory.forEach((work, index) => {
-            if (typeof workExperienceFileData !== "undefined" && workExperienceFileData[work.uid]) {
-              work.ScannedCopyFile = workExperienceFileData[work.uid];
-            }
-          });
+        //// Work Experience Files
+        //if (applicationData.EducationInformation.WorkExperience &&
+        //  applicationData.EducationInformation.WorkExperience.WorkExperienceHistory) {
+        //  applicationData.EducationInformation.WorkExperience.WorkExperienceHistory.forEach((work, index) => {
+        //    if (typeof workExperienceFileData !== "undefined" && workExperienceFileData[work.uid]) {
+        //      work.ScannedCopyFile = workExperienceFileData[work.uid];
+        //    }
+        //  });
+        //}
+
+        // Work Experience Files - already embedded in DTO by createWorkExperienceObject()
+        // No uid-based mapping required
+        if (applicationData.EducationInformation?.WorkExperience?.WorkExperienceHistory) {
+          applicationData.EducationInformation.WorkExperience.WorkExperienceHistory =
+            applicationData.EducationInformation.WorkExperience.WorkExperienceHistory.map(w => w);
         }
       }
 
@@ -794,20 +872,20 @@ var CRMApplicationHelper = {
         CRMCourseInformationHelper.clearCRMApplicationCourse();
       }
 
-      // Clear Education & English Language
-      if (typeof CRMEducationNEnglishLanguagHelper !== "undefined" &&
-        typeof CRMEducationNEnglishLanguagHelper.clearEducationNEnglishLanguageForm === "function") {
-        CRMEducationNEnglishLanguagHelper.clearEducationNEnglishLanguageForm();
-      }
+      //// Clear Education & English Language
+      //if (typeof CRMEducationNEnglishLanguagHelper !== "undefined" &&
+      //  typeof CRMEducationNEnglishLanguagHelper.clearEducationNEnglishLanguageForm === "function") {
+      //  CRMEducationNEnglishLanguagHelper.clearEducationNEnglishLanguageForm();
+      //}
 
-      // Clear Additional Information
-      if (typeof CRMAdditionalInformationHelper !== "undefined" &&
-        typeof CRMAdditionalInformationHelper.clearAdditionalInformationForm === "function") {
-        CRMAdditionalInformationHelper.clearAdditionalInformationForm();
-      }
+      //// Clear Additional Information
+      //if (typeof CRMAdditionalInformationHelper !== "undefined" &&
+      //  typeof CRMAdditionalInformationHelper.clearAdditionalInformationForm === "function") {
+      //  CRMAdditionalInformationHelper.clearAdditionalInformationForm();
+      //}
 
       // Reset application ID
-      $("#applicationId").val(0);
+      $("#hdnApplicationId").val(0);
 
       console.log("All application forms cleared successfully");
 
@@ -832,33 +910,39 @@ var CRMApplicationHelper = {
         $("#hdnApplicationId").val(applicationData.ApplicationId);
       }
 
-      // Populate Course Information tab
-      if (applicationData.CourseInformation || applicationData.PersonalDetails) {
-        CRMCourseInformationHelper.populateCourseInformation(applicationData);
-      }
+      debugger;
+      console.log(applicationData);
+      CRMCourseInformationHelper.populateCourseInformation(applicationData);
+      CRMEducationNEnglishLanguagHelper.populateEducationInformation(applicationData);
+      CRMAdditionalInformationHelper.populateAdditionalInformation(applicationData);
 
-      // Populate Education & English Language tab  
-      if (applicationData.EducationInformation) {
-        CRMEducationNEnglishLanguagHelper.populateEducationInformation(applicationData.EducationInformation);
-      }
+      //// Populate Course Information tab
+      //if (applicationData.CourseInformation || applicationData.PersonalDetails) {
+      //  CRMCourseInformationHelper.populateCourseInformation(applicationData);
+      //}
 
-      // Populate Additional Information tab
-      if (applicationData.AdditionalInformation || applicationData.ReferenceDetails || applicationData.StatementOfPurpose) {
-        CRMAdditionalInformationHelper.populateAdditionalInformation(applicationData);
-      }
+      //// Populate Education & English Language tab  
+      //if (applicationData.EducationInformation) {
+      //  CRMEducationNEnglishLanguagHelper.populateEducationInformation(applicationData.EducationInformation);
+      //}
+
+      //// Populate Additional Information tab
+      //if (applicationData.AdditionalInformation || applicationData.ReferenceDetails || applicationData.StatementOfPurpose) {
+      //  CRMAdditionalInformationHelper.populateAdditionalInformation(applicationData);
+      //}
 
       console.log("Application object populated successfully");
 
-      if (typeof ToastrMessage !== "undefined") {
-        ToastrMessage.showSuccess("Application data loaded successfully!", "Data Loaded", 3000);
-      }
+      //if (typeof ToastrMessage !== "undefined") {
+      //  ToastrMessage.showSuccess("Application data loaded successfully!", "Data Loaded", 3000);
+      //}
 
     } catch (error) {
       console.error("Error populating application object:", error);
       if (typeof VanillaApiCallManager !== "undefined") {
         VanillaApiCallManager.handleApiError(error);
       }
-      if (typeof ToastrMessage !== "undefined") {
+      else if (typeof ToastrMessage !== "undefined") {
         ToastrMessage.showError("Error loading application data: " + error.message, "Data Load Error", 0);
       }
     }

@@ -32,7 +32,7 @@ var ActionDetailManager = {
     }
   },
 
-  getSummaryGridDataSource: function (stateId) {
+  getSummaryGridDataSource2: function (stateId) {
     return AjaxManager.GenericGridDataSource({
       apiUrl: baseApi + "/get-action-summary-by-statusId?stateId=" + encodeURIComponent(stateId),
       requestType: "POST",
@@ -47,6 +47,24 @@ var ActionDetailManager = {
       allowUnsort: true,
       schemaData: "Items",
       schemaTotal: "TotalCount"
+    });
+  },
+
+
+  getSummaryGridDataSource: function () {
+    return VanillaApiCallManager.GenericGridDataSource({
+      apiUrl: baseApi + "/get-action-summary-by-statusId?stateId=" + encodeURIComponent(stateId),
+      requestType: "POST",
+      async: true,
+      modelFields: {},
+      pageSize: 10,
+      serverPaging: true,
+      serverSorting: true,
+      serverFiltering: true,
+      allowUnsort: true,
+      schemaData: "Data.Items",
+      schemaTotal: "Data.TotalCount",
+      buttonCount: 3
     });
   },
 
@@ -173,60 +191,328 @@ var ActionDetailManager = {
 
 var ActionDetailHelper = {
 
+  //initActionDetails: function () {
+  //  ActionDetailHelper.generateNextStateCombo();
+  //},
+
+  //generateActionGrid: function (stateId) {
+  //  const gridOptions = {
+  //    dataSource: [],
+  //    autoBind: true,
+  //    navigatable: true,
+  //    //height: 700,
+  //    width: "100%",
+  //    scrollable: false, // Enable both horizontal and vertical scrolling
+  //    resizable: false,
+  //    filterable: false,
+  //    sortable: false,
+  //    columns: ActionDetailHelper.GenerateColumns(),
+  //    editable: false,
+  //    selectable: "row",
+  //  };
+
+  //  $("#gridSummaryAction").kendoGrid(gridOptions);
+
+  //  const gridInstance = $("#gridSummaryAction").data("kendoGrid");
+  //  if (gridInstance) {
+  //    const dataSource = ActionDetailManager.getSummaryGridDataSource(stateId);
+  //    gridInstance.setDataSource(dataSource);
+
+  //    // Wait for data to load
+  //    // After setting dataSource
+  //    dataSource.fetch(function () {
+  //      //console.log(dataSource.data());
+  //    });
+  //  }
+
+
+
+  //},
+
+  //GenerateColumns: function () {
+  //  return columns = [
+
+  //    { field: "WfactionId", hidden: true },
+  //    { field: "WfstateId", hidden: true },
+  //    /*      { field: "StateName", hidden: true },*/
+  //    { field: "NextStateId", hidden: true },
+  //    { field: "AcSortOrder", hidden: true },
+  //    { field: "IsDefaultStart", hidden: true },
+  //    { field: "IsClosed", hidden: true },
+  //    { field: "ActionName", title: "Action Name", width: 70 },
+  //    { field: "NextStateName", title: "Next State", width: 80 },
+  //    { field: "EmailAlert", title: "Email", width: 40, template: "#= EmailAlert == 1 ? 'Yes' : 'No' #" },
+  //    { field: "SmsAlert", title: "SMS", width: 40, template: "#= SmsAlert == 1 ? 'Yes' : 'No' #" },
+  //    { field: "Edit", title: "#", filterable: false, width: 120, template: '<input type="button" class="k-button btn btn-outline-dark me-1" value="Edit" id="btnEditAction" onClick="ActionDetailHelper.clickEventForEditButton(event)"  /><input type="button" class="k-button btn btn-outline-danger" value="Delete" id="btnDeleteAction" onClick="ActionDetailHelper.clickEventForDeleteButton(event)"  />' },
+  //  ];
+  //},
+
+
   initActionDetails: function () {
-    //ActionDetailHelper.initializeSummaryGrid();
     ActionDetailHelper.generateNextStateCombo();
+    this.initializeResponsiveActionGrid();
+    this.bindResizeEvents();
   },
 
+  // Update the existing method to handle empty data better
   generateActionGrid: function (stateId) {
-    const gridOptions = {
-      dataSource: [],
-      autoBind: true,
-      navigatable: true,
-      //height: 700,
-      width: "100%",
-      scrollable: false, // Enable both horizontal and vertical scrolling
-      resizable: false,
-      filterable: false,
-      sortable: false,
-      columns: ActionDetailHelper.GenerateColumns(),
-      editable: false,
-      selectable: "row",
-    };
-
-    $("#gridSummaryAction").kendoGrid(gridOptions);
-
-    const gridInstance = $("#gridSummaryAction").data("kendoGrid");
-    if (gridInstance) {
-      const dataSource = ActionDetailManager.getSummaryGridDataSource(stateId);
-      gridInstance.setDataSource(dataSource);
-
-      // Wait for data to load
-      // After setting dataSource
-      dataSource.fetch(function () {
-        //console.log(dataSource.data());
-      });
+    // Check if grid already exists
+    var existingGrid = $("#gridSummaryAction").data("kendoGrid");
+    if (existingGrid) {
+      if (!stateId) {
+        // If no stateId, clear the data source
+        existingGrid.dataSource.data([]);
+        return;
+      } else {
+        // Update data source with new stateId
+        var newDataSource = ActionDetailManager.getSummaryGridDataSource(stateId);
+        existingGrid.setDataSource(newDataSource);
+        return;
+      }
     }
 
+    // If grid doesn't exist, create new one
+    this.initializeResponsiveActionGrid(stateId);
   },
 
-  GenerateColumns: function () {
-    return columns = [
+  initializeResponsiveActionGrid: function (stateId) {
+    var columns = this.generateResponsiveActionColumns();
 
+    $("#gridSummaryAction").kendoGrid({
+      dataSource: stateId ? ActionDetailManager.getSummaryGridDataSource(stateId) : [],
+      height: this.calculateDynamicActionGridHeight(),
+      width: "100%",
+      scrollable: true, // Enable scrolling when needed
+      resizable: true,
+      sortable: true,
+      filterable: true,
+      pageable: false, // Disable pagination to show dynamic scrolling
+      columns: columns,
+      mobile: true,
+      toolbar: this.getActionToolbarConfig(),
+      dataBound: function (e) {
+        ActionDetailHelper.adjustActionGridForMobile();
+        ActionDetailHelper.adjustGridHeightBasedOnData(e);
+      },
+      editable: false,
+      selectable: "row",
+      autoBind: true,
+      navigatable: true,
+      noRecords: {
+        template: "<div class='text-center p-4'><i class='fas fa-inbox fa-2x text-muted mb-2'></i><br><span class='text-muted'>No actions found</span></div>"
+      }
+    });
+  },
+
+  calculateDynamicActionGridHeight: function () {
+    // Calculate height for maximum 10 rows
+    var headerHeight = 50; // Grid header height
+    var rowHeight = 35; // Approximate row height
+    var maxRows = 10;
+    var toolbarHeight = 40; // Toolbar height
+    var borderPadding = 10; // Border and padding
+
+    var maxHeight = headerHeight + (rowHeight * maxRows) + toolbarHeight + borderPadding;
+
+    var windowHeight = window.innerHeight;
+    var windowWidth = window.innerWidth;
+
+    if (windowWidth < 576) {
+      return Math.min(maxHeight, 400); // Mobile - maximum 400px
+    } else if (windowWidth < 992) {
+      return Math.min(maxHeight, 450); // Tablet - maximum 450px
+    } else {
+      return Math.min(maxHeight, windowHeight - 350); // Desktop
+    }
+  },
+
+  adjustGridHeightBasedOnData: function (e) {
+    var grid = e.sender;
+    var dataSource = grid.dataSource;
+    var totalItems = dataSource.total();
+
+    // Calculate dynamic height based on data
+    var headerHeight = 50;
+    var rowHeight = 35;
+    var toolbarHeight = 40;
+    var borderPadding = 10;
+    var minHeight = 150; // Minimum height for empty grid
+
+    var calculatedHeight;
+
+    if (totalItems === 0) {
+      // If no data, set minimum height
+      calculatedHeight = minHeight;
+      // Hide scrollbar when no data
+      grid.wrapper.find(".k-grid-content").css("overflow-y", "hidden");
+    } else if (totalItems <= 10) {
+      // If items <= 10, adjust height to fit all items without scrollbar
+      calculatedHeight = headerHeight + (rowHeight * totalItems) + toolbarHeight + borderPadding;
+      grid.wrapper.find(".k-grid-content").css("overflow-y", "hidden");
+    } else {
+      // If items > 10, set height for 10 items and show scrollbar
+      calculatedHeight = headerHeight + (rowHeight * 10) + toolbarHeight + borderPadding;
+      grid.wrapper.find(".k-grid-content").css("overflow-y", "auto");
+    }
+
+    // Apply the calculated height
+    grid.wrapper.height(calculatedHeight);
+    grid.wrapper.find(".k-grid-content").height(calculatedHeight - headerHeight - toolbarHeight);
+
+    // Refresh grid layout
+    grid.resize();
+  },
+
+  generateResponsiveActionColumns: function () {
+    var isMobile = window.innerWidth < 768;
+
+    var columns = [
       { field: "WfactionId", hidden: true },
       { field: "WfstateId", hidden: true },
-      /*      { field: "StateName", hidden: true },*/
       { field: "NextStateId", hidden: true },
       { field: "AcSortOrder", hidden: true },
       { field: "IsDefaultStart", hidden: true },
       { field: "IsClosed", hidden: true },
-      { field: "ActionName", title: "Action Name", width: 70 },
-      { field: "NextStateName", title: "Next State", width: 80 },
-      { field: "EmailAlert", title: "Email", width: 40, template: "#= EmailAlert == 1 ? 'Yes' : 'No' #" },
-      { field: "SmsAlert", title: "SMS", width: 40, template: "#= SmsAlert == 1 ? 'Yes' : 'No' #" },
-      { field: "Edit", title: "#", filterable: false, width: 120, template: '<input type="button" class="k-button btn btn-outline-dark me-1" value="Edit" id="btnEditAction" onClick="ActionDetailHelper.clickEventForEditButton(event)"  /><input type="button" class="k-button btn btn-outline-danger" value="Delete" id="btnDeleteAction" onClick="ActionDetailHelper.clickEventForDeleteButton(event)"  />' },
+      {
+        field: "ActionName",
+        title: "Action Name",
+        width: isMobile ? 120 : 200,
+        attributes: {
+          style: "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+        }
+      },
+      {
+        field: "NextStateName",
+        title: "Next State",
+        width: isMobile ? 100 : 180,
+        hidden: isMobile,
+        attributes: {
+          style: "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+        }
+      },
+      {
+        field: "EmailAlert",
+        title: "Email",
+        width: isMobile ? 60 : 80,
+        template: "#= EmailAlert == 1 ? 'Yes' : 'No' #"
+      },
+      {
+        field: "SmsAlert",
+        title: "SMS",
+        width: isMobile ? 60 : 80,
+        hidden: isMobile,
+        template: "#= SmsAlert == 1 ? 'Yes' : 'No' #"
+      },
+      {
+        field: "Actions",
+        title: "Actions",
+        filterable: false,
+        width: isMobile ? 100 : 160,
+        template: this.getActionActionTemplate()
+      }
+    ];
+
+    return columns;
+  },
+
+  getActionActionTemplate: function () {
+    if (window.innerWidth < 768) {
+      // Mobile dropdown menu - Fixed template with proper escaping
+      return '<div class="dropdown">' +
+        '<button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">' +
+        'Actions' +
+        '</button>' +
+        '<ul class="dropdown-menu">' +
+        '<li><a class="dropdown-item" href="javascript:void(0)" onclick="ActionDetailHelper.clickEventForEditButton(event)">Edit</a></li>' +
+        '<li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="ActionDetailHelper.clickEventForDeleteButton(event)">Delete</a></li>' +
+        '</ul>' +
+        '</div>';
+    } else {
+      // Desktop buttons - Fixed template
+      return '<button class="btn btn-outline-dark btn-action me-1" onclick="ActionDetailHelper.clickEventForEditButton(event)">Edit</button>' +
+        '<button class="btn btn-outline-danger btn-action" onclick="ActionDetailHelper.clickEventForDeleteButton(event)">Delete</button>';
+    }
+  },
+
+  getActionToolbarConfig: function () {
+    if (window.innerWidth < 768) {
+      return ["excel"]; 
+    }
+    return ["excel", "pdf"
+     /* ,{ template: '<button type="button" id="btnExportCsvWorkFlowAction" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }*/
     ];
   },
+
+  calculateActionGridHeight: function () {
+    var windowHeight = window.innerHeight;
+    var windowWidth = window.innerWidth;
+
+    if (windowWidth < 576) {
+      return 350; // Mobile
+    } else if (windowWidth < 992) {
+      return 400; // Tablet
+    } else {
+      return Math.min(500, windowHeight - 350); // Desktop
+    }
+  },
+
+  adjustActionGridForMobile: function () {
+    if (window.innerWidth < 768) {
+      // Additional mobile adjustments
+      $("#gridSummaryAction").find(".k-grid-toolbar").find(".k-button").addClass("btn-sm");
+      $("#gridSummaryAction").find(".k-pager-wrap").addClass("k-pager-sm");
+    }
+  },
+
+  bindResizeEvents: function () {
+    var resizeTimer;
+    $(window).on('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        var grid = $("#gridSummaryAction").data("kendoGrid");
+        if (grid) {
+          // Destroy and reinitialize for major changes
+          if (window.innerWidth < 768 !== ActionDetailHelper.wasMobileAction) {
+            grid.destroy();
+            $("#gridSummaryAction").empty();
+            ActionDetailHelper.initializeResponsiveActionGrid();
+            ActionDetailHelper.wasMobileAction = window.innerWidth < 768;
+          } else {
+            // Just resize for minor changes
+            grid.resize();
+          }
+        }
+      }, 250);
+    });
+
+    // Track mobile state
+    this.wasMobileAction = window.innerWidth < 768;
+  },
+
+  // Add method to clear grid data
+  clearActionGrid: function () {
+    var grid = $("#gridSummaryAction").data("kendoGrid");
+    if (grid) {
+      grid.dataSource.data([]);
+    }
+  },
+
+  // Add method to refresh grid with new data
+  refreshActionGrid: function (stateId) {
+    if (!stateId) {
+      this.clearActionGrid();
+      return;
+    }
+
+    var grid = $("#gridSummaryAction").data("kendoGrid");
+    if (grid) {
+      var dataSource = ActionDetailManager.getSummaryGridDataSource(stateId);
+      grid.setDataSource(dataSource);
+    } else {
+      this.initializeResponsiveActionGrid(stateId);
+    }
+  },
+
 
   // initialize all combo box.
   generateNextStateCombo: function () {

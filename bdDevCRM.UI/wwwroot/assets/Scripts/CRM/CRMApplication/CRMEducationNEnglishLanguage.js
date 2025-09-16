@@ -394,7 +394,6 @@ var CRMEducationNEnglishLanguagHelper = {
       });
   },
 
-
   editorFileUpload: function (container, options) {
     const dataItem = options.model;
     const uid = dataItem.uid;
@@ -547,34 +546,21 @@ var CRMEducationNEnglishLanguagHelper = {
   openDocumentPreview: function (documentPath, docuid, fileName) {
     debugger;
     if (!documentPath) {
-      alert("No document available for preview.");
+      CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No document available for preview.', [
+        { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+      ], 0);
       return;
     }
 
     try {
-      // Check if we have the file data stored locally
       const fileData = educationPdfFileData[docuid];
       if (fileData) {
         PreviewManger.previewFileBlob(fileData, fileName);
       } else {
         PreviewManger.openPreview(documentPath, fileName);
       }
-
-      //if (fileData) {
-      //  // Preview local file data using iframe
-      //  this.previewLocalPdfFileWithIframe(fileData, fileName);
-      //} else {
-      //  // Use the existing PreviewManger for server files
-      //  if (typeof PreviewManger !== 'undefined' && PreviewManger.openPreview) {
-      //    PreviewManger.openPreview(documentPath);
-      //  } else {
-      //    // Fallback: open in new tab
-      //    window.open(documentPath, '_blank');
-      //  }
-      //}
     } catch (error) {
       console.error("Error opening document preview:", error);
-      // Fallback: open in new tab
       window.open(documentPath, '_blank');
     }
   },
@@ -741,11 +727,14 @@ var CRMEducationNEnglishLanguagHelper = {
     return [
       { field: "WorkExperienceId", title: "WorkExperienceId", hidden: true },
       { field: "ApplicantId", title: "ApplicantId", hidden: true },
+
+      // Keep these hidden so template can use them
       { field: "ScannedCopyFile", title: "ScannedCopyFile", hidden: true },
       { field: "ScannedCopyFileName", title: "ScannedCopyFileName", hidden: true },
       { field: "ScannedCopyPath", title: "ScannedCopyPath", hidden: true },
       { field: "DocumentName", title: "DocumentName", hidden: true },
       { field: "FileThumbnail", title: "FileThumbnail", hidden: true },
+
       { field: "NameOfEmployer", title: "Name of Employer", width: "200px" },
       { field: "Position", title: "Position", width: "150px" },
       //{ field: "StartDate", title: "Start Date", width: "120px", format: "{0:dd/MM/yyyy}" },
@@ -774,27 +763,13 @@ var CRMEducationNEnglishLanguagHelper = {
       {
         field: "ScannedCopy",
         title: "Scanned Copy",
-        template: "", // prevent default rendering
+        template: "",
         editor: CRMEducationNEnglishLanguagHelper.editorWorkFileUpload,
         filterable: false,
         width: "200px"
       },
-      //{
-      //  field: "ScannedCopy",
-      //  title: "Scanned Copy",
-      //  editor: CRMEducationNEnglishLanguagHelper.editorWorkFileUpload,
-      //  filterable: false,
-      //  width: "200px"
-      //},
-      //{
-      //  field: "ScannedCopy",
-      //  title: "Scanned Copy",
-      //  template: '#= CRMEducationNEnglishLanguagHelper.editorWorkFileUpload2(data) #',
-      //  filterable: false,
-      //  width: "200px"
-      //},
       {
-        field: "ViewScanned",
+        field: "View",
         title: "View Scanned Copy",
         template: '#= CRMEducationNEnglishLanguagHelper.ViewWorkDetails(data) #',
         editable: false,
@@ -887,26 +862,60 @@ var CRMEducationNEnglishLanguagHelper = {
     });
   },
 
-  updateWorkGridRowWithDocument: function (docuid, fileInfo) {
-    const grid = $("#gridWorkExperience").data("kendoGrid");
+  updateGridRowWithDocument: function (docuid, fileInfo) {
+    debugger;
+    const grid = $("#gridEducationSummary").data("kendoGrid");
     if (!grid) return;
 
     const dataSource = grid.dataSource;
     const data = dataSource.data();
 
+    // Find the row by uid
     for (let i = 0; i < data.length; i++) {
       if (data[i].uid === docuid) {
-        data[i].set("ScannedCopy", fileInfo.response || fileInfo.name);
+        // Update the row data
+        data[i].set("AttachedDocument", fileInfo.response || fileInfo.name);
         data[i].set("DocumentName", fileInfo.name);
-        data[i].set("FileThumbnail", fileInfo.thumbnail || "");
+        data[i].set("PdfThumbnail", fileInfo.thumbnail || "");
+
         try {
           // assign directly as Object
-          data[i].ScannedCopyFile = fileInfo.file || null;
+          data[i].AttachedDocumentFile = fileInfo.file || null;
         } catch (e) {
+          // Fallback: assign directly if set() fails
           // Preferred: try set() if model is observable
-          data[i].set("ScannedCopyFile", fileInfo.file || "");
+          data[i].set("AttachedDocumentFile", fileInfo.file || "");
         }
 
+        break;
+      }
+    }
+    console.log(data);
+
+    // Refresh the grid to show updated data
+    grid.refresh();
+  },
+  updateWorkGridRowWithDocument: function (docuid, fileInfo) {
+    const grid = $("#gridWorkExperience").data("kendoGrid");
+    if (!grid) return;
+
+    const data = grid.dataSource.data();
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].uid === docuid) {
+        const path = fileInfo.response || fileInfo.name || "";
+
+        data[i].set("ScannedCopy", path);
+        data[i].set("ScannedCopyPath", path);
+        data[i].set("ScannedCopyFileName", fileInfo.name || data[i].ScannedCopyFileName || "");
+        data[i].set("DocumentName", fileInfo.name || data[i].DocumentName || "");
+        data[i].set("FileThumbnail", fileInfo.thumbnail || "");
+
+        try {
+          data[i].ScannedCopyFile = fileInfo.file || null;
+        } catch (e) {
+          data[i].set("ScannedCopyFile", fileInfo.file || "");
+        }
         break;
       }
     }
@@ -914,13 +923,19 @@ var CRMEducationNEnglishLanguagHelper = {
   },
 
   ViewWorkDetails: function (data) {
-    if (data.ScannedCopy != null && data.ScannedCopy != "") {
-      const fileName = data.DocumentName || data.ScannedCopy.split("/").pop();
-      const thumbnailSrc = data.FileThumbnail || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
+    const path = data.ScannedCopyPath || "";
+    if (path) {
+      const fileName =
+        data.ScannedCopyFileName ||
+        data.DocumentName ||
+        path.split("/").pop();
+
+      const thumbnailSrc = data.FileThumbnail ||
+        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
 
       return '<div class="document-preview" style="height: 100px; width: auto; text-align: center;">' +
         '<img src="' + thumbnailSrc + '" alt="File" style="height: 100px; width: auto; cursor: pointer; border: 1px solid #ddd; border-radius: 4px;" ' +
-        'onclick="CRMEducationNEnglishLanguagHelper.openWorkDocumentPreview(\'' + data.ScannedCopy + '\', \'' + data.uid + '\', \'' + fileName + '\')" ' +
+        'onclick="CRMEducationNEnglishLanguagHelper.openWorkDocumentPreview(\'' + path + '\', \'' + data.uid + '\', \'' + fileName + '\')" ' +
         'title="Click to preview: ' + fileName + '"/>' +
         '<div style="font-size: 12px; text-align: center; margin-top: 5px; color: #666;">' + fileName + '</div>' +
         '</div>';
@@ -931,7 +946,9 @@ var CRMEducationNEnglishLanguagHelper = {
 
   openWorkDocumentPreview: function (documentPath, docuid, fileName) {
     if (!documentPath) {
-      alert("No document available for preview.");
+      CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No document available for preview.', [
+        { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+      ], 0);
       return;
     }
 
@@ -990,7 +1007,6 @@ var CRMEducationNEnglishLanguagHelper = {
       }
     }
   },
-
 
   /* ------ Updated Clear Methods with File Data ------ */
   clearIELTSInformation: function () {
@@ -1439,16 +1455,34 @@ var CRMEducationNEnglishLanguagHelper = {
   },
 
   /* ------ Document View Methods ------ */
+  /* ------ Document View Methods (updated: server-path fallback + custom warning box) ------ */
   viewIELTSDocument: function () {
+    // 1) Local file selected this session
     if (ieltsFileData) {
       if (typeof PreviewManger !== "undefined") {
         PreviewManger.previewFileBlob(ieltsFileData, ieltsFileData.name);
       } else {
-        alert("Preview functionality is not available");
+        CommonManager.MsgBox('warning', 'center', 'Preview', 'Preview functionality is not available', [
+          { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+        ], 0);
       }
-    } else {
-      alert("No IELTS document uploaded");
+      return;
     }
+
+    // 2) Try server file set during populate
+    const btn = $("#fileIELTSScannedCopyViewBtn");
+    const serverPath = btn.data("filePath");
+    const serverName = btn.data("fileName");
+
+    if (serverPath && typeof PreviewManger !== "undefined") {
+      PreviewManger.openPreview(serverPath, serverName);
+      return;
+    }
+
+    // 3) Custom warning box instead of alert
+    CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No IELTS document uploaded', [
+      { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+    ], 0);
   },
 
   viewTOEFLDocument: function () {
@@ -1456,11 +1490,25 @@ var CRMEducationNEnglishLanguagHelper = {
       if (typeof PreviewManger !== "undefined") {
         PreviewManger.previewFileBlob(toeflFileData, toeflFileData.name);
       } else {
-        alert("Preview functionality is not available");
+        CommonManager.MsgBox('warning', 'center', 'Preview', 'Preview functionality is not available', [
+          { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+        ], 0);
       }
-    } else {
-      alert("No TOEFL document uploaded");
+      return;
     }
+
+    const btn = $("#fileTOEFLScannedCopyViewBtn");
+    const serverPath = btn.data("filePath");
+    const serverName = btn.data("fileName");
+
+    if (serverPath && typeof PreviewManger !== "undefined") {
+      PreviewManger.openPreview(serverPath, serverName);
+      return;
+    }
+
+    CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No TOEFL document uploaded', [
+      { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+    ], 0);
   },
 
   viewPTEDocument: function () {
@@ -1468,11 +1516,25 @@ var CRMEducationNEnglishLanguagHelper = {
       if (typeof PreviewManger !== "undefined") {
         PreviewManger.previewFileBlob(pteFileData, pteFileData.name);
       } else {
-        alert("Preview functionality is not available");
+        CommonManager.MsgBox('warning', 'center', 'Preview', 'Preview functionality is not available', [
+          { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+        ], 0);
       }
-    } else {
-      alert("No PTE document uploaded");
+      return;
     }
+
+    const btn = $("#filePTEScannedCopyViewBtn");
+    const serverPath = btn.data("filePath");
+    const serverName = btn.data("fileName");
+
+    if (serverPath && typeof PreviewManger !== "undefined") {
+      PreviewManger.openPreview(serverPath, serverName);
+      return;
+    }
+
+    CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No PTE document uploaded', [
+      { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+    ], 0);
   },
 
   viewGMATDocument: function () {
@@ -1480,11 +1542,25 @@ var CRMEducationNEnglishLanguagHelper = {
       if (typeof PreviewManger !== "undefined") {
         PreviewManger.previewFileBlob(gmatFileData, gmatFileData.name);
       } else {
-        alert("Preview functionality is not available");
+        CommonManager.MsgBox('warning', 'center', 'Preview', 'Preview functionality is not available', [
+          { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+        ], 0);
       }
-    } else {
-      alert("No GMAT document uploaded");
+      return;
     }
+
+    const btn = $("#fileGMATScannedCopyViewBtn");
+    const serverPath = btn.data("filePath");
+    const serverName = btn.data("fileName");
+
+    if (serverPath && typeof PreviewManger !== "undefined") {
+      PreviewManger.openPreview(serverPath, serverName);
+      return;
+    }
+
+    CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No GMAT document uploaded', [
+      { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+    ], 0);
   },
 
   viewOTHERSDocument: function () {
@@ -1492,12 +1568,130 @@ var CRMEducationNEnglishLanguagHelper = {
       if (typeof PreviewManger !== "undefined") {
         PreviewManger.previewFileBlob(othersFileData, othersFileData.name);
       } else {
-        alert("Preview functionality is not available");
+        CommonManager.MsgBox('warning', 'center', 'Preview', 'Preview functionality is not available', [
+          { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+        ], 0);
       }
-    } else {
-      alert("No OTHERS document uploaded");
+      return;
+    }
+
+    const btn = $("#oTHERSScannedCopyViewBtn");
+    const serverPath = btn.data("filePath");
+    const serverName = btn.data("fileName");
+
+    if (serverPath && typeof PreviewManger !== "undefined") {
+      PreviewManger.openPreview(serverPath, serverName);
+      return;
+    }
+
+    CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No OTHERS document uploaded', [
+      { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+    ], 0);
+  },
+
+  // Also replace alert in preview helpers
+  openDocumentPreview: function (documentPath, docuid, fileName) {
+    debugger;
+    if (!documentPath) {
+      CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No document available for preview.', [
+        { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+      ], 0);
+      return;
+    }
+
+    try {
+      const fileData = educationPdfFileData[docuid];
+      if (fileData) {
+        PreviewManger.previewFileBlob(fileData, fileName);
+      } else {
+        PreviewManger.openPreview(documentPath, fileName);
+      }
+    } catch (error) {
+      console.error("Error opening document preview:", error);
+      window.open(documentPath, '_blank');
     }
   },
+
+  openWorkDocumentPreview: function (documentPath, docuid, fileName) {
+    if (!documentPath) {
+      CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No document available for preview.', [
+        { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+      ], 0);
+      return;
+    }
+
+    try {
+      const fileData = workExperienceFileData[docuid];
+      if (fileData) {
+        PreviewManger.previewFileBlob(fileData, fileName);
+      } else {
+        PreviewManger.openPreview(documentPath, fileName);
+      }
+    } catch (error) {
+      console.error("Error opening work document preview:", error);
+      window.open(documentPath, '_blank');
+    }
+  },
+
+  //viewIELTSDocument: function () {
+  //  if (ieltsFileData) {
+  //    if (typeof PreviewManger !== "undefined") {
+  //      PreviewManger.previewFileBlob(ieltsFileData, ieltsFileData.name);
+  //    } else {
+  //      alert("Preview functionality is not available");
+  //    }
+  //  } else {
+  //    alert("No IELTS document uploaded");
+  //  }
+  //},
+
+  //viewTOEFLDocument: function () {
+  //  if (toeflFileData) {
+  //    if (typeof PreviewManger !== "undefined") {
+  //      PreviewManger.previewFileBlob(toeflFileData, toeflFileData.name);
+  //    } else {
+  //      alert("Preview functionality is not available");
+  //    }
+  //  } else {
+  //    alert("No TOEFL document uploaded");
+  //  }
+  //},
+
+  //viewPTEDocument: function () {
+  //  if (pteFileData) {
+  //    if (typeof PreviewManger !== "undefined") {
+  //      PreviewManger.previewFileBlob(pteFileData, pteFileData.name);
+  //    } else {
+  //      alert("Preview functionality is not available");
+  //    }
+  //  } else {
+  //    alert("No PTE document uploaded");
+  //  }
+  //},
+
+  //viewGMATDocument: function () {
+  //  if (gmatFileData) {
+  //    if (typeof PreviewManger !== "undefined") {
+  //      PreviewManger.previewFileBlob(gmatFileData, gmatFileData.name);
+  //    } else {
+  //      alert("Preview functionality is not available");
+  //    }
+  //  } else {
+  //    alert("No GMAT document uploaded");
+  //  }
+  //},
+
+  //viewOTHERSDocument: function () {
+  //  if (othersFileData) {
+  //    if (typeof PreviewManger !== "undefined") {
+  //      PreviewManger.previewFileBlob(othersFileData, othersFileData.name);
+  //    } else {
+  //      alert("Preview functionality is not available");
+  //    }
+  //  } else {
+  //    alert("No OTHERS document uploaded");
+  //  }
+  //},
 
 
 
@@ -1683,80 +1877,50 @@ var CRMEducationNEnglishLanguagHelper = {
     try {
       const grid = $("#gridWorkExperience").data("kendoGrid");
       const workExperienceData = [];
-      const scannedCopyFiles = [];
+      //const scannedCopyFiles = [];
 
       if (grid) {
         const data = grid.dataSource.data();
 
         data.forEach(function (item) {
-          workExperienceData.push({
-            WorkExperienceId: item.WorkExperienceId,
-            ApplicantId: item.ApplicantId,
-            NameOfEmployer: item.NameOfEmployer,
-            Position: item.Position,
-            StartDate: item.StartDate,
-            EndDate: item.EndDate,
-            Period: item.Period,
-            MainResponsibility: item.MainResponsibility,
-            ScannedCopyFile: item.ScannedCopyFile,
-            ScannedCopyFileName: item.ScannedCopyFileName,
-            ScannedCopyPath: item.ScannedCopyPath,
-            //ScannedCopy: item.ScannedCopy,
-            DocumentName: item.DocumentName,
-            FileThumbnail: item.FileThumbnail,
-          });
-          if (item.ScannedCopyFile) {
-            scannedCopyFiles.push(item.ScannedCopyFile);
-          }
+          // File object থাকলে এটিই নিন, নাহলে null
+          const file = item.ScannedCopyFile instanceof File ? item.ScannedCopyFile : null;
 
+          workExperienceData.push({
+            WorkExperienceId: item.WorkExperienceId || 0,
+            ApplicantId: item.ApplicantId || 0,
+            NameOfEmployer: item.NameOfEmployer || "",
+            Position: item.Position || "",
+            StartDate: item.StartDate ? new Date(item.StartDate) : null,
+            EndDate: item.EndDate ? new Date(item.EndDate) : null,
+            Period: item.Period || "",
+            MainResponsibility: item.MainResponsibility || "",
+
+            // Server fields
+            ScannedCopyPath: item.ScannedCopyPath || "",
+            ScannedCopyFileName: item.ScannedCopyFileName || "",
+
+            // IMPORTANT: File property must be ScannedCopyFile for server binding
+            ScannedCopyFile: file,
+
+            DocumentName: item.DocumentName || "",
+            FileThumbnail: item.FileThumbnail || ""
+          });
+
+          //if (file) scannedCopyFiles.push(file);
         });
       }
 
       return {
         WorkExperienceHistory: workExperienceData,
         TotalWorkExperienceRecords: workExperienceData.length,
-        ScannedCopyFileList: scannedCopyFiles,
+        //ScannedCopyFileList: scannedCopyFiles // optional, server না লাগলে রাখতে হবে না
       };
     } catch (error) {
       console.log("Error creating Work Experience object:" + error);
       return {};
     }
   },
-
-  //createWorkExperienceObject: function () {
-  //  try {
-  //    const grid = $("#gridWorkExperience").data("kendoGrid");
-  //    const workExperienceData = [];
-
-  //    if (grid) {
-  //      const dataSource = grid.dataSource;
-  //      const data = dataSource.data();
-
-  //      data.forEach(function (item) {
-  //        workExperienceData.push({
-  //          WorkExperienceId: item.WorkExperienceId,
-  //          NameOfEmployer: item.NameOfEmployer,
-  //          Position: item.Position,
-  //          StartDate: item.StartDate,
-  //          EndDate: item.EndDate,
-  //          Period: item.Period,
-  //          MainResponsibility: item.MainResponsibility,
-  //          ScannedCopy: item.ScannedCopy,
-  //          DocumentName: item.DocumentName,
-  //          FileThumbnail: item.FileThumbnail
-  //        });
-  //      });
-  //    }
-
-  //    return {
-  //      WorkExperienceHistory: workExperienceData,
-  //      TotalWorkExperienceRecords: workExperienceData.length
-  //    };
-  //  } catch (error) {
-  //    console.log("Error creating Work Experience object:" + error);
-  //    return {};
-  //  }
-  //},
 
   /* ------ Utility Methods ------ */
   exportEducationFormDataAsJSON: function () {
@@ -2048,45 +2212,43 @@ var CRMEducationNEnglishLanguagHelper = {
 
 
   /* -------- Populate Education Information Tab -------- */
-  /* -------- Populate Education Information Tab -------- */
-  /* -------- Populate Education Information Tab -------- */
   populateEducationInformation: function (educationData) {
     try {
       console.log("=== Populating Education Information ===");
 
+      // Populate Education History
+      if (educationData.EducationHistories != null && educationData.EducationHistories.length > 0) {
+        this.populateEducationHistory(educationData.EducationHistories);
+      }
+
       // Populate IELTS Information
-      if (educationData.IELTSInformation) {
-        this.populateIELTSInformation(educationData.IELTSInformation);
+      if (educationData != null) {
+        this.populateIELTSInformation(educationData);
       }
 
       // Populate TOEFL Information
-      if (educationData.TOEFLInformation) {
-        this.populateTOEFLInformation(educationData.TOEFLInformation);
+      if (educationData != null) {
+        this.populateTOEFLInformation(educationData);
       }
 
       // Populate PTE Information
-      if (educationData.PTEInformation) {
-        this.populatePTEInformation(educationData.PTEInformation);
+      if (educationData != null) {
+        this.populatePTEInformation(educationData);
       }
 
       // Populate GMAT Information
-      if (educationData.GMATInformation) {
-        this.populateGMATInformation(educationData.GMATInformation);
+      if (educationData != null) {
+        this.populateGMATInformation(educationData);
       }
 
       // Populate OTHERS Information
-      if (educationData.OTHERSInformation) {
-        this.populateOTHERSInformation(educationData.OTHERSInformation);
-      }
-
-      // Populate Education History
-      if (educationData.EducationDetails && educationData.EducationDetails.EducationHistory) {
-        this.populateEducationHistory(educationData.EducationDetails.EducationHistory);
+      if (educationData != null) {
+        this.populateOTHERSInformation(educationData);
       }
 
       // Populate Work Experience
-      if (educationData.WorkExperience && educationData.WorkExperience.WorkExperienceHistory) {
-        this.populateWorkExperience(educationData.WorkExperience.WorkExperienceHistory);
+      if (educationData.WorkExperienceHistories != null && educationData.WorkExperienceHistories.length > 0) {
+        this.populateWorkExperience(educationData.WorkExperienceHistories);
       }
 
       console.log("Education Information populated successfully");
@@ -2309,7 +2471,8 @@ var CRMEducationNEnglishLanguagHelper = {
 
       const grid = $("#gridEducationSummary").data("kendoGrid");
       if (!grid) return;
-
+      console.log(grid);
+      console.log(educationHistory);
       // Clear existing data
       grid.dataSource.data([]);
 
@@ -2322,7 +2485,7 @@ var CRMEducationNEnglishLanguagHelper = {
           Qualification: education.Qualification || "",
           PassingYear: education.PassingYear || new Date().getFullYear(),
           Grade: education.Grade || "",
-          AttachedDocument: education.AttachedDocument || "",
+          AttachedDocument: education.DocumentPath || "",
           DocumentName: education.DocumentName || "",
           PdfThumbnail: education.PdfThumbnail || ""
         });
@@ -2338,15 +2501,15 @@ var CRMEducationNEnglishLanguagHelper = {
   populateWorkExperience: function (workExperience) {
     try {
       if (!workExperience || !Array.isArray(workExperience)) return;
-
       const grid = $("#gridWorkExperience").data("kendoGrid");
       if (!grid) return;
 
-      // Clear existing data
       grid.dataSource.data([]);
 
-      // Add work experience records to grid
       workExperience.forEach(work => {
+        //const path = work.ScannedCopyPath || work.ScannedCopy || "";
+        //const name = work.ScannedCopyFileName || work.DocumentName || (path ? path.split("/").pop() : "");
+
         grid.dataSource.add({
           WorkExperienceId: work.WorkExperienceId || 0,
           ApplicantId: work.ApplicantId || 0,
@@ -2356,7 +2519,14 @@ var CRMEducationNEnglishLanguagHelper = {
           EndDate: work.EndDate ? new Date(work.EndDate) : null,
           Period: work.Period || "",
           MainResponsibility: work.MainResponsibility || "",
-          ScannedCopy: work.ScannedCopy || "",
+
+          // Map server fields correctly
+          ScannedCopyPath: work.ScannedCopyPath || "",
+          ScannedCopyFileName: work.ScannedCopyFileName || "",
+
+          // Keep backward compat and View template fallback
+          ScannedCopy:  work.ScannedCopy || "",
+
           DocumentName: work.DocumentName || "",
           FileThumbnail: work.FileThumbnail || ""
         });
@@ -2367,6 +2537,7 @@ var CRMEducationNEnglishLanguagHelper = {
       console.error("Error populating Work Experience:", error);
     }
   },
+
 
 }
 

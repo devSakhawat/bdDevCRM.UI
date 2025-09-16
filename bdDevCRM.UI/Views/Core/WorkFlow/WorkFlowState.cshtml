@@ -4,21 +4,117 @@
 }
 
 
+
 <!-- row -->
-<div class="row gx-1 gy-2">
+<div class="row gx-2 gy-3">
 	<h3 class="k-header text-center">Workflow Status</h3>
 
-	<div class="col-7">
+  <div class="col-lg-5 col-md-12 col-sm-12">
+    <div id="divDetails">
+      <partial name="WorkFlow/_WorkFlowDetail" />
+    </div>
+  </div>
+
+	<!-- Grid Section - Responsive -->
+	<div class="col-lg-7 col-md-12 col-sm-12">
 		<div id="divSummary">
 			<partial name="WorkFlow/_WorkFlowSummery" />
 		</div>
 	</div>
 
-	<div class="col-5">
-		<div>
-			<partial name="WorkFlow/_WorkFlowDetail" />
-		</div>
-	</div>
 </div>
 
 <script src="~/assets/scripts/core/workflow/workflowsettings.js"></script>
+
+
+
+<style>
+/* 
+  .fieldsetCommon {
+    position: relative;
+    text-align: left;
+  }
+
+  fieldset legend.legendCommon {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%); 
+      background: transparent;
+      font-weight: bold;
+    font-size: 14px;
+    margin-left: 12px;
+    }
+ */
+
+
+  /* Mobile Responsive CSS */
+/*   .workflow-container {
+    padding: 15px;
+  } */
+
+  /* Grid Container Styling */
+/*   .grid-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  } */
+
+  /* Kendo Grid Responsive Overrides */
+/*   #gridSummary {
+    width: 100% !important;
+    min-width: auto !important;
+    margin-top: 10px;
+  } */
+
+
+
+
+  /* Desktop View */
+
+
+  /* Grid Scrolling Improvements */
+/*   .k-grid-content {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+ */
+  /* Prevent Grid Overflow */
+/*   .gridParrentDivOverflowHidden {
+    overflow: visible !important;
+    width: 100%;
+  } */
+
+  /* Responsive Table Wrapper */
+/*   .table-responsive-wrapper {
+    position: relative;
+    width: 100%;
+
+    -webkit-overflow-scrolling: touch;
+  } */
+
+  /* Action Buttons Responsive */
+/*   .btn-action {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin: 2px;
+  } */
+
+
+  /* Form Elements Responsive */
+/*   .form-control, .k-textbox, .k-dropdown {
+    width: 100% !important;
+  } */
+
+  /* Header Responsive */
+/*   .k-header {
+    font-size: 1.5rem;
+  }
+
+  .k-column-title{
+    font-size: 12px;
+    font-weight: 500;
+  } */
+
+
+</style>

@@ -217,4 +217,5 @@ var CourseSummaryHelper = {
       CourseDetailsHelper.refreshCurrencyCombo();
     }
   }
+
 };

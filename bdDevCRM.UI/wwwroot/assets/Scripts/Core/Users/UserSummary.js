@@ -23,32 +23,6 @@ var UserSummaryManager = {
     }
   },
 
-  //GetMotherCompany: function () {
-  //  var companies = [];
-  //  var jsonParams = "";
-  //  var serviceUrl = "/mother-companies";
-
-  //  return new Promise(function (resolve, reject) {
-  //    function onSuccess(jsonData) {
-  //      companies = jsonData;
-  //      resolve(companies);
-  //    }
-
-  //    function onFailed(jqXHR, textStatus, errorThrown) {
-  //      ToastrMessage.showToastrNotification({
-  //        preventDuplicates: true,
-  //        closeButton: true,
-  //        timeOut: 0,
-  //        message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
-  //        type: 'error',
-  //      });
-  //      reject(errorThrown);
-  //    }
-
-  //    AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-  //  });
-  //},
-
 
   GetMotherCompany: async function () {
     const serviceUrl = "/mother-companies";
@@ -67,26 +41,6 @@ var UserSummaryManager = {
     }
   },
 
-
-  //getSummaryGridDataSource: function () {
-  //  return AjaxManager.GenericGridDataSource({
-  //    apiUrl: baseApi + "/user-summary",
-  //    requestType: "POST",
-  //    async: true,
-  //    modelFields: {
-  //      //createdDate: { type: "date" }
-  //    },
-  //    pageSize: 15,
-  //    serverPaging: true,
-  //    serverSorting: true,
-  //    serverFiltering: true,
-  //    allowUnsort: true,
-  //    schemaData: "Items",
-  //    schemaTotal: "TotalCount",
-  //    buttonCount: 3  // Add this explicitly
-  //  });
-  //},
-
   getSummaryGridDataSource: function (companyId) {
     const serviceUrl = `/user-summary?companyId=${companyId}`;
 
@@ -104,6 +58,7 @@ var UserSummaryManager = {
       schemaTotal: "Data.TotalCount"
     });
   },
+
 
 };
 
@@ -124,14 +79,6 @@ var UserSummaryHelper = {
       resizable: true,
       filterable: true,
       sortable: true,
-      //pageable: {
-      //  //pageSizes: [5, 10, 20, 100],
-      //  buttonCount: 5,
-      //  refresh: true,
-      //  serverPaging: true,
-      //  serverFiltering: true,
-      //  serverSorting: true
-      //},
       pageable: {
         pageSizes: [10, 20, 50, 100],
         buttonCount: 3, // This sets exactly 3 buttons as required

@@ -1,6 +1,6 @@
-﻿fieldset, legend {
+﻿/*fieldset, legend {
     all: revert;
-}
+}*/
 
 .reset {
   all: revert;

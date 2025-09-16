@@ -1,6 +1,6 @@
 ﻿
 <script src="~/assets/scripts/core/accesscontrol/accesscontroldetails.js"></script>
-<div id="divdetailsForDetails">
+@* <div id="divdetailsForDetails">
   <fieldset class="reset">
     <legend class="reset">Access Control Details</legend>
 
@@ -22,4 +22,26 @@
     </form>
 
   </fieldset>
-</div>
+</div> *@
+
+<fieldset class="border p-3 fieldsetCommon">
+  <legend class="legendCommon">Workflow Status Details</legend>
+
+  <form id="accessControlForm" class="main-form mt-3">
+    <input type="hidden" id="hdnAccessControlId" value="0" />
+
+    <div class="mb-3">
+      <label class="form-label" for="accessControl-name">Access Name:<span class="redstart">*</span></label>
+      <input type="text" id="txtAccessControlName" name="accessControl-name" class="form-control" maxlength="50"
+             placeholder="Access Control name" required validationmessage="Please enter Access Control Name" />
+    </div>
+
+    <div class="d-flex justify-content-end">
+      <button type="button" class="btn btn-primary me-2" onclick="AccessControlDetailsManager.saveOrUpdateItem()" id="btnSave">+ Add New</button>
+      <button type="button" class="btn btn-secondary me-2" onclick="AccessControlDetailsHelper.clearForm()" id="btnClear">Clear</button>
+    </div>
+
+    <div class="status"></div>
+  </form>
+
+</fieldset>

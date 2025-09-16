@@ -193,19 +193,102 @@ textarea {
   border-bottom-right-radius: 4px;
 }
 
-
-
 #tabstrip ul li {
-/*  font-size: 15px;
-  font-weight: 600;*/
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444 !important;
+}
+.k-tabstrip-items .k-link {
+  /*color: #2e2e2e;*/
+  color: #444 !important;
 }
 
-.reset legend {
-  font-size: 14px;
-  font-weight: 600;
-}
+
 
 /************************ Responsive kendo grid with scroll bar *************************************/
+/************************ Responsive kendo grid with scroll bar *************************************/
+/************************ Responsive kendo grid with scroll bar *************************************/
+
+
+.fieldsetCommon {
+  position: relative;
+  text-align: left;
+}
+fieldset legend.legendCommon {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  transform: none;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-left: 12px;
+  padding: 0;
+  width: auto;
+  text-align: left;
+  background: #F1F5F9;
+  color: #444 !important;
+}
+
+legend.legendCommon.topAfterDiv_Backgorup {
+  top: -10px;
+  background: #FFFFFF;
+}
+
+/*
+fieldset legend.legendCommon {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  font-weight: bold;
+  font-size: 14px;
+  margin-left: 12px;
+}*/
+
+
+
+
+
+/* Responsive Table Wrapper */
+.table-responsive-wrapper {
+  position: relative;
+  width: 100%;
+   overflow-x: auto; 
+  -webkit-overflow-scrolling: touch;
+}
+
+/*.responsiveGrid {
+  width: 100% !important;
+  min-width: auto !important;
+  margin-top: 10px;
+}*/
+
+/* Grid Scrolling Improvements */
+.k-grid-content {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+.k-header {
+  font-size: 1rem;
+  color: #444 !important;
+}
+
+.k-column-title {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.responsiveGrid .k-widget {
+
+}
+
+
+
+
+
+
 .gridParrentDivOverflowHidden {
   overflow-x: hidden;
 }
@@ -238,5 +321,130 @@ textarea {
 
 /************************ /////////////////////////////////////////////////////////// */
 /* Responsive Grid Styling */
+/* === Flexible Kendo Grid (generic): max 80vh, shrink-to-fit, scroll on overflow === */
+/* Place any Kendo Grid inside: <div class="table-responsive-wrapper"><div class="k-grid">...</div></div> */
+
+/* 1) Wrapper: limit overall height */
+.table-responsive-wrapper {
+  max-height: 80vh;
+  overflow: visible;
+}
+
+  /* 2) Cancel any fixed heights inside wrapper (e.g., old .responsiveGrid rules) */
+  .table-responsive-wrapper .responsiveGrid,
+  .table-responsive-wrapper .k-grid {
+    height: auto !important;
+    /*max-height: 100%;*/
+    max-height: 80vh;
+  }
+
+  /* 3) Make Kendo grid root a flex column to isolate scrolling to content */
+  .table-responsive-wrapper .k-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+    /* 4) Keep header/toolbar/pager natural height */
+    .table-responsive-wrapper .k-grid .k-grid-toolbar,
+    .table-responsive-wrapper .k-grid .k-grid-header,
+    .table-responsive-wrapper .k-grid .k-pager-wrap {
+      flex: 0 0 auto;
+    }
+
+    /* 5) Scroll only the content area; grow to fill remaining space */
+    .table-responsive-wrapper .k-grid .k-grid-content,
+    .table-responsive-wrapper .k-grid .k-grid-content-locked {
+      flex: 1 1 auto;
+      min-height: 0; /* required for flex scrolling */
+      overflow-y: auto !important; /* vertical scroll when overflow */
+      overflow-x: auto !important; /* horizontal scroll for wide columns */
+    }
+
+/* 6) Safety: ensure old media-query heights don’t apply inside the wrapper */
+@media (min-width: 992px) {
+  .table-responsive-wrapper .responsiveGrid,
+  .table-responsive-wrapper .k-grid {
+    height: auto !important;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+  .table-responsive-wrapper .responsiveGrid,
+  .table-responsive-wrapper .k-grid {
+    height: auto !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .table-responsive-wrapper .responsiveGrid,
+  .table-responsive-wrapper .k-grid {
+    height: auto !important;
+  }
+}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************ ///////////////////////////////////////////////////////////
+    Media Queries
+*********************** /////////////////////////////////////////////////////////// */
+
+@media (min-width: 992px) {
+  .responsiveGrid {
+    /*height: calc(100vh - 180px) !important;*/
+    /*max-height: 600px;*/
+  }
+}
+
+/* Tablet View */
+@media (min-width: 577px) and (max-width: 991px) {
+
+/*  .responsiveGrid {
+    height: 450px !important;
+  }*/
+}
+
+
+@media (max-width: 768px) {
+  /*.btn-action {
+    display: block;
+    width: 100%;
+    margin: 2px 0;
+  }*/
+}
+
+
+/* Mobile View (phones) */
+@media (max-width: 576px) {
+  .k-header {
+    font-size: 1.2rem;
+  }
+
+/*  .responsiveGrid {
+    height: 400px !important;
+    font-size: 12px;
+  }*/
+  /* Hide less important columns on mobile */
+  .k-grid td:nth-child(2),
+  .k-grid th:nth-child(2) {
+    display: none;
+  }
+
+}

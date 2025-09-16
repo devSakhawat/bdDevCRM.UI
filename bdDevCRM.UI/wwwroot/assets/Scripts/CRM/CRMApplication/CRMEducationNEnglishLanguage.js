@@ -34,9 +34,8 @@ var CRMEducationNEnglishLanguagManager = {
         autoUpload: true
       },
       validation: {
-        maxFileSize: 6194304,
-        allowedExtensions: [".pdf"],
-        requiredExtensions: [".pdf"]
+        maxFileSize: 6194304, // ~5.9MB
+        allowedExtensions: [".pdf"]
       }
     });
 

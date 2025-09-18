@@ -894,6 +894,7 @@ var CRMEducationNEnglishLanguagHelper = {
     // Refresh the grid to show updated data
     grid.refresh();
   },
+
   updateWorkGridRowWithDocument: function (docuid, fileInfo) {
     const grid = $("#gridWorkExperience").data("kendoGrid");
     if (!grid) return;
@@ -1119,7 +1120,7 @@ var CRMEducationNEnglishLanguagHelper = {
   clearOTHERSInformation: function () {
     try {
       // Text Fields
-      $("#txtOTHERSAdditionalInformation").val("");
+      $("#txtAdditionalInformation").val("");
 
       // File Fields
       $("#fileOTHERSScannedCopy").val("");
@@ -1860,9 +1861,9 @@ var CRMEducationNEnglishLanguagHelper = {
   createOTHERSInformationObject: function () {
     try {
       return {
-        OTHERSInformationId: parseInt($("#hdnOTHERSInformationId").val()) || 0,
+        OthersInformationId: parseInt($("#hdnOTHERSInformationId").val()) || 0,
         ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
-        OTHERSAdditionalInformation: $("#txtOTHERSAdditionalInformation").val(),
+        AdditionalInformation: $("#txtAdditionalInformation").val(),
         OTHERSScannedCopyFile: othersFileData,
         OTHERSScannedCopyFileName: othersFileData ? othersFileData.name : ""
       };
@@ -2206,7 +2207,7 @@ var CRMEducationNEnglishLanguagHelper = {
   },
 
   fillOTHERSDemoData: function () {
-    $("#txtOTHERSAdditionalInformation").val("Demo additional information for other language certifications or entrance exams");
+    $("#txtAdditionalInformation").val("Demo additional information for other language certifications or entrance exams");
   },
 
 
@@ -2438,10 +2439,10 @@ var CRMEducationNEnglishLanguagHelper = {
       if (!othersData) return;
 
       // Set hidden fields
-      $("#hdnOTHERSInformationId").val(othersData.OTHERSInformationId || 0);
+      $("#hdnOTHERSInformationId").val(othersData.OthersInformationId || 0);
 
       // Populate OTHERS information
-      $("#txtOTHERSAdditionalInformation").val(othersData.OTHERSAdditionalInformation || "");
+      $("#txtAdditionalInformation").val(othersData.AdditionalInformation || "");
 
       // Handle OTHERS file if exists
       if (othersData.OTHERSScannedCopyPath && othersData.OTHERSScannedCopyFileName) {

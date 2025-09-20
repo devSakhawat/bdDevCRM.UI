@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\assets\Scripts\CRMSolution\Core\Login\" />
+    <Compile Remove="wwwroot\assets\Scripts\CRMSolution\**" />
+    <Content Remove="wwwroot\assets\Scripts\CRMSolution\**" />
+    <EmbeddedResource Remove="wwwroot\assets\Scripts\CRMSolution\**" />
+    <None Remove="wwwroot\assets\Scripts\CRMSolution\**" />
   </ItemGroup>
 
   <ItemGroup>

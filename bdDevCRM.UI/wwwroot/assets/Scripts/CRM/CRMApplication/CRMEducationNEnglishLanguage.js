@@ -922,48 +922,128 @@ var CRMEducationNEnglishLanguagHelper = {
     grid.refresh();
   },
 
+  //ViewWorkDetails: function (data) {
+  //  const path = data.ScannedCopyPath || "";
+  //  if (path) {
+  //    const fileName =
+  //      data.ScannedCopyFileName ||
+  //      data.DocumentName ||
+  //      path.split("/").pop();
+
+  //    const thumbnailSrc = data.FileThumbnail ||
+  //      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
+
+  //    return '<div class="document-preview" style="height: 100px; width: auto; text-align: center;">' +
+  //      '<img src="' + thumbnailSrc + '" alt="File" style="height: 100px; width: auto; cursor: pointer; border: 1px solid #ddd; border-radius: 4px;" ' +
+  //      'onclick="CRMEducationNEnglishLanguagHelper.openWorkDocumentPreview(\'' + path + '\', \'' + data.uid + '\', \'' + fileName + '\')" ' +
+  //      'title="Click to preview: ' + fileName + '"/>' +
+  //      '<div style="font-size: 12px; text-align: center; margin-top: 5px; color: #666;">' + fileName + '</div>' +
+  //      '</div>';
+  //  } else {
+  //    return '<div style="text-align: center; color: #999; padding: 20px; height: 100px; display: flex; align-items: center; justify-content: center;">No document uploaded</div>';
+  //  }
+  //},
+
   ViewWorkDetails: function (data) {
-    const path = data.ScannedCopyPath || "";
-    if (path) {
-      const fileName =
-        data.ScannedCopyFileName ||
-        data.DocumentName ||
-        path.split("/").pop();
-
-      const thumbnailSrc = data.FileThumbnail ||
-        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
-
-      return '<div class="document-preview" style="height: 100px; width: auto; text-align: center;">' +
-        '<img src="' + thumbnailSrc + '" alt="File" style="height: 100px; width: auto; cursor: pointer; border: 1px solid #ddd; border-radius: 4px;" ' +
-        'onclick="CRMEducationNEnglishLanguagHelper.openWorkDocumentPreview(\'' + path + '\', \'' + data.uid + '\', \'' + fileName + '\')" ' +
-        'title="Click to preview: ' + fileName + '"/>' +
-        '<div style="font-size: 12px; text-align: center; margin-top: 5px; color: #666;">' + fileName + '</div>' +
-        '</div>';
-    } else {
-      return '<div style="text-align: center; color: #999; padding: 20px; height: 100px; display: flex; align-items: center; justify-content: center;">No document uploaded</div>';
+    // Unified path fallback
+    const rawPath = data.ScannedCopyPath || data.ScannedCopy || "";
+    if (!rawPath) {
+      return '<div style="text-align:center; color:#999; padding:20px; height:100px; display:flex; align-items:center; justify-content:center;">No document uploaded</div>';
     }
+
+    // Absolute / relative resolve
+    const isAbsolute = /^(https?:)?\/\//i.test(rawPath) || rawPath.startsWith("data:");
+    const fullPath = isAbsolute ? rawPath : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + rawPath : rawPath);
+
+    // Detect image vs pdf
+    const cleanName = rawPath.split("?")[0].split("#")[0];
+    const ext = (cleanName.substring(cleanName.lastIndexOf(".") + 1) || "").toLowerCase();
+    const isImage = /\.(jpe?g|png|gif|bmp|webp|svg)$/i.test(cleanName);
+    const isPdf = ext === "pdf";
+
+    // File name fallback
+    const fileName =
+      data.ScannedCopyFileName ||
+      data.DocumentName ||
+      (cleanName ? cleanName.split("/").pop() : "Document");
+
+    // Thumbnail logic
+    let thumbnailSrc;
+    if (isImage) {
+      // Use server-provided thumbnail else original image
+      if (data.FileThumbnail) {
+        thumbnailSrc = data.FileThumbnail.startsWith("data:") ? data.FileThumbnail
+          : (/^(https?:)?\/\//i.test(data.FileThumbnail) ? data.FileThumbnail
+            : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + data.FileThumbnail : data.FileThumbnail));
+      } else {
+        thumbnailSrc = fullPath; // original image
+      }
+    } else if (isPdf) {
+      // PDF: যদি PDF thumbnail (server generated) থাকে সেটি; নইলে placeholder
+      thumbnailSrc = data.FileThumbnail
+        ? (data.FileThumbnail.startsWith("data:") ? data.FileThumbnail
+          : (/^(https?:)?\/\//i.test(data.FileThumbnail) ? data.FileThumbnail
+            : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + data.FileThumbnail : data.FileThumbnail)))
+        : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+UERGPC90ZXh0Pgo8L3N2Zz4K';
+    } else {
+      // Other file types – generic placeholder
+      thumbnailSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
+    }
+
+    return `
+      <div class="document-preview" style="height:100px;width:auto;text-align:center;">
+        <img src="${thumbnailSrc}" 
+             alt="File" 
+             style="height:100px;width:auto;cursor:pointer;border:1px solid #ddd;border-radius:4px; background:#fff;"
+             onclick="CRMEducationNEnglishLanguagHelper.openWorkDocumentPreview('${rawPath.replace(/'/g, "\\'")}', '${data.uid}', '${fileName.replace(/'/g, "\\'")}')" 
+             title="Click to preview: ${fileName}"
+             onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';" />
+        <div style="font-size:12px;text-align:center;margin-top:5px;color:#666;">${fileName}</div>
+      </div>`;
   },
 
   openWorkDocumentPreview: function (documentPath, docuid, fileName) {
-    if (!documentPath) {
+    const resolvedPath = documentPath || "";
+    if (!resolvedPath) {
       CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No document available for preview.', [
-        { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+        { addClass: 'btn btn-primary', text: 'OK', onClick: ($n) => $n.close() }
       ], 0);
       return;
     }
-
     try {
       const fileData = workExperienceFileData[docuid];
       if (fileData) {
         PreviewManger.previewFileBlob(fileData, fileName);
       } else {
-        PreviewManger.openPreview(documentPath, fileName);
+        PreviewManger.openPreview(resolvedPath, fileName);
       }
     } catch (error) {
       console.error("Error opening work document preview:", error);
-      window.open(documentPath, '_blank');
+      window.open(resolvedPath, '_blank');
     }
   },
+
+
+  //openWorkDocumentPreview: function (documentPath, docuid, fileName) {
+  //  if (!documentPath) {
+  //    CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No document available for preview.', [
+  //      { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
+  //    ], 0);
+  //    return;
+  //  }
+
+  //  try {
+  //    const fileData = workExperienceFileData[docuid];
+  //    if (fileData) {
+  //      PreviewManger.previewFileBlob(fileData, fileName);
+  //    } else {
+  //      PreviewManger.openPreview(documentPath, fileName);
+  //    }
+  //  } catch (error) {
+  //    console.error("Error opening work document preview:", error);
+  //    window.open(documentPath, '_blank');
+  //  }
+  //},
 
   /* =========================================================
    Form Clearing and Data Object Creation Methods
@@ -2442,7 +2522,7 @@ var CRMEducationNEnglishLanguagHelper = {
       $("#hdnOTHERSInformationId").val(othersData.OthersInformationId || 0);
 
       // Populate OTHERS information
-      $("#txtAdditionalInformation").val(othersData.AdditionalInformation || "");
+      $("#txtAdditionalInformation").val(othersData.OTHERSAdditionalInformation || "");
 
       // Handle OTHERS file if exists
       if (othersData.OTHERSScannedCopyPath && othersData.OTHERSScannedCopyFileName) {
@@ -2507,8 +2587,9 @@ var CRMEducationNEnglishLanguagHelper = {
       grid.dataSource.data([]);
 
       workExperience.forEach(work => {
-        //const path = work.ScannedCopyPath || work.ScannedCopy || "";
-        //const name = work.ScannedCopyFileName || work.DocumentName || (path ? path.split("/").pop() : "");
+        const rawPath = work.ScannedCopyPath || work.ScannedCopy || "";
+        const clean = rawPath.split("?")[0].split("#")[0];
+        const isImage = /\.(jpe?g|png|gif|bmp|webp|svg)$/i.test(clean);
 
         grid.dataSource.add({
           WorkExperienceId: work.WorkExperienceId || 0,
@@ -2519,16 +2600,11 @@ var CRMEducationNEnglishLanguagHelper = {
           EndDate: work.EndDate ? new Date(work.EndDate) : null,
           Period: work.Period || "",
           MainResponsibility: work.MainResponsibility || "",
-
-          // Map server fields correctly
-          ScannedCopyPath: work.ScannedCopyPath || "",
-          ScannedCopyFileName: work.ScannedCopyFileName || "",
-
-          // Keep backward compat and View template fallback
-          ScannedCopy:  work.ScannedCopy || "",
-
+          ScannedCopyPath: rawPath,
+          ScannedCopy: rawPath,
+          ScannedCopyFileName: work.ScannedCopyFileName || work.DocumentName || (clean ? clean.split("/").pop() : ""),
           DocumentName: work.DocumentName || "",
-          FileThumbnail: work.FileThumbnail || ""
+          FileThumbnail: work.FileThumbnail || (isImage ? rawPath : ""),
         });
       });
 
@@ -2537,6 +2613,47 @@ var CRMEducationNEnglishLanguagHelper = {
       console.error("Error populating Work Experience:", error);
     }
   },
+
+
+  //populateWorkExperience: function (workExperience) {
+  //  try {
+  //    if (!workExperience || !Array.isArray(workExperience)) return;
+  //    const grid = $("#gridWorkExperience").data("kendoGrid");
+  //    if (!grid) return;
+
+  //    grid.dataSource.data([]);
+
+  //    workExperience.forEach(work => {
+  //      //const path = work.ScannedCopyPath || work.ScannedCopy || "";
+  //      //const name = work.ScannedCopyFileName || work.DocumentName || (path ? path.split("/").pop() : "");
+
+  //      grid.dataSource.add({
+  //        WorkExperienceId: work.WorkExperienceId || 0,
+  //        ApplicantId: work.ApplicantId || 0,
+  //        NameOfEmployer: work.NameOfEmployer || "",
+  //        Position: work.Position || "",
+  //        StartDate: work.StartDate ? new Date(work.StartDate) : null,
+  //        EndDate: work.EndDate ? new Date(work.EndDate) : null,
+  //        Period: work.Period || "",
+  //        MainResponsibility: work.MainResponsibility || "",
+
+  //        // Map server fields correctly
+  //        ScannedCopyPath: work.ScannedCopyPath || "",
+  //        ScannedCopyFileName: work.ScannedCopyFileName || "",
+
+  //        // Keep backward compat and View template fallback
+  //        ScannedCopy:  work.ScannedCopy || "",
+
+  //        DocumentName: work.DocumentName || "",
+  //        FileThumbnail: work.FileThumbnail || ""
+  //      });
+  //    });
+
+  //    console.log("Work Experience populated:", workExperience.length, "records");
+  //  } catch (error) {
+  //    console.error("Error populating Work Experience:", error);
+  //  }
+  //},
 
 
 }

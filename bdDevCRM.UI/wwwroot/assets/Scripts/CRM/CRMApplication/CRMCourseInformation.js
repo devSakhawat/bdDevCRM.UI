@@ -1120,7 +1120,6 @@ var CRMCourseInformationHelper = {
 
   createPersonalDetailsObject: function () {
     try {
-      debugger;
       const genderCombo = $("#cmbGenderForCourse").data("kendoComboBox");
       const titleCombo = $("#cmbTitleForCourse").data("kendoComboBox");
       const maritalStatusCombo = $("#cmbMaritalStatusForCourse").data("kendoComboBox");
@@ -1641,8 +1640,8 @@ var CRMCourseInformationHelper = {
     try {
       if (!personalData) return;
       const src = personalData.PersonalDetails ? personalData.PersonalDetails : personalData;
-      // Set hidden fields
-      $("#hdnApplicantId").val(src.ApplicantId || 0);
+      //// Set hidden fields
+      //$("#hdnApplicantId").val(src.ApplicantId || 0);
 
       // Populate Gender
       if (src.GenderId) {

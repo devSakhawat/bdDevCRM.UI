@@ -1963,7 +1963,6 @@ var CRMEducationNEnglishLanguagHelper = {
         const data = grid.dataSource.data();
 
         data.forEach(function (item) {
-          // File object থাকলে এটিই নিন, নাহলে null
           const file = item.ScannedCopyFile instanceof File ? item.ScannedCopyFile : null;
 
           workExperienceData.push({

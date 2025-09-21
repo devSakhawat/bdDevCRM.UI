@@ -104,7 +104,7 @@ var CRMAdditionalInformationHelper = {
       resizable: true,
       width: "400px",
       columns: CRMAdditionalInformationHelper.generateAdditionalReferenceSummaryColumn(),
-      editable: { model: "inline" },
+      editable: { mode: "inline" },
       navigatable: true,
       selectable: true,
     };
@@ -598,14 +598,15 @@ var CRMAdditionalInformationHelper = {
     try {
       const grid = $("#gridAdditionalReferenceSummary").data("kendoGrid");
       const referenceData = [];
-
+      const applicantIdGlobal = parseInt($("#hdnApplicantId").val()) || 0;
       if (grid) {
         const dataSource = grid.dataSource;
         const data = dataSource.data();
-
+        console.log(data);
         data.forEach(function (item) {
           referenceData.push({
             ApplicantRefferenceId: item.ApplicantRefferenceId,
+            ApplicantId: item.ApplicantId || applicantIdGlobal,
             Name: item.Name,
             Designation: item.Designation,
             Institution: item.Institution,
@@ -786,8 +787,8 @@ var CRMAdditionalInformationHelper = {
       console.log("=== Populating Additional Information ===");
 
       // Populate Reference Details
-      if (applicationData.ReferenceDetails && applicationData.ReferenceDetails.References) {
-        this.populateReferenceDetails(applicationData.ReferenceDetails.References);
+      if (applicationData.ApplicantReferences != null && applicationData.ApplicantReferences.length > 0) {
+        this.populateReferenceDetails(applicationData.ApplicantReferences);
       }
 
       // Populate Statement of Purpose
@@ -821,7 +822,8 @@ var CRMAdditionalInformationHelper = {
       references.forEach(reference => {
         grid.dataSource.add({
           ApplicantRefferenceId: reference.ApplicantReferenceId || 0,
-          ApplicantId: reference.ApplicantId || 0,
+          //ApplicantId: reference.ApplicantId || 0,
+          ApplicantId: reference.ApplicantId || parseInt($("#hdnApplicantId").val()) || 0,
           Name: reference.Name || "",
           Designation: reference.Designation || "",
           Institution: reference.Institution || "",

@@ -909,6 +909,9 @@ var CRMApplicationHelper = {
       if (applicationData.ApplicationId) {
         $("#hdnApplicationId").val(applicationData.ApplicationId);
       }
+      if (applicationData.ApplicantId) {
+        $("#hdnApplicantId").val(applicationData.ApplicantId);
+      }
 
       debugger;
       console.log(applicationData);

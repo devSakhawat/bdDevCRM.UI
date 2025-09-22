@@ -80,9 +80,9 @@ var CRMAdditionalInformationHelper = {
         data: [],
         schema: {
           model: {
-            id: "ApplicantRefferenceId",
+            id: "ApplicantReferenceId",
             fields: {
-              ApplicantRefferenceId: { type: "number", editable: false, nullable: true },
+              ApplicantReferenceId: { type: "number", editable: false, nullable: true },
               ApplicantId: { type: "number", editable: false, nullable: true },
               Name: { type: "string" },
               Designation: { type: "string" },
@@ -107,14 +107,40 @@ var CRMAdditionalInformationHelper = {
       editable: { mode: "inline" },
       navigatable: true,
       selectable: true,
+      //remove: CRMAdditionalInformationHelper.referenceGridRemoveConfirm
     };
 
     $("#gridAdditionalReferenceSummary").kendoGrid(gridOption);
   },
 
+  // ================= Custom Delete Confirmation (Reference Grid) =================
+  referenceGridRemoveConfirm: function (e) {
+    e.preventDefault();
+
+    const grid = $("#gridAdditionalReferenceSummary").data("kendoGrid");
+    if (!grid) return;
+
+    const model = e.model;
+    const nameRaw = model && model.Name ? model.Name : "এই রেফারেন্স";
+    const htmlEncode = (window.kendo && kendo.htmlEncode) ? kendo.htmlEncode : function (v) { return $('<div/>').text(v).html(); };
+    const name = htmlEncode(nameRaw);
+
+    CommonManager.showConfirm(
+      "Delete Confirmation",
+      "আপনি কি নিশ্চিত যে আপনি '<b>" + name + "</b>' রেফারেন্সটি মুছে ফেলতে চান?",
+      function () { // Yes
+        grid.dataSource.remove(model);
+        if (typeof ToastrMessage !== "undefined") {
+          ToastrMessage.showSuccess("রেফারেন্সটি সফলভাবে মুছে ফেলা হয়েছে");
+        }
+      },
+      function () { /* Cancel - কিছু করবো না */ }
+    );
+  },
+
   generateAdditionalReferenceSummaryColumn: function () {
     return [
-      { field: "ApplicantRefferenceId", title: "ApplicantRefferenceId", hidden: true },
+      { field: "ApplicantReferenceId", title: "ApplicantReferenceId", hidden: true },
       { field: "ApplicantId", title: "ApplicantId", hidden: true },
       { field: "Name", title: "Name", width: "200px" },
       { field: "Designation", title: "Designation", width: "200px" },
@@ -157,9 +183,42 @@ var CRMAdditionalInformationHelper = {
       editable: { model: "inline" },
       navigatable: true,
       selectable: true,
+      //remove: CRMAdditionalInformationHelper.documentGridRemoveConfirm
     };
 
     $("#griAdditionalDocumentsSummary").kendoGrid(gridOption);
+  },
+
+  //documentGridRemoveConfirm: function (e) {
+  //  const title = e.model && e.model.Title ? e.model.Title : "this document";
+  //  if (!confirm("আপনি কি নিশ্চিত যে আপনি '" + title + "' ডকুমেন্টটি মুছে ফেলতে চান?")) {
+  //    e.preventDefault();
+  //  }
+  //},
+
+  // ================= Custom Delete Confirmation (Documents Grid) =================
+  documentGridRemoveConfirm: function (e) {
+    e.preventDefault();
+
+    const grid = $("#griAdditionalDocumentsSummary").data("kendoGrid");
+    if (!grid) return;
+
+    const model = e.model;
+    const titleRaw = model && model.Title ? model.Title : "এই ডকুমেন্ট";
+    const htmlEncode = (window.kendo && kendo.htmlEncode) ? kendo.htmlEncode : function (v) { return $('<div/>').text(v).html(); };
+    const title = htmlEncode(titleRaw);
+
+    CommonManager.showConfirm(
+      "Delete Confirmation",
+      "আপনি কি নিশ্চিত যে আপনি '<b>" + title + "</b>' ডকুমেন্টটি মুছে ফেলতে চান?",
+      function () { // Yes
+        grid.dataSource.remove(model);
+        if (typeof ToastrMessage !== "undefined") {
+          ToastrMessage.showSuccess("ডকুমেন্টটি সফলভাবে মুছে ফেলা হয়েছে");
+        }
+      },
+      function () { /* Cancel */ }
+    );
   },
 
   generateAdditionalDocumentsSummaryColumn: function () {
@@ -605,7 +664,7 @@ var CRMAdditionalInformationHelper = {
         console.log(data);
         data.forEach(function (item) {
           referenceData.push({
-            ApplicantRefferenceId: item.ApplicantRefferenceId,
+            ApplicantReferenceId: item.ApplicantReferenceId,
             ApplicantId: item.ApplicantId || applicantIdGlobal,
             Name: item.Name,
             Designation: item.Designation,
@@ -821,7 +880,7 @@ var CRMAdditionalInformationHelper = {
       // Add reference records to grid
       references.forEach(reference => {
         grid.dataSource.add({
-          ApplicantRefferenceId: reference.ApplicantReferenceId || 0,
+          ApplicantReferenceId: reference.ApplicantReferenceId || 0,
           //ApplicantId: reference.ApplicantId || 0,
           ApplicantId: reference.ApplicantId || parseInt($("#hdnApplicantId").val()) || 0,
           Name: reference.Name || "",

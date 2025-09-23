@@ -163,13 +163,14 @@ var CRMAdditionalInformationHelper = {
         data: [],
         schema: {
           model: {
-            id: "DocumentId",
+            id: "AdditionalDocumentId",
             fields: {
-              DocumentId: { type: "number", editable: false, nullable: true },
+              AdditionalDocumentId: { type: "number", editable: false, nullable: true },
               ApplicantId: { type: "number", editable: false, nullable: true },
-              Title: { type: "string" },
-              UploadFile: { type: "string" },
+              DocumentTitle: { type: "string" },
               DocumentName: { type: "string" },
+              UploadFormFile: { type: "object", editable: false, nullable: true },
+              DocumentPath: { type: "string" },
               FileThumbnail: { type: "string" }
             }
           }
@@ -183,18 +184,10 @@ var CRMAdditionalInformationHelper = {
       editable: { model: "inline" },
       navigatable: true,
       selectable: true,
-      //remove: CRMAdditionalInformationHelper.documentGridRemoveConfirm
     };
 
     $("#griAdditionalDocumentsSummary").kendoGrid(gridOption);
   },
-
-  //documentGridRemoveConfirm: function (e) {
-  //  const title = e.model && e.model.Title ? e.model.Title : "this document";
-  //  if (!confirm("আপনি কি নিশ্চিত যে আপনি '" + title + "' ডকুমেন্টটি মুছে ফেলতে চান?")) {
-  //    e.preventDefault();
-  //  }
-  //},
 
   // ================= Custom Delete Confirmation (Documents Grid) =================
   documentGridRemoveConfirm: function (e) {
@@ -204,17 +197,17 @@ var CRMAdditionalInformationHelper = {
     if (!grid) return;
 
     const model = e.model;
-    const titleRaw = model && model.Title ? model.Title : "এই ডকুমেন্ট";
+    const titleRaw = model && model.Title ? model.Title : "this document";
     const htmlEncode = (window.kendo && kendo.htmlEncode) ? kendo.htmlEncode : function (v) { return $('<div/>').text(v).html(); };
     const title = htmlEncode(titleRaw);
 
     CommonManager.showConfirm(
       "Delete Confirmation",
-      "আপনি কি নিশ্চিত যে আপনি '<b>" + title + "</b>' ডকুমেন্টটি মুছে ফেলতে চান?",
+      "Are your sure '<b>" + title + "</b>' delete the record?",
       function () { // Yes
         grid.dataSource.remove(model);
         if (typeof ToastrMessage !== "undefined") {
-          ToastrMessage.showSuccess("ডকুমেন্টটি সফলভাবে মুছে ফেলা হয়েছে");
+          ToastrMessage.showSuccess("Record deleted successfully");
         }
       },
       function () { /* Cancel */ }
@@ -223,13 +216,22 @@ var CRMAdditionalInformationHelper = {
 
   generateAdditionalDocumentsSummaryColumn: function () {
     return [
-      { field: "DocumentId", title: "DocumentId", hidden: true },
+      { field: "AdditionalDocumentId", title: "AdditionalDocumentId", hidden: true },
       { field: "ApplicantId", title: "ApplicantId", hidden: true },
-      { field: "Title", title: "Title", width: "400px" },
+      { field: "DocumentTitle", title: "Document Title", width: "400px" },
+      { field: "DocumentName", title: "Document Name", width: "400px" },
+      //{
+      //  field: "UploadFile",
+      //  title: "Upload Document",
+      //  template: '#= CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload(data) #',
+      //  filterable: false,
+      //  width: "200px"
+      //},
       {
         field: "UploadFile",
         title: "Upload Document",
-        template: '#= CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload(data) #',
+        template: '',
+        editor: CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload,
         filterable: false,
         width: "200px"
       },
@@ -337,24 +339,35 @@ var CRMAdditionalInformationHelper = {
   /* =========================================================
      Additional Documents Grid File Upload Methods
   =========================================================*/
-  editorAdditionalDocumentFileUpload: function (data) {
-    if (data.UploadFile && data.DocumentName) {
-      return '<div class="document-info">' +
-        '<span class="document-name" title="' + data.DocumentName + '">' +
-        (data.DocumentName.length > 20 ? data.DocumentName.substring(0, 20) + '...' : data.DocumentName) +
-        '</span><br/>' +
-        '<input type="file" accept=".pdf,.zip" class="k-button form-control" ' +
-        'onchange="CRMAdditionalInformationHelper.handleDirectAdditionalDocumentFileUpload(this, \'' + data.uid + '\')" ' +
-        'title="Replace document"/>' +
-        '</div>';
-    } else {
-      return '<input type="file" accept=".pdf,.zip" value="Select PDF/ZIP file" class="k-button form-control" ' +
-        'onchange="CRMAdditionalInformationHelper.handleDirectAdditionalDocumentFileUpload(this, \'' + data.uid + '\')" ' +
-        'title="Upload PDF or ZIP document"/>';
-    }
+
+  //editorAdditionalDocumentFileUpload: function (data) {
+  //  if (data.UploadFile && data.DocumentName) {
+  //    return '<div class="document-info">' +
+  //      '<span class="document-name" title="' + data.DocumentName + '">' +
+  //      (data.DocumentName.length > 20 ? data.DocumentName.substring(0, 20) + '...' : data.DocumentName) +
+  //      '</span><br/>' +
+  //      '<input type="file" accept=".pdf,.zip" class="k-button form-control" ' +
+  //      'onchange="CRMAdditionalInformationHelper.handleDirectAdditionalDocumentFileUpload(this, \'' + data.uid + '\')" ' +
+  //      'title="Replace document"/>' +
+  //      '</div>';
+  //  } else {
+  //    return '<input type="file" accept=".pdf,.zip" value="Select PDF/ZIP file" class="k-button form-control" ' +
+  //      'onchange="CRMAdditionalInformationHelper.handleDirectAdditionalDocumentFileUpload(this, \'' + data.uid + '\')" ' +
+  //      'title="Upload PDF or ZIP document"/>';
+  //  }
+  //},
+
+  editorAdditionalDocumentFileUpload: function (container, options) {
+    const dataItem = options.model;
+    const uid = dataItem.uid;
+
+    $('<input type="file" accept=".pdf,.jpg,.jpeg,.png,.gif" class="form-control" />')
+      .attr("onchange", 'CRMAdditionalInformationHelper.handleDirectAdditionalDocumentFileUpload(this, "' + uid + '")')
+      .appendTo(container);
   },
 
   handleDirectAdditionalDocumentFileUpload: function (input, docuid) {
+    debugger;
     const file = input.files[0];
     if (!file) return;
 
@@ -380,7 +393,8 @@ var CRMAdditionalInformationHelper = {
       CRMAdditionalInformationHelper.updateAdditionalDocumentGridRowWithDocument(docuid, {
         name: fileName,
         response: filePath,
-        thumbnail: thumbnailUrl
+        thumbnail: thumbnailUrl,
+        file: file
       });
 
       if (typeof ToastrMessage !== 'undefined') {
@@ -391,26 +405,87 @@ var CRMAdditionalInformationHelper = {
     });
   },
 
+  //generateAdditionalDocumentThumbnail: function (file, docuid, callback) {
+  //  if (!file) {
+  //    if (callback) callback(null);
+  //    return;
+  //  }
+
+  //  // Handle different file types
+  //  if (file.type === 'application/pdf') {
+  //    // Use PDF thumbnail generation (if PDF.js is available)
+  //    this.generatePdfThumbnail(file, callback);
+  //  } else if (file.type.includes('zip')) {
+  //    // Use ZIP icon for ZIP files
+  //    const zipIcon = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+WklQPC90ZXh0Pgo8L3N2Zz4K';
+  //    if (callback) callback(zipIcon);
+  //  } else {
+  //    if (callback) callback(null);
+  //  }
+  //},
+
+
+  //generatePdfThumbnail: function (file, callback) {
+  //  const reader = new FileReader();
+  //  reader.onload = function () {
+  //    const typedArray = new Uint8Array(this.result);
+
+  //    if (typeof pdfjsLib !== 'undefined') {
+  //      pdfjsLib.getDocument(typedArray).promise.then(pdf => {
+  //        pdf.getPage(1).then(page => {
+  //          const canvas = document.createElement("canvas");
+  //          const context = canvas.getContext("2d");
+  //          const scale = 100 / page.getViewport({ scale: 1 }).height;
+  //          const viewport = page.getViewport({ scale });
+
+  //          canvas.width = viewport.width;
+  //          canvas.height = viewport.height;
+
+  //          page.render({ canvasContext: context, viewport })
+  //            .promise.then(() => {
+  //              const imgUrl = canvas.toDataURL("image/png");
+  //              if (callback) callback(imgUrl);
+  //            });
+  //        });
+  //      }).catch(error => {
+  //        console.error("Error generating PDF thumbnail:", error);
+  //        if (callback) callback(null);
+  //      });
+  //    } else {
+  //      console.error("PDF.js library not loaded");
+  //      if (callback) callback(null);
+  //    }
+  //  };
+  //  reader.readAsArrayBuffer(file);
+  //},
+
+  // Generate Additional Document file thumbnail (PDF + Images)
+
   generateAdditionalDocumentThumbnail: function (file, docuid, callback) {
     if (!file) {
       if (callback) callback(null);
       return;
     }
 
+    // Clear old data first
+    if (additionalDocumentsFileData[docuid]) {
+      delete additionalDocumentsFileData[docuid];
+    }
+    additionalDocumentsFileData[docuid] = file;
+
     // Handle different file types
     if (file.type === 'application/pdf') {
-      // Use PDF thumbnail generation (if PDF.js is available)
-      this.generatePdfThumbnail(file, callback);
-    } else if (file.type.includes('zip')) {
-      // Use ZIP icon for ZIP files
-      const zipIcon = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+WklQPC90ZXh0Pgo8L3N2Zz4K';
-      if (callback) callback(zipIcon);
+      // Use PDF thumbnail generation
+      this.generateAdditionalDocumentPdfThumbnail(file, docuid, callback);
+    } else if (file.type.startsWith('image/')) {
+      // Use image thumbnail generation
+      this.generateAdditionalDocumentImageThumbnail(file, callback);
     } else {
       if (callback) callback(null);
     }
   },
-
-  generatePdfThumbnail: function (file, callback) {
+  // Generate PDF thumbnail for work experience
+  generateAdditionalDocumentPdfThumbnail: function (file, docuid, callback) {
     const reader = new FileReader();
     reader.onload = function () {
       const typedArray = new Uint8Array(this.result);
@@ -433,7 +508,7 @@ var CRMAdditionalInformationHelper = {
               });
           });
         }).catch(error => {
-          console.error("Error generating PDF thumbnail:", error);
+          console.error("Error generating additional document PDF thumbnail:", error);
           if (callback) callback(null);
         });
       } else {
@@ -444,25 +519,61 @@ var CRMAdditionalInformationHelper = {
     reader.readAsArrayBuffer(file);
   },
 
+  // Generate Image thumbnail for work experience
+  generateAdditionalDocumentImageThumbnail: function (file, callback) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        // Calculate dimensions for 100px height
+        const scale = 100 / img.height;
+        canvas.width = img.width * scale;
+        canvas.height = 100;
+
+        // Draw resized image
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL("image/png");
+
+        if (callback) callback(thumbnailUrl);
+      };
+      img.onerror = function () {
+        console.error("Error loading image for thumbnail");
+        if (callback) callback(null);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  },
+
   updateAdditionalDocumentGridRowWithDocument: function (docuid, fileInfo) {
     const grid = $("#griAdditionalDocumentsSummary").data("kendoGrid");
     if (!grid) return;
 
     const dataSource = grid.dataSource;
     const data = dataSource.data();
+    const path = fileInfo.response || fileInfo.name || "";
 
     for (let i = 0; i < data.length; i++) {
       if (data[i].uid === docuid) {
-        data[i].set("UploadFile", fileInfo.response || fileInfo.name);
         data[i].set("DocumentName", fileInfo.name);
+        data[i].set("DocumentPath", path);
         data[i].set("FileThumbnail", fileInfo.thumbnail || "");
+
+        try {
+          data[i].UploadFormFile = fileInfo.file || null;
+        } catch (e) {
+          data[i].set("UploadFormFile", fileInfo.file || "");
+        }
         break;
       }
     }
     grid.refresh();
   },
 
-  ViewAdditionalDocumentDetails: function (data) {
+  ViewAdditionalDocumentDetails2: function (data) {
     if (data.UploadFile != null && data.UploadFile != "") {
       const fileName = data.DocumentName || data.UploadFile.split("/").pop();
       const thumbnailSrc = data.FileThumbnail || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
@@ -476,6 +587,61 @@ var CRMAdditionalInformationHelper = {
     } else {
       return '<div style="text-align: center; color: #999; padding: 20px; height: 100px; display: flex; align-items: center; justify-content: center;">No document uploaded</div>';
     }
+  },
+
+  ViewAdditionalDocumentDetails: function (data) {
+    // Unified path fallback
+    const rawPath = data.UploadFormFile || data.UploadFormFile || "";
+    if (!rawPath) {
+      return '<div style="text-align:center; color:#999; padding:20px; height:100px; display:flex; align-items:center; justify-content:center;">No document uploaded</div>';
+    }
+
+    // Absolute / relative resolve
+    const isAbsolute = /^(https?:)?\/\//i.test(rawPath) || rawPath.startsWith("data:");
+    const fullPath = isAbsolute ? rawPath : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + rawPath : rawPath);
+
+    // Detect image vs pdf
+    const cleanName = rawPath.split("?")[0].split("#")[0];
+    const ext = (cleanName.substring(cleanName.lastIndexOf(".") + 1) || "").toLowerCase();
+    const isImage = /\.(jpe?g|png|gif|bmp|webp|svg)$/i.test(cleanName);
+    const isPdf = ext === "pdf";
+
+    // File name fallback
+    const fileName = data.DocumentName || data.DocumentName || (cleanName ? cleanName.split("/").pop() : "Document");
+
+    // Thumbnail logic
+    let thumbnailSrc;
+    if (isImage) {
+      // Use server-provided thumbnail else original image
+      if (data.FileThumbnail) {
+        thumbnailSrc = data.FileThumbnail.startsWith("data:") ? data.FileThumbnail
+          : (/^(https?:)?\/\//i.test(data.FileThumbnail) ? data.FileThumbnail
+            : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + data.FileThumbnail : data.FileThumbnail));
+      } else {
+        thumbnailSrc = fullPath; // original image
+      }
+    } else if (isPdf) {
+      // PDF:if PDF thumbnail (server generated) then it will be other hand placeholder
+      thumbnailSrc = data.FileThumbnail
+        ? (data.FileThumbnail.startsWith("data:") ? data.FileThumbnail
+          : (/^(https?:)?\/\//i.test(data.FileThumbnail) ? data.FileThumbnail
+            : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + data.FileThumbnail : data.FileThumbnail)))
+        : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+UERGPC90ZXh0Pgo8L3N2Zz4K';
+    } else {
+      // Other file types – generic placeholder
+      thumbnailSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
+    }
+
+    return `
+      <div class="document-preview" style="height:100px;width:auto;text-align:center;">
+        <img src="${thumbnailSrc}" 
+             alt="File" 
+             style="height:100px;width:auto;cursor:pointer;border:1px solid #ddd;border-radius:4px; background:#fff;"
+             onclick="CRMAdditionalInformationHelper.openAdditionalDocumentPreview('${rawPath.replace(/'/g, "\\'")}', '${data.uid}', '${fileName.replace(/'/g, "\\'")}')" 
+             title="Click to preview: ${fileName}"
+             onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';" />
+        <div style="font-size:12px;text-align:center;margin-top:5px;color:#666;">${fileName}</div>
+      </div>`;
   },
 
   openAdditionalDocumentPreview: function (documentPath, docuid, fileName) {
@@ -724,19 +890,22 @@ var CRMAdditionalInformationHelper = {
     try {
       const grid = $("#griAdditionalDocumentsSummary").data("kendoGrid");
       const documentsData = [];
-
+      const applicantIdGlobal = parseInt($("#hdnApplicantId").val()) || 0;
       if (grid) {
         const dataSource = grid.dataSource;
         const data = dataSource.data();
 
         data.forEach(function (item) {
+          const file = item.UploadFormFile instanceof File ? item.UploadFormFile : null;
           documentsData.push({
-            DocumentId: item.DocumentId,
-            ApplicantId: item.ApplicantId,
-            Title: item.Title,
-            UploadFile: item.UploadFile,
-            DocumentName: item.DocumentName,
-            FileThumbnail: item.FileThumbnail
+            AdditionalDocumentId: item.AdditionalDocumentId,
+            ApplicantId: (item.ApplicantId && parseInt(item.ApplicantId) > 0)
+              ? parseInt(item.ApplicantId) : applicantIdGlobal,
+            DocumentTitle: item.DocumentTitle || "",
+            DocumentName: item.DocumentName || "",
+            DocumentPath: item.DocumentPath || "",
+            UploadFormFile: file,
+            FileThumbnail: item.FileThumbnail || ""
           });
         });
       }

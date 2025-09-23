@@ -1974,7 +1974,6 @@ var CRMEducationNEnglishLanguagHelper = {
             EndDate: item.EndDate ? new Date(item.EndDate) : null,
             Period: item.Period || "",
             MainResponsibility: item.MainResponsibility || "",
-
             // Server fields
             ScannedCopyPath: item.ScannedCopyPath || "",
             ScannedCopyFileName: item.ScannedCopyFileName || "",
@@ -1993,7 +1992,6 @@ var CRMEducationNEnglishLanguagHelper = {
       return {
         WorkExperienceHistory: workExperienceData,
         TotalWorkExperienceRecords: workExperienceData.length,
-        //ScannedCopyFileList: scannedCopyFiles // optional, server না লাগলে রাখতে হবে না
       };
     } catch (error) {
       console.log("Error creating Work Experience object:" + error);

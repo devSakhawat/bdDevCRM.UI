@@ -50,7 +50,98 @@ var CRMAdditionalInformationManager = {
     }
 
     return true;
-  }
+  },
+
+
+  generateAdditionalDocumentThumbnail: function (file, docuid, callback) {
+    if (!file) {
+      if (callback) callback(null);
+      return;
+    }
+
+    // Clear old data first
+    if (additionalDocumentsFileData[docuid]) {
+      delete additionalDocumentsFileData[docuid];
+    }
+    additionalDocumentsFileData[docuid] = file;
+
+    // Handle different file types
+    if (file.type === 'application/pdf') {
+      // Use PDF thumbnail generation
+      this.generateAdditionalDocumentPdfThumbnail(file, docuid, callback);
+    } else if (file.type.startsWith('image/')) {
+      // Use image thumbnail generation
+      this.generateAdditionalDocumentImageThumbnail(file, callback);
+    } else {
+      if (callback) callback(null);
+    }
+  },
+
+  // Generate PDF thumbnail for Additional Document
+  generateAdditionalDocumentPdfThumbnail: function (file, docuid, callback) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      const typedArray = new Uint8Array(this.result);
+
+      if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.getDocument(typedArray).promise.then(pdf => {
+          pdf.getPage(1).then(page => {
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            const scale = 100 / page.getViewport({ scale: 1 }).height;
+            const viewport = page.getViewport({ scale });
+
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            page.render({ canvasContext: context, viewport })
+              .promise.then(() => {
+                const imgUrl = canvas.toDataURL("image/png");
+                if (callback) callback(imgUrl);
+              });
+          });
+        }).catch(error => {
+          console.error("Error generating additional document PDF thumbnail:", error);
+          if (callback) callback(null);
+        });
+      } else {
+        console.error("PDF.js library not loaded");
+        if (callback) callback(null);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  },
+
+  // Generate Image thumbnail for Additional Document
+  generateAdditionalDocumentImageThumbnail: function (file, callback) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        // Calculate dimensions for 100px height
+        const scale = 100 / img.height;
+        canvas.width = img.width * scale;
+        canvas.height = 100;
+
+        // Draw resized image
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL("image/png");
+
+        if (callback) callback(thumbnailUrl);
+      };
+      img.onerror = function () {
+        console.error("Error loading image for thumbnail");
+        if (callback) callback(null);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  },
+
+
 }
 
 var CRMAdditionalInformationHelper = {
@@ -169,8 +260,8 @@ var CRMAdditionalInformationHelper = {
               ApplicantId: { type: "number", editable: false, nullable: true },
               DocumentTitle: { type: "string" },
               DocumentName: { type: "string" },
-              UploadFormFile: { type: "object", editable: false, nullable: true },
               DocumentPath: { type: "string" },
+              UploadFormFile: { type: "object", editable: false, nullable: true },
               FileThumbnail: { type: "string" }
             }
           }
@@ -187,6 +278,42 @@ var CRMAdditionalInformationHelper = {
     };
 
     $("#griAdditionalDocumentsSummary").kendoGrid(gridOption);
+  },
+
+  generateAdditionalDocumentsSummaryColumn: function () {
+    return [
+      { field: "AdditionalDocumentId", title: "AdditionalDocumentId", hidden: true },
+      { field: "ApplicantId", title: "ApplicantId", hidden: true },
+      { field: "DocumentPath", title: "DocumentPath", hidden: true },
+
+      { field: "DocumentTitle", title: "Document Title", width: "300px" },
+      { field: "DocumentName", title: "Document Name", width: "300px" },
+      //{
+      //  field: "UploadFile",
+      //  title: "Upload Document",
+      //  template: '#= CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload(data) #',
+      //  filterable: false,
+      //  width: "200px"
+      //},
+      {
+        field: "UploadFile",
+        title: "Upload Document",
+        template: "",
+        editor: CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload,
+        filterable: false,
+        width: "200px"
+      },
+      {
+        field: "View",
+        title: "View Document",
+        template: '#= CRMAdditionalInformationHelper.ViewAdditionalDocumentDetails(data) #',
+        editable: false,
+        filterable: false,
+        width: "200px"
+      },
+      //{ command: "destroy", title: "Action", width: "100px" }
+      { command: ["edit", "destroy"], title: "Action", width: "180px" }
+    ];
   },
 
   // ================= Custom Delete Confirmation (Documents Grid) =================
@@ -214,38 +341,6 @@ var CRMAdditionalInformationHelper = {
     );
   },
 
-  generateAdditionalDocumentsSummaryColumn: function () {
-    return [
-      { field: "AdditionalDocumentId", title: "AdditionalDocumentId", hidden: true },
-      { field: "ApplicantId", title: "ApplicantId", hidden: true },
-      { field: "DocumentTitle", title: "Document Title", width: "400px" },
-      { field: "DocumentName", title: "Document Name", width: "400px" },
-      //{
-      //  field: "UploadFile",
-      //  title: "Upload Document",
-      //  template: '#= CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload(data) #',
-      //  filterable: false,
-      //  width: "200px"
-      //},
-      {
-        field: "UploadFile",
-        title: "Upload Document",
-        template: '',
-        editor: CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload,
-        filterable: false,
-        width: "200px"
-      },
-      {
-        field: "ViewDocument",
-        title: "View Document",
-        template: '#= CRMAdditionalInformationHelper.ViewAdditionalDocumentDetails(data) #',
-        editable: false,
-        filterable: false,
-        width: "200px"
-      },
-      { command: "destroy", title: "Action", width: "100px" }
-    ];
-  },
 
   /* =========================================================
      File Upload Methods
@@ -358,6 +453,7 @@ var CRMAdditionalInformationHelper = {
   //},
 
   editorAdditionalDocumentFileUpload: function (container, options) {
+    debugger;
     const dataItem = options.model;
     const uid = dataItem.uid;
 
@@ -386,7 +482,7 @@ var CRMAdditionalInformationHelper = {
     additionalDocumentsFileData[docuid] = file;
 
     // Generate thumbnail and update grid
-    this.generateAdditionalDocumentThumbnail(file, docuid, function (thumbnailUrl) {
+    CRMAdditionalInformationManager.generateAdditionalDocumentThumbnail(file, docuid, function (thumbnailUrl) {
       const fileName = file.name;
       const filePath = "/uploads/additionaldocuments/" + fileName;
 
@@ -461,104 +557,19 @@ var CRMAdditionalInformationHelper = {
 
   // Generate Additional Document file thumbnail (PDF + Images)
 
-  generateAdditionalDocumentThumbnail: function (file, docuid, callback) {
-    if (!file) {
-      if (callback) callback(null);
-      return;
-    }
-
-    // Clear old data first
-    if (additionalDocumentsFileData[docuid]) {
-      delete additionalDocumentsFileData[docuid];
-    }
-    additionalDocumentsFileData[docuid] = file;
-
-    // Handle different file types
-    if (file.type === 'application/pdf') {
-      // Use PDF thumbnail generation
-      this.generateAdditionalDocumentPdfThumbnail(file, docuid, callback);
-    } else if (file.type.startsWith('image/')) {
-      // Use image thumbnail generation
-      this.generateAdditionalDocumentImageThumbnail(file, callback);
-    } else {
-      if (callback) callback(null);
-    }
-  },
-  // Generate PDF thumbnail for work experience
-  generateAdditionalDocumentPdfThumbnail: function (file, docuid, callback) {
-    const reader = new FileReader();
-    reader.onload = function () {
-      const typedArray = new Uint8Array(this.result);
-
-      if (typeof pdfjsLib !== 'undefined') {
-        pdfjsLib.getDocument(typedArray).promise.then(pdf => {
-          pdf.getPage(1).then(page => {
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
-            const scale = 100 / page.getViewport({ scale: 1 }).height;
-            const viewport = page.getViewport({ scale });
-
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-
-            page.render({ canvasContext: context, viewport })
-              .promise.then(() => {
-                const imgUrl = canvas.toDataURL("image/png");
-                if (callback) callback(imgUrl);
-              });
-          });
-        }).catch(error => {
-          console.error("Error generating additional document PDF thumbnail:", error);
-          if (callback) callback(null);
-        });
-      } else {
-        console.error("PDF.js library not loaded");
-        if (callback) callback(null);
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  },
-
-  // Generate Image thumbnail for work experience
-  generateAdditionalDocumentImageThumbnail: function (file, callback) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const img = new Image();
-      img.onload = function () {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        // Calculate dimensions for 100px height
-        const scale = 100 / img.height;
-        canvas.width = img.width * scale;
-        canvas.height = 100;
-
-        // Draw resized image
-        context.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const thumbnailUrl = canvas.toDataURL("image/png");
-
-        if (callback) callback(thumbnailUrl);
-      };
-      img.onerror = function () {
-        console.error("Error loading image for thumbnail");
-        if (callback) callback(null);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  },
-
   updateAdditionalDocumentGridRowWithDocument: function (docuid, fileInfo) {
     const grid = $("#griAdditionalDocumentsSummary").data("kendoGrid");
     if (!grid) return;
 
-    const dataSource = grid.dataSource;
-    const data = dataSource.data();
+    //const dataSource = grid.dataSource;
+    //const data = dataSource.data();
+    const data = grid.dataSource.data();
     const path = fileInfo.response || fileInfo.name || "";
 
     for (let i = 0; i < data.length; i++) {
       if (data[i].uid === docuid) {
-        data[i].set("DocumentName", fileInfo.name);
+        //data[i].set("DocumentName", fileInfo.name);
+        data[i].set("UploadFile", path);
         data[i].set("DocumentPath", path);
         data[i].set("FileThumbnail", fileInfo.thumbnail || "");
 
@@ -591,7 +602,7 @@ var CRMAdditionalInformationHelper = {
 
   ViewAdditionalDocumentDetails: function (data) {
     // Unified path fallback
-    const rawPath = data.UploadFormFile || data.UploadFormFile || "";
+    const rawPath = data.DocumentPath || data.UploadFile || "";
     if (!rawPath) {
       return '<div style="text-align:center; color:#999; padding:20px; height:100px; display:flex; align-items:center; justify-content:center;">No document uploaded</div>';
     }

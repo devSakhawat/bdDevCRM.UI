@@ -738,29 +738,11 @@ var CRMEducationNEnglishLanguagHelper = {
       { field: "Position", title: "Position", width: "150px" },
       //{ field: "StartDate", title: "Start Date", width: "120px", format: "{0:dd/MM/yyyy}" },
       //{ field: "EndDate", title: "End Date", width: "120px", format: "{0:dd/MM/yyyy}" },
-      {
-        field: "StartDate",
-        title: "Start Date",
-        width: "230px",
-        format: "{0:dd/MMM/yyyy}",
-        editor: CommonManager.datePickerEditor
-      },
-      {
-        field: "EndDate",
-        title: "End Date",
-        width: "230px",
-        format: "{0:dd/MMM/yyyy}",
-        editor: CommonManager.datePickerEditor
-      },
+      {field: "StartDate", title: "Start Date", width: "230px", format: "{0:dd/MMM/yyyy}", editor: CommonManager.datePickerEditor },
+      {field: "EndDate", title: "End Date", width: "230px", format: "{0:dd/MMM/yyyy}", editor: CommonManager.datePickerEditor },
       { field: "Period", title: "Period", width: "100px" },
-      {
-        field: "MainResponsibility",
-        title: "Main Responsibility",
-        width: "250px",
-        editor: CommonManager.textareaEditor
-      },
-      {
-        field: "ScannedCopy",
+      {field: "MainResponsibility", title: "Main Responsibility", width: "250px", editor: CommonManager.textareaEditor },
+      {field: "ScannedCopy",
         title: "Scanned Copy",
         template: "",
         editor: CRMEducationNEnglishLanguagHelper.editorWorkFileUpload,
@@ -780,6 +762,7 @@ var CRMEducationNEnglishLanguagHelper = {
   },
 
   editorWorkFileUpload: function (container, options) {
+    debugger;
     const dataItem = options.model;
     const uid = dataItem.uid;
 
@@ -826,6 +809,7 @@ var CRMEducationNEnglishLanguagHelper = {
   },
 
   handleDirectWorkFileUpload: function (input, docuid) {
+    debugger;
     const file = input.files[0];
     if (!file) return;
 
@@ -900,10 +884,10 @@ var CRMEducationNEnglishLanguagHelper = {
     if (!grid) return;
 
     const data = grid.dataSource.data();
+    const path = fileInfo.response || fileInfo.name || "";
 
     for (let i = 0; i < data.length; i++) {
       if (data[i].uid === docuid) {
-        const path = fileInfo.response || fileInfo.name || "";
 
         data[i].set("ScannedCopy", path);
         data[i].set("ScannedCopyPath", path);
@@ -945,6 +929,7 @@ var CRMEducationNEnglishLanguagHelper = {
   //},
 
   ViewWorkDetails: function (data) {
+    debugger;
     // Unified path fallback
     const rawPath = data.ScannedCopyPath || data.ScannedCopy || "";
     if (!rawPath) {
@@ -979,7 +964,7 @@ var CRMEducationNEnglishLanguagHelper = {
         thumbnailSrc = fullPath; // original image
       }
     } else if (isPdf) {
-      // PDF: যদি PDF thumbnail (server generated) থাকে সেটি; নইলে placeholder
+      // PDF: if the PDF thumbnail from (server generated) then pdf thumnail other wise placeholder
       thumbnailSrc = data.FileThumbnail
         ? (data.FileThumbnail.startsWith("data:") ? data.FileThumbnail
           : (/^(https?:)?\/\//i.test(data.FileThumbnail) ? data.FileThumbnail
@@ -2610,48 +2595,6 @@ var CRMEducationNEnglishLanguagHelper = {
       console.error("Error populating Work Experience:", error);
     }
   },
-
-
-  //populateWorkExperience: function (workExperience) {
-  //  try {
-  //    if (!workExperience || !Array.isArray(workExperience)) return;
-  //    const grid = $("#gridWorkExperience").data("kendoGrid");
-  //    if (!grid) return;
-
-  //    grid.dataSource.data([]);
-
-  //    workExperience.forEach(work => {
-  //      //const path = work.ScannedCopyPath || work.ScannedCopy || "";
-  //      //const name = work.ScannedCopyFileName || work.DocumentName || (path ? path.split("/").pop() : "");
-
-  //      grid.dataSource.add({
-  //        WorkExperienceId: work.WorkExperienceId || 0,
-  //        ApplicantId: work.ApplicantId || 0,
-  //        NameOfEmployer: work.NameOfEmployer || "",
-  //        Position: work.Position || "",
-  //        StartDate: work.StartDate ? new Date(work.StartDate) : null,
-  //        EndDate: work.EndDate ? new Date(work.EndDate) : null,
-  //        Period: work.Period || "",
-  //        MainResponsibility: work.MainResponsibility || "",
-
-  //        // Map server fields correctly
-  //        ScannedCopyPath: work.ScannedCopyPath || "",
-  //        ScannedCopyFileName: work.ScannedCopyFileName || "",
-
-  //        // Keep backward compat and View template fallback
-  //        ScannedCopy:  work.ScannedCopy || "",
-
-  //        DocumentName: work.DocumentName || "",
-  //        FileThumbnail: work.FileThumbnail || ""
-  //      });
-  //    });
-
-  //    console.log("Work Experience populated:", workExperience.length, "records");
-  //  } catch (error) {
-  //    console.error("Error populating Work Experience:", error);
-  //  }
-  //},
-
 
 }
 

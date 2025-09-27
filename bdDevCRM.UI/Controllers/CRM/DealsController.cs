@@ -6,14 +6,14 @@ namespace bdDevCRM.UI.Controllers.CRM
   {
     public IActionResult Index()
     {
-      return View();
+      return View("CRM/Deals/Deals");
     }
 
 
 
     public IActionResult Deals()
     {
-      return View("Deals/Deals");
+      return View("Views/CRM/Deals/Deals.cshtml");
     }
   }
 }

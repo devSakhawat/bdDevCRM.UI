@@ -52,7 +52,6 @@ var CRMAdditionalInformationManager = {
     return true;
   },
 
-
   generateAdditionalDocumentThumbnail: function (file, docuid, callback) {
     if (!file) {
       if (callback) callback(null);
@@ -435,23 +434,6 @@ var CRMAdditionalInformationHelper = {
      Additional Documents Grid File Upload Methods
   =========================================================*/
 
-  //editorAdditionalDocumentFileUpload: function (data) {
-  //  if (data.UploadFile && data.DocumentName) {
-  //    return '<div class="document-info">' +
-  //      '<span class="document-name" title="' + data.DocumentName + '">' +
-  //      (data.DocumentName.length > 20 ? data.DocumentName.substring(0, 20) + '...' : data.DocumentName) +
-  //      '</span><br/>' +
-  //      '<input type="file" accept=".pdf,.zip" class="k-button form-control" ' +
-  //      'onchange="CRMAdditionalInformationHelper.handleDirectAdditionalDocumentFileUpload(this, \'' + data.uid + '\')" ' +
-  //      'title="Replace document"/>' +
-  //      '</div>';
-  //  } else {
-  //    return '<input type="file" accept=".pdf,.zip" value="Select PDF/ZIP file" class="k-button form-control" ' +
-  //      'onchange="CRMAdditionalInformationHelper.handleDirectAdditionalDocumentFileUpload(this, \'' + data.uid + '\')" ' +
-  //      'title="Upload PDF or ZIP document"/>';
-  //  }
-  //},
-
   editorAdditionalDocumentFileUpload: function (container, options) {
     debugger;
     const dataItem = options.model;
@@ -678,33 +660,80 @@ var CRMAdditionalInformationHelper = {
      Radio Button Event Handling
   =========================================================*/
   bindRadioButtonEvents: function () {
-    // Accommodation radio buttons
-    $("input[name='requireAccommodation']").on("change", function () {
+    // Use correct name (case-sensitive)
+    $("input[name='RequireAccommodation']").on("change", function () {
       CRMAdditionalInformationHelper.handleAccommodationChange();
     });
 
-    // Health & Medical Needs radio buttons
     $("input[name='HealthNMedicalNeeds']").on("change", function () {
       CRMAdditionalInformationHelper.handleHealthMedicalNeedsChange();
     });
+
+    // Initialize state if pre-selected
+    $("input[name='RequireAccommodation']:checked").trigger("change");
+    $("input[name='HealthNMedicalNeeds']:checked").trigger("change");
   },
 
   handleAccommodationChange: function () {
-    const selectedValue = $("input[name='requireAccommodation']:checked").val();
+    const selectedValue = $("input[name='RequireAccommodation']:checked").val(); // "true" | "false"
     console.log("Accommodation requirement changed:", selectedValue);
-    // Add any specific logic for accommodation selection
   },
 
   handleHealthMedicalNeedsChange: function () {
-    const selectedValue = $("input[name='HealthNMedicalNeeds']:checked").val();
+    const selectedValue = $("input[name='HealthNMedicalNeeds']:checked").val(); // "true" | "false"
     const remarksField = $("#txtHealthNMedicalNeedsRemarks");
-
-    if (selectedValue === "Yes") {
+    if (selectedValue === "true") {
       remarksField.prop("disabled", false).focus();
-    } else if (selectedValue === "No") {
+    } else if (selectedValue === "false") {
       remarksField.prop("disabled", true).val("");
     }
   },
+
+  handleAccommodationChange: function () {
+    const selectedValue = $("input[name='RequireAccommodation']:checked").val(); // "true" | "false"
+    console.log("Accommodation requirement changed:", selectedValue);
+  },
+
+  handleHealthMedicalNeedsChange: function () {
+    const selectedValue = $("input[name='HealthNMedicalNeeds']:checked").val(); // "true" | "false"
+    const remarksField = $("#txtHealthNMedicalNeedsRemarks");
+    if (selectedValue === "true") {
+      remarksField.prop("disabled", false).focus();
+    } else if (selectedValue === "false") {
+      remarksField.prop("disabled", true).val("");
+    }
+  },
+
+
+
+  //bindRadioButtonEvents: function () {
+  //  // Accommodation radio buttons
+  //  $("input[name='requireAccommodation']").on("change", function () {
+  //    CRMAdditionalInformationHelper.handleAccommodationChange();
+  //  });
+
+  //  // Health & Medical Needs radio buttons
+  //  $("input[name='HealthNMedicalNeeds']").on("change", function () {
+  //    CRMAdditionalInformationHelper.handleHealthMedicalNeedsChange();
+  //  });
+  //},
+
+  //handleAccommodationChange: function () {
+  //  const selectedValue = $("input[name='requireAccommodation']:checked").val();
+  //  console.log("Accommodation requirement changed:", selectedValue);
+  //  // Add any specific logic for accommodation selection
+  //},
+
+  //handleHealthMedicalNeedsChange: function () {
+  //  const selectedValue = $("input[name='HealthNMedicalNeeds']:checked").val();
+  //  const remarksField = $("#txtHealthNMedicalNeedsRemarks");
+
+  //  if (selectedValue === "Yes") {
+  //    remarksField.prop("disabled", false).focus();
+  //  } else if (selectedValue === "No") {
+  //    remarksField.prop("disabled", true).val("");
+  //  }
+  //},
 
   /* =========================================================
      Form Clearing Methods
@@ -770,11 +799,9 @@ var CRMAdditionalInformationHelper = {
 
   clearAdditionalInformationFields: function () {
     try {
-      // Clear radio buttons
-      $("input[name='requireAccommodation']").prop("checked", false);
+      $("input[name='RequireAccommodation']").prop("checked", false);
       $("input[name='HealthNMedicalNeeds']").prop("checked", false);
 
-      // Clear text areas
       $("#txtHealthNMedicalNeedsRemarks").val("").prop("disabled", false);
       $("#txtAdditionalInformationRemarks").val("");
 
@@ -783,6 +810,22 @@ var CRMAdditionalInformationHelper = {
       console.error("Error clearing Additional Information fields:", error);
     }
   },
+
+  //clearAdditionalInformationFields: function () {
+  //  try {
+  //    // Clear radio buttons
+  //    $("input[name='requireAccommodation']").prop("checked", false);
+  //    $("input[name='HealthNMedicalNeeds']").prop("checked", false);
+
+  //    // Clear text areas
+  //    $("#txtHealthNMedicalNeedsRemarks").val("").prop("disabled", false);
+  //    $("#txtAdditionalInformationRemarks").val("");
+
+  //    console.log("Additional Information fields cleared");
+  //  } catch (error) {
+  //    console.error("Error clearing Additional Information fields:", error);
+  //  }
+  //},
 
   clearAdditionalDocumentsGrid: function () {
     try {
@@ -885,17 +928,25 @@ var CRMAdditionalInformationHelper = {
 
   createAdditionalInfoObject: function () {
     try {
-      return {
-        RequireAccommodation: $("input[name='requireAccommodation']:checked").val() || "",
-        HealthNMedicalNeeds: $("input[name='HealthNMedicalNeeds']:checked").val() || "",
+      var objAddtionalInfo = {
+        AdditionalInfoId: parseInt($("#hdnAdditionalInfoId").val()) || 0,
+        ApplicantId: parseInt($("#hdnApplicantId").val()) || 0,
+
+        // convert string "true"/"false" → boolean
+        RequireAccommodation: $("input[name='RequireAccommodation']:checked").val() === "true",
+        HealthNMedicalNeeds: $("input[name='HealthNMedicalNeeds']:checked").val() === "true",
+
         HealthNMedicalNeedsRemarks: $("#txtHealthNMedicalNeedsRemarks").val(),
         AdditionalInformationRemarks: $("#txtAdditionalInformationRemarks").val()
-      };
+      }
+      return objAddtionalInfo;
+
     } catch (error) {
       console.error("Error creating Additional Info object:", error);
       return {};
     }
   },
+
 
   createAdditionalDocumentsObject: function () {
     try {
@@ -956,21 +1007,20 @@ var CRMAdditionalInformationHelper = {
     }
   },
 
+
   validateAdditionalInformationForm: function () {
     try {
       console.log("=== Validating Additional Information Form ===");
-
       const validationErrors = [];
 
-      // Validate Reference Details (at least one reference should be provided)
       const grid = $("#gridAdditionalReferenceSummary").data("kendoGrid");
       if (grid && grid.dataSource.data().length === 0) {
         validationErrors.push("At least one reference is required");
       }
 
-      // Validate Health & Medical Needs remarks if Yes is selected
+      // Check for "true" instead of "Yes"
       const healthNeedsSelected = $("input[name='HealthNMedicalNeeds']:checked").val();
-      if (healthNeedsSelected === "Yes" && !$("#txtHealthNMedicalNeedsRemarks").val().trim()) {
+      if (healthNeedsSelected === "true" && !$("#txtHealthNMedicalNeedsRemarks").val().trim()) {
         validationErrors.push("Please provide details for Health & Medical Needs");
       }
 
@@ -997,12 +1047,11 @@ var CRMAdditionalInformationHelper = {
     try {
       console.log("=== Filling Additional Information Demo Data ===");
 
-      // Fill Statement of Purpose
       $("#txtStatementOfPurposeRemarks").val("I am applying for this program to advance my career in software development and gain expertise in modern technologies. This course aligns perfectly with my professional goals and will help me contribute more effectively to my field.");
 
-      // Fill Additional Information
-      $("input[name='requireAccommodation'][value='No']").prop("checked", true);
-      $("input[name='HealthNMedicalNeeds'][value='No']").prop("checked", true);
+      // Use correct names and boolean string values
+      $("input[name='RequireAccommodation'][value='false']").prop("checked", true).trigger("change");
+      $("input[name='HealthNMedicalNeeds'][value='false']").prop("checked", true).trigger("change");
       $("#txtAdditionalInformationRemarks").val("I am excited about this opportunity and believe I will be a valuable addition to the program.");
 
       console.log("Additional Information demo data filled successfully");
@@ -1018,8 +1067,69 @@ var CRMAdditionalInformationHelper = {
     }
   },
 
-  /* -------- Populate Additional Information Tab -------- */
-/* -------- Populate Additional Information Tab -------- */
+  //validateAdditionalInformationForm: function () {
+  //  try {
+  //    console.log("=== Validating Additional Information Form ===");
+
+  //    const validationErrors = [];
+
+  //    // Validate Reference Details (at least one reference should be provided)
+  //    const grid = $("#gridAdditionalReferenceSummary").data("kendoGrid");
+  //    if (grid && grid.dataSource.data().length === 0) {
+  //      validationErrors.push("At least one reference is required");
+  //    }
+
+  //    // Validate Health & Medical Needs remarks if Yes is selected
+  //    const healthNeedsSelected = $("input[name='HealthNMedicalNeeds']:checked").val();
+  //    if (healthNeedsSelected === "Yes" && !$("#txtHealthNMedicalNeedsRemarks").val().trim()) {
+  //      validationErrors.push("Please provide details for Health & Medical Needs");
+  //    }
+
+  //    if (validationErrors.length === 0) {
+  //      console.log("Additional Information form validation passed successfully");
+  //      if (typeof ToastrMessage !== "undefined") {
+  //        ToastrMessage.showSuccess("Additional Information form validation passed successfully!", "Validation Success", 3000);
+  //      }
+  //      return true;
+  //    } else {
+  //      console.log("Additional Information form validation failed:", validationErrors);
+  //      if (typeof ToastrMessage !== "undefined") {
+  //        ToastrMessage.showError("Additional Information form validation failed. Check console for details.", "Validation Error", 0);
+  //      }
+  //      return false;
+  //    }
+  //  } catch (error) {
+  //    console.error("Error validating Additional Information form:", error);
+  //    return false;
+  //  }
+  //},
+
+  //fillAdditionalInfoDemoData: function () {
+  //  try {
+  //    console.log("=== Filling Additional Information Demo Data ===");
+
+  //    // Fill Statement of Purpose
+  //    $("#txtStatementOfPurposeRemarks").val("I am applying for this program to advance my career in software development and gain expertise in modern technologies. This course aligns perfectly with my professional goals and will help me contribute more effectively to my field.");
+
+  //    // Fill Additional Information
+  //    $("input[name='requireAccommodation'][value='No']").prop("checked", true);
+  //    $("input[name='HealthNMedicalNeeds'][value='No']").prop("checked", true);
+  //    $("#txtAdditionalInformationRemarks").val("I am excited about this opportunity and believe I will be a valuable addition to the program.");
+
+  //    console.log("Additional Information demo data filled successfully");
+  //    if (typeof ToastrMessage !== "undefined") {
+  //      ToastrMessage.showSuccess("Additional Information demo data filled successfully!", "Demo Data", 3000);
+  //    }
+
+  //  } catch (error) {
+  //    console.error("Error filling Additional Information demo data:", error);
+  //    if (typeof ToastrMessage !== "undefined") {
+  //      ToastrMessage.showError("Error filling Additional Information demo data: " + error.message, "Demo Data Error", 0);
+  //    }
+  //  }
+  //},
+
+
 /* -------- Populate Additional Information Tab -------- */
   populateAdditionalInformation: function (applicationData) {
     try {
@@ -1031,13 +1141,18 @@ var CRMAdditionalInformationHelper = {
       }
 
       // Populate Statement of Purpose
-      if (applicationData.StatementOfPurpose) {
-        this.populateStatementOfPurpose(applicationData.StatementOfPurpose);
+      if (applicationData != null && applicationData != undefined ) {
+        this.populateStatementOfPurpose(applicationData);
       }
 
       // Populate Additional Information Fields
-      if (applicationData.AdditionalInformation) {
-        this.populateAdditionalInfoFields(applicationData.AdditionalInformation);
+      if (applicationData) {
+        this.populateAdditionalInfoFields(applicationData);
+      }
+
+      // Populate Additional Documents
+      if (applicationData.AdditionalDocuments != null && applicationData.AdditionalDocuments.length > 0) {
+        this.populateWorkExperience(educationData.WorkExperienceHistories);
       }
 
       console.log("Additional Information populated successfully");
@@ -1119,17 +1234,16 @@ var CRMAdditionalInformationHelper = {
     try {
       if (!additionalInfo) return;
 
-      // Populate Accommodation requirement
-      if (additionalInfo.RequireAccommodation) {
+      $("#hdnAdditionalInfoId").val(additionalInfo.AdditionalInfoId || 0);
+
+      // Populate Accommodation requirement (convert bool → "true"/"false")
+      if (typeof additionalInfo.RequireAccommodation === "boolean") {
         $(`input[name='RequireAccommodation'][value='${additionalInfo.RequireAccommodation}']`).prop("checked", true);
       }
 
-      // Populate Health & Medical Needs
-      if (additionalInfo.HealthNMedicalNeeds) {
-        $(`input[name='HealthNMedicalNeeds'][value='${additionalInfo.HealthNMedicalNeeds}']`).prop("checked", true);
-
-        // Trigger change event to enable/disable remarks field
-        $(`input[name='HealthNMedicalNeeds'][value='${additionalInfo.HealthNMedicalNeeds}']`).trigger("change");
+      // Populate Health & Medical Needs (convert bool → "true"/"false")
+      if (typeof additionalInfo.HealthNMedicalNeeds === "boolean") {
+        $(`input[name='HealthNMedicalNeeds'][value='${additionalInfo.HealthNMedicalNeeds}']`).prop("checked", true).trigger("change"); // trigger only when set
       }
 
       // Populate Health & Medical Needs Remarks
@@ -1142,9 +1256,7 @@ var CRMAdditionalInformationHelper = {
     } catch (error) {
       console.error("Error populating Additional Information fields:", error);
     }
-  }
-
-
+  },
 
 
 

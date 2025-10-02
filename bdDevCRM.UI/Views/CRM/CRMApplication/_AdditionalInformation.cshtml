@@ -54,45 +54,33 @@
 	</fieldset>
 
 	<!-- Additional Information Detials -->
-@* 	<fieldset class="reset">
-		<legend class="reset">Additional Information</legend> *@
 	<fieldset class="border p-3 fieldsetCommon mt-5">
 		<legend class="legendCommon topAfterDiv_Backgorup">Additional Information</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnAdditionalInfoId" value="0" />
 			<!-- Do you require Accommodation  -->
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2 custom-checkbox">
 				<span class="me-5">Do you require Accommodation</span>
 
-				<input name="RequireAccommodation" type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">Yes</label>
+				<input id="RequireAccommodation_True" name="RequireAccommodation" value="true" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="RequireAccommodation_True">Yes</label>
 
-				<input name="RequireAccommodation" type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">No</label>
+				<input id="RequireAccommodation_False" name="RequireAccommodation" value="false" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="RequireAccommodation_False" >No</label>
 			</div>
 
-
-
-
-			@* <input id="radioIsPassportYes" name="ValidPassport" type="radio" class="form-check-input inputRadio" />
-			<label class="lbl">Yes</label>
-			<input id="radioIsPassportNo" name="ValidPassport" type="radio" class="form-check-input inputRadio" />
-			<label class="lbl">No</label> *@
-
-
+			<!-- Health & medical Needs.  -->
 			<h4 class="" k-header mb-2">Health & medical Needs.</h4>
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2 custom-checkbox">
 				<span class="me-5">Do you suffer from any health or medical needs which requires additional support to be provided by the institutions to which you have made an application? By providing such information early the institution may be able to make special arrangements.</span>
 
-				<input name="HealthNMedicalNeeds" type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">Yes</label>
+				<input name="HealthNMedicalNeeds" value="true" id="HealthNMedicalNeeds_True" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="HealthNMedicalNeeds_True">Yes</label>
 
-				<input name="HealthNMedicalNeeds" type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">No</label>
+				<input name="HealthNMedicalNeeds" value="false" id="HealthNMedicalNeeds_False" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="HealthNMedicalNeeds_False" >No</label>
 			</div>
-
-
-
 
 			<!-- Health & medical Needs -->
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
@@ -114,8 +102,6 @@
 	</fieldset>
 
 	<!-- Additional Documents -->
-	@* <fieldset class="reset">
-		<legend class="reset">Additional Documents</legend> *@
 	<fieldset class="border p-3 fieldsetCommon mt-5">
 		<legend class="legendCommon topAfterDiv_Backgorup">Additional Documents</legend>
 		<div class="row">

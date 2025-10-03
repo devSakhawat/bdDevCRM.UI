@@ -289,7 +289,27 @@ var CRMApplicationManager = {
         ToastrMessage.showError("Error filling complete application demo data: " + error.message, "Demo Data Error", 0);
       }
     }
-  }
+  },
+
+  // Replace old GetStatusByMenuUser with this async version
+  getStatusByMenuUser: async function () {
+    try {
+      const serviceUrl = "/crm-application-status";
+      const res = await VanillaApiCallManager.get(baseApi, serviceUrl);
+
+      if (res && res.IsSuccess === true && Array.isArray(res.Data)) {
+        return res.Data; // expects [{ WFStateId, StateName }, ...]
+      }
+      return [];
+    } catch (err) {
+      console.error("Error loading status by menu user:", err);
+      if (typeof VanillaApiCallManager !== "undefined") {
+        VanillaApiCallManager.handleApiError(err);
+      }
+      return [];
+    }
+  },
+
 };
 
 
@@ -325,8 +345,40 @@ var CRMApplicationHelper = {
     }
   },
 
-  /* -------- CRM Application Grid -------- */
+  /*********************** Common Function Start ***********************************************/
+  // Rewrite to use CRMApplicationManager and Kendo safely
+  populateStatusByMenuUser: async function (elementSelector = "#cmbStatus") {
+    try {
+      const $el = $(elementSelector);
+      if (!$el.length) return;
 
+      // fetch data
+      const data = await CRMApplicationManager.getStatusByMenuUser();
+
+      // destroy previous widget if any
+      const existing = $el.data("kendoDropDownList");
+      if (existing) { existing.destroy(); $el.off(); }
+
+      // init kendo dropdown
+      $el.kendoDropDownList({
+        optionLabel: "Select Status",
+        dataTextField: "StateName",
+        dataValueField: "WFStateId",
+        dataSource: data,
+        filter: "contains",
+        suggest: true
+      });
+    } catch (err) {
+      console.error("Error populating status dropdown:", err);
+      if (typeof VanillaApiCallManager !== "undefined") {
+        VanillaApiCallManager.handleApiError(err);
+      }
+    }
+  },
+
+  /*********************** Common Function End ***********************************************/
+
+  /* -------- CRM Application Grid -------- */
   initCrmApplicationSummary: function () {
     this.initializeSummaryGrid();
     this.setGridDataSource();
@@ -342,7 +394,9 @@ var CRMApplicationHelper = {
         { template: '<button type="button" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base" onclick="CRMApplicationHelper.showForm();"><span class="k-button-text"> + Create New </span></button>' },
         { name: "excel" },
         { name: "pdf" },
-        { template: '<button type="button" id="btnExportApplicationCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
+        { template: '<button type="button" id="btnExportApplicationCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' },
+        // NEW: toolbar right side status dropdown host ( right side by using Bootstrap utility)
+        { template: '<div class="ms-auto d-flex align-items-center" style="gap:8px;"><label class="fw-semibold">Status:</label><input id="cmbStatusToolbar" style="width: 240px;" /></div>' }
       ],
       excel: {
         fileName: "Application_List_" + Date.now() + ".xlsx",
@@ -393,6 +447,21 @@ var CRMApplicationHelper = {
     $("#btnExportApplicationCsv").on("click", function () {
       CommonManager.GenerateCSVFileAllPages("gridSummaryCrmApplication", "Application", "Actions");
     });
+
+    // NEW: Initialize Status dropdown inside toolbar and wire change → reload grid
+    (async function () {
+      await CRMApplicationHelper.populateStatusByMenuUser("#cmbStatusToolbar");
+      const dd = $("#cmbStatusToolbar").data("kendoDropDownList");
+      if (dd) {
+        dd.bind("change", function () {
+          const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
+          const statusId = dd.value() || 0;
+          if (grid) {
+            grid.dataSource.read({ StatusId: statusId });
+          }
+        });
+      }
+    })();
   },
 
   setGridDataSource: function () {
@@ -417,6 +486,11 @@ var CRMApplicationHelper = {
       });
 
       grid.setDataSource(ds);
+
+      // NEW: first load with current toolbar status (if any)
+      const dd = $("#cmbStatusToolbar").data("kendoDropDownList");
+      const statusId = dd ? (dd.value() || 0) : 0;
+      ds.read({ StatusId: statusId });
     }
   },
 

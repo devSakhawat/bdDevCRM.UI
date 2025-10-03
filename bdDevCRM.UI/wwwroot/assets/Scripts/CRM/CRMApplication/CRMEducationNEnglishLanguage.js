@@ -281,21 +281,6 @@ var CRMEducationNEnglishLanguagHelper = {
 
     // Initialize Kendo Windows with controlled height
     CommonManager.initializeKendoWindow("#windDocumentPhotoUpload", "Upload Document", "60%");
-
-    // Fixed preview window height instead of full PDF size
-    //if (!$("#previewWindow").data("kendoWindow")) {
-    //  $("#previewWindow").kendoWindow({
-    //    width: "80%",
-    //    height: "600px", // Fixed height instead of 80vh
-    //    title: "Document Preview",
-    //    modal: true,
-    //    visible: false,
-    //    close: function () {
-    //      // Clean up any blob URLs
-    //      PreviewManger.cleanupPreviewResources();
-    //    }
-    //  });
-    //}
   },
 
   initializeEducationSummaryGrid: function () {
@@ -414,25 +399,6 @@ var CRMEducationNEnglishLanguagHelper = {
       .attr("onchange", 'CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, "' + uid + '")')
       .appendTo(wrapper);
   },
-
-  //editorFileUpload: function (data) {
-  //  // If document is already uploaded, show document name
-  //  if (data.AttachedDocument && data.DocumentName) {
-  //    return '<div class="document-info">' +
-  //      '<span class="document-name" title="' + data.DocumentName + '">' +
-  //      (data.DocumentName.length > 20 ? data.DocumentName.substring(0, 20) + '...' : data.DocumentName) +
-  //      '</span><br/>' +
-  //      '<input type="file" accept=".pdf" class="k-button form-control" ' +
-  //      'onchange="CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, \'' + data.uid + '\')" ' +
-  //      'title="Replace document"/>' +
-  //      '</div>';
-  //  } else {
-  //    // If no document uploaded, show file input
-  //    return '<input type="file" accept=".pdf" value="Select PDF file" class="k-button form-control" ' +
-  //      'onchange="CRMEducationNEnglishLanguagHelper.handleDirectFileUpload(this, \'' + data.uid + '\')" ' +
-  //      'title="Upload PDF document only"/>';
-  //  }
-  //},
 
   ViewDetails: function (data) {
     debugger;
@@ -642,49 +608,10 @@ var CRMEducationNEnglishLanguagHelper = {
               style="border: none;">
           </iframe>
       `);
-
-    //const file = await PreviewManger.createFileFromUrl(fullUrl, fileName, mimeType);
-    //if (!file) return;
-
-    //const reader = new FileReader();
-    //reader.onload = function (e) {
-    //  const blob = new Blob([e.target.result], { type: mimeType });
-    //  const url = URL.createObjectURL(blob);
-
-    //  if (!$("#previewWindow").data("kendoWindow")) {
-    //    $("#previewWindow").kendoWindow({
-    //      width: "80%",
-    //      height: "80vh",
-    //      title: "Preview",
-    //      modal: true,
-    //      visible: false,
-    //      close: function () {
-    //        $("#preview").empty();
-    //      }
-    //    });
-    //  }
-
-    //  $("#previewWindow").data("kendoWindow").center().open();
-
-    //  if (mimeType === "application/pdf") {
-    //    $("#preview").kendoPDFViewer({
-    //      pdfjsProcessing: { file: url },
-    //      width: "100%",
-    //      height: "100%",
-    //      toolbar: {
-    //        items: ["pager", "spacer", "zoomIn", "zoomOut", "toggleSelection", "download"]
-    //      }
-    //    });
-    //  } else {
-    //    $("#preview").html(`<img src="${url}" style="width:100%; height:auto;" />`);
-    //  }
-    //};
-
-    //reader.readAsArrayBuffer(file);
   },
 
   initializeWorkExperienceGrid: function () {
-    const gridOption = {
+    const gridOption = { 
       dataSource: new kendo.data.DataSource({
         data: [],
         schema: {
@@ -906,30 +833,7 @@ var CRMEducationNEnglishLanguagHelper = {
     grid.refresh();
   },
 
-  //ViewWorkDetails: function (data) {
-  //  const path = data.ScannedCopyPath || "";
-  //  if (path) {
-  //    const fileName =
-  //      data.ScannedCopyFileName ||
-  //      data.DocumentName ||
-  //      path.split("/").pop();
-
-  //    const thumbnailSrc = data.FileThumbnail ||
-  //      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
-
-  //    return '<div class="document-preview" style="height: 100px; width: auto; text-align: center;">' +
-  //      '<img src="' + thumbnailSrc + '" alt="File" style="height: 100px; width: auto; cursor: pointer; border: 1px solid #ddd; border-radius: 4px;" ' +
-  //      'onclick="CRMEducationNEnglishLanguagHelper.openWorkDocumentPreview(\'' + path + '\', \'' + data.uid + '\', \'' + fileName + '\')" ' +
-  //      'title="Click to preview: ' + fileName + '"/>' +
-  //      '<div style="font-size: 12px; text-align: center; margin-top: 5px; color: #666;">' + fileName + '</div>' +
-  //      '</div>';
-  //  } else {
-  //    return '<div style="text-align: center; color: #999; padding: 20px; height: 100px; display: flex; align-items: center; justify-content: center;">No document uploaded</div>';
-  //  }
-  //},
-
   ViewWorkDetails: function (data) {
-    debugger;
     // Unified path fallback
     const rawPath = data.ScannedCopyPath || data.ScannedCopy || "";
     if (!rawPath) {
@@ -1007,28 +911,6 @@ var CRMEducationNEnglishLanguagHelper = {
       window.open(resolvedPath, '_blank');
     }
   },
-
-
-  //openWorkDocumentPreview: function (documentPath, docuid, fileName) {
-  //  if (!documentPath) {
-  //    CommonManager.MsgBox('warning', 'center', 'Document Missing', 'No document available for preview.', [
-  //      { addClass: 'btn btn-primary', text: 'OK', onClick: ($noty) => $noty.close() }
-  //    ], 0);
-  //    return;
-  //  }
-
-  //  try {
-  //    const fileData = workExperienceFileData[docuid];
-  //    if (fileData) {
-  //      PreviewManger.previewFileBlob(fileData, fileName);
-  //    } else {
-  //      PreviewManger.openPreview(documentPath, fileName);
-  //    }
-  //  } catch (error) {
-  //    console.error("Error opening work document preview:", error);
-  //    window.open(documentPath, '_blank');
-  //  }
-  //},
 
   /* =========================================================
    Form Clearing and Data Object Creation Methods
@@ -1366,7 +1248,6 @@ var CRMEducationNEnglishLanguagHelper = {
     });
   },
 
-
   /* ------ Utility Method to Convert File Input to View Button ------ */
   convertToViewButton: function (selector, testType, clickHandler) {
     const $element = $(selector);
@@ -1697,68 +1578,6 @@ var CRMEducationNEnglishLanguagHelper = {
       window.open(documentPath, '_blank');
     }
   },
-
-  //viewIELTSDocument: function () {
-  //  if (ieltsFileData) {
-  //    if (typeof PreviewManger !== "undefined") {
-  //      PreviewManger.previewFileBlob(ieltsFileData, ieltsFileData.name);
-  //    } else {
-  //      alert("Preview functionality is not available");
-  //    }
-  //  } else {
-  //    alert("No IELTS document uploaded");
-  //  }
-  //},
-
-  //viewTOEFLDocument: function () {
-  //  if (toeflFileData) {
-  //    if (typeof PreviewManger !== "undefined") {
-  //      PreviewManger.previewFileBlob(toeflFileData, toeflFileData.name);
-  //    } else {
-  //      alert("Preview functionality is not available");
-  //    }
-  //  } else {
-  //    alert("No TOEFL document uploaded");
-  //  }
-  //},
-
-  //viewPTEDocument: function () {
-  //  if (pteFileData) {
-  //    if (typeof PreviewManger !== "undefined") {
-  //      PreviewManger.previewFileBlob(pteFileData, pteFileData.name);
-  //    } else {
-  //      alert("Preview functionality is not available");
-  //    }
-  //  } else {
-  //    alert("No PTE document uploaded");
-  //  }
-  //},
-
-  //viewGMATDocument: function () {
-  //  if (gmatFileData) {
-  //    if (typeof PreviewManger !== "undefined") {
-  //      PreviewManger.previewFileBlob(gmatFileData, gmatFileData.name);
-  //    } else {
-  //      alert("Preview functionality is not available");
-  //    }
-  //  } else {
-  //    alert("No GMAT document uploaded");
-  //  }
-  //},
-
-  //viewOTHERSDocument: function () {
-  //  if (othersFileData) {
-  //    if (typeof PreviewManger !== "undefined") {
-  //      PreviewManger.previewFileBlob(othersFileData, othersFileData.name);
-  //    } else {
-  //      alert("Preview functionality is not available");
-  //    }
-  //  } else {
-  //    alert("No OTHERS document uploaded");
-  //  }
-  //},
-
-
 
   /* ------ Data Object Creation Methods ------ */
   createEducationNEnglishLanguageInformation: function () {
@@ -2271,7 +2090,6 @@ var CRMEducationNEnglishLanguagHelper = {
   fillOTHERSDemoData: function () {
     $("#txtAdditionalInformation").val("Demo additional information for other language certifications or entrance exams");
   },
-
 
   /* -------- Populate Education Information Tab -------- */
   populateEducationInformation: function (educationData) {

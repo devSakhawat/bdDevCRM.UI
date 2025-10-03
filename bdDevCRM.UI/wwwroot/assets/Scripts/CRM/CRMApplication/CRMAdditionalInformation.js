@@ -247,7 +247,75 @@ var CRMAdditionalInformationHelper = {
     ];
   },
 
+
+  initializeSummaryGrid: function () {
+    var Columns = this.generateColumns();
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(this.generateColumns());
+    var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
+
+    const gridOptions = {
+      toolbar: [
+        { template: '<button type="button" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base" onclick="CRMApplicationHelper.showForm();"><span class="k-button-text"> + Create New </span></button>' },
+        { name: "excel" },
+        { name: "pdf" },
+        { template: '<button type="button" id="btnExportApplicationCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
+      ],
+      excel: {
+        fileName: "Application_List_" + Date.now() + ".xlsx",
+        filterable: true,
+        allPages: true,
+        columnInfo: true,
+      },
+      pdf: {
+        fileName: "Application_List_" + Date.now() + ".pdf",
+        allPages: true,
+        paperSize: "A4",
+        landscape: true,
+        margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
+        scale: 0.9,
+        repeatHeaders: true,
+      },
+      dataSource: [],
+      autoBind: true,
+      navigatable: true,
+      scrollable: true,
+      resizable: true,
+      width: gridWidth,
+      filterable: true,
+      sortable: true,
+      pageable: {
+        refresh: true,
+        pageSizes: [10, 50, 100, 500, 1000],
+        buttonCount: 5,
+        input: false,
+        numeric: true,
+        serverPaging: true,
+        serverFiltering: true,
+        serverSorting: true
+      },
+      columns: Columns,
+      editable: false,
+      /*selectable: "row",*/
+      selectable: true,
+      error: function (e) {
+        VanillaApiCallManager.handleApiError(error);
+      }
+    };
+
+    // Initialize the Kendo Grid
+    $("#gridSummaryCrmApplication").kendoGrid(gridOptions);
+
+    // CSV Export button event
+    $("#btnExportApplicationCsv").on("click", function () {
+      CommonManager.GenerateCSVFileAllPages("gridSummaryCrmApplication", "Application", "Actions");
+    });
+  },
+
   initializeAdditionalDocumentsSummaryGrid: function () {
+    var Columns = this.generateAdditionalDocumentsSummaryColumn();
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(this.generateAdditionalDocumentsSummaryColumn());
+    var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
+
     const gridOption = {
       dataSource: new kendo.data.DataSource({
         data: [],
@@ -269,9 +337,11 @@ var CRMAdditionalInformationHelper = {
       toolbar: ["create"],
       scrollable: true,
       resizable: true,
-      width: "400px",
-      columns: CRMAdditionalInformationHelper.generateAdditionalDocumentsSummaryColumn(),
-      editable: { model: "inline" },
+      width: gridWidth,
+      columns: Columns,
+      //width: "400px",
+      //columns: CRMAdditionalInformationHelper.generateAdditionalDocumentsSummaryColumn(),
+      editable: { mode: "inline" },
       navigatable: true,
       selectable: true,
     };
@@ -283,17 +353,9 @@ var CRMAdditionalInformationHelper = {
     return [
       { field: "AdditionalDocumentId", title: "AdditionalDocumentId", hidden: true },
       { field: "ApplicantId", title: "ApplicantId", hidden: true },
-      { field: "DocumentPath", title: "DocumentPath", hidden: true },
-
       { field: "DocumentTitle", title: "Document Title", width: "300px" },
       { field: "DocumentName", title: "Document Name", width: "300px" },
-      //{
-      //  field: "UploadFile",
-      //  title: "Upload Document",
-      //  template: '#= CRMAdditionalInformationHelper.editorAdditionalDocumentFileUpload(data) #',
-      //  filterable: false,
-      //  width: "200px"
-      //},
+      { field: "DocumentPath", title: "DocumentPath", hidden: true },
       {
         field: "UploadFile",
         title: "Upload Document",
@@ -310,7 +372,6 @@ var CRMAdditionalInformationHelper = {
         filterable: false,
         width: "200px"
       },
-      //{ command: "destroy", title: "Action", width: "100px" }
       { command: ["edit", "destroy"], title: "Action", width: "180px" }
     ];
   },
@@ -483,60 +544,6 @@ var CRMAdditionalInformationHelper = {
     });
   },
 
-  //generateAdditionalDocumentThumbnail: function (file, docuid, callback) {
-  //  if (!file) {
-  //    if (callback) callback(null);
-  //    return;
-  //  }
-
-  //  // Handle different file types
-  //  if (file.type === 'application/pdf') {
-  //    // Use PDF thumbnail generation (if PDF.js is available)
-  //    this.generatePdfThumbnail(file, callback);
-  //  } else if (file.type.includes('zip')) {
-  //    // Use ZIP icon for ZIP files
-  //    const zipIcon = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+WklQPC90ZXh0Pgo8L3N2Zz4K';
-  //    if (callback) callback(zipIcon);
-  //  } else {
-  //    if (callback) callback(null);
-  //  }
-  //},
-
-
-  //generatePdfThumbnail: function (file, callback) {
-  //  const reader = new FileReader();
-  //  reader.onload = function () {
-  //    const typedArray = new Uint8Array(this.result);
-
-  //    if (typeof pdfjsLib !== 'undefined') {
-  //      pdfjsLib.getDocument(typedArray).promise.then(pdf => {
-  //        pdf.getPage(1).then(page => {
-  //          const canvas = document.createElement("canvas");
-  //          const context = canvas.getContext("2d");
-  //          const scale = 100 / page.getViewport({ scale: 1 }).height;
-  //          const viewport = page.getViewport({ scale });
-
-  //          canvas.width = viewport.width;
-  //          canvas.height = viewport.height;
-
-  //          page.render({ canvasContext: context, viewport })
-  //            .promise.then(() => {
-  //              const imgUrl = canvas.toDataURL("image/png");
-  //              if (callback) callback(imgUrl);
-  //            });
-  //        });
-  //      }).catch(error => {
-  //        console.error("Error generating PDF thumbnail:", error);
-  //        if (callback) callback(null);
-  //      });
-  //    } else {
-  //      console.error("PDF.js library not loaded");
-  //      if (callback) callback(null);
-  //    }
-  //  };
-  //  reader.readAsArrayBuffer(file);
-  //},
-
   // Generate Additional Document file thumbnail (PDF + Images)
 
   updateAdditionalDocumentGridRowWithDocument: function (docuid, fileInfo) {
@@ -583,6 +590,7 @@ var CRMAdditionalInformationHelper = {
   },
 
   ViewAdditionalDocumentDetails: function (data) {
+    debugger;
     // Unified path fallback
     const rawPath = data.DocumentPath || data.UploadFile || "";
     if (!rawPath) {
@@ -631,6 +639,64 @@ var CRMAdditionalInformationHelper = {
              alt="File" 
              style="height:100px;width:auto;cursor:pointer;border:1px solid #ddd;border-radius:4px; background:#fff;"
              onclick="CRMAdditionalInformationHelper.openAdditionalDocumentPreview('${rawPath.replace(/'/g, "\\'")}', '${data.uid}', '${fileName.replace(/'/g, "\\'")}')" 
+             title="Click to preview: ${fileName}"
+             onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';" />
+        <div style="font-size:12px;text-align:center;margin-top:5px;color:#666;">${fileName}</div>
+      </div>`;
+  },
+
+  ViewWorkDetails: function (data) {
+    // Unified path fallback
+    const rawPath = data.ScannedCopyPath || data.ScannedCopy || "";
+    if (!rawPath) {
+      return '<div style="text-align:center; color:#999; padding:20px; height:100px; display:flex; align-items:center; justify-content:center;">No document uploaded</div>';
+    }
+
+    // Absolute / relative resolve
+    const isAbsolute = /^(https?:)?\/\//i.test(rawPath) || rawPath.startsWith("data:");
+    const fullPath = isAbsolute ? rawPath : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + rawPath : rawPath);
+
+    // Detect image vs pdf
+    const cleanName = rawPath.split("?")[0].split("#")[0];
+    const ext = (cleanName.substring(cleanName.lastIndexOf(".") + 1) || "").toLowerCase();
+    const isImage = /\.(jpe?g|png|gif|bmp|webp|svg)$/i.test(cleanName);
+    const isPdf = ext === "pdf";
+
+    // File name fallback
+    const fileName =
+      data.ScannedCopyFileName ||
+      data.DocumentName ||
+      (cleanName ? cleanName.split("/").pop() : "Document");
+
+    // Thumbnail logic
+    let thumbnailSrc;
+    if (isImage) {
+      // Use server-provided thumbnail else original image
+      if (data.FileThumbnail) {
+        thumbnailSrc = data.FileThumbnail.startsWith("data:") ? data.FileThumbnail
+          : (/^(https?:)?\/\//i.test(data.FileThumbnail) ? data.FileThumbnail
+            : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + data.FileThumbnail : data.FileThumbnail));
+      } else {
+        thumbnailSrc = fullPath; // original image
+      }
+    } else if (isPdf) {
+      // PDF: if the PDF thumbnail from (server generated) then pdf thumnail other wise placeholder
+      thumbnailSrc = data.FileThumbnail
+        ? (data.FileThumbnail.startsWith("data:") ? data.FileThumbnail
+          : (/^(https?:)?\/\//i.test(data.FileThumbnail) ? data.FileThumbnail
+            : (typeof baseApiFilePath !== "undefined" ? baseApiFilePath + data.FileThumbnail : data.FileThumbnail)))
+        : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+UERGPC90ZXh0Pgo8L3N2Zz4K';
+    } else {
+      // Other file types – generic placeholder
+      thumbnailSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';
+    }
+
+    return `
+      <div class="document-preview" style="height:100px;width:auto;text-align:center;">
+        <img src="${thumbnailSrc}" 
+             alt="File" 
+             style="height:100px;width:auto;cursor:pointer;border:1px solid #ddd;border-radius:4px; background:#fff;"
+             onclick="CRMEducationNEnglishLanguagHelper.openWorkDocumentPreview('${rawPath.replace(/'/g, "\\'")}', '${data.uid}', '${fileName.replace(/'/g, "\\'")}')" 
              title="Click to preview: ${fileName}"
              onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAzNUgyNVYyNUg3NVYzNUg3NVY3NUgyNVYzNVoiIGZpbGw9IiNEREREREQiLz4KPHRleHQgeD0iNTAiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OTk5OSI+RklMRTwvdGV4dD4KPC9zdmc+';" />
         <div style="font-size:12px;text-align:center;margin-top:5px;color:#666;">${fileName}</div>
@@ -704,36 +770,6 @@ var CRMAdditionalInformationHelper = {
     }
   },
 
-
-
-  //bindRadioButtonEvents: function () {
-  //  // Accommodation radio buttons
-  //  $("input[name='requireAccommodation']").on("change", function () {
-  //    CRMAdditionalInformationHelper.handleAccommodationChange();
-  //  });
-
-  //  // Health & Medical Needs radio buttons
-  //  $("input[name='HealthNMedicalNeeds']").on("change", function () {
-  //    CRMAdditionalInformationHelper.handleHealthMedicalNeedsChange();
-  //  });
-  //},
-
-  //handleAccommodationChange: function () {
-  //  const selectedValue = $("input[name='requireAccommodation']:checked").val();
-  //  console.log("Accommodation requirement changed:", selectedValue);
-  //  // Add any specific logic for accommodation selection
-  //},
-
-  //handleHealthMedicalNeedsChange: function () {
-  //  const selectedValue = $("input[name='HealthNMedicalNeeds']:checked").val();
-  //  const remarksField = $("#txtHealthNMedicalNeedsRemarks");
-
-  //  if (selectedValue === "Yes") {
-  //    remarksField.prop("disabled", false).focus();
-  //  } else if (selectedValue === "No") {
-  //    remarksField.prop("disabled", true).val("");
-  //  }
-  //},
 
   /* =========================================================
      Form Clearing Methods
@@ -810,22 +846,6 @@ var CRMAdditionalInformationHelper = {
       console.error("Error clearing Additional Information fields:", error);
     }
   },
-
-  //clearAdditionalInformationFields: function () {
-  //  try {
-  //    // Clear radio buttons
-  //    $("input[name='requireAccommodation']").prop("checked", false);
-  //    $("input[name='HealthNMedicalNeeds']").prop("checked", false);
-
-  //    // Clear text areas
-  //    $("#txtHealthNMedicalNeedsRemarks").val("").prop("disabled", false);
-  //    $("#txtAdditionalInformationRemarks").val("");
-
-  //    console.log("Additional Information fields cleared");
-  //  } catch (error) {
-  //    console.error("Error clearing Additional Information fields:", error);
-  //  }
-  //},
 
   clearAdditionalDocumentsGrid: function () {
     try {
@@ -947,7 +967,6 @@ var CRMAdditionalInformationHelper = {
     }
   },
 
-
   createAdditionalDocumentsObject: function () {
     try {
       const grid = $("#griAdditionalDocumentsSummary").data("kendoGrid");
@@ -1006,7 +1025,6 @@ var CRMAdditionalInformationHelper = {
       return null;
     }
   },
-
 
   validateAdditionalInformationForm: function () {
     try {
@@ -1067,69 +1085,6 @@ var CRMAdditionalInformationHelper = {
     }
   },
 
-  //validateAdditionalInformationForm: function () {
-  //  try {
-  //    console.log("=== Validating Additional Information Form ===");
-
-  //    const validationErrors = [];
-
-  //    // Validate Reference Details (at least one reference should be provided)
-  //    const grid = $("#gridAdditionalReferenceSummary").data("kendoGrid");
-  //    if (grid && grid.dataSource.data().length === 0) {
-  //      validationErrors.push("At least one reference is required");
-  //    }
-
-  //    // Validate Health & Medical Needs remarks if Yes is selected
-  //    const healthNeedsSelected = $("input[name='HealthNMedicalNeeds']:checked").val();
-  //    if (healthNeedsSelected === "Yes" && !$("#txtHealthNMedicalNeedsRemarks").val().trim()) {
-  //      validationErrors.push("Please provide details for Health & Medical Needs");
-  //    }
-
-  //    if (validationErrors.length === 0) {
-  //      console.log("Additional Information form validation passed successfully");
-  //      if (typeof ToastrMessage !== "undefined") {
-  //        ToastrMessage.showSuccess("Additional Information form validation passed successfully!", "Validation Success", 3000);
-  //      }
-  //      return true;
-  //    } else {
-  //      console.log("Additional Information form validation failed:", validationErrors);
-  //      if (typeof ToastrMessage !== "undefined") {
-  //        ToastrMessage.showError("Additional Information form validation failed. Check console for details.", "Validation Error", 0);
-  //      }
-  //      return false;
-  //    }
-  //  } catch (error) {
-  //    console.error("Error validating Additional Information form:", error);
-  //    return false;
-  //  }
-  //},
-
-  //fillAdditionalInfoDemoData: function () {
-  //  try {
-  //    console.log("=== Filling Additional Information Demo Data ===");
-
-  //    // Fill Statement of Purpose
-  //    $("#txtStatementOfPurposeRemarks").val("I am applying for this program to advance my career in software development and gain expertise in modern technologies. This course aligns perfectly with my professional goals and will help me contribute more effectively to my field.");
-
-  //    // Fill Additional Information
-  //    $("input[name='requireAccommodation'][value='No']").prop("checked", true);
-  //    $("input[name='HealthNMedicalNeeds'][value='No']").prop("checked", true);
-  //    $("#txtAdditionalInformationRemarks").val("I am excited about this opportunity and believe I will be a valuable addition to the program.");
-
-  //    console.log("Additional Information demo data filled successfully");
-  //    if (typeof ToastrMessage !== "undefined") {
-  //      ToastrMessage.showSuccess("Additional Information demo data filled successfully!", "Demo Data", 3000);
-  //    }
-
-  //  } catch (error) {
-  //    console.error("Error filling Additional Information demo data:", error);
-  //    if (typeof ToastrMessage !== "undefined") {
-  //      ToastrMessage.showError("Error filling Additional Information demo data: " + error.message, "Demo Data Error", 0);
-  //    }
-  //  }
-  //},
-
-
 /* -------- Populate Additional Information Tab -------- */
   populateAdditionalInformation: function (applicationData) {
     try {
@@ -1152,7 +1107,7 @@ var CRMAdditionalInformationHelper = {
 
       // Populate Additional Documents
       if (applicationData.AdditionalDocuments != null && applicationData.AdditionalDocuments.length > 0) {
-        this.populateWorkExperience(educationData.WorkExperienceHistories);
+        this.populateAdditionalDocuments(applicationData.AdditionalDocuments);
       }
 
       console.log("Additional Information populated successfully");
@@ -1258,7 +1213,41 @@ var CRMAdditionalInformationHelper = {
     }
   },
 
+  /* -------- Populate Additional Documents Grid -------- */
+  populateAdditionalDocuments: function (additionalDocuments) {
+    debugger;
+    try {
+      if (!additionalDocuments || !Array.isArray(additionalDocuments)) return;
 
+      const grid = $("#griAdditionalDocumentsSummary").data("kendoGrid");
+      if (!grid) return;
+
+      // Clear existing data
+      grid.dataSource.data([]);
+
+      additionalDocuments.forEach(doc => {
+        // Resolve path and basic file info (similar to WorkExperience populate)
+        const rawPath = doc.DocumentPath || doc.UploadFile || "";
+        const clean = rawPath.split("?")[0].split("#")[0];
+        const isImage = /\.(jpe?g|png|gif|bmp|webp|svg)$/i.test(clean);
+
+        grid.dataSource.add({
+          AdditionalDocumentId: doc.AdditionalDocumentId || 0,
+          ApplicantId: doc.ApplicantId || parseInt($("#hdnApplicantId").val()) || 0,
+          DocumentTitle: doc.DocumentTitle || "",
+          DocumentName: doc.DocumentName || (clean ? clean.split("/").pop() : ""),
+          DocumentPath: rawPath,
+          UploadFormFile: null,
+          // If server didn't provide a thumbnail for images, use the original image as thumbnail (like Work grid)
+          FileThumbnail: doc.FileThumbnail || (isImage ? rawPath : "")
+        });
+      });
+
+      console.log("Additional Documents populated:", additionalDocuments.length, "records");
+    } catch (error) {
+      console.error("Error populating Additional Documents:", error);
+    }
+  },
 
 
 

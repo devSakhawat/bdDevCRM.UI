@@ -1,16 +1,8 @@
 <script src="~/assets/scripts/core/crmintakemonth/intakemonthsummary.js"></script>
 
-<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-  <fieldset class="reset">
-    <legend class="reset">Intake Month Summary</legend>
-    <div class="col-12 text-center">
-      <div id="gridSummaryIntakeMonth" style="width: 100%;"></div>
-    </div>
-  </fieldset>
-</div>
-
-<script type="text/javascript">
-  $(document).ready(function () {
-    IntakeMonthManager.initIntakeMonth();
-  });
-</script>
+<fieldset class="border p-3 fieldsetCommon">
+  <legend class="legendCommon">Intake Month Summary</legend>
+  <div class="table-responsive-wrapper">
+    <div id="gridSummaryIntakeMonth" class="responsiveGrid"></div>
+  </div>
+</fieldset>

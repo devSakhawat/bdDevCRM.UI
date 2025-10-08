@@ -36,6 +36,11 @@ var CountrySummaryHelper = {
   },
 
   generateCountryGrid: function () {
+    var Columns = this.generateCountryColumns();
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
+    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+    var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
+
     const gridOptions = {
       dataSource: [],
       autoBind: true,
@@ -48,7 +53,7 @@ var CountrySummaryHelper = {
       sortable: false,
       pageable: {
         pageSizes: [10, 20, 50, 100],
-        buttonCount: 3, // This sets exactly 3 buttons as required
+        buttonCount: 3,
         refresh: true,
         input: false,
         numeric: true,

@@ -4,20 +4,22 @@
 }
 
 <!-- row -->
-<div class="row">
-	<!-- Institute Summary -->
-	@* <div class="row"> *@
-		<partial name="CRMInstitute/_InstituteSummary" />
-	@* </div> *@
-
-	<!-- Institute Form -->
-  <div class="row">
-		<div id="InstitutePopUp" style="display: none">
-			<partial name="CRMInstitute/_InstituteDetails" />
-		</div>
-	</div>
-	
+<div class="row gx-1 gy-2" >
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div id="divSummary">
+      <partial name="CRMInstitute/_InstituteSummary" />
+    </div>
+  </div>
 </div>
+
+<div class="row">
+  <div id="InstitutePopUp" style="display: none">
+    <partial name="CRMInstitute/_InstituteDetails" />
+  </div>
+</div>
+
+
+
 
 <script src="~/assets/scripts/core/crminstitute/institute.js"></script>
 

@@ -3,13 +3,21 @@
   Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
 }
 
-<div class="row">
-  <partial name="CRMIntakeYear/_IntakeYearSummary" />
-  <div class="row">
-    <div id="IntakeYearPopUp" style="display: none">
-      <partial name="CRMIntakeYear/_IntakeYearDetails" />
+<!-- row -->
+<div class="row gx-1 gy-2">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div id="divSummary">
+      <partial name="CRMIntakeYear/_IntakeYearSummary" />
     </div>
   </div>
 </div>
+
+<div class="row">
+  <div id="IntakeMonthPopUp" style="display: none">
+    <partial name="CRMIntakeYear/_IntakeYearDetails" />
+  </div>
+</div>
+
+
 
 <script src="~/assets/scripts/core/crmintakeyear/intakeyear.js"></script>

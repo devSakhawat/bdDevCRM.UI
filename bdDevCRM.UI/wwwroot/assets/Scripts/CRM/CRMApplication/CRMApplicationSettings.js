@@ -25,9 +25,10 @@ var CRMApplicationManager = {
 
 
   /* ------- Application Summary Grid Data Source -------- */
-  getApplicationGridDataSource: function () {
+  getApplicationGridDataSource: function (statusId) {
     return VanillaApiCallManager.GenericGridDataSource({
-      apiUrl: baseApi + "/crm-application-summary",
+      //apiUrl: baseApi + "/crm-application-summary",
+      apiUrl: baseApi + `/crm-application-summary/${statusId}`,
       requestType: "POST",
       async: true,
       modelFields: { createdDate: { type: "date" } },
@@ -354,20 +355,105 @@ var CRMApplicationHelper = {
 
       // fetch data
       const data = await CRMApplicationManager.getStatusByMenuUser();
+      // insert "All" at 0th sequence
+      data.unshift({ StateName: "Select Status", WfStateId: 0 });
 
       // destroy previous widget if any
       const existing = $el.data("kendoDropDownList");
       if (existing) { existing.destroy(); $el.off(); }
 
-      // init kendo dropdown
+      // init kendo dropdown (without optionLabel)
       $el.kendoDropDownList({
-        optionLabel: "Select Status",
         dataTextField: "StateName",
-        dataValueField: "WFStateId",
+        dataValueField: "WfStateId",
         dataSource: data,
+        valuePrimitive: true,
+        value: data[0]?.WfStateId || 0,
         filter: "contains",
         suggest: true
       });
+
+      //// init kendo dropdown with computed default
+      //$el.kendoDropDownList({
+      //  optionLabel: { StateName: "Select Status", WfStateId: 0 },
+      //  dataTextField: "StateName",
+      //  dataValueField: "WfStateId",
+      //  dataSource: data,
+      //  valuePrimitive: true,
+      //  value: data[0]?.WfStateId || 0,
+      //  filter: "contains",
+      //  suggest: true
+      //});
+
+      // if admin then set deafult falue otherwise set first sequence of users state data.
+      const dd = $el.data("kendoDropDownList");
+      if (dd) dd.value(data[0]?.WfStateId || 0);
+
+      //debugger
+      //if (accessArray && accessArray.length > 0) {
+      //  // Check if any item in accessArray has RefferenceId == 3
+      //  if (accessArray.some(function (item) { return item.ReferenceID === 3; })) {
+
+      //    // Proceed to check for "recommendation" in StateName in data
+      //    var containsRecommendation = data.find(function (item) {
+      //      return item.StateName.toLowerCase().includes("recommendation");
+      //    });
+
+      //    // If found, set the value of the Kendo ComboBox
+      //    if (containsRecommendation) {
+      //      $("#cmbStatusForSummary").data("kendoComboBox").value(containsRecommendation.WFStateId);
+      //    }
+      //  }
+
+      //  // Check if any item in accessArray has RefferenceId == 4
+      //  if (accessArray.some(function (item) { return item.ReferenceID === 4; })) {
+
+      //    // Proceed to check for "recommendation" in StateName in data
+      //    var containsApproval = data.find(function (item) {
+      //      return item.StateName.toLowerCase().includes("approval");
+      //    });
+
+      //    // If found, set the value of the Kendo ComboBox
+      //    if (containsApproval) {
+      //      $("#cmbStatusForSummary").data("kendoComboBox").value(containsApproval.WFStateId);
+      //    }
+      //  }
+
+
+      //  // Check if any item in accessArray has RefferenceId == 22
+      //  if (accessArray.some(function (item) { return item.ReferenceID === 22; })) {
+
+      //    // Proceed to check for "recommendation" in StateName in data
+      //    var containsHR = data.find(function (item) {
+      //      return item.StateName.toLowerCase().includes("hr");
+      //    });
+
+      //    // If found, set the value of the Kendo ComboBox
+      //    if (containsHR) {
+      //      $("#cmbStatusForSummary").data("kendoComboBox").value(containsHR.WFStateId);
+      //    }
+      //  }
+
+      //  if (assembly.AssemblyInfoId == 14) {
+      //    // Check if any item in accessArray has RefferenceId == 22
+      //    if (accessArray.some(function (item) { return item.ReferenceID === 31; })) {
+
+      //      // Proceed to check for "recommendation" in StateName in data
+      //      var containsHR = data.find(function (item) {
+      //        return item.StateName.toLowerCase().includes("higher");
+      //      });
+
+      //      // If found, set the value of the Kendo ComboBox
+      //      if (containsHR) {
+      //        $("#cmbStatusForSummary").data("kendoComboBox").value(containsHR.WFStateId);
+      //      }
+      //    }
+      //  }
+
+      //}
+
+
+
     } catch (err) {
       console.error("Error populating status dropdown:", err);
       if (typeof VanillaApiCallManager !== "undefined") {
@@ -376,18 +462,114 @@ var CRMApplicationHelper = {
     }
   },
 
+  PopulatePerformanceReviewStatusForJobConfirmation: function () {
+    var obj = new Object();
+
+    obj = PerformanceReviewManager.PopulatePerformanceReviewStatusForJobConfirmation();
+
+    var combo = $("#cmbStatusForSummary").kendoComboBox({
+      placeholder: "Select Section",
+      dataTextField: "StateName",
+      dataValueField: "WFStateId",
+      dataSource: obj
+    }).data('kendoComboBox');
+    if (assembly.AssemblyInfoId != 14) {
+      combo.dataSource.insert(0, { WFStateId: 0, StateName: 'All' });
+    }
+    debugger
+    if (accessArray && accessArray.length > 0) {
+      // Check if any item in accessArray has RefferenceId == 3
+      if (accessArray.some(function (item) { return item.ReferenceID === 3; })) {
+
+        // Proceed to check for "recommendation" in StateName in obj
+        var containsRecommendation = obj.find(function (item) {
+          return item.StateName.toLowerCase().includes("recommendation");
+        });
+
+        // If found, set the value of the Kendo ComboBox
+        if (containsRecommendation) {
+          $("#cmbStatusForSummary").data("kendoComboBox").value(containsRecommendation.WFStateId);
+        }
+      }
+
+      // Check if any item in accessArray has RefferenceId == 4
+      if (accessArray.some(function (item) { return item.ReferenceID === 4; })) {
+
+        // Proceed to check for "recommendation" in StateName in obj
+        var containsApproval = obj.find(function (item) {
+          return item.StateName.toLowerCase().includes("approval");
+        });
+
+        // If found, set the value of the Kendo ComboBox
+        if (containsApproval) {
+          $("#cmbStatusForSummary").data("kendoComboBox").value(containsApproval.WFStateId);
+        }
+      }
+
+
+      // Check if any item in accessArray has RefferenceId == 22
+      if (accessArray.some(function (item) { return item.ReferenceID === 22; })) {
+
+        // Proceed to check for "recommendation" in StateName in obj
+        var containsHR = obj.find(function (item) {
+          return item.StateName.toLowerCase().includes("hr");
+        });
+
+        // If found, set the value of the Kendo ComboBox
+        if (containsHR) {
+          $("#cmbStatusForSummary").data("kendoComboBox").value(containsHR.WFStateId);
+        }
+      }
+
+      if (assembly.AssemblyInfoId == 14) {
+        // Check if any item in accessArray has RefferenceId == 22
+        if (accessArray.some(function (item) { return item.ReferenceID === 31; })) {
+
+          // Proceed to check for "recommendation" in StateName in obj
+          var containsHR = obj.find(function (item) {
+            return item.StateName.toLowerCase().includes("higher");
+          });
+
+          // If found, set the value of the Kendo ComboBox
+          if (containsHR) {
+            $("#cmbStatusForSummary").data("kendoComboBox").value(containsHR.WFStateId);
+          }
+        }
+      }
+
+    }
+
+  },
+
+
+
+
+
+
   /*********************** Common Function End ***********************************************/
 
   /* -------- CRM Application Grid -------- */
+
   initCrmApplicationSummary: function () {
+    debugger;
     this.initializeSummaryGrid();
-    this.setGridDataSource();
+
+    this.loadStatusDropdownData()
+      .catch(err => {
+        VanillaApiCallManager?.handleApiError?.(err);
+      })
+      .finally(() => {
+        this.setGridDataSource();
+      });
   },
 
   initializeSummaryGrid: function () {
+
     var Columns = this.generateColumns();
-    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(this.generateColumns());
-    var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
+    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+    var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
+
 
     const gridOptions = {
       toolbar: [
@@ -395,7 +577,6 @@ var CRMApplicationHelper = {
         { name: "excel" },
         { name: "pdf" },
         { template: '<button type="button" id="btnExportApplicationCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' },
-        // NEW: toolbar right side status dropdown host ( right side by using Bootstrap utility)
         { template: '<div class="ms-auto d-flex align-items-center" style="gap:8px;"><label class="fw-semibold">Status:</label><input id="cmbStatusToolbar" style="width: 240px;" /></div>' }
       ],
       excel: {
@@ -433,42 +614,45 @@ var CRMApplicationHelper = {
       },
       columns: Columns,
       editable: false,
-      /*selectable: "row",*/
       selectable: true,
       error: function (e) {
-        VanillaApiCallManager.handleApiError(error);
+        VanillaApiCallManager.handleApiError(e);
       }
     };
 
-    // Initialize the Kendo Grid
+    // Initialize the Kendo Grid (empty)
     $("#gridSummaryCrmApplication").kendoGrid(gridOptions);
 
     // CSV Export button event
     $("#btnExportApplicationCsv").on("click", function () {
       CommonManager.GenerateCSVFileAllPages("gridSummaryCrmApplication", "Application", "Actions");
     });
+  },
 
-    // NEW: Initialize Status dropdown inside toolbar and wire change → reload grid
-    (async function () {
-      await CRMApplicationHelper.populateStatusByMenuUser("#cmbStatusToolbar");
-      const dd = $("#cmbStatusToolbar").data("kendoDropDownList");
-      if (dd) {
-        dd.bind("change", function () {
-          const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
-          const statusId = dd.value() || 0;
-          if (grid) {
-            grid.dataSource.read({ StatusId: statusId });
-          }
-        });
-      }
-    })();
+  // Status Dropdown Loader for (Toolbar '#cmbStatusToolbar')
+  loadStatusDropdownData: async function () {
+    // Populate Dropdown ()
+    await CRMApplicationHelper.populateStatusByMenuUser("#cmbStatusToolbar");
+
+    // tiye dropdown change event handler
+    const dd = $("#cmbStatusToolbar").data("kendoDropDownList");
+    if (dd) {
+      dd.bind("change", function () {
+        const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
+        const statusId = dd.value() || 0;
+        // if there are no dataset for grid then no issue for change
+        if (grid && grid.dataSource) {
+          grid.dataSource.read({ StatusId: statusId });
+        }
+      });
+    }
   },
 
   setGridDataSource: function () {
-
     const grid = $("#gridSummaryCrmApplication").data("kendoGrid");
     if (grid) {
-      const ds = CRMApplicationManager.getApplicationGridDataSource();
+      const dd = $("#cmbStatusToolbar").data("kendoDropDownList");
+      const ds = CRMApplicationManager.getApplicationGridDataSource(dd.value() || 0);
 
       // Add data source error handling
       ds.bind("error", function (error) {
@@ -480,17 +664,14 @@ var CRMApplicationHelper = {
         console.log(ds);
         if (e.response && e.response.isSuccess === false) {
           VanillaApiCallManager.handleApiError(e.response);
-          //console.error("API returned error:", e.response.message);
-          //kendo.alert("Error: " + e.response.message);
         }
       });
 
       grid.setDataSource(ds);
 
-      // NEW: first load with current toolbar status (if any)
-      const dd = $("#cmbStatusToolbar").data("kendoDropDownList");
-      const statusId = dd ? (dd.value() || 0) : 0;
-      ds.read({ StatusId: statusId });
+      //const dd = $("#cmbStatusToolbar").data("kendoDropDownList");
+      //const statusId = dd ? (dd.value() || 0) : 0;
+      //ds.read({ StatusId: statusId });
     }
   },
 

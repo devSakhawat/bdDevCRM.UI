@@ -4,13 +4,33 @@
 }
 
 
-<!-- row -->
+@* <!-- row -->
 <div class="row">
 	<!-- Country Form -->
 		<partial name="Country/_CountryDetail" />
 	<!-- Country Summary -->
 		<partial name="Country/_CountrySummery" />
+</div> *@
+
+<!-- row -->
+<div class="row gx-2 gy-3">
+	<h3 class="k-header text-center">Country Settings</h3>
+
+	<div class="col-lg-5 col-md-12 col-sm-12">
+		<div class="divDetails">
+			<partial name="Country/_CountryDetail" />
+		</div>
+	</div>
+
+	<!-- Grid Section - Responsive -->
+	<div class="col-lg-7 col-md-12 col-sm-12">
+		<div class="divSummary pe-3">
+			<partial name="Country/_CountrySummery" />
+		</div>
+	</div>
 </div>
+
+
 
 <script src="~/assets/scripts/core/country/country.js"></script>
 

@@ -56,9 +56,12 @@ var PaymentMethodSummaryHelper = {
   },
 
   initializeSummaryGrid: function () {
+
     var Columns = this.generateColumns();
     var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
-    var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
+    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+    var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
+
 
     const gridOptions = {
       toolbar: [

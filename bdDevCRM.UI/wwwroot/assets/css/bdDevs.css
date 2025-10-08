@@ -209,11 +209,11 @@ textarea {
 /************************ Responsive kendo grid with scroll bar *************************************/
 /************************ Responsive kendo grid with scroll bar *************************************/
 
-
 .fieldsetCommon {
   position: relative;
   text-align: left;
 }
+
 fieldset legend.legendCommon {
   position: absolute;
   top: -12px;
@@ -234,35 +234,18 @@ legend.legendCommon.topAfterDiv_Backgorup {
   background: #FFFFFF;
 }
 
-/*
-fieldset legend.legendCommon {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: transparent;
-  font-weight: bold;
-  font-size: 14px;
-  margin-left: 12px;
-}*/
-
-
-
-
+legend.legendCommonModalBGImportant {
+  background: #FFFFFF !important;
+}
 
 /* Responsive Table Wrapper */
 .table-responsive-wrapper {
   position: relative;
   width: 100%;
-   overflow-x: auto; 
+  max-height: 80vh;
+  overflow: visible; /* Let grid handle its own scrolling */
   -webkit-overflow-scrolling: touch;
 }
-
-/*.responsiveGrid {
-  width: 100% !important;
-  min-width: auto !important;
-  margin-top: 10px;
-}*/
 
 /* Grid Scrolling Improvements */
 .k-grid-content {
@@ -280,25 +263,15 @@ fieldset legend.legendCommon {
   font-weight: 500;
 }
 
-.responsiveGrid .k-widget {
-
-}
-
-
-
-
-
-
 .gridParrentDivOverflowHidden {
   overflow-x: hidden;
 }
 
-.min-width_100{
+.min-width_100 {
   min-width: 100%;
 }
 
-
-.min-width_96{
+.min-width_96 {
   min-width: 96%;
 }
 
@@ -310,58 +283,58 @@ fieldset legend.legendCommon {
   background-color: #F1F5F9;
 }
 
-/*.overflow-auto {
-  overflow-y: auto !important;
-}*/
+/************************ Flexible Kendo Grid (generic): Conditional Scroll *************************************/
+/* === Auto horizontal scroll when columns overflow === */
 
-/*.k-grid-header,
-.k-grid-content {
-  min-width: max-content;
-}*/
-
-/************************ /////////////////////////////////////////////////////////// */
-/* Responsive Grid Styling */
-/* === Flexible Kendo Grid (generic): max 80vh, shrink-to-fit, scroll on overflow === */
-/* Place any Kendo Grid inside: <div class="table-responsive-wrapper"><div class="k-grid">...</div></div> */
-
-/* 1) Wrapper: limit overall height */
+/* 1) Wrapper: limit overall height only */
 .table-responsive-wrapper {
   max-height: 80vh;
   overflow: visible;
+  /* Remove overflow-x: auto - let grid control it */
 }
 
-  /* 2) Cancel any fixed heights inside wrapper (e.g., old .responsiveGrid rules) */
-  .table-responsive-wrapper .responsiveGrid,
-  .table-responsive-wrapper .k-grid {
-    height: auto !important;
-    /*max-height: 100%;*/
-    max-height: 80vh;
-  }
+/* 2) Cancel any fixed heights inside wrapper */
+.table-responsive-wrapper .responsiveGrid,
+.table-responsive-wrapper .k-grid {
+  height: auto !important;
+  max-height: 80vh;
+}
 
-  /* 3) Make Kendo grid root a flex column to isolate scrolling to content */
-  .table-responsive-wrapper .k-grid {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
+/* 3) Make Kendo grid root a flex column */
+.table-responsive-wrapper .k-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 
-    /* 4) Keep header/toolbar/pager natural height */
-    .table-responsive-wrapper .k-grid .k-grid-toolbar,
-    .table-responsive-wrapper .k-grid .k-grid-header,
-    .table-responsive-wrapper .k-grid .k-pager-wrap {
-      flex: 0 0 auto;
-    }
+/* 4) Keep header/toolbar/pager natural height */
+.table-responsive-wrapper .k-grid .k-grid-toolbar,
+.table-responsive-wrapper .k-grid .k-grid-header,
+.table-responsive-wrapper .k-grid .k-pager-wrap {
+  flex: 0 0 auto;
+}
 
-    /* 5) Scroll only the content area; grow to fill remaining space */
-    .table-responsive-wrapper .k-grid .k-grid-content,
-    .table-responsive-wrapper .k-grid .k-grid-content-locked {
-      flex: 1 1 auto;
-      min-height: 0; /* required for flex scrolling */
-      overflow-y: auto !important; /* vertical scroll when overflow */
-      overflow-x: auto !important; /* horizontal scroll for wide columns */
-    }
+/* 5) Content area: conditional horizontal + vertical scroll */
+.table-responsive-wrapper .k-grid .k-grid-content,
+.table-responsive-wrapper .k-grid .k-grid-content-locked {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: auto !important; /* Shows only when content overflows */
+}
 
-/* 6) Safety: ensure old media-query heights don’t apply inside the wrapper */
+/* 6) Header wrapper: sync with content scroll */
+.table-responsive-wrapper .k-grid .k-grid-header-wrap {
+  overflow-x: auto !important; /* Syncs with content horizontal scroll */
+}
+
+/* 7) Table: natural width, no forced 100% */
+.table-responsive-wrapper .k-grid .k-table {
+  width: auto !important;
+  min-width: 100%; /* Ensures at least full width */
+}
+
+/* 8) Safety: ensure old media-query heights don't apply */
 @media (min-width: 992px) {
   .table-responsive-wrapper .responsiveGrid,
   .table-responsive-wrapper .k-grid {
@@ -381,70 +354,94 @@ fieldset legend.legendCommon {
   .table-responsive-wrapper .k-grid {
     height: auto !important;
   }
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/************************ ///////////////////////////////////////////////////////////
-    Media Queries
-*********************** /////////////////////////////////////////////////////////// */
-
-@media (min-width: 992px) {
-  .responsiveGrid {
-    /*height: calc(100vh - 180px) !important;*/
-    /*max-height: 600px;*/
-  }
-}
-
-/* Tablet View */
-@media (min-width: 577px) and (max-width: 991px) {
-
-/*  .responsiveGrid {
-    height: 450px !important;
-  }*/
-}
-
-
-@media (max-width: 768px) {
-  /*.btn-action {
-    display: block;
-    width: 100%;
-    margin: 2px 0;
-  }*/
-}
-
-
-/* Mobile View (phones) */
-@media (max-width: 576px) {
   .k-header {
     font-size: 1.2rem;
   }
 
-/*  .responsiveGrid {
-    height: 400px !important;
-    font-size: 12px;
-  }*/
   /* Hide less important columns on mobile */
   .k-grid td:nth-child(2),
   .k-grid th:nth-child(2) {
     display: none;
   }
-
 }
+
+/************************ AccessControl Summary: Specific NO Horizontal Scroll *************************************/
+/* Use .no-horizontal-scroll class for grids that should NOT have horizontal scroll */
+
+.table-responsive-wrapper.no-horizontal-scroll {
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  overflow-x: hidden !important; /* Force no horizontal scroll */
+}
+
+.table-responsive-wrapper.no-horizontal-scroll .k-grid,
+#gridSummary.responsiveGrid {
+  width: 100% !important;
+}
+
+/* Hide X-scroll both in header and content */
+.table-responsive-wrapper.no-horizontal-scroll .k-grid .k-grid-content,
+.table-responsive-wrapper.no-horizontal-scroll .k-grid .k-grid-content-locked {
+  overflow-x: hidden !important;
+}
+
+.table-responsive-wrapper.no-horizontal-scroll .k-grid .k-grid-header-wrap {
+  overflow: hidden !important;
+}
+
+/* Make table shrink-to-fit and wrap long text */
+.table-responsive-wrapper.no-horizontal-scroll .k-grid .k-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
+
+.table-responsive-wrapper.no-horizontal-scroll .k-grid td,
+.table-responsive-wrapper.no-horizontal-scroll .k-grid th {
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Grid container: viewport based height */
+#gridSummary.responsiveGrid {
+  height: var(--gridSummaryHeight, 65vh) !important;
+  min-height: 420px !important;
+}
+
+/* Kendo Grid fills parent height */
+#gridSummary .k-grid {
+  height: 100% !important;
+}
+
+/* Override theme CSS that sets small height on content-area */
+#gridSummary .k-grid .k-grid-content {
+  max-height: none !important;
+}
+
+/* Grid header: NO horizontal scroll */
+.table-responsive-wrapper .k-grid .k-grid-header-wrap {
+  overflow-x: hidden !important; /* Header এ scroll লাগবে না */
+  overflow-y: hidden !important;
+}
+
+/* Grid content: ONLY content area scrolls */
+.table-responsive-wrapper .k-grid .k-grid-content,
+.table-responsive-wrapper .k-grid .k-grid-content-locked {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: auto !important; /* শুধু content scroll করবে */
+}
+
+/* Sync header with content scroll via JavaScript */
+
+
+
+
+
+
+
+

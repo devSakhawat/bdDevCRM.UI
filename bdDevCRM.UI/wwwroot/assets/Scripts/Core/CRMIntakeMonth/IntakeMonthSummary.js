@@ -1,4 +1,4 @@
-/// <reference path="../../common/common.js" />
+﻿/// <reference path="../../common/common.js" />
 /// <reference path="intakemonth.js" />
 /// <reference path="intakemonthdetails.js" />
 
@@ -43,7 +43,12 @@ var IntakeMonthSummaryHelper = {
   initializeSummaryGrid: function () {
     var Columns = this.generateColumns();
     var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
-    var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
+
+    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+
+    var gridWidth = totalColumnsWidth > containerWidth
+      ? "100%"
+      : `${totalColumnsWidth}px`;
 
     const gridOptions = {
       toolbar: [
@@ -77,9 +82,9 @@ var IntakeMonthSummaryHelper = {
       dataSource: [],
       autoBind: true,
       navigatable: true,
-      scrollable: true,
+      scrollable: true, // Enable scrolling
       resizable: true,
-      width: gridWidth,
+      width: gridWidth, // Dynamic width
       filterable: true,
       sortable: true,
       pageable: {
@@ -115,23 +120,25 @@ var IntakeMonthSummaryHelper = {
       const ds = IntakeMonthSummaryManager.getSummaryIntakeMonthGridDataSource();
 
       ds.bind("error", function (e) {
-        console.log("DataSource Error Event:", e);
-        console.log("DataSource Error Event:", e.response);
-        kendo.alert({
-          title: "Error",
-          content: "Error: " + e.response
-        });
+        VanillaApiCallManager.handleApiError(e);
+        //console.log("DataSource Error Event:", e);
+        //console.log("DataSource Error Event:", e.response);
+        //kendo.alert({
+        //  title: "Error",
+        //  content: "Error: " + e.response
+        //});
       });
 
       ds.bind("requestEnd", function (e) {
         console.log(e);
         console.log(e.response);
         if (e.response && e.response.isSuccess === false) {
-          console.log("API returned error:", e.response.message);
-          kendo.alert({
-            title: "Error",
-            content: "Error: " + e.response.message
-          });
+          VanillaApiCallManager.handleApiError(e);
+          //console.log("API returned error:", e.response.message);
+          //kendo.alert({
+          //  title: "Error",
+          //  content: "Error: " + e.response.message
+          //});
         }
       });
 

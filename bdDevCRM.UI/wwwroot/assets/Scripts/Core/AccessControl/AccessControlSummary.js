@@ -20,7 +20,6 @@ var AccessControlSummaryManager = {
     });
   },
 
-
 };
 
 var AccessControlSummaryHelper = {
@@ -29,47 +28,11 @@ var AccessControlSummaryHelper = {
     AccessControlSummaryHelper.initializeResponsiveGrid();
   },
 
-  initializeResponsiveGrid2: function () {
-    var columns = this.generateResponsiveColumns();
-
-    $("#gridSummary").kendoGrid({
-      toolbar: [
-        { name: "excel" },
-        { template: '<button type="button" id="btnExportCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
-      ],
-      excel: {
-        fileName: "AccessControlExport.xlsx",
-        filterable: true,
-        allPages: true,
-        columnInfo: true,
-      },
-      dataSource: AccessControlSummaryManager.getSummaryGridDataSource(),
-      height: this.calculateGridHeight(),
-      width: "100%",
-      scrollable: {
-        virtual: false
-      },
-      resizable: true,
-      sortable: true,
-      filterable: true,
-      pageable: {
-        refresh: true,
-        pageSizes: [10, 20, 50],
-        buttonCount: 3
-      },
-      columns: columns,
-      mobile: true,
-      /*toolbar: this.getToolbarConfig(),*/
-      dataBound: function () {
-        AccessControlSummaryHelper.adjustGridForMobile();
-      }
-    });
-  },
-
   initializeResponsiveGrid: function () {
     var Columns = this.generateResponsiveColumns();
-    //var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(this.generateColumns());
-    //var gridWidth = totalColumnsWidth > (window.innerWidth - 323) ? (window.innerWidth - 323).toString() : `${totalColumnsWidth}px`;
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
+    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+    var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
 
     const gridOptions = {
       toolbar: [
@@ -91,18 +54,14 @@ var AccessControlSummaryHelper = {
         margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
         scale: 0.9,
         repeatHeaders: true,
-        //columns: [
-        //  { field: "InstituteName", width: 200 }
-        //]
       },
       dataSource: [],
       autoBind: true,
       navigatable: true,
       scrollable: true,
       resizable: true,
-      //width: gridWidth,
       height: this.calculateGridHeight(),
-      width: "100%",
+      width: gridWidth,
       filterable: true,
       sortable: true,
       pageable: {
@@ -120,9 +79,8 @@ var AccessControlSummaryHelper = {
       selectable: "row",
 
       error: function (e) {
-        VanillaApiCallManager.handleApiError(error);
-        //console.error("Grid Error:", e);
-        //kendo.alert("Grid Error: " + e.errors);
+        // FIX: use the correct variable
+        VanillaApiCallManager.handleApiError(e);
       }
     };
 
@@ -137,7 +95,6 @@ var AccessControlSummaryHelper = {
 
     const grid = $("#gridSummary").data("kendoGrid");
     if (grid) {
-      //const ds = InstituteSummaryManager.getSummaryInstituteGridDataSourceVanilla();
       const ds = AccessControlSummaryManager.getSummaryGridDataSource();
 
       // Add data source error handling
@@ -147,18 +104,27 @@ var AccessControlSummaryHelper = {
 
       // Add data source success handling
       ds.bind("requestEnd", function (e) {
-        console.log(ds);
         if (e.response && e.response.isSuccess === false) {
           VanillaApiCallManager.handleApiError(e.response);
-          //console.error("API returned error:", e.response.message);
-          //kendo.alert("Error: " + e.response.message);
         }
       });
 
       grid.setDataSource(ds);
-    }
-  },
 
+      // Ensure correct height after binding (accounts for toolbar/header/pager)
+      grid.setOptions({ height: AccessControlSummaryHelper.calculateGridHeight() });
+      grid.resize();
+    }
+
+    // Recalculate on window resize
+    $(window).off("resize.accessControlGrid").on("resize.accessControlGrid", function () {
+      const g = $("#gridSummary").data("kendoGrid");
+      if (g) {
+        g.setOptions({ height: AccessControlSummaryHelper.calculateGridHeight() });
+        g.resize();
+      }
+    });
+  },
 
   generateResponsiveColumns: function () {
     var isMobile = window.innerWidth < 768;
@@ -169,9 +135,6 @@ var AccessControlSummaryHelper = {
         field: "AccessName",
         title: isMobile ? "Name" : "Access Name",
         width: isMobile ? 120 : 200,
-        //attributes: {
-        //  style: "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-        //}
       },
       {
         field: "Action",
@@ -180,62 +143,57 @@ var AccessControlSummaryHelper = {
         width: isMobile ? 100 : 220,
         template: this.getActionTemplate()
       },
-      //// Action buttons
-      //{
-      //  field: "Action", title: "#", filterable: false, width: "230px",
-      //  template: `
-      //  <input type="button" class="btn btn-outline-success widthSize30_per"
-      //         value="View" onClick="InstituteSummaryHelper.clickEventForViewButton(event)" />
-      //  <input type="button" class="btn btn-outline-dark me-1 widthSize30_per"
-      //         value="Edit" onClick="InstituteSummaryHelper.clickEventForEditButton(event)" />
-      //  <input type="button" class="btn btn-outline-danger widthSize33_per"
-      //         value="Delete" onClick="InstituteSummaryHelper.clickEventForDeleteButton(event)" />
-      //`
-      //}
     ];
 
     return columns;
   },
 
   getActionTemplate: function () {
-      // Desktop buttons - Fixed template
+    // Desktop buttons - Fixed template
     return '<button class="btn btn-outline-dark me-1" onclick="AccessControlSummaryHelper.clickEventForEditButton(event)">Edit</button>'
-      +'<button class="btn btn-outline-danger" onclick="AccessControlSummaryHelper.clickEventForDeleteButton(event)">Delete</button>';
+      + '<button class="btn btn-outline-danger" onclick="AccessControlSummaryHelper.clickEventForDeleteButton(event)">Delete</button>';
   },
 
+  // New calculation that uses the grid's top offset to get true available height
   calculateGridHeight: function () {
     var windowHeight = window.innerHeight;
-    var windowWidth = window.innerWidth;
+    var $grid = $("#gridSummary");
 
-    if (windowWidth < 576) {
-      return 400; // Mobile
-    } else if (windowWidth < 992) {
-      return 450; // Tablet
-    } else {
-      return Math.min(800, windowHeight - 300); // Desktop
+    // Wait for DOM to be ready
+    if (!$grid.length) {
+      return 500; // fallback if grid not yet rendered
     }
+
+    var top = $grid.offset().top;
+
+    // Footer space: keep 30px at the bottom + account for any browser chrome
+    var bottomPadding = 40;
+
+    // available viewport space from grid top to bottom
+    var available = Math.max(0, windowHeight - top - bottomPadding);
+
+    // clamp per breakpoint (remove maxH constraint for full viewport use)
+    var windowWidth = window.innerWidth;
+    var minH = windowWidth < 576 ? 300 : (windowWidth < 992 ? 350 : 400);
+
+    // Use available height directly (no max limit) but ensure minimum
+    var finalH = Math.max(minH, available);
+
+    // Expose to CSS so the wrapper can size itself without extra reflow
+    var el = document.getElementById("gridSummary");
+    if (el) {
+      el.style.setProperty("--gridSummaryHeight", finalH + "px");
+    }
+
+    return finalH;
   },
 
   adjustGridForMobile: function () {
     if (window.innerWidth < 768) {
-      // Additional mobile adjustments
       $(".k-grid-toolbar").find(".k-button").addClass("btn-sm");
       $(".k-pager-wrap").addClass("k-pager-sm");
     }
   },
-
-  //clickEventForEditButton: function (e) {
-
-  //  var grid = $("#gridSummary").data("kendoGrid");
-  //  var row = $(e.target).closest("tr");
-  //  var dataItem = grid.dataItem(row);
-
-  //  if (dataItem) {
-  //    CommonManager.MakeFormEditable("#divdetailsForDetails");
-  //    AccessControlDetailsHelper.PopulateObject(dataItem);
-  //  }
-  //},
-
 
   /* --- Action Handlers --- */
   _getGridItem: function (event) {

@@ -118,10 +118,12 @@ var WorkFlowDetailsHelper = {
 
   populateObject: async function (item) {
     try {
+      debugger;
       console.log("Populating object:", item);
       WorkFlowDetailsHelper.clearForm();
       $("#btnSaveOrUpdate").text("Update Item");
       $("#stateID").val(item.WfStateId);
+      $("#txtSequenceNo").val(item.Sequence);
 
       // Menu ComboBox setup
       var menuComboBoxInstance = $("#cmbMenu").data("kendoComboBox");
@@ -132,55 +134,59 @@ var WorkFlowDetailsHelper = {
       $("#txtStateName").val(item.StateName);
 
       if (item.IsClosed !== null && item.IsClosed !== undefined) {
-        var combo = $("#cmbIsClose").data("kendoComboBox");
-        var targetValue = parseInt(item.IsClosed);
-
-        // Check if combo and its dataSource exist
-        if (combo && combo.dataSource && combo.dataSource.data) {
-          var dataItems = combo.dataSource.data();
-          console.log(dataItems);
-
-          // Handle Kendo DataSource object - convert to array or iterate through items
-          var targetIndex = -1;
-
-          // Method 1: Use Kendo DataSource's view() method which returns an array
-          if (dataItems.view && typeof dataItems.view === 'function') {
-            var viewItems = dataItems.view();
-            targetIndex = viewItems.findIndex(dataItem => parseInt(dataItem.value) === targetValue);
-          }
-          // Method 2: If view() is not available, iterate through the length property
-          else if (dataItems.length !== undefined) {
-            for (var i = 0; i < dataItems.length; i++) {
-              var dataItem = dataItems[i];
-              if (dataItem && parseInt(dataItem.value) === targetValue) {
-                targetIndex = i;
-                break;
-              }
-            }
-          }
-          // Method 3: Convert to array if it has indexed properties
-          else if (dataItems.length !== undefined) {
-            var itemsArray = [];
-            for (var i = 0; i < dataItems.length; i++) {
-              if (dataItems[i]) {
-                itemsArray.push(dataItems[i]);
-              }
-            }
-            targetIndex = itemsArray.findIndex(dataItem => parseInt(dataItem.value) === targetValue);
-          }
-
-          if (targetIndex >= 0) {
-            combo.select(targetIndex);
-            console.log("Selected index:", targetIndex, "for value:", targetValue);
-          } else {
-            console.warn("Target value not found, trying direct value setting:", targetValue);
-            // Fallback: try direct value setting
-            combo.value(targetValue.toString());
-          }
-        } else {
-          console.warn("ComboBox or its dataSource not available");
-        }
+        $("#cmbIsClose").data("kendoDropDownList").value(item.IsClosed);
       }
+
+      //if (item.IsClosed !== null && item.IsClosed !== undefined) {
+      //  var dropDown = $("#cmbIsClose").data("kendoDropDownList");
+      //  var targetValue = parseInt(item.IsClosed);
+
+      //  // Check if dropDown and its dataSource exist
+      //  if (dropDown && dropDown.dataSource && dropDown.dataSource.data) {
+      //    var dataItems = dropDown.dataSource.data();
+      //    console.log(dataItems);
+
+      //    // Handle Kendo DataSource object - convert to array or iterate through items
+      //    var targetIndex = -1;
+
+      //    // Method 1: Use Kendo DataSource's view() method which returns an array
+      //    if (dataItems.view && typeof dataItems.view === 'function') {
+      //      var viewItems = dataItems.view();
+      //      targetIndex = viewItems.findIndex(dataItem => parseInt(dataItem.value) === targetValue);
+      //    }
+      //    // Method 2: If view() is not available, iterate through the length property
+      //    else if (dataItems.length !== undefined) {
+      //      for (var i = 0; i < dataItems.length; i++) {
+      //        var dataItem = dataItems[i];
+      //        if (dataItem && parseInt(dataItem.value) === targetValue) {
+      //          targetIndex = i;
+      //          break;
+      //        }
+      //      }
+      //    }
+      //    // Method 3: Convert to array if it has indexed properties
+      //    else if (dataItems.length !== undefined) {
+      //      var itemsArray = [];
+      //      for (var i = 0; i < dataItems.length; i++) {
+      //        if (dataItems[i]) {
+      //          itemsArray.push(dataItems[i]);
+      //        }
+      //      }
+      //      targetIndex = itemsArray.findIndex(dataItem => parseInt(dataItem.value) === targetValue);
+      //    }
+
+      //    if (targetIndex >= 0) {
+      //      dropDown.select(targetIndex);
+      //      console.log("Selected index:", targetIndex, "for value:", targetValue);
+      //    } else {
+      //      console.warn("Target value not found, trying direct value setting:", targetValue);
+      //      // Fallback: try direct value setting
+      //      dropDown.value(targetValue.toString());
+      //    }
+      //  } else {
+      //    console.warn("dropDownBox or its dataSource not available");
+      //  }
+      //}
 
       // IsDefaultStart checkbox
       $("#chkIsDefault").prop('checked', item.IsDefaultStart === true || item.IsDefaultStart === 1);
@@ -188,8 +194,10 @@ var WorkFlowDetailsHelper = {
       // Set state name in action section
       $("#txtStateName_Action").val(item.StateName);
 
-      // Additional UI state updates
-      this.updateUIAfterPopulate(item);
+      //// Additional UI state updates
+      //this.updateUIAfterPopulate(item);
+
+      ActionDetailHelper.initializeResponsiveActionGrid(item.WfStateId);
 
       console.log("Object populated successfully");
 
@@ -260,8 +268,6 @@ var WorkFlowDetailsHelper = {
       return false;
     }
   },
-
-
 
   // Helper method for setting IsClosed combo value - Updated to handle value 0 properly
   setIsClosedComboValue: function (isClosedValue) {
@@ -355,20 +361,14 @@ var WorkFlowDetailsHelper = {
   // Helper function to update UI after populating object
   updateUIAfterPopulate: function (item) {
     try {
-      // Update any additional UI elements based on the populated data
-
-      // Show/hide sections based on data availability
       if (item.IsClosed === 1) {
-        // If state is closed, maybe disable some controls
         $("#txtStateName").prop('readonly', true);
       } else {
         $("#txtStateName").prop('readonly', false);
       }
 
-      // Update tab titles or other dynamic content if needed
       var tabStrip = $("#tabstrip").data("kendoTabStrip");
       if (tabStrip && item.StateName) {
-        // You could update tab titles or content based on the state
         var stateTab = tabStrip.tabGroup.children().eq(0);
         if (stateTab.length > 0) {
           // Update any dynamic content in tabs
@@ -393,7 +393,6 @@ var WorkFlowDetailsHelper = {
   validatePopulatedData: function (item) {
     var validationErrors = [];
 
-    // Required field validation matching DTO
     if (!item.WfStateId || item.WfStateId <= 0) {
       validationErrors.push("Invalid State ID");
     }

@@ -3,8 +3,6 @@
 // <reference path="statedetails.js" />
 
 
-
-
 var ActionDetailManager = {
 
   fetchNextStateComboBoxData: async function (menuId) {
@@ -50,8 +48,24 @@ var ActionDetailManager = {
     });
   },
 
+  //fetchInstituteComboBoxData: async function () {
+  //  debugger;
+  //  const serviceUrl = "/get-action-summary-by-statusId?stateId=" + encodeURIComponent(stateId),
+  //  //try {
+  //  //  const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+  //  //  if (response && response.IsSuccess === true) {
+  //  //    return Promise.resolve(response.Data);
+  //  //  } else {
+  //  //    throw new Error("Failed to load institute data");
+  //  //  }
+  //  //} catch (error) {
+  //  //  VanillaApiCallManager.handleApiError(error);
+  //  //  return Promise.reject(error);
+  //  //}
+  //},
 
-  getSummaryGridDataSource: function () {
+  getSummaryGridDataSource: function (stateId) {
+    debugger;
     return VanillaApiCallManager.GenericGridDataSource({
       apiUrl: baseApi + "/get-action-summary-by-statusId?stateId=" + encodeURIComponent(stateId),
       requestType: "POST",
@@ -249,12 +263,107 @@ var ActionDetailHelper = {
 
 
   initActionDetails: function () {
-    ActionDetailHelper.generateNextStateCombo();
-    this.initializeResponsiveActionGrid();
-    this.bindResizeEvents();
+    //ActionDetailHelper.generateNextStateCombo();
+    //this.initializeResponsiveActionGrid(0);
+    //this.bindResizeEvents();
   },
 
-  // Update the existing method to handle empty data better
+  initializeActionSummaryGrid: function () {
+    var Columns = this.generateResponsiveColumns();
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
+    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+    var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
+
+    const gridOptions = {
+      toolbar: this.getToolbarConfig(),
+      excel: {
+        fileName: "WorkflowList" + Date.now() + ".xlsx",
+        filterable: true,
+        allPages: true,
+        columnInfo: true,
+      },
+      pdf: {
+        fileName: "Workflow_Information.pdf",
+        allPages: true,
+        paperSize: "A4",
+        landscape: true,
+        margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
+        scale: 0.9,
+        repeatHeaders: true,
+        columns: [
+          { field: "WorkflowTitle", width: 200 }
+        ]
+      },
+      dataSource: [],
+      autoBind: true,
+      navigatable: true,
+      scrollable: true,
+      resizable: true,
+      width: gridWidth,
+      filterable: true,
+      sortable: true,
+      pageable: {
+        refresh: true,
+        pageSizes: [10, 20, 30, 50, 100],
+        buttonCount: 5,
+        input: false,
+        numeric: true,
+        serverPaging: true,
+        serverFiltering: true,
+        serverSorting: true
+      },
+      columns: Columns,
+      mobile: true,
+      toolbar: this.getToolbarConfig(),
+      dataBound: function () {
+        WorkFlowSummaryHelper.adjustGridForMobile();
+      },
+      editable: false,
+      selectable: "row",
+      error: function (e) {
+        console.log("Grid Error:", e);
+        kendo.alert({
+          title: "Error",
+          content: "Error: " + e.errors
+        });
+      }
+    };
+
+    $("#gridSummary").kendoGrid(gridOptions);
+
+    $("#btnExportCsvCourse").on("click", function () {
+      CommonManager.GenerateCSVFileAllPages("gridSummary", "CourseListCSV", "Actions");
+    });
+
+    const grid = $("#gridSummary").data("kendoGrid");
+    if (grid) {
+      const ds = WrokFlowSummaryManager.getSummaryGridDataSource();
+
+      ds.bind("error", function (e) {
+        console.log("DataSource Error Event:", e);
+        console.log("DataSource Error Event:", e.response);
+        kendo.alert({
+          title: "Error",
+          content: "Error: " + e.response
+        });
+      });
+
+      ds.bind("requestEnd", function (e) {
+        console.log(e);
+        console.log(e.response);
+        if (e.response && e.response.isSuccess === false) {
+          console.log("API returned error:", e.response.message);
+          kendo.alert({
+            title: "Error",
+            content: "Error: " + e.response.message
+          });
+        }
+      });
+
+      grid.setDataSource(ds);
+    }
+  },
+
   generateActionGrid: function (stateId) {
     // Check if grid already exists
     var existingGrid = $("#gridSummaryAction").data("kendoGrid");
@@ -276,18 +385,25 @@ var ActionDetailHelper = {
   },
 
   initializeResponsiveActionGrid: function (stateId) {
-    var columns = this.generateResponsiveActionColumns();
+    debugger;
+    this.clearActionGrid();
+    var Columns = this.generateResponsiveActionColumns();
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
+    //var containerWidth = $("#gridSummaryAction").width() || (window.innerWidth - 323);
+    var containerWidth = $("#gridSummaryAction").width();
+    var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
+    var height = this.calculateDynamicActionGridHeight();
 
     $("#gridSummaryAction").kendoGrid({
       dataSource: stateId ? ActionDetailManager.getSummaryGridDataSource(stateId) : [],
-      height: this.calculateDynamicActionGridHeight(),
-      width: "100%",
-      scrollable: true, // Enable scrolling when needed
+      height: height,
+      scrollable: true, 
       resizable: true,
+      width: gridWidth,
       sortable: true,
       filterable: true,
-      pageable: false, // Disable pagination to show dynamic scrolling
-      columns: columns,
+      pageable: false, 
+      columns: Columns,
       mobile: true,
       toolbar: this.getActionToolbarConfig(),
       dataBound: function (e) {
@@ -305,28 +421,37 @@ var ActionDetailHelper = {
   },
 
   calculateDynamicActionGridHeight: function () {
-    // Calculate height for maximum 10 rows
-    var headerHeight = 50; // Grid header height
-    var rowHeight = 35; // Approximate row height
-    var maxRows = 10;
-    var toolbarHeight = 40; // Toolbar height
-    var borderPadding = 10; // Border and padding
+    var returnHeight = 0;
+    //var headerHeight = 50;
+    //var rowHeight = 35;
+    //var maxRows = 10;
+    //var toolbarHeight = 40;
+    //var borderPadding = 10;
+    //var maxHeight = headerHeight + (rowHeight * maxRows) + toolbarHeight + borderPadding;
 
-    var maxHeight = headerHeight + (rowHeight * maxRows) + toolbarHeight + borderPadding;
-
+    var maxHeight = 50 + (35 * 10) + 40 + 10;
     var windowHeight = window.innerHeight;
     var windowWidth = window.innerWidth;
 
     if (windowWidth < 576) {
-      return Math.min(maxHeight, 400); // Mobile - maximum 400px
+      returnHeight = Math.min(maxHeight, 400); // Mobile - maximum 400px
     } else if (windowWidth < 992) {
-      return Math.min(maxHeight, 450); // Tablet - maximum 450px
+      returnHeight = Math.min(maxHeight, 450); // Tablet - maximum 450px
     } else {
-      return Math.min(maxHeight, windowHeight - 350); // Desktop
+      returnHeight = Math.min(maxHeight, windowHeight); // Desktop
+      //if (maxHeight > windowHeight) // Desktop
+      //{
+      //  returnHeight = windowHeight;
+      //}
+      //else {
+      //  returnHeight = Math.min(maxHeight, windowHeight); // Desktop
+      //}
     }
+    return returnHeight;
   },
 
   adjustGridHeightBasedOnData: function (e) {
+    debugger;
     var grid = e.sender;
     var dataSource = grid.dataSource;
     var totalItems = dataSource.total();
@@ -357,7 +482,8 @@ var ActionDetailHelper = {
 
     // Apply the calculated height
     grid.wrapper.height(calculatedHeight);
-    grid.wrapper.find(".k-grid-content").height(calculatedHeight - headerHeight - toolbarHeight);
+    grid.wrapper.find(".k-grid-content").height(calculatedHeight - headerHeight);
+    //grid.wrapper.find(".k-grid-content").height(calculatedHeight - headerHeight - toolbarHeight);
 
     // Refresh grid layout
     grid.resize();
@@ -518,7 +644,7 @@ var ActionDetailHelper = {
   generateNextStateCombo: function () {
     $("#cmbNextState").kendoComboBox({
       placeholder: "Select Next State...",
-      //optionLabel: "-- Select Next State --",
+      optionLabel: "-- Select Next State --",
       dataTextField: "StateName",
       dataValueField: "WfstateId",
       filter: "contains",

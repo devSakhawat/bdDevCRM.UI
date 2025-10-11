@@ -8,7 +8,10 @@ $(document).ready(function () {
   WorkFlowDetailsHelper.createTabstrip();
   WorkFlowSummaryHelper.initWorkFlowSummary();
   StateDetailsHelper.initStateDetails();
-  ActionDetailHelper.initActionDetails();
+
+  ActionDetailHelper.initializeResponsiveActionGrid(0);
+  ActionDetailHelper.generateNextStateCombo();
+ /* ActionDetailHelper.initActionDetails();*/
 
   //StateDetailsHelper.initStateDetails().then(function () {
   //  ActionDetailHelper.initActionDetails();

@@ -28,36 +28,104 @@ var WrokFlowSummaryManager = {
 var WorkFlowSummaryHelper = {
 
   initWorkFlowSummary: function () {
-    this.initializeResponsiveGrid();
+    this.initializeSummaryGrid();
     this.bindResizeEvents();
   },
 
-  initializeResponsiveGrid: function () {
-    var columns = this.generateResponsiveColumns();
-    var dataSource = WrokFlowSummaryManager.getSummaryGridDataSource();
-    console.log(dataSource);
-    $("#gridSummary").kendoGrid({
-      dataSource: dataSource,
-      height: this.calculateGridHeight(),
-      width: "100%",
-      scrollable: {
-        virtual: false
+  initializeSummaryGrid: function () {
+    var Columns = this.generateResponsiveColumns();
+    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
+    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+    var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
+
+    const gridOptions = {
+      toolbar: this.getToolbarConfig(),
+      excel: {
+        fileName: "WorkflowList" + Date.now() + ".xlsx",
+        filterable: true,
+        allPages: true,
+        columnInfo: true,
       },
+      pdf: {
+        fileName: "Workflow_Information.pdf",
+        allPages: true,
+        paperSize: "A4",
+        landscape: true,
+        margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
+        scale: 0.9,
+        repeatHeaders: true,
+        columns: [
+          { field: "WorkflowTitle", width: 200 }
+        ]
+      },
+      dataSource: [],
+      autoBind: true,
+      navigatable: true,
+      scrollable: true,
       resizable: true,
-      sortable: true,
+      width: gridWidth,
       filterable: true,
+      sortable: true,
       pageable: {
         refresh: true,
-        pageSizes: [10, 20, 50],
-        buttonCount: 3
+        pageSizes: [10, 20, 30, 50, 100],
+        buttonCount: 5,
+        input: false,
+        numeric: true,
+        serverPaging: true,
+        serverFiltering: true,
+        serverSorting: true
       },
-      columns: columns,
+      columns: Columns,
       mobile: true,
       toolbar: this.getToolbarConfig(),
       dataBound: function () {
         WorkFlowSummaryHelper.adjustGridForMobile();
+      },
+      editable: false,
+      selectable: "row",
+      error: function (e) {
+        console.log("Grid Error:", e);
+        kendo.alert({
+          title: "Error",
+          content: "Error: " + e.errors
+        });
       }
+    };
+
+    $("#gridSummary").kendoGrid(gridOptions);
+
+    $("#btnExportCsvCourse").on("click", function () {
+      CommonManager.GenerateCSVFileAllPages("gridSummary", "CourseListCSV", "Actions");
     });
+
+    const grid = $("#gridSummary").data("kendoGrid");
+    if (grid) {
+      const ds = WrokFlowSummaryManager.getSummaryGridDataSource();
+
+      ds.bind("error", function (e) {
+        console.log("DataSource Error Event:", e);
+        console.log("DataSource Error Event:", e.response);
+        kendo.alert({
+          title: "Error",
+          content: "Error: " + e.response
+        });
+      });
+
+      ds.bind("requestEnd", function (e) {
+        console.log(e);
+        console.log(e.response);
+        if (e.response && e.response.isSuccess === false) {
+          console.log("API returned error:", e.response.message);
+          kendo.alert({
+            title: "Error",
+            content: "Error: " + e.response.message
+          });
+        }
+      });
+
+      grid.setDataSource(ds);
+    }
   },
 
   generateResponsiveColumns: function () {
@@ -197,7 +265,7 @@ var WorkFlowSummaryHelper = {
           if (window.innerWidth < 768 !== WorkFlowSummaryHelper.wasMobile) {
             grid.destroy();
             $("#gridSummary").empty();
-            WorkFlowSummaryHelper.initializeResponsiveGrid();
+            WorkFlowSummaryHelper.initializeSummaryGrid();
             WorkFlowSummaryHelper.wasMobile = window.innerWidth < 768;
           } else {
             // Just resize for minor changes
@@ -231,6 +299,7 @@ var WorkFlowSummaryHelper = {
   },
 
   clickEventForEditButton: function (event) {
+    debugger;
     const item = this._getGridItem(event);
     if (item) {
       console.log(item);

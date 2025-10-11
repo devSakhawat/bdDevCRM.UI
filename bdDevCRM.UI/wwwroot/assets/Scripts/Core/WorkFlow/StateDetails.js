@@ -33,104 +33,51 @@ var StateDetailsManager = {
   },
 
   saveOrUpdate: function () {
-    //if (UserDetailsHelper.validateUserDetaisForm()) {
+    const id = $("#stateID").val() || 0;
+    const isCreate = id == 0;
+    const serviceUrl = isCreate ? "/workflow" : `/workflow/${id}`;
+    const httpType = isCreate ? "POST" : "PUT";
+    const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+    const successMsg = isCreate ? "New data saved successfully." : "Information updated successfully.";
 
-    // default
-    var isToUpdateOrCreate = $("#stateID").val();
-    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
-    var serviceUrl = isToUpdateOrCreate == 0 ? "/workflow" : "/workflow/" + isToUpdateOrCreate;
-    var confmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
-    var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
+    const modelDto = StateDetailsHelper.createStateInfo();
+    if (!modelDto) {
+      throw new Error("Failed to create DTO object");
+    }
 
-    AjaxManager.MsgBox(
-      'info',
-      'center',
-      'Confirmation',
-      confmsg,
-      [
-        {
-          addClass: 'btn btn-primary',
-          text: 'Yes',
-          onClick: function ($noty) {
-            $noty.close();
-            var objWfState = StateDetailsHelper.createStateInfo();
-
-            var jsonObject = JSON.stringify(objWfState);
-            var responseData = AjaxManager.PostDataForDotnetCoreWithHttp(baseApi, serviceUrl, jsonObject, httpType, onSuccess, onFailed);
-            function onSuccess(responseData, textStatus, xhr) {
-              console.log("Status Code:", xhr); // 200
+    debugger;
+    CommonManager.MsgBox(
+      "info",
+      "center",
+      "Confirmation",
+      confirmMsg,
+      [{
+        addClass: "btn btn-primary",
+        text: "Yes",
+        onClick: async function ($noty) {
+          $noty.close();
+          var jsonObject = JSON.stringify(modelDto);
+          try {
+            const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+            if (response && (response.IsSuccess === true || response === "Success")) {
+              ToastrMessage.showSuccess(successMsg);
               StateDetailsHelper.clearStateForm();
-
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 0,
-                //message: successmsg,
-                message: responseData == "Success" ? successmsg : responseData,
-                type: 'success',
-              });
-              $("#gridSummary").data("kendoGrid").dataSource.read();
+              $("#divSummary").data("kendoGrid").dataSource.read();
+            } else {
+              throw new Error(response.Message || response || "Unknown error occurred");
             }
-
-            function onFailed(jqXHR, textStatus, errorThrown) {
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 0,
-                message: jqXHR.status + " : " + jqXHR.responseText,
-                type: 'error',
-              });
-            }
-
+          } catch (err) {
+            console.log(err);
+            VanillaApiCallManager?.handleApiError?.(err);
           }
-        },
-        {
-          addClass: 'btn',
-          text: 'Cancel',
-          onClick: function ($noty) {
-            $noty.close();
-          }
-        },
-      ]
-      , 0
+        }
+      },
+      { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
+      0
     );
-
-    //}
-    //function onSuccess(jsonData) {
-    //  //var js = jsonData.split('"');
-    //  if (jsonData == "Success") {
-    //    AjaxManager.MsgBox('success', 'center', 'Success:', 'User Saved Successfully',
-    //      [{
-    //        addClass: 'btn btn-primary', text: 'Ok', onClick: function ($noty) {
-    //          $noty.close();
-    //          UserDetailsHelper.clearUserForm();
-    //          $("#gridUser").data("kendoGrid").dataSource.read();
-    //          $("#btnSave").text("Save");
-    //          $("#cmbCompanyNameDetails").focus();
-    //        }
-    //      }]);
-    //  }
-    //  else {
-    //    AjaxManager.MsgBox('warning', 'center', 'Failed', jsonData,
-    //      [{
-    //        addClass: 'btn btn-primary', text: 'Ok', onClick: function ($noty) {
-    //          $noty.close();
-    //        }
-    //      }]);
-    //  }
-    //}
-
-    //function onFailed(error) {
-    //  AjaxManager.MsgBox('error', 'center', 'Failed', error.statusText,
-    //    [{
-    //      addClass: 'btn btn-primary', text: 'Ok', onClick: function ($noty) {
-    //        $noty.close();
-    //      }
-    //    }]);
-    //}
-  }
+    
+  },
 }
-
 
 var StateDetailsHelper = {
 
@@ -139,6 +86,7 @@ var StateDetailsHelper = {
     StateDetailsHelper.generateIsCloseCombo();
     await this.populateMenuCombo();
   },
+
 
   // initialize all combo box.
   generateMenuCombo: function () {
@@ -167,24 +115,50 @@ var StateDetailsHelper = {
     }
   },
 
-  generateIsCloseCombo: function () {
-    $("#cmbIsClose").kendoComboBox({
-      placeholder: "Select from List",
-      dataTextField: "text",
-      dataValueField: "value",
-      dataSource: [
-        { text: "Open", value: "0" },
-        { text: "Possible Close", value: "1" },
-        { text: "Close", value: "2" },
-        { text: "Destroyed", value: "3" },
-        { text: "Draft", value: "4" },
-        { text: "Deligated", value: "5" },
-        { text: "Published", value: "6" },
-        { text: "Extended", value: "7" },
-      ],
-      filter: "contains",
-      suggest: true
-    });
+  generateIsCloseCombo: async function (elementSelector = "#cmbIsClose") {
+    try {
+      const $el = $(elementSelector);
+      if (!$el.length) return;
+
+      // fetch data
+      const data = [
+        { ClosingStateName: "Select Closing Status", closingStateId: "0" },
+        { ClosingStateName: "Open", closingStateId: "1" },
+        { ClosingStateName: "Possible Close", closingStateId: "2" },
+        { ClosingStateName: "Close", closingStateId: "3" },
+        { ClosingStateName: "Destroyed", closingStateId: "4" },
+        { ClosingStateName: "Draft", closingStateId: "5" },
+        { ClosingStateName: "Deligated", closingStateId: "6" },
+        { ClosingStateName: "Published", closingStateId: "7" },
+        { ClosingStateName: "Extended", closingStateId: "8" },
+      ];
+
+      // destroy previous widget if any
+      const existing = $el.data("kendoDropDownList");
+      if (existing) { existing.destroy(); $el.off(); }
+
+      // init kendo dropdown (without optionLabel)
+      $el.kendoDropDownList({
+        dataTextField: "ClosingStateName",
+        dataValueField: "closingStateId",
+        dataSource: data,
+        valuePrimitive: true,
+        value: data[0]?.closingStateId || 0,
+        filter: "contains",
+        suggest: true
+      });
+
+
+      // if admin then set deafult falue otherwise set first sequence of users state data.
+      const dd = $el.data("kendoDropDownList");
+      if (dd) dd.value(data[0]?.WfStateId || 0);
+
+    } catch (err) {
+      console.error("Error populating status dropdown:", err);
+      if (typeof VanillaApiCallManager !== "undefined") {
+        VanillaApiCallManager.handleApiError(err);
+      }
+    }
   },
 
   createStateInfo: function () {
@@ -194,10 +168,10 @@ var StateDetailsHelper = {
     //// using jQuery
     //state.MenuID = $("#cmbMenu").val() == '' ? '0' : $("#cmbMenu").val();
 
-    //state.StateName = $("#txtStateName").val() == '' ? '0' : $("#stateID").val();
+    state.Sequence = $("#txtSequenceNo").val();
     state.WFStateId = $("#stateID").val() == '' ? '0' : $("#stateID").val();
     state.StateName = $("#txtStateName").val();
-    state.IsClosed = $("#cmbIsClose").data("kendoComboBox").value() == '' ? '0' : $("#cmbIsClose").data("kendoComboBox").value();
+    state.IsClosed = $("#cmbIsClose").data("kendoDropDownList").value() == '' ? '0' : $("#cmbIsClose").data("kendoDropDownList").value();
 
     if ($("#chkIsDefault").is(':checked') == true) {
       state.IsDefaultStart = true;
@@ -213,7 +187,8 @@ var StateDetailsHelper = {
     $("#cmbMenu").val('');
     $("#cmbMenu").data("kendoComboBox").text('');
     $("#txtStateName").val('');
-    $("#cmbIsClose").data("kendoComboBox").value(0);
+    $("#txtSequenceNo").val('');
+    $("#cmbIsClose").data("kendoDropDownList").value(0);
     $("#chkIsDefault").prop("checked", false);
 
     $("#gridSummaryAction").empty();

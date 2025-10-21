@@ -3,6 +3,7 @@
 /// <reference path="coursesummary.js" />
 
 var CourseDetailsManager = {
+
   fetchInstituteComboBoxData: async function () {
     debugger;
     const serviceUrl = "/crm-institute-ddl";

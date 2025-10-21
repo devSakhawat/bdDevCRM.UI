@@ -1,4 +1,13 @@
-﻿
+﻿/// <reference path="accesscontrolpermission.js" />
+/// <reference path="actionpermission.js" />
+/// <reference path="group.js" />
+/// <reference path="groupdetails.js" />
+/// <reference path="groupinfo.js" />
+/// <reference path="grouppermission.js" />
+/// <reference path="menupermission.js" />
+/// <reference path="groupsummary.js" />
+/// <reference path="reportpermission.js" />
+
 var stateArray = [];
 var statePermissionArray = [];
 

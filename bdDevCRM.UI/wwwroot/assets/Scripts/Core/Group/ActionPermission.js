@@ -1,7 +1,15 @@
-﻿var actionArray = [];
+﻿/// <reference path="accesscontrolpermission.js" />
+/// <reference path="group.js" />
+/// <reference path="groupdetails.js" />
+/// <reference path="groupinfo.js" />
+/// <reference path="grouppermission.js" />
+/// <reference path="groupsummary.js" />
+/// <reference path="menupermission.js" />
+/// <reference path="reportpermission.js" />
+/// <reference path="statepermission.js" />
 
+var actionArray = [];
 var actionPermissionArray = [];
-
 
 var ActionManager = {
 

@@ -15,6 +15,9 @@ $(document).ready(function () {
 
   CRMCourseInformationHelper.intCourse();
 
+  CommonFunctions.GetAccessPermisionForCurrentUser();
+  //isHr = CommonFunctions.checkHrUser();
+
 });
 
 
@@ -311,6 +314,43 @@ var CRMApplicationManager = {
     }
   },
 
+  getAccessPermisionForCurrentUser: async function () {
+    try {
+      const serviceUrl = "/GetAccessPermisionForCurrentUser";
+
+      const res = await VanillaApiCallManager.get(baseApi, serviceUrl, );
+
+      if (res && res.IsSuccess === true && Array.isArray(res.Data)) {
+        return res.Data; // expects [{ WFStateId, StateName }, ...]
+      }
+      return [];
+    } catch (err) {
+      console.error("Error loading status by menu user:", err);
+      if (typeof VanillaApiCallManager !== "undefined") {
+        VanillaApiCallManager.handleApiError(err);
+      }
+      return [];
+    }
+  },
+
+  GetAccessPermisionForCurrentUser: function () {
+    var objStatus = "";
+    var jsonParam = "";
+    var serviceUrl = "../Group/GetAccessPermisionForCurrentUserConfirmationModule/";
+    AjaxManager.GetJsonResult(serviceUrl, jsonParam, false, false, onSuccess, onFailed);
+
+    function onSuccess(jsonData) {
+      for (var i = 0; i < jsonData.length; i++) {
+        accessArray.push(jsonData[i]);
+      }
+
+      //leaveApplicationHelper.PopulateAccessArray(jsonData);
+    }
+    function onFailed(error) {
+
+      AjaxManager.MsgBox('error', 'center', 'Error', error.statusText, [{ addClass: 'btn btn-primary', text: 'Ok', onClick: function ($noty) { $noty.close(); } }]);
+    }
+  },
 };
 
 
@@ -373,87 +413,9 @@ var CRMApplicationHelper = {
         suggest: true
       });
 
-      //// init kendo dropdown with computed default
-      //$el.kendoDropDownList({
-      //  optionLabel: { StateName: "Select Status", WfStateId: 0 },
-      //  dataTextField: "StateName",
-      //  dataValueField: "WfStateId",
-      //  dataSource: data,
-      //  valuePrimitive: true,
-      //  value: data[0]?.WfStateId || 0,
-      //  filter: "contains",
-      //  suggest: true
-      //});
-
       // if admin then set deafult falue otherwise set first sequence of users state data.
       const dd = $el.data("kendoDropDownList");
       if (dd) dd.value(data[0]?.WfStateId || 0);
-
-      //debugger
-      //if (accessArray && accessArray.length > 0) {
-      //  // Check if any item in accessArray has RefferenceId == 3
-      //  if (accessArray.some(function (item) { return item.ReferenceID === 3; })) {
-
-      //    // Proceed to check for "recommendation" in StateName in data
-      //    var containsRecommendation = data.find(function (item) {
-      //      return item.StateName.toLowerCase().includes("recommendation");
-      //    });
-
-      //    // If found, set the value of the Kendo ComboBox
-      //    if (containsRecommendation) {
-      //      $("#cmbStatusForSummary").data("kendoComboBox").value(containsRecommendation.WFStateId);
-      //    }
-      //  }
-
-      //  // Check if any item in accessArray has RefferenceId == 4
-      //  if (accessArray.some(function (item) { return item.ReferenceID === 4; })) {
-
-      //    // Proceed to check for "recommendation" in StateName in data
-      //    var containsApproval = data.find(function (item) {
-      //      return item.StateName.toLowerCase().includes("approval");
-      //    });
-
-      //    // If found, set the value of the Kendo ComboBox
-      //    if (containsApproval) {
-      //      $("#cmbStatusForSummary").data("kendoComboBox").value(containsApproval.WFStateId);
-      //    }
-      //  }
-
-
-      //  // Check if any item in accessArray has RefferenceId == 22
-      //  if (accessArray.some(function (item) { return item.ReferenceID === 22; })) {
-
-      //    // Proceed to check for "recommendation" in StateName in data
-      //    var containsHR = data.find(function (item) {
-      //      return item.StateName.toLowerCase().includes("hr");
-      //    });
-
-      //    // If found, set the value of the Kendo ComboBox
-      //    if (containsHR) {
-      //      $("#cmbStatusForSummary").data("kendoComboBox").value(containsHR.WFStateId);
-      //    }
-      //  }
-
-      //  if (assembly.AssemblyInfoId == 14) {
-      //    // Check if any item in accessArray has RefferenceId == 22
-      //    if (accessArray.some(function (item) { return item.ReferenceID === 31; })) {
-
-      //      // Proceed to check for "recommendation" in StateName in data
-      //      var containsHR = data.find(function (item) {
-      //        return item.StateName.toLowerCase().includes("higher");
-      //      });
-
-      //      // If found, set the value of the Kendo ComboBox
-      //      if (containsHR) {
-      //        $("#cmbStatusForSummary").data("kendoComboBox").value(containsHR.WFStateId);
-      //      }
-      //    }
-      //  }
-
-      //}
-
-
-
     } catch (err) {
       console.error("Error populating status dropdown:", err);
       if (typeof VanillaApiCallManager !== "undefined") {
@@ -540,10 +502,6 @@ var CRMApplicationHelper = {
     }
 
   },
-
-
-
-
 
 
   /*********************** Common Function End ***********************************************/
@@ -1126,18 +1084,6 @@ var CRMApplicationHelper = {
         typeof CRMCourseInformationHelper.clearCRMApplicationCourse === "function") {
         CRMCourseInformationHelper.clearCRMApplicationCourse();
       }
-
-      //// Clear Education & English Language
-      //if (typeof CRMEducationNEnglishLanguagHelper !== "undefined" &&
-      //  typeof CRMEducationNEnglishLanguagHelper.clearEducationNEnglishLanguageForm === "function") {
-      //  CRMEducationNEnglishLanguagHelper.clearEducationNEnglishLanguageForm();
-      //}
-
-      //// Clear Additional Information
-      //if (typeof CRMAdditionalInformationHelper !== "undefined" &&
-      //  typeof CRMAdditionalInformationHelper.clearAdditionalInformationForm === "function") {
-      //  CRMAdditionalInformationHelper.clearAdditionalInformationForm();
-      //}
 
       // Reset application ID
       $("#hdnApplicationId").val(0);

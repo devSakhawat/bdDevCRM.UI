@@ -374,102 +374,6 @@ var AjaxManager = {
     return gridDataSource;
   },
 
-  GenericGridDataSourceNew: function (options) {
-    // Default options with fallback values
-    const defaults = {
-      apiUrl: "", // API endpoint
-      requestType: "POST", // HTTP method
-      async: true, // Asynchronous requests
-      contentType: "application/json; charset=utf-8", // Default content type
-      modelFields: {}, // Model fields for schema
-      pageSize: 10, // Default page size
-      serverPaging: true, // Enable server-side paging
-      serverSorting: false, // Enable server-side sorting
-      serverFiltering: true, // Enable server-side filtering
-      allowUnsort: false, // Allow unsorting columns
-      schemaData: "items", // Data field in the API response
-      schemaTotal: "totalCount", // Total count field in the API response
-      parameterMap: function (options) {
-        return JSON.stringify(options); // Default parameter mapping
-      }
-    };
-
-    // Merge user-provided options with defaults
-    const config = { ...defaults, ...options };
-
-    console.log("Token:", AjaxManager.getDefaultHeaders()); // Log headers for debugging
-
-    // Create and return the Kendo DataSource
-    return new kendo.data.DataSource({
-      type: "json",
-      serverPaging: config.serverPaging,
-      serverSorting: config.serverSorting,
-      serverFiltering: config.serverFiltering,
-      allowUnsort: config.allowUnsort,
-      pageSize: config.pageSize,
-      transport: {
-        read: {
-          url: config.apiUrl,
-          type: config.requestType,
-          dataType: "json",
-          async: config.async,
-          contentType: config.contentType,
-          headers: AjaxManager.getDefaultHeaders() // Attach default headers
-        },
-        parameterMap: config.parameterMap
-      },
-      schema: {
-        data: config.schemaData,
-        total: config.schemaTotal,
-        model: {
-          fields: config.modelFields // Dynamically set model fields
-        }
-      }
-    });
-  },
-
-  GenericGridDataSource2: function (options) {
-
-    var apiUrl = options.apiUrl;
-    var serverPaging = options.serverPaging !== undefined ? options.serverPaging : true;
-    var serverSorting = options.serverSorting !== undefined ? options.serverSorting : false;
-    var serverFiltering = options.serverFiltering !== undefined ? options.serverFiltering : true;
-    var pageSize = options.pageSize || 10;
-    var modelFields = options.modelFields || {};
-
-    // Create a new Kendo DataSource with dynamic configurations
-    var gridDataSource = new kendo.data.DataSource({
-      type: "json",
-      serverPaging: serverPaging,
-      serverSorting: serverSorting,
-      serverFiltering: serverFiltering,
-      allowUnsort: options.allowUnsort || false,
-      pageSize: pageSize,
-      transport: {
-        read: {
-          url: apiUrl,
-          headers: headers,
-          type: "POST", // Default to POST
-          dataType: "json",
-          async: options.async !== undefined ? options.async : false,
-          contentType: options.contentType || "application/json; charset=utf-8",
-          headers: AjaxManager.getDefaultHeaders()
-        },
-        parameterMap: options.parameterMap || function (options) {
-          return JSON.stringify(options);
-        }
-      },
-      schema: {
-        data: options.schemaData || "items",
-        total: options.schemaTotal || "totalCount",
-        model: {
-          fields: modelFields // Provide dynamic fields based on options
-        }
-      }
-    });
-    return gridDataSource;
-  },
-
   GetDataSource: function (serviceUrl, jsonParams) {
     var objResult = new Object();
     $.ajax({
@@ -798,16 +702,6 @@ var AjaxManager = {
     return res;
   },
 
-  //// Function to get default headers
-  //getDefaultHeaders: function () {
-  //  TokenManger.CheckToken(); // Ensure the token is valid
-  //  return {
-  //    "Authorization": "Bearer " + token,
-  //    "Accept": "application/json",
-  //    "Content-Type": "application/json"
-  //  };
-  //},
-
   GetDataForDotnetCoreAsync: function (baseApi, serviceUrl, jsonParams, isAsync, isCache, onSuccess, onFailed) {
     jQuery.support.cors = true;
 
@@ -1058,19 +952,6 @@ var AjaxManager = {
     });
   },
 
-  SendJson2: function (serviceUrl, jsonParams, successCallback, errorCallback) {
-    jQuery.ajax({
-      url: serviceUrl,
-      async: false,
-      type: "POST",
-      data: "{" + jsonParams + "}",
-      dataType: "json",
-      contentType: "application/json; charset=utf-8",
-      success: successCallback,
-      error: errorCallback
-    });
-  },
-
   GetReport: function (serviceUrl, jsonParams, errorCallback) {
     //  ////debugger;
     jQuery.ajax({
@@ -1146,25 +1027,6 @@ var AjaxManager = {
     });
   },
 
-  //Export1: function (serviceUrl, jsonParams)4 {
-  //  //  var jsonParam = 'param:' + JSON.stringify(finalSubmitedParam) + ',reportId:' + reportId;
-  //  $.blockUI({
-  //    message: $('#divBlockMessage'),
-  //    onBlock: function () {
-  //      AjaxManager.SendJson(serviceUrl, jsonParams, function (result) {
-
-  //        $.unblockUI();
-  //        window.open(result, '_self');
-
-
-  //      }, function () {
-  //        $.unblockUI();
-  //      });
-  //    }
-  //  });
-  //},
-
-  // message box with auto hide delay
   MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
     try {
       // Map Noty message types to SweetAlert2 types
@@ -1261,121 +1123,6 @@ var AjaxManager = {
       alert(messageText || "Operation confirmation required");
       return Promise.resolve();
     }
-  },
-
-  MsgBoxOldByMe: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray) {
-    try {
-      // Map Noty message types to SweetAlert2 types
-      const typeMap = {
-        'success': 'success',
-        'error': 'error',
-        'warning': 'warning',
-        'info': 'info',
-        'information': 'info',
-        'alert': 'question'
-      };
-
-      // Get the appropriate icon type
-      const iconType = typeMap[messageBoxType] || 'info';
-
-      // Set up the SweetAlert2 configuration
-      const swalConfig = {
-        title: messageBoxHeaderText || '',
-        html: messageText || '',
-        icon: iconType,
-
-        showClass: {
-          popup: 'swal2-show',
-          backdrop: 'swal2-backdrop-show',
-          icon: 'swal2-icon-show'
-        },
-        hideClass: {
-          popup: 'swal2-hide',
-          backdrop: 'swal2-backdrop-hide',
-          icon: 'swal2-icon-hide'
-        },
-        customClass: {
-          container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
-        },
-        //customClass: {
-        //  container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
-        //},
-        showConfirmButton: false,
-        showCancelButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        //allowEnterKey: false,
-        focusConfirm: false,
-
-        // Add the didOpen hook here
-        didOpen: () => {
-          document.querySelector('.swal2-container').style.zIndex = '9999'; // Set z-index dynamically
-          Swal.getPopup().addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault(); // prevent Enter from submitting
-            }
-          });
-        }
-      };
-
-      // Handle positioning
-      if (displayPosition.includes('top')) {
-        swalConfig.position = 'top';
-      } else if (displayPosition.includes('bottom')) {
-        swalConfig.position = 'bottom';
-      } else {
-        swalConfig.position = 'center';
-      }
-
-      // Process buttons
-      if (Array.isArray(buttonsArray) && buttonsArray.length > 0) {
-        const primaryButton = buttonsArray.find(btn => btn.addClass && btn.addClass.includes('btn-primary'));
-        const cancelButton = buttonsArray.find(btn => btn.text === 'Cancel' || btn.text === 'No');
-
-        if (primaryButton) {
-          swalConfig.showConfirmButton = true;
-          swalConfig.confirmButtonText = primaryButton.text || 'OK';
-          swalConfig.confirmButtonClass = primaryButton.addClass || 'btn btn-primary';
-          swalConfig.focusConfirm = true;
-        }
-
-        if (cancelButton) {
-          swalConfig.showCancelButton = true;
-          swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
-          swalConfig.cancelButtonClass = cancelButton.addClass || 'btn';
-        }
-      }
-
-      // Fire the SweetAlert2 dialog
-      return Swal.fire(swalConfig).then((result) => {
-        if (result.isConfirmed && buttonsArray[0] && typeof buttonsArray[0].onClick === 'function') {
-          const notyMock = { close: () => { } };
-          buttonsArray[0].onClick(notyMock);
-        } else if (result.isDismissed && buttonsArray[1] && typeof buttonsArray[1].onClick === 'function') {
-          const notyMock = { close: () => { } };
-          buttonsArray[1].onClick(notyMock);
-        }
-      });
-
-    } catch (error) {
-      console.error("Error in SweetAlert MsgBox:", error);
-      alert(messageText || "Operation confirmation required");
-      return Promise.resolve();
-    }
-  },
-
-  MsgBox2: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray) {
-    var n = noty({
-      textHeader: messageBoxHeaderText,
-      text: messageText,
-      type: messageBoxType,
-      modal: true,
-      dismissQueue: true,
-      layout: displayPosition,
-      theme: 'defaultTheme',
-      buttons: buttonsArray
-    });
-    $(".btn-primary").focus();
   },
 
   getGridConfig: function (opt, urllink, sortColumnName, orderBy) {
@@ -1478,38 +1225,6 @@ var AjaxManager = {
     });
   },
 
-  //initPopupWindow: function (ctrId, title, width, fileId) {
-
-  //    $("#" + ctrId).kendoWindow({
-  //        position: {
-  //            top: 0, // or "100px"
-  //            left: "10%",
-  //            right: "10%"
-  //        },
-  //        title: title,
-  //        resizeable: false,
-  //        width: width,
-  //        actions: ["Pin", "Refresh", "Maximize", "Close"],
-  //        modal: true,
-  //        visible: false,
-  //        //minHeight: '80%',
-  //        open: function () {
-  //            // the opening animation is about to start
-  //            var input = this.wrapper.find("#" + fileId);
-  //            if (input.data("kendoUpload")) {
-  //                var upload = input.data("kendoUpload");
-  //                upload.destroy();
-  //                //$("#upload-wrapper").empty();
-  //                $("#" + ctrId).empty();
-  //                debugger;
-  //                var filedata = ("#" + fileId);
-  //                input = $('<input id=' + filedata + ' name="files" type="file"/>').appendTo($("#" + ctrId));
-  //            }
-  //            input.kendoUpload();
-  //        }
-  //    });
-  //},
-
   showlink: function (el, cellval, opts) {
     var op = { baseLinkUrl: opts.baseLinkUrl, showAction: opts.showAction, addParam: opts.addParam };
     if (!isUndefined(opts.colModel.formatoptions)) {
@@ -1582,6 +1297,11 @@ var AjaxManager = {
 };
 //End AjaxManager
 
+
+
+/* =========================================================
+    Menu Api Call Functions
+=========================================================*/
 // Menu start
 var MenuManager = {
 
@@ -1714,99 +1434,7 @@ var MenuManager = {
     });
   },
 
-  //#region commented code
-  //getMenu: function (moduleId) {
-  //  var pathName = window.location.pathname;
-  //  var pageName = pathName.substring(pathName.lastIndexOf('/') + 1);
-  //  var serviceURL = "../Menu/SelectMenuByUserPermission/";
-  //  var jsonParam = "";// "moduleId=" + moduleId;
-  //  AjaxManager.GetJsonResult(serviceURL, jsonParam, false, false, onSuccess, onFailed);
-  //  function onSuccess(jsonData) {
-  //    //MenuManager.populateMenus(jsonData);
-  //  }
-  //  function onFailed(error) {
-  //    window.alert(error.statusText);
-  //  }
-  //},
-
-  //getCurrentUser: function (menuRefresh) {
-  //  var jsonParam = '';
-  //  //var pathName = window.location.pathname;
-  //  //var pageName = pathName.substring(pathName.lastIndexOf('/') + 1);
-  //  var serviceURL = "../Home/GetCurrentUser";
-  //  //if (pageName.toLowerCase() == "home.mvc") {
-  //  //    serviceURL = "./Home/GetCurrentUser";
-  //  //}
-  //  //else {
-  //  //    serviceURL = "./GetCurrentUser";
-  //  //}
-  //  AjaxManager.SendJson2(serviceURL, jsonParam, onSuccess, onFailed);
-  //  function onSuccess(jsonData) {
-  //    CurrentUser = jsonData;
-  //    if (CurrentUser != undefined) {
-  //      if (menuRefresh == true) {
-  //        MenuManager.getMenu(1);
-  //      }
-
-  //      $("#headerLogo").attr('style', 'background-image: url("' + CurrentUser.FullLogoPath + '") !important');
-  //    }
-
-  //  }
-  //  function onFailed(error) {
-  //    window.alert(error.statusText);
-  //  }
-  //},
-
-  //getCurrentEmployee: function () {
-  //  var jsonParam = '';
-  //  var serviceURL = "../Home/GetCurrentEmployee";
-  //  return AjaxManager.GetSingleObject(serviceURL, jsonParam);
-
-  //},
-
-  //IsStringEmpty: function (str) {
-  //  if (str && str != '')
-  //    return false;
-  //  else
-  //    return true;
-  //},
-
-  //addchiledMenu: function (objMenuOrginal, menuId, objMenuList) {
-  //  var chiledMenuArray = [];
-  //  var newMenuArray = [];
-  //  for (var j = 0; j < objMenuList.length; j++) {
-  //    if (objMenuList[j].ParentMenuId == menuId) {
-  //      var objMenu = new Object();
-  //      objMenu = objMenuOrginal;
-  //      var objChiledMenu = new Object();
-  //      objChiledMenu.id = objMenuList[j].MenuId;
-  //      objChiledMenu.itemId = objMenuList[j].MenuId;
-  //      objChiledMenu.text = objMenuList[j].MenuName;
-  //      if (objMenuList[j].MenuPath == "") {
-  //        objMenu.url = "";
-  //      }
-  //      else {
-  //        objMenu.url = objMenuList[j].MenuPath;
-  //      }
-  //      objChiledMenu.spriteCssClass = "html";
-  //      chiledMenuArray = objMenuOrginal.items;
-  //      if (chiledMenuArray == undefined || chiledMenuArray.length == 0) {
-  //        chiledMenuArray = [];
-  //      }
-  //      else {
-  //        objChiledMenu.expanded = true,
-  //          objChiledMenu.spriteCssClass = "folder";
-  //      }
-  //      newMenuArray = MenuManager.chiledMenu(objChiledMenu, objMenuList[j].MenuId, objMenuList);
-  //      chiledMenuArray.push(objChiledMenu);
-  //      objMenu.items = chiledMenuArray;
-  //    }
-  //  }
-  //  return chiledMenuArray;
-  //},
-  //#endregion
 };
-
 var MenuHelper = {
 
   GetMenuInformation: function () {
@@ -1997,7 +1625,9 @@ var MenuHelper = {
 };
 // Menu end
 
-
+/* =========================================================
+    Vanilla Api Call Functions
+=========================================================*/
 // Vanilla Api Call Mechanism start
 const VanillaApiCallManager = {
 
@@ -2767,6 +2397,9 @@ const VanillaApiCallManager = {
 // Vanilla Api Call Machanism end
 
 
+/* =========================================================
+    Token Manger Functions
+=========================================================*/
 var TokenManger = {
   CheckToken: function () {
     token = localStorage.getItem("jwtToken");
@@ -2803,6 +2436,10 @@ var TokenManger = {
 
 };
 
+
+/* =========================================================
+    Common Manager Functions
+=========================================================*/
 var CommonManager = {
   // Emsure SweetAlert2 with High z-index
   MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
@@ -2920,105 +2557,6 @@ var CommonManager = {
       { addClass: "btn", text: "Cancel", onClick: () => onCancel && onCancel() }
     ], 0);
   },
-
-  //// Enhanced MsgBox (placeholder - implement based on your notification system)
-  //MsgBox: function (messageBoxType, displayPosition, messageBoxHeaderText, messageText, buttonsArray, autoHideDelay = 2000) {
-  //  try {
-  //    // Map Noty message types to SweetAlert2 types
-  //    const typeMap = {
-  //      'success': 'success',
-  //      'error': 'error',
-  //      'warning': 'warning',
-  //      'info': 'info',
-  //      'information': 'info',
-  //      'alert': 'question'
-  //    };
-  //    // Get the appropriate icon type
-  //    const iconType = typeMap[messageBoxType] || 'info';
-  //    // Set up the SweetAlert2 configuration
-  //    const swalConfig = {
-  //      title: messageBoxHeaderText || '',
-  //      html: messageText || '',
-  //      icon: iconType,
-  //      timer: autoHideDelay, // Auto-close after specified delay (default 3000ms)
-  //      timerProgressBar: true, // Show a progress bar
-  //      showClass: {
-  //        popup: 'swal2-show',
-  //        backdrop: 'swal2-backdrop-show',
-  //        icon: 'swal2-icon-show'
-  //      },
-  //      hideClass: {
-  //        popup: 'swal2-hide',
-  //        backdrop: 'swal2-backdrop-hide',
-  //        icon: 'swal2-icon-hide'
-  //      },
-  //      customClass: {
-  //        container: 'custom-swal-zindex' // Optional: If you want to apply a custom class
-  //      },
-  //      showConfirmButton: false,
-  //      showCancelButton: false,
-  //      allowOutsideClick: false,
-  //      allowEscapeKey: false,
-  //      allowEnterKey: false,
-  //      focusConfirm: false,
-  //      // Add the didOpen hook here
-  //      didOpen: () => {
-  //        document.querySelector('.swal2-container').style.zIndex = '20000'; // Set z-index dynamically
-  //      }
-  //    };
-
-  //    // Handle auto-hide delay
-  //    if (autoHideDelay > 0) {
-  //      swalConfig.timer = autoHideDelay; // Auto-close after specified delay
-  //      swalConfig.timerProgressBar = true; // Show a progress bar
-  //    }
-
-  //    // Handle positioning
-  //    if (displayPosition.includes('top')) {
-  //      swalConfig.position = 'top';
-  //    } else if (displayPosition.includes('bottom')) {
-  //      swalConfig.position = 'bottom';
-  //    } else {
-  //      swalConfig.position = 'center';
-  //    }
-  //    // Process buttons
-  //    if (Array.isArray(buttonsArray) && buttonsArray.length > 0) {
-  //      const primaryButton = buttonsArray.find(btn => btn.addClass && btn.addClass.includes('btn-primary'));
-  //      const cancelButton = buttonsArray.find(btn => btn.text === 'Cancel' || btn.text === 'No');
-  //      if (primaryButton) {
-  //        swalConfig.showConfirmButton = true;
-  //        swalConfig.confirmButtonText = primaryButton.text || 'OK';
-  //        swalConfig.customClass = swalConfig.customClass || {};
-  //        swalConfig.customClass.confirmButton = primaryButton.addClass || 'btn btn-primary';
-  //      }
-
-  //      if (cancelButton) {
-  //        swalConfig.showCancelButton = true;
-  //        swalConfig.cancelButtonText = cancelButton.text || 'Cancel';
-  //        swalConfig.customClass = swalConfig.customClass || {};
-  //        swalConfig.customClass.cancelButton = cancelButton.addClass || 'btn';
-  //      }
-  //    }
-  //    // Fire the SweetAlert2 dialog
-  //    return Swal.fire(swalConfig).then((result) => {
-  //      // Check if auto-closed by timer
-  //      if (result.dismiss === Swal.DismissReason.timer) {
-  //        // Optional: Handle timer-based dismissal if needed
-  //        console.log('Message box was closed by the timer');
-  //      } else if (result.isConfirmed && buttonsArray[0] && typeof buttonsArray[0].onClick === 'function') {
-  //        const notyMock = { close: () => { } };
-  //        buttonsArray[0].onClick(notyMock);
-  //      } else if (result.isDismissed && buttonsArray[1] && typeof buttonsArray[1].onClick === 'function') {
-  //        const notyMock = { close: () => { } };
-  //        buttonsArray[1].onClick(notyMock);
-  //      }
-  //    });
-  //  } catch (error) {
-  //    console.error("Error in SweetAlert MsgBox:", error);
-  //    alert(messageText || "Operation confirmation required");
-  //    return Promise.resolve();
-  //  }
-  //},
 
   MakeFormReadOnly: function (formSelector) {
     const containerSelector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
@@ -3247,19 +2785,6 @@ var CommonManager = {
     }
   },
 
-  //openKendoWindow: function (windowSelector, kendowWindowTitle, kendowWindowWidth = "50%") {
-  //  const gridSelector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
-  //  var popUp = $(gridSelector).data("kendoWindow");
-  //  if (!popUp) {
-  //    this.initializeKendoWindow(windowSelector, kendowWindowTitle, kendowWindowWidth);
-  //  }
-  //  if (kendowWindowTitle && kendowWindowTitle != "") {
-  //    popUp = $(gridSelector).data("kendoWindow");
-  //    popUp.title = kendowWindowTitle;
-  //  }
-  //  popUp.center().open();
-  //},
-
   closeKendoWindow: function (windowSelector) {
 
     if (!windowSelector.startsWith("#")) {
@@ -3273,17 +2798,6 @@ var CommonManager = {
       kendo.warning("No Kendo Window found for selector:", windowSelector);
     }
   },
-
-  //appandCloseButton: function (windowSelector) {
-  //  const windowId = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
-  //  // Append Close button dynamically if not already added
-  //  const buttonContainer = $(".btnDiv ul li");
-  //  if (buttonContainer.find(".btn-close-generic")) {
-  //    buttonContainer.find(".btn-close-generic").remove();
-  //  }
-  //  const closeBtn = `<button type="button" class="btn btn-danger me-2 btn-close-generic" onclick="CommonManager.closeKendoWindow('${windowId}')">Close</button>`;
-  //  buttonContainer.append(closeBtn);
-  //},
 
   appandCloseButton: function (windowSelector) {
     const windowId = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
@@ -3844,7 +3358,7 @@ var CommonManager = {
 
   /**/
   /**
-
+   * 
 * Calculate the number of months between two dates
 
 * @param {Date} date1 - The start date
@@ -3854,40 +3368,7 @@ var CommonManager = {
 * @returns {number} - The number of months between the two dates
 
 */
-  /**/
-  /**
 
-function monthDiff(date1, date2) {
-
-  // Calculate the number of milliseconds in one month (approx.)
-
-  var ONE_MONTH = 1000 * 60 * 60 * 24 * 30;
-
-
-
-  // Convert both dates to milliseconds
-
-  var date1_ms = date1.getTime();
-
-  var date2_ms = date2.getTime();
-
-
-
-  // Calculate the difference in milliseconds
-
-  var difference_ms = Math.abs(date1_ms - date2_ms);
-
-
-
-  // Convert back to months and return
-
-  return Math.round(difference_ms / ONE_MONTH);
-
-}
-
-
-
-  /**/
   daysBetween: function (date1, date2) {
 
     var d1 = new Date(date1);
@@ -4058,6 +3539,7 @@ function monthDiff(date1, date2) {
         placeholder: "Select Date"
       });
   },
+
   /* -------- Grid Textarea editor -------- */
   textareaEditor: function (container, options) {
     $('<textarea data-bind="value:' + options.field + '" rows="3" style="width: 100%; resize: vertical;"></textarea>')
@@ -4159,7 +3641,11 @@ function monthDiff(date1, date2) {
 
 };
 
+/* =========================================================
+    Toastr Message
+=========================================================*/
 var ToastrMessage = {
+
   showToastrNotification: function (options = {}) {
     const defaultOptions = {
       preventDuplicates: true,
@@ -4237,8 +3723,12 @@ var ToastrMessage = {
     console.log(consoleMessage);
     return displayMessage;
   }
+
 };
 
+/* =========================================================
+   Validator Functions
+=========================================================*/
 var ValidatorManager = {
 
   validator: function (divId) {
@@ -4335,7 +3825,8 @@ var FileValidationManager = {
    * @param {Object} options - Validation options
    * @returns {Object} - Validation result {isValid: boolean, errorMessage: string}
    */
-  validateImageFile: function(file, options = {}) {
+
+  validateImageFile: function (file, options = {}) {
     const config = {
       maxSizeInMB: options.maxSizeInMB || 2, // Default 2MB
       allowedTypes: options.allowedTypes || ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
@@ -4412,7 +3903,8 @@ var FileValidationManager = {
    * @param {boolean} showToast - Whether to show toast message
    * @returns {Object} - Validation result
    */
-  validateFileSize: function(file, maxSizeInMB = 2, showToast = true) {
+
+  validateFileSize: function (file, maxSizeInMB = 2, showToast = true) {
     if (!file) {
       return {
         isValid: false,
@@ -4460,5 +3952,81 @@ var FileValidationManager = {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+};
+
+var accessArray = [];
+var CommonFunctions = {
+
+  /**
+   * Get access permissions for current user
+   * @param {number} moduleId - Module ID (optional, default: 0)
+   * @param {number} menuId - Menu ID (optional, default: 0)
+   * @returns {Promise<Array>} - Access permissions array
+   */
+  GetAccessPermisionForCurrentUser: async function (moduleId = 0, menuId = 0) {
+    try {
+      const serviceUrl = "/groups/accesspermisionforcurrentuser";
+      const commonProperty = { ModuleId: moduleId, MenuId: menuId, UserId: 0 };
+      const res = await VanillaApiCallManager.post( baseApi, serviceUrl, commonProperty );
+
+      if (res && res.IsSuccess === true && Array.isArray(res.Data)) {
+        accessArray = [];
+
+        for (var i = 0; i < res.Data.length; i++) {
+          accessArray.push(res.Data[i]);
+        }
+
+        console.log(`Access permissions loaded: ${accessArray.length} items`);
+        return res.Data;
+      } else {
+        console.warn("No access permissions found or API returned error");
+        return [];
+      }
+    } catch (err) {
+      console.error("Error loading access permissions:", err);
+
+      if (typeof VanillaApiCallManager !== "undefined") {
+        VanillaApiCallManager.handleApiError(err);
+      }
+
+      return [];
+    }
+  },
+
+  /**
+   * Check if current user is HR
+   * @returns {boolean}
+   */
+  checkCurrentUser: function () {
+    var hr = false;
+
+    for (var i = 0; i < accessArray.length; i++) {
+      if (accessArray[i].ReferenceID == 22) {
+        hr = true;
+        break;
+      }
+    }
+
+    return hr;
+  },
+
+  /**
+   * Check if user has specific reference ID permission
+   * @param {number} referenceId - Reference ID to check
+   * @returns {boolean}
+   */
+  hasPermission: function (referenceId) {
+    return accessArray.some(function (item) {
+      return item.ReferenceID === referenceId;
+    });
+  },
+
+  /**
+   * Get all permissions for current user
+   * @returns {Array}
+   */
+  getAllPermissions: function () {
+    return accessArray;
   }
 };

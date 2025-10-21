@@ -1,4 +1,14 @@
-﻿var GroupSummaryManager = {
+﻿/// <reference path="accesscontrolpermission.js" />
+/// <reference path="actionpermission.js" />
+/// <reference path="group.js" />
+/// <reference path="groupdetails.js" />
+/// <reference path="groupinfo.js" />
+/// <reference path="grouppermission.js" />
+/// <reference path="menupermission.js" />
+/// <reference path="reportpermission.js" />
+/// <reference path="statepermission.js" />
+
+var GroupSummaryManager = {
 
   getSummaryGridDataSource: function () {
     return AjaxManager.GenericGridDataSource({

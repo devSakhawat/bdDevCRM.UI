@@ -51,7 +51,8 @@ var StateDetailsManager = {
       "center",
       "Confirmation",
       confirmMsg,
-      [{
+      [
+        {
         addClass: "btn btn-primary",
         text: "Yes",
         onClick: async function ($noty) {
@@ -62,7 +63,12 @@ var StateDetailsManager = {
             if (response && (response.IsSuccess === true || response === "Success")) {
               ToastrMessage.showSuccess(successMsg);
               StateDetailsHelper.clearStateForm();
-              $("#divSummary").data("kendoGrid").dataSource.read();
+              const grid = $("#gridSummary").data("kendoGrid");
+              if (grid) {
+                grid.dataSource.read();
+              } else {
+                console.error("Grid not found with ID: #gridSummary");
+              }
             } else {
               throw new Error(response.Message || response || "Unknown error occurred");
             }
@@ -72,11 +78,14 @@ var StateDetailsManager = {
           }
         }
       },
-      { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
+        { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }
+      ],
       0
     );
     
   },
+
+
 }
 
 var StateDetailsHelper = {

@@ -1,8 +1,191 @@
-﻿// <reference path="workflowsummary.js" />
-// <reference path="statedetails.js" />
-// <reference path="actiondetail.js" />
+﻿/// <reference path="actiondetail.js" />
+/// <reference path="statedetails.js" />
+/// <reference path="workflowsummary.js" />
+/// <reference path="workflowsettings.js" />
+
 
 var WorkFlowDetailsManager = {
+
+  deleteItem3: function (item) {
+
+    // Validation: Check if item exists
+    if (!item || item == null || item == undefined) {
+      console.warn("No item provided for deletion");
+      return false;
+    }
+
+    // Workflow State ID check
+    if (!item.WfStateId || item.WfStateId <= 0) {
+      ToastrMessage.showError("Invalid Workflow State ID", "Validation Error", 3000);
+      return false;
+    }
+
+    const successMsg = "Workflow state deleted successfully.";
+    const serviceUrl = `/workflow/${item.WfStateId}`;
+    const confirmMsg = `Are you sure you want to delete the workflow state "${item.StateName}"?`;
+    const httpType = "DELETE";
+
+    CommonManager.MsgBox(
+      'warning',
+      'center',
+      'Delete Confirmation',
+      confirmMsg,
+      [
+        {
+          addClass: 'btn btn-danger',
+          text: 'Yes, Delete',
+          onClick: async function ($noty) {
+            $noty.close();
+            
+            const jsonObject = JSON.stringify(item);
+            
+            try {
+              const responseData = await AjaxManager.PostDataAjax(
+                baseApi, 
+                serviceUrl, 
+                jsonObject, 
+                httpType
+              );
+
+              // Clear form after successful deletion
+              WorkFlowDetailsHelper.clearForm();
+
+              // Show success message
+              ToastrMessage.showSuccess(successMsg);
+
+              // Refresh the summary grid
+              const grid = $("#gridSummary").data("kendoGrid");
+              if (grid) {
+                grid.dataSource.read();
+              }
+
+            } catch (error) {
+              console.error("Error deleting workflow state:", error);
+              
+              let errorMessage = error.responseText || error.statusText || "Failed to delete workflow state";
+              
+              ToastrMessage.showError( `${error.status}: ${errorMessage}`, "Delete Error", 0 );
+            }
+          }
+        },
+        { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }
+      ],
+      0
+    );
+  },
+
+  deleteItem2: function (gridItem) {
+    // Validation: Check if item exists
+    if (!item || item == null || item == undefined) {
+      console.warn("No item provided for deletion");
+      return false;
+    }
+
+    // Workflow State ID check
+    if (!item.WfStateId || item.WfStateId <= 0) {
+      ToastrMessage.showError("Invalid Workflow State ID", "Validation Error", 3000);
+      return false;
+    }
+
+    const successMsg = "Workflow state deleted successfully.";
+    const serviceUrl = `/wf-state/${item.WfStateId}`;
+    const confirmMsg = `Are you sure you want to delete the workflow state "${item.StateName}"?`;
+    const httpType = "DELETE";
+
+    AjaxManager.MsgBox(
+      "info",
+      "center",
+      "Confirmation",
+      "Are you sure to delete this course?",
+      [{
+        addClass: "btn btn-primary",
+        text: "Yes",
+        onClick: async function ($noty) {
+          $noty.close();
+          try {
+            const response = await VanillaApiCallManager.delete(baseApi, serviceUrl);
+            if (response && response.IsSuccess === true) {
+              ToastrMessage.showSuccess("Data deleted successfully.");
+              CourseDetailsHelper.clearForm();
+              $("#gridSummary").data("kendoGrid").dataSource.read();
+            } else {
+              throw new Error(response.Message || "Delete operation failed.");
+            }
+          } catch (err) {
+            const msg = err.responseText || err.statusText || err.message || "Unknown error";
+            VanillaApiCallManager.handleApiError(err.response || msg);
+          }
+        }
+      },
+      { addClass: "btn", text: "Cancel", onClick: $n => $n.close() }],
+      0
+    );
+  },
+
+  deleteItem: function (item) {
+    // Validation: Check if item exists
+    if (!item || item == null || item == undefined) {
+      console.warn("No item provided for deletion");
+      return false;
+    }
+
+    // Workflow State ID check
+    if (!item.WfStateId || item.WfStateId <= 0) {
+      ToastrMessage.showError("Invalid Workflow State ID", "Validation Error", 3000);
+      return false;
+    }
+
+    const successMsg = "Workflow state deleted successfully.";
+    const serviceUrl = `/workflow/${item.WfStateId}`;
+    const confirmMsg = `Are you sure you want to delete the workflow state "${item.StateName}"?`;
+    const httpType = "DELETE";
+
+    AjaxManager.MsgBox(
+      'warning',
+      'center',
+      'Delete Confirmation',
+      confirmMsg,
+      [
+        {
+          addClass: 'btn btn-primary',
+          text: 'Yes',
+          onClick: async function ($noty) {
+            $noty.close();
+            var jsonObject = JSON.stringify(item);
+            try {
+              const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+              //const response = await VanillaApiCallManager.delete(baseApi, serviceUrl);
+              if (response && response.IsSuccess === true) {
+                // Clear form after successful deletion
+                WorkFlowDetailsHelper.clearForm();
+
+                // Show success message
+                ToastrMessage.showSuccess(successMsg);
+                const grid = $("#gridSummary").data("kendoGrid");
+                if (grid) {
+                  grid.dataSource.read();
+                }
+              } else {
+                throw new Error(response.Message || "Delete operation failed.");
+              }
+            } catch (err) {
+              const msg = err.responseText || err.statusText || err.message || "Unknown error";
+              VanillaApiCallManager.handleApiError(err.response || msg);
+            }
+          }
+        },
+        {
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function ($noty) {
+            $noty.close();
+          }
+        },
+      ]
+      , 0
+    );
+  },
+
 
 }
 
@@ -107,11 +290,11 @@ var WorkFlowDetailsHelper = {
     $("#cmbIsClose").data("kendoComboBox").value(item.IsClosed);
     $("#chkIsDefault").prop('checked', item.IsDefaultStart);
     ActionDetailHelper.clearActionForm();
-    var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
-    if (nextStateComboBox) {
-      var nextStateComboBoxDataSource = await ActionDetailHelper.loadNextStateCombo(item.MenuId);
-      nextStateComboBox.setDataSource(nextStateComboBoxDataSource);
-    }
+    //var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
+    //if (nextStateComboBox) {
+    //  var nextStateComboBoxDataSource = await ActionDetailHelper.loadNextStateCombo(item.MenuId);
+    //  nextStateComboBox.setDataSource(nextStateComboBoxDataSource);
+    //}
     ActionDetailHelper.generateActionGrid(item.WfstateId);
     $("#txtStateName_Action").val(item.StateName);
   },
@@ -137,68 +320,21 @@ var WorkFlowDetailsHelper = {
         $("#cmbIsClose").data("kendoDropDownList").value(item.IsClosed);
       }
 
-      //if (item.IsClosed !== null && item.IsClosed !== undefined) {
-      //  var dropDown = $("#cmbIsClose").data("kendoDropDownList");
-      //  var targetValue = parseInt(item.IsClosed);
-
-      //  // Check if dropDown and its dataSource exist
-      //  if (dropDown && dropDown.dataSource && dropDown.dataSource.data) {
-      //    var dataItems = dropDown.dataSource.data();
-      //    console.log(dataItems);
-
-      //    // Handle Kendo DataSource object - convert to array or iterate through items
-      //    var targetIndex = -1;
-
-      //    // Method 1: Use Kendo DataSource's view() method which returns an array
-      //    if (dataItems.view && typeof dataItems.view === 'function') {
-      //      var viewItems = dataItems.view();
-      //      targetIndex = viewItems.findIndex(dataItem => parseInt(dataItem.value) === targetValue);
-      //    }
-      //    // Method 2: If view() is not available, iterate through the length property
-      //    else if (dataItems.length !== undefined) {
-      //      for (var i = 0; i < dataItems.length; i++) {
-      //        var dataItem = dataItems[i];
-      //        if (dataItem && parseInt(dataItem.value) === targetValue) {
-      //          targetIndex = i;
-      //          break;
-      //        }
-      //      }
-      //    }
-      //    // Method 3: Convert to array if it has indexed properties
-      //    else if (dataItems.length !== undefined) {
-      //      var itemsArray = [];
-      //      for (var i = 0; i < dataItems.length; i++) {
-      //        if (dataItems[i]) {
-      //          itemsArray.push(dataItems[i]);
-      //        }
-      //      }
-      //      targetIndex = itemsArray.findIndex(dataItem => parseInt(dataItem.value) === targetValue);
-      //    }
-
-      //    if (targetIndex >= 0) {
-      //      dropDown.select(targetIndex);
-      //      console.log("Selected index:", targetIndex, "for value:", targetValue);
-      //    } else {
-      //      console.warn("Target value not found, trying direct value setting:", targetValue);
-      //      // Fallback: try direct value setting
-      //      dropDown.value(targetValue.toString());
-      //    }
-      //  } else {
-      //    console.warn("dropDownBox or its dataSource not available");
-      //  }
-      //}
-
-      // IsDefaultStart checkbox
       $("#chkIsDefault").prop('checked', item.IsDefaultStart === true || item.IsDefaultStart === 1);
 
       // Set state name in action section
       $("#txtStateName_Action").val(item.StateName);
 
-      //// Additional UI state updates
-      //this.updateUIAfterPopulate(item);
-
       ActionDetailHelper.initializeResponsiveActionGrid(item.WfStateId);
 
+      var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
+      if (nextStateComboBox) {
+        var nextStateComboBoxDataSource = await ActionDetailHelper.loadNextStateCombo(item.MenuId);
+        console.log(nextStateComboBoxDataSource);
+        nextStateComboBox.setDataSource(nextStateComboBoxDataSource.Data);
+      }
+
+      console.log(nextStateComboBoxDataSource);
       console.log("Object populated successfully");
 
     } catch (error) {

@@ -49,7 +49,6 @@ var AccessControlDetailsManager = {
     }
   },
 
-  
   SaveData: function () {
     debugger;
     var isToUpdateOrCreate = $("#hdnAccessControlId").val();
@@ -108,7 +107,6 @@ var AccessControlDetailsManager = {
       , 0
     );
   },
-
 
   saveOrUpdateItem: async function () {
     try {

@@ -1,33 +1,38 @@
-﻿var moduleArray = [];
+﻿/// <reference path="accesscontrolpermission.js" />
+/// <reference path="actionpermission.js" />
+/// <reference path="group.js" />
+/// <reference path="groupdetails.js" />
+/// <reference path="groupinfo.js" />
+/// <reference path="groupsummary.js" />
+/// <reference path="menupermission.js" />
+/// <reference path="reportpermission.js" />
+/// <reference path="statepermission.js" />
+
+var moduleArray = [];
 
 var GroupPermissionManager = {
 
-  groupPermissionbyGroupId: function (groupId) {
 
-    var jsonParams = $.param({
-      groupId: groupId
-    });
-    var serviceUrl = "/grouppermission/key/";
+  groupPermissionbyGroupId: async function (groupId) {
+    debugger;
+    if (!groupId) {
+      return Promise.resolve([]);
+    }
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        resolve(jsonData);
+    const serviceUrl = `/grouppermission/${groupId}`;
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load data");
       }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, false, false, onSuccess, onFailed);
-    });
-  }
+    } catch (error) {
+      console.log("Error loading data:" + error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
+  },
 
 };
 
@@ -121,6 +126,23 @@ var GroupPermissionHelper = {
           }
         }
       }
+
+      //for (var i = 0; i < objGroupPermission.length; i++) {
+      //  if (objGroupPermission[i].PermissionTableName == "Module") {
+
+      //    for (var j = 0; j < allmoduleArray.length; j++) {
+      //      if (allmoduleArray[j].ModuleId == objGroupPermission[i].ReferenceID) {
+      //        $('#chkModule' + objGroupPermission[i].ReferenceID).prop('checked', true);
+      //        var obj = new Object();
+      //        obj.ReferenceID = objGroupPermission[i].ReferenceID;
+      //        obj.ModuleName = allmoduleArray[j].ModuleName;
+      //        obj.PermissionTableName = "Module";
+      //        moduleArray.push(obj);
+      //        break;
+      //      }
+      //    }
+      //  }
+      //}
 
       $("#cmbApplicationForModule").kendoComboBox({
         placeholder: "Select a module",

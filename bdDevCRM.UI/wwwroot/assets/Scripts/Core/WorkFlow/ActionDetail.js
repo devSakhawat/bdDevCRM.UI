@@ -48,22 +48,6 @@ var ActionDetailManager = {
     });
   },
 
-  //fetchInstituteComboBoxData: async function () {
-  //  debugger;
-  //  const serviceUrl = "/get-action-summary-by-statusId?stateId=" + encodeURIComponent(stateId),
-  //  //try {
-  //  //  const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
-  //  //  if (response && response.IsSuccess === true) {
-  //  //    return Promise.resolve(response.Data);
-  //  //  } else {
-  //  //    throw new Error("Failed to load institute data");
-  //  //  }
-  //  //} catch (error) {
-  //  //  VanillaApiCallManager.handleApiError(error);
-  //  //  return Promise.reject(error);
-  //  //}
-  //},
-
   getSummaryGridDataSource: function (stateId) {
     debugger;
     return VanillaApiCallManager.GenericGridDataSource({
@@ -83,20 +67,23 @@ var ActionDetailManager = {
   },
 
   saveOrUpdate: async function () {
-    //if (UserDetailsHelper.validateUserDetaisForm()) {
+    const id = $("#actionID").val() || 0;
+    const isCreate = id == 0;
+    const serviceUrl = isCreate ? "/wf-action" : `/wf-action/${id}`;
+    const httpType = isCreate ? "POST" : "PUT";
+    const confirmMsg = isCreate ? "Do you want to save information?" : "Do you want to update information?";
+    const successMsg = isCreate ? "New Data Saved Successfully." : "Information Updated Successfully.";
 
-    // default
-    var isToUpdateOrCreate = $("#actionID").val();
-    var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
-    var serviceUrl = isToUpdateOrCreate == 0 ? "/wf-action" : "/wf-action/" + isToUpdateOrCreate;
-    var confirmmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
-    var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
+    const action = ActionDetailHelper.createActionData();
+    if (!action) {
+      throw new Error("Failed to create action data");
+    }
 
     AjaxManager.MsgBox(
       'info',
       'center',
       'Confirmation',
-      confirmmsg,
+      confirmMsg,
       [
         {
           addClass: 'btn btn-primary',
@@ -107,25 +94,29 @@ var ActionDetailManager = {
             console.log(action);
             var jsonObject = JSON.stringify(action);
             try {
-              const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
-              ActionDetailHelper.clearActionForm();
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 3000,
-                message: responseData === "Success" ? successmsg : responseData,
-                type: 'success',
-              });
-              $("#gridSummaryAction").data("kendoGrid").dataSource.read();
-            } catch (error) {
-              let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 0,
-                message: `${error.status} : ${errorMessage}`,
-                type: 'error'
-              });
+              const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+              if (response && (response.IsSuccess === true || response === "Success")) {
+                ActionDetailHelper.clearActionForm();
+                ToastrMessage.showSuccess(successMsg);
+                //ToastrMessage.showToastrNotification({
+                //  preventDuplicates: true,
+                //  closeButton: true,
+                //  timeOut: 3000,
+                //  message: successMsg,
+                //  type: 'success',
+                //});
+                const grid = $("#gridSummaryAction").data("kendoGrid");
+                if (grid) {
+                  grid.dataSource.read();
+                } else {
+                  console.error("Grid not found with ID: #gridSummaryAction");
+                }
+              } else {
+                throw new Error(response.Message || response || "Unknown error occurred");
+              }
+            } catch (err) {
+              console.log(err);
+              VanillaApiCallManager?.handleApiError?.(err);
             }
           }
         },
@@ -136,54 +127,60 @@ var ActionDetailManager = {
             $noty.close();
           }
         },
-      ]
-      , 0
+      ],
+      0
     );
   },
 
-  deleteData: function (actionGridData) {
-    // default
-    console.log(actionGridData);
-    if (actionGridData == null || actionGridData == undefined) return false;
-   
-    var successmsg = "Data Deleted Successfully.";
-    var serviceUrl = "/wf-action/" + actionGridData.WfactionId;
-    var confirmmsg = "Are you sure to Delete this action?";
-    var httpType = "DELETE";
+  deleteData: function (item) {
+    // Validation: Check if item exists
+    if (!item || item == null || item == undefined) {
+      console.warn("No item provided for deletion");
+      return false;
+    }
+
+    // Workflow action ID check
+    if (!item.WfActionId || item.WfActionId <= 0) {
+      ToastrMessage.showError("Invalid Workflow action ID", "Validation Error", 3000);
+      return false;
+    }
+
+    const successMsg = "Workflow action state deleted successfully.";
+    const serviceUrl = `/wf-action/${item.WfActionId}`;
+    const confirmMsg = `Are you sure you want to delete the workflow action state "${item.ActionName}"?`;
+    const httpType = "DELETE";
 
     AjaxManager.MsgBox(
-      'info',
+      'warning',
       'center',
-      'Confirmation',
-      confirmmsg,
+      'Delete Confirmation',
+      confirmMsg,
       [
         {
           addClass: 'btn btn-primary',
           text: 'Yes',
           onClick: async function ($noty) {
             $noty.close();
-            var jsonObject = JSON.stringify(actionGridData);
+            var jsonObject = JSON.stringify(item);
             try {
-              const responseData = await AjaxManager.PostDataAjax(baseApi, serviceUrl, jsonObject, httpType);
-              ActionDetailHelper.clearActionForm();
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 3000,
-                message: responseData === "Success" ? successmsg : responseData,
-                type: 'success',
-              });
+              const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+              if (response && response.IsSuccess === true) {
 
-              $("#gridSummaryAction").data("kendoGrid").dataSource.read();
-            } catch (error) {
-              let errorMessage = error.responseText || error.statusText || "Unknown error occurred";
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 0,
-                message: `${error.status} : ${errorMessage}`,
-                type: 'error'
-              });
+                // Clear Action Detail form
+                ActionDetailHelper.clearActionForm();
+
+                // Show success message
+                ToastrMessage.showSuccess(successMsg);
+                const grid = $("#gridSummaryAction").data("kendoGrid");
+                if (grid) {
+                  grid.dataSource.read();
+                }
+              } else {
+                throw new Error(response.Message || "Delete operation failed.");
+              }
+            } catch (err) {
+              const msg = err.responseText || err.statusText || err.message || "Unknown error";
+              VanillaApiCallManager.handleApiError(err.response || msg);
             }
           }
         },
@@ -197,70 +194,77 @@ var ActionDetailManager = {
       ]
       , 0
     );
-
   },
+
+  deleteItem2: function (item) {
+    // Validation: Check if item exists
+    if (!item || item == null || item == undefined) {
+      console.warn("No item provided for deletion");
+      return false;
+    }
+
+    // Workflow State ID check
+    if (!item.WfStateId || item.WfStateId <= 0) {
+      ToastrMessage.showError("Invalid Workflow State ID", "Validation Error", 3000);
+      return false;
+    }
+
+    const successMsg = "Workflow state deleted successfully.";
+    const serviceUrl = `/workflow/${item.WfStateId}`;
+    const confirmMsg = `Are you sure you want to delete the workflow state "${item.StateName}"?`;
+    const httpType = "DELETE";
+
+    AjaxManager.MsgBox(
+      'warning',
+      'center',
+      'Delete Confirmation',
+      confirmMsg,
+      [
+        {
+          addClass: 'btn btn-primary',
+          text: 'Yes',
+          onClick: async function ($noty) {
+            $noty.close();
+            var jsonObject = JSON.stringify(item);
+            try {
+              const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+              //const response = await VanillaApiCallManager.delete(baseApi, serviceUrl);
+              if (response && response.IsSuccess === true) {
+                // Clear form after successful deletion
+                WorkFlowDetailsHelper.clearForm();
+
+                // Show success message
+                ToastrMessage.showSuccess(successMsg);
+                const grid = $("#gridSummary").data("kendoGrid");
+                if (grid) {
+                  grid.dataSource.read();
+                }
+              } else {
+                throw new Error(response.Message || "Delete operation failed.");
+              }
+            } catch (err) {
+              const msg = err.responseText || err.statusText || err.message || "Unknown error";
+              VanillaApiCallManager.handleApiError(err.response || msg);
+            }
+          }
+        },
+        {
+          addClass: 'btn',
+          text: 'Cancel',
+          onClick: function ($noty) {
+            $noty.close();
+          }
+        },
+      ]
+      , 0
+    );
+  },
+
 
 }
 
 
 var ActionDetailHelper = {
-
-  //initActionDetails: function () {
-  //  ActionDetailHelper.generateNextStateCombo();
-  //},
-
-  //generateActionGrid: function (stateId) {
-  //  const gridOptions = {
-  //    dataSource: [],
-  //    autoBind: true,
-  //    navigatable: true,
-  //    //height: 700,
-  //    width: "100%",
-  //    scrollable: false, // Enable both horizontal and vertical scrolling
-  //    resizable: false,
-  //    filterable: false,
-  //    sortable: false,
-  //    columns: ActionDetailHelper.GenerateColumns(),
-  //    editable: false,
-  //    selectable: "row",
-  //  };
-
-  //  $("#gridSummaryAction").kendoGrid(gridOptions);
-
-  //  const gridInstance = $("#gridSummaryAction").data("kendoGrid");
-  //  if (gridInstance) {
-  //    const dataSource = ActionDetailManager.getSummaryGridDataSource(stateId);
-  //    gridInstance.setDataSource(dataSource);
-
-  //    // Wait for data to load
-  //    // After setting dataSource
-  //    dataSource.fetch(function () {
-  //      //console.log(dataSource.data());
-  //    });
-  //  }
-
-
-
-  //},
-
-  //GenerateColumns: function () {
-  //  return columns = [
-
-  //    { field: "WfactionId", hidden: true },
-  //    { field: "WfstateId", hidden: true },
-  //    /*      { field: "StateName", hidden: true },*/
-  //    { field: "NextStateId", hidden: true },
-  //    { field: "AcSortOrder", hidden: true },
-  //    { field: "IsDefaultStart", hidden: true },
-  //    { field: "IsClosed", hidden: true },
-  //    { field: "ActionName", title: "Action Name", width: 70 },
-  //    { field: "NextStateName", title: "Next State", width: 80 },
-  //    { field: "EmailAlert", title: "Email", width: 40, template: "#= EmailAlert == 1 ? 'Yes' : 'No' #" },
-  //    { field: "SmsAlert", title: "SMS", width: 40, template: "#= SmsAlert == 1 ? 'Yes' : 'No' #" },
-  //    { field: "Edit", title: "#", filterable: false, width: 120, template: '<input type="button" class="k-button btn btn-outline-dark me-1" value="Edit" id="btnEditAction" onClick="ActionDetailHelper.clickEventForEditButton(event)"  /><input type="button" class="k-button btn btn-outline-danger" value="Delete" id="btnDeleteAction" onClick="ActionDetailHelper.clickEventForDeleteButton(event)"  />' },
-  //  ];
-  //},
-
 
   initActionDetails: function () {
     //ActionDetailHelper.generateNextStateCombo();
@@ -271,7 +275,7 @@ var ActionDetailHelper = {
   initializeActionSummaryGrid: function () {
     var Columns = this.generateResponsiveColumns();
     var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
-    var containerWidth = $("#divSummary").width() || (window.innerWidth - 323);
+    var containerWidth = $("#gridSummaryAction").width() || (window.innerWidth - 323);
     var gridWidth = totalColumnsWidth > containerWidth ? "100%" : `${totalColumnsWidth}px`;
 
     const gridOptions = {
@@ -329,13 +333,13 @@ var ActionDetailHelper = {
       }
     };
 
-    $("#gridSummary").kendoGrid(gridOptions);
+    $("#gridSummaryAction").kendoGrid(gridOptions);
 
     $("#btnExportCsvCourse").on("click", function () {
-      CommonManager.GenerateCSVFileAllPages("gridSummary", "CourseListCSV", "Actions");
+      CommonManager.GenerateCSVFileAllPages("gridSummaryAction", "CourseListCSV", "Actions");
     });
 
-    const grid = $("#gridSummary").data("kendoGrid");
+    const grid = $("#gridSummaryAction").data("kendoGrid");
     if (grid) {
       const ds = WrokFlowSummaryManager.getSummaryGridDataSource();
 
@@ -369,11 +373,9 @@ var ActionDetailHelper = {
     var existingGrid = $("#gridSummaryAction").data("kendoGrid");
     if (existingGrid) {
       if (!stateId) {
-        // If no stateId, clear the data source
         existingGrid.dataSource.data([]);
         return;
       } else {
-        // Update data source with new stateId
         var newDataSource = ActionDetailManager.getSummaryGridDataSource(stateId);
         existingGrid.setDataSource(newDataSource);
         return;
@@ -493,12 +495,14 @@ var ActionDetailHelper = {
     var isMobile = window.innerWidth < 768;
 
     var columns = [
-      { field: "WfactionId", hidden: true },
-      { field: "WfstateId", hidden: true },
+      { field: "WfActionId", hidden: true },
+      { field: "WfStateId", hidden: true },
       { field: "NextStateId", hidden: true },
       { field: "AcSortOrder", hidden: true },
       { field: "IsDefaultStart", hidden: true },
       { field: "IsClosed", hidden: true },
+      { field: "MenuId", hidden: true },
+      { field: "Sequence", hidden: true },
       {
         field: "ActionName",
         title: "Action Name",
@@ -644,13 +648,26 @@ var ActionDetailHelper = {
   generateNextStateCombo: function () {
     $("#cmbNextState").kendoComboBox({
       placeholder: "Select Next State...",
-      optionLabel: "-- Select Next State --",
+      optionLabel: "Select Next State",
       dataTextField: "StateName",
-      dataValueField: "WfstateId",
+      dataValueField: "WfStateId",
       filter: "contains",
       suggest: true,
       dataSource: []
     });
+
+    //// init kendo dropdown (without optionLabel)
+    //$el.kendoDropDownList({
+    //  dataTextField: "ClosingStateName",
+    //  dataValueField: "closingStateId",
+    //  dataSource: data,
+    //  valuePrimitive: true,
+    //  value: data[0]?.closingStateId || 0,
+    //  filter: "contains",
+    //  suggest: true
+    //});
+
+
   },
 
   clearActionForm: function () {
@@ -718,20 +735,25 @@ var ActionDetailHelper = {
       action.SmsAlert = 0;
     }
 
-    action.IsDefaultStart = "0";
-    action.IsClosed = "0";
+    //action.IsDefaultStart = "0";
+    //action.IsClosed = "0";
     return action;
   },
 
   editItem: async function (item) {
-    $("#btnActionSaveOrUpdate").text("Update Item");
-    var nextState = $("#cmbNextState").data("kendoComboBox");
-    nextState.value(item.NextStateId);
+    $("#btnActionSaveOrUpdate").text("Update Item");   
     $("#txtStateName_Action").val(item.StateName);
     $("#txtActionName").val(item.ActionName);
     $("#numSortOrder").val(item.AcSortOrder);
     $('#chkIsEmail').attr('checked', item.EmailAlert == 1 ? true : false);
     $('#chkIsSms').attr('checked', item.SmsAlert == 1 ? true : false);
+    var nextStateComboBox = $("#cmbNextState").data("kendoComboBox");
+
+    if (nextStateComboBox) {
+      var nextStateComboBoxDataSource = await ActionDetailHelper.loadNextStateCombo(item.MenuId);
+      nextStateComboBox.setDataSource(nextStateComboBoxDataSource.Data);
+    }
+    nextStateComboBox.value(item.NextStateId);
 
     $("#actionID").val(item.WfactionId);
   },

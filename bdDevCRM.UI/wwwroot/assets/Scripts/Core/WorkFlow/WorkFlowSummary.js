@@ -123,7 +123,7 @@ var WorkFlowSummaryHelper = {
           });
         }
       });
-
+      console.log(ds);
       grid.setDataSource(ds);
     }
   },
@@ -185,11 +185,16 @@ var WorkFlowSummaryHelper = {
         width: isMobile ? 60 : 80,
         template: "#= IsDefaultStart ? 'Yes' : 'No' #"
       },
+      { field: "IsClosed", hidden: true },
+      { field: "ClosingStateId", hidden: true },
       {
-        field: "IsClosed",
+        field: "ClosingStateName",
         title: "Status",
-        width: isMobile ? 60 : 80,
-        template: "#= IsClosed == 1 ? 'Closed' : 'Open' #"
+        width: isMobile ? 80 : 100,
+        hidden: isMobile,
+        attributes: {
+          style: "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+        }
       },
       {
         field: "Action",
@@ -213,14 +218,14 @@ var WorkFlowSummaryHelper = {
         '<ul class="dropdown-menu">' +
         '<li><a class="dropdown-item" href="javascript:void(0)" onclick="WorkFlowSummaryHelper.clickEventForViewButton(event)">View</a></li>' +
         '<li><a class="dropdown-item" href="javascript:void(0)" onclick="WorkFlowSummaryHelper.clickEventForEditButton(event)">Edit</a></li>' +
-        '<li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="WorkFlowSummaryHelper.deleteItemFromGrid(event)">Delete</a></li>' +
+        '<li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="WorkFlowSummaryHelper.clickEventForDeleteButton(event)">Delete</a></li>' +
         '</ul>' +
         '</div>';
     } else {
       // Desktop buttons - Fixed template
       return '<button class="btn btn-outline-success btn-action me-1" onclick="WorkFlowSummaryHelper.clickEventForViewButton(event)">View</button>' +
         '<button class="btn btn-outline-dark btn-action me-1" onclick="WorkFlowSummaryHelper.clickEventForEditButton(event)">Edit</button>' +
-        '<button class="btn btn-outline-danger btn-action" onclick="WorkFlowSummaryHelper.deleteItemFromGrid(event)">Delete</button>';
+        '<button class="btn btn-outline-danger btn-action" onclick="WorkFlowSummaryHelper.clickEventForDeleteButton(event)">Delete</button>';
     }
   },
 
@@ -326,8 +331,7 @@ var WorkFlowSummaryHelper = {
   clickEventForDeleteButton: function (event) {
     const item = this._getGridItem(event);
     if (item) {
-      WorkflowDetailsManager.deleteItem(item);
+      WorkFlowDetailsManager.deleteItem(item);
     }
   },
-
 };

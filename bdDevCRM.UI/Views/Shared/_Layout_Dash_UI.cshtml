@@ -10,8 +10,6 @@
   <!-- Favicon icon-->
   <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico" />
 
-  <!-- Color modes -->
-  @* <script src="~/assets/js/vendors/color-modes.js"></script> *@
 
   <!-- Libs CSS -->
   <link href="~/assets/libs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
@@ -28,57 +26,16 @@
   <!-- common css -->
   <link href="~/assets/css/commonsize.css" rel="stylesheet" />
   <link href="~/assets/css/common.css" rel="stylesheet" />
+  <link rel="stylesheet" href="~/assets/css/theme.min.css">
+  <link href="~/assets/css/bddevs.css" rel="stylesheet" />
 
   <!-- Scripts -->
   <!-- Libs JS -->
   @* <script src="~/assets/kendo_2023_r1/js/jquery.min.js"></script> *@
   <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-  <!-- jszip.min.js -->
-  @* Kendo 2023_r1 jquery version is jQuery v1.12.4 but we are using jquery v3.7.0 *@
   <script src="~/assets/kendo_2023_r1/js/jszip.min.js"></script>
 
-
-
-  <!-- Theme CSS with bootstrap -->
-  <link rel="stylesheet" href="~/assets/css/theme.min.css">
-
-  <!-- CRM CSS -->
-  <link href="~/assets/css/bddevs.css" rel="stylesheet" />
-
-
-
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-      // Call the function to populate the menu
-      MenuHelper.GetMenuInformation();
-
-      // // Initialize feather icons after the menu is populated
-      // if (typeof feather !== 'undefined') {
-      //   feather.replace();
-      // }
-
-      // // Update arrow icon when menu is expanded
-      // $('#sideNavbar').on('shown.bs.collapse', '.collapse', function () {
-      //   const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
-      //   arrowIcon.attr('data-feather', 'chevron-down'); // Change to down arrow
-      //   if (typeof feather !== 'undefined') {
-      //     feather.replace(); // Re-render feather icons
-      //   }
-      // });
-
-      // // Update arrow icon when menu is collapsed
-      // $('#sideNavbar').on('hidden.bs.collapse', '.collapse', function () {
-      //   const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
-      //   arrowIcon.attr('data-feather', 'chevron-right'); // Change to right arrow
-      //   if (typeof feather !== 'undefined') {
-      //     feather.replace(); // Re-render feather icons
-      //   }
-      // });
-
-    });
-  </script>
 
 
   <title>bdDevs CRM System</title>
@@ -114,7 +71,7 @@
               <div class="input-group">
                 <input class="form-control rounded-3 bg-transparent ps-9" type="search" value="" id="searchInput"
                        placeholder="Search" />
-                <span class="">
+                <span class="position-absolute start-0">
                   <button class="btn position-absolute start-0" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -336,6 +293,25 @@
   <script src="~/assets/scripts/common/kendo.common.datasource.js"></script>
 
   @await RenderSectionAsync("Scripts", required: false)
-</body>
 
+  <!-- ✅ Menu Initialization Script -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      try {
+        // Check if MenuHelper exists
+        if (typeof MenuHelper === 'undefined') {
+          console.error('MenuHelper is not defined. Make sure common.js is loaded.');
+          return;
+        }
+
+        // Initialize menu
+        MenuHelper.GetMenuInformation();
+        
+        console.log('Menu initialized successfully');
+      } catch (error) {
+        console.error('Error initializing menu:', error);
+      }
+    });
+  </script>
+</body>
 </html>

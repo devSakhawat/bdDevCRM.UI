@@ -96,52 +96,10 @@ var GroupSummaryHelper = {
       ];
   },
 
-  //clickEventForViewButton: function (e) {
-  //  debugger;
-
-  //  var grid = $("#gridSummary").data("kendoGrid");
-  //  var row = $(e.target).closest("tr");
-  //  var dataItem = grid.dataItem(row);
-
-  //  if (dataItem) {
-  //    GroupDetailsHelper.PopulateObject(dataItem);
-  //    AjaxManager.MakeFormReadOnly("#divdetailsForDetails");
-  //  }
-
-  //},
-
-  //clickEventForDeleteButton: function (e) {
-  //  debugger;
-
-  //  var grid = $("#gridSummary").data("kendoGrid");
-  //  var row = $(e.target).closest("tr");
-  //  var dataItem = grid.dataItem(row);
-
-  //  if (dataItem) {
-  //    GroupDetailsManager.DeleteData(dataItem);
-  //  }
-  //},
-
-  //clickEventForEditGroup: function () {
-
-  //  //$('#gridSummary table tr').live('dblclick', function () {
-  //  $('#gridSummary').on('dblclick', 'table tr', function () {
-  //    GroupDetailsHelper.clearGroupForm();
-  //    var entityGrid = $("#gridSummary").data("kendoGrid");
-  //    var selectedItem = entityGrid.dataItem(entityGrid.select());
-  //    GroupInfoHelper.populateGroupInfoDetails(selectedItem);
-  //    GroupPermissionHelper.populateExistingModule(selectedItem);
-  //  });
-  //},
-
-
   clickEventForEditButton: function (e) {
     debugger;
     GroupDetailsHelper.clearGroupForm();
     $("#btnSave").text("Update");
-
-    //var entityGrid = $("#gridGroup").data("kendoGrid");
-    //var selectedItem = entityGrid.dataItem(entityGrid.select());
 
     var grid = $("#gridSummary").data("kendoGrid");
     var row = $(e.target).closest("tr");

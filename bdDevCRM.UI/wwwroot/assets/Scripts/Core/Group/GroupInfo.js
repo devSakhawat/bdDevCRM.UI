@@ -10,28 +10,21 @@
 
 var GroupInfoManager = {
 
-  getModules: function () {
-    var jsonParams = "";
-    var serviceUrl = "/modules";
+  getModules: async function () {
+    const serviceUrl = "/modules";
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        resolve(jsonData);
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load modules");
       }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, false, false, onSuccess, onFailed);
-    });
+    } catch (error) {
+      console.log("Error loading modules:" + error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
 };
@@ -80,7 +73,8 @@ var GroupInfoHelper = {
   },
 
   clearGroupInfo: function () {
-    $('.chkBox').prop('checked', false); // Use .prop() instead of .prop()
+    $("#dynamicCheckBoxForModule").find('input[type="checkbox"]').prop('checked', false);
+    $("#dynamicCheckBoxForModule").empty();
     $('#txtGroupName').val('');
     $("#hdnGroupId").val('0');
     $("#divGroupId > form").kendoValidator();
@@ -88,14 +82,29 @@ var GroupInfoHelper = {
     var status = $(".status");
     status.text("").removeClass("invalid");
 
-    // Ensure the Kendo TabStrip is fully initialized
     var tabStrip = $("#tabstrip").data("kendoTabStrip");
     if (tabStrip) {
       tabStrip.select(0); // Select the first tab
-    } else {
-      Message.ErrorWithHeaderText(error);
     }
   },
+
+  //clearGroupInfo: function () {
+  //  $('.form-check-input').prop('checked', false); // Use .prop() instead of .prop()
+  //  $('#txtGroupName').val('');
+  //  $("#hdnGroupId").val('0');
+  //  $("#divGroupId > form").kendoValidator();
+  //  $("#divGroupId").find("span.k-tooltip-validation").hide();
+  //  var status = $(".status");
+  //  status.text("").removeClass("invalid");
+
+  //  // Ensure the Kendo TabStrip is fully initialized
+  //  var tabStrip = $("#tabstrip").data("kendoTabStrip");
+  //  if (tabStrip) {
+  //    tabStrip.select(0); // Select the first tab
+  //  } else {
+  //    Message.ErrorWithHeaderText(error);
+  //  }
+  //},
 
   populateGroupInfoDetails: function (objGroup) {
     $("#hdnGroupId").val(objGroup.GroupId);

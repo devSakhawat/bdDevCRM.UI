@@ -98,6 +98,7 @@ var GroupPermissionHelper = {
   },
 
   onSelect: function (e) {
+    debugger;
     var dataItem = this.dataItem(e.item.index());
     MenuPermissionHelper.populateMenuTreeByModuleId(dataItem.ReferenceID);
     AccessControlHelper.getAllAccessControl(dataItem.ReferenceID);
@@ -126,23 +127,6 @@ var GroupPermissionHelper = {
           }
         }
       }
-
-      //for (var i = 0; i < objGroupPermission.length; i++) {
-      //  if (objGroupPermission[i].PermissionTableName == "Module") {
-
-      //    for (var j = 0; j < allmoduleArray.length; j++) {
-      //      if (allmoduleArray[j].ModuleId == objGroupPermission[i].ReferenceID) {
-      //        $('#chkModule' + objGroupPermission[i].ReferenceID).prop('checked', true);
-      //        var obj = new Object();
-      //        obj.ReferenceID = objGroupPermission[i].ReferenceID;
-      //        obj.ModuleName = allmoduleArray[j].ModuleName;
-      //        obj.PermissionTableName = "Module";
-      //        moduleArray.push(obj);
-      //        break;
-      //      }
-      //    }
-      //  }
-      //}
 
       $("#cmbApplicationForModule").kendoComboBox({
         placeholder: "Select a module",

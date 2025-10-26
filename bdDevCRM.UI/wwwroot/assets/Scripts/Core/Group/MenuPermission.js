@@ -14,36 +14,42 @@ var gbmoduleId = 0;
 
 var MenuPermissionManager = {
 
-  renderMenuByModuleId: function (moduleId) {
+  //renderMenuByModuleId2: async function (moduleId) {
+  //  const serviceUrl = `/menus-by-moduleId/${moduleId}`;
 
-    var objMenu = "";
-    var jsonParams = "moduleId=" + moduleId;
-    var serviceUrl = "/menus-by-moduleId";
+  //  try {
+  //    const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+  //    if (response && response.IsSuccess === true) {
+  //      return Promise.resolve(response.Data);
+  //    } else {
+  //      throw new Error("Failed to load modules");
+  //    }
+  //  } catch (error) {
+  //    console.log("Error loading modules:" + error);
+  //    VanillaApiCallManager.handleApiError(error);
+  //    return Promise.reject(error);
+  //  }
+  //},
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        objMenu = jsonData;
-        allmenuArray = [];
-        for (var i = 0; i < objMenu.length; i++) {
-          allmenuArray.push(objMenu[i]);
-        }
-        resolve(jsonData);
+  renderMenuByModuleId: async function (moduleId) {
+    debugger;
+    //if (!moduleId) {
+    //  return Promise.resolve([]);
+    //}
+
+    const serviceUrl = `/menus-by-moduleId/${moduleId}`;
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load data");
       }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
-    });
-
+    } catch (error) {
+      console.log("Error loading data:" + error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
 

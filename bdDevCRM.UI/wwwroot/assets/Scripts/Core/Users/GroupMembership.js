@@ -4,7 +4,6 @@ var groupArray = [];
 var GroupMembershipManager = {
 
   // in data service don't use companyId
-  //GetGroupByCompanyId: function (companyId) {
   getGroups: function () {
     let groups = [];
     var jsonParams = "";
@@ -29,6 +28,51 @@ var GroupMembershipManager = {
 
       AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
     });
+  },
+  
+
+  // in data service don't use companyId
+  getGroups: function () {
+    let groups = [];
+    var jsonParams = "";
+    var serviceUrl = "/groups";
+
+    return new Promise(function (resolve, reject) {
+      function onSuccess(jsonData) {
+        groups = jsonData;
+        resolve(groups);
+      }
+
+      function onFailed(jqXHR, textStatus, errorThrown) {
+        ToastrMessage.showToastrNotification({
+          preventDuplicates: true,
+          closeButton: true,
+          timeOut: 0,
+          message: jqXHR.responseJSON?.message + "(" + jqXHR.responseJSON?.statusCode + ")",
+          type: 'error',
+        });
+        reject(errorThrown);
+      }
+
+      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, true, false, onSuccess, onFailed);
+    });
+  },
+
+  getModules: async function () {
+    const serviceUrl = "/modules";
+
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load modules");
+      }
+    } catch (error) {
+      console.log("Error loading modules:" + error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
   },
 
   getGroupMemberByUserId: function (userId) {

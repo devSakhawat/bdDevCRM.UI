@@ -157,11 +157,11 @@ var UserSummaryHelper = {
       { field: "ShortName", title: "Short Name", width: "300" },//EmployeeId in Employement
       { field: "IsActive", title: "Is Active", width: "80", template: "#= IsActive ? 'Active' : 'Inactive' #" },
       {
-        field: "ResetPassword", title: "Reset Password", filterable: false, width: "400",
+        field: "ResetPassword", title: "Reset Password", filterable: false, width: "500",
         template: '<input type="button" class="k-button btn btn-outline-warning" value="Reset Password" id="btnResetPassword" />',sortable: false, exportable: false
       },
       {
-        field: "Edit", title: "Edit", filterable: false, width: "60",
+        field: "Edit", title: "Edit", filterable: false, width: "300",
         template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="UserSummaryHelper.clickEventForEditButton(event)"  />', sortable: false, exportable: false
       }
     ];

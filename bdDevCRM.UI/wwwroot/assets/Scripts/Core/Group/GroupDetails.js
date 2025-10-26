@@ -271,6 +271,30 @@ var GroupDetailsHelper = {
     }
   },
 
+  //ClearInformation: function () {
+  //  $("#hdGroupId").val("0");
+  //  $("#hdSorOrder").val("0");
+  //  $("#Group-name").val("");
+  //  $("#Group-path").val("");
+
+  //  var cmbModule = $("#cmd-module").data("kendoComboBox");
+  //  if (cmbModule) {
+  //    cmbModule.value("");
+  //    cmbModule.text("");
+  //  }
+
+  //  var cmbParentGroup = $("#cmb-parent-Group").data("kendoComboBox");
+  //  if (cmbParentGroup) {
+  //    cmbParentGroup.value("");
+  //    cmbParentGroup.text("");
+  //  }
+  //  cmbParentGroup.destroy();
+
+  //  GroupDetailsHelper.InitGroupByModuleId();
+
+  //  $('#chkIsQuickLink').prop('checked', false); // Use prop() for checkboxes
+  //},
+
   clearGroupForm: function () {
     $("#btnSave").text("Save");
 

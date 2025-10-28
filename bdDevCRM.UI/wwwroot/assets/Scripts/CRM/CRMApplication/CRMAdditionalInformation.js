@@ -211,20 +211,19 @@ var CRMAdditionalInformationHelper = {
     if (!grid) return;
 
     const model = e.model;
-    const nameRaw = model && model.Name ? model.Name : "এই রেফারেন্স";
+    const nameRaw = model && model.Name ? model.Name : "This reference";
     const htmlEncode = (window.kendo && kendo.htmlEncode) ? kendo.htmlEncode : function (v) { return $('<div/>').text(v).html(); };
     const name = htmlEncode(nameRaw);
 
     CommonManager.showConfirm(
       "Delete Confirmation",
-      "আপনি কি নিশ্চিত যে আপনি '<b>" + name + "</b>' রেফারেন্সটি মুছে ফেলতে চান?",
       function () { // Yes
         grid.dataSource.remove(model);
         if (typeof ToastrMessage !== "undefined") {
-          ToastrMessage.showSuccess("রেফারেন্সটি সফলভাবে মুছে ফেলা হয়েছে");
+          ToastrMessage.showSuccess("Reference Deleted Successfully.");
         }
       },
-      function () { /* Cancel - কিছু করবো না */ }
+      function () {  }
     );
   },
 

@@ -8,6 +8,7 @@
 /// <reference path="reportpermission.js" />
 /// <reference path="statepermission.js" />
 
+var allmoduleArray = [];
 
 var GroupManager = {};
 

@@ -11,6 +11,7 @@
 var accessArray = [];
 var accessPermissionArray = [];
 var gbModuleId = 0;
+
 var AccessControlManager = {
   getAllAccessControl: function () {
 
@@ -106,7 +107,7 @@ var AccessControlHelper = {
     }
   },
 
-  RemoveAccessPermissionByModuleId: function (moduleId) {
+  removeAccessPermissionByModuleId: function (moduleId) {
     for (var i = 0; i < accessPermissionArray.length; i++) {
       if (accessPermissionArray[i].ParentPermission == moduleId) {
         accessPermissionArray.splice(i, 1);

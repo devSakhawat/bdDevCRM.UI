@@ -14,23 +14,6 @@ var gbmoduleId = 0;
 
 var MenuPermissionManager = {
 
-  //renderMenuByModuleId2: async function (moduleId) {
-  //  const serviceUrl = `/menus-by-moduleId/${moduleId}`;
-
-  //  try {
-  //    const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
-  //    if (response && response.IsSuccess === true) {
-  //      return Promise.resolve(response.Data);
-  //    } else {
-  //      throw new Error("Failed to load modules");
-  //    }
-  //  } catch (error) {
-  //    console.log("Error loading modules:" + error);
-  //    VanillaApiCallManager.handleApiError(error);
-  //    return Promise.reject(error);
-  //  }
-  //},
-
   renderMenuByModuleId: async function (moduleId) {
     debugger;
     //if (!moduleId) {

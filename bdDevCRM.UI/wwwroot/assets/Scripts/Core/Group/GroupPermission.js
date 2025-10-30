@@ -54,27 +54,34 @@ var GroupPermissionHelper = {
     $("#cmbApplicationForModule").val('');
 
     if ($("#" + controlId).is(':checked') == true) {
+      // Add item to array
       moduleArray.push(obj);
     }
     else {
-      for (var i = 0; i < moduleArray.length; i++) {
-        if (moduleArray[i].ReferenceID == moduleId) {
-
-          MenuPermissionHelper.DeleteFormMenuByModuleId(moduleArray[i].ReferenceID);
-          AccessControlHelper.RemoveAccessPermissionByModuleId(moduleArray[i].ReferenceID);
-          moduleArray.splice(i, 1);
+      // Remove item from array
+      moduleArray = moduleArray.filter(function(item) {
+        if (item.ReferenceID == moduleId) {
+          MenuPermissionHelper.deleteFormMenuByModuleId(item.ReferenceID);
+          AccessControlHelper.removeAccessPermissionByModuleId(item.ReferenceID);
+          return false; // Remove this item
         }
-      }
+        return true; // Keep other items
+      });
     }
 
-    $("#cmbApplicationForModule").kendoComboBox({
-      placeholder: "Select a module",
-      dataTextField: "ModuleName",
-      dataValueField: "ReferenceID",
-      select: GroupPermissionHelper.onSelect,
-      dataSource: moduleArray
-    });
-
+    // Update ComboBox DataSource
+    var comboBox = $("#cmbApplicationForModule").data("kendoComboBox");
+    if (comboBox) {
+      comboBox.setDataSource(moduleArray);
+    } else {
+      $("#cmbApplicationForModule").kendoComboBox({
+        placeholder: "Select a module",
+        dataTextField: "ModuleName",
+        dataValueField: "ReferenceID",
+        select: GroupPermissionHelper.onSelect,
+        dataSource: moduleArray
+      });
+    }
   },
 
   clearGroupPermissionForm: function () {

@@ -35,28 +35,21 @@ var GroupInfoHelper = {
   },
 
   generateModuleForGroupInfo: async function () {
-    //var link = "<ul class='moduleCheckList'>";
     var link = "<div class='row'>";
     allmoduleArray = [];
 
     try {
-      // Await the result of getModules
       const objModuleList = await GroupInfoManager.getModules();
-      //console.log(objModuleList);
-
-      //for (var i = 0; i < objModuleList.length; i++) {
-      //  link += "<li class='mb-2'><input type=\"checkbox\" class=\"chkBox\" id=\"chkModule" + objModuleList[i].ModuleId + "\" onclick=\"GroupPermissionHelper.populateModuleCombo(" + objModuleList[i].ModuleId + ", '" + objModuleList[i].ModuleName + "', this.id)\"/> " + objModuleList[i].ModuleName + "</li>";
-      //  allmoduleArray.push(objModuleList[i]);
-      //}
-      //link += "</ul>";
 
       for (var i = 0; i < objModuleList.length; i++) {
         link += `
                 <div class="col-12 mb-1">
-                  <div class="d-flex justify-content-start align-items-center  pb-01">
-                    <span class = "widthSize40_per">${objModuleList[i].ModuleName}</span>
-                    <input type="checkbox" class="form-check-input" id="chkModule${objModuleList[i].ModuleId}"
-                           onclick="GroupPermissionHelper.populateModuleCombo(${objModuleList[i].ModuleId}, '${objModuleList[i].ModuleName}', this.id)" />
+                  <div class="d-flex justify-content-start align-items-center pb-01">
+                    <span class="widthSize40_per">${objModuleList[i].ModuleName}</span>
+                    <input type="checkbox" class="form-check-input module-checkbox" 
+                           id="chkModule${objModuleList[i].ModuleId}"
+                           data-module-id="${objModuleList[i].ModuleId}"
+                           data-module-name="${objModuleList[i].ModuleName}" />
                   </div>
                 </div>
                 `;
@@ -64,8 +57,16 @@ var GroupInfoHelper = {
       }
       link += "</div>";
 
-
       $("#dynamicCheckBoxForModule").html(link);
+      
+      // Attach event listeners to all checkboxes
+      $("#dynamicCheckBoxForModule").find('.module-checkbox').on('change', function() {
+        var moduleId = $(this).data('module-id');
+        var moduleName = $(this).data('module-name');
+        var controlId = $(this).attr('id');
+        GroupPermissionHelper.populateModuleCombo(moduleId, moduleName, controlId);
+      });
+
     } catch (error) {
       console.error("Error fetching modules:", error);
       Message.ErrorWithHeaderText(error);

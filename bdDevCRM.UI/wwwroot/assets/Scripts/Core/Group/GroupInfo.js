@@ -73,38 +73,37 @@ var GroupInfoHelper = {
   },
 
   clearGroupInfo: function () {
-    $("#dynamicCheckBoxForModule").find('input[type="checkbox"]').prop('checked', false);
-    $("#dynamicCheckBoxForModule").empty();
-    $('#txtGroupName').val('');
-    $("#hdnGroupId").val('0');
-    $("#divGroupId > form").kendoValidator();
-    $("#divGroupId").find("span.k-tooltip-validation").hide();
-    var status = $(".status");
-    status.text("").removeClass("invalid");
+    try {
+      // Uncheck and remove dynamic checkboxes
+      $("#dynamicCheckBoxForModule").find('input[type="checkbox"]').prop('checked', false);
+      $("#dynamicCheckBoxForModule").empty();
 
-    var tabStrip = $("#tabstrip").data("kendoTabStrip");
-    if (tabStrip) {
-      tabStrip.select(0); // Select the first tab
+      // Reset text fields and hidden ids
+      $('#txtGroupName').val('');
+      $("#hdnGroupId").val('0');
+
+      // Reset validator messages and tooltip validations
+      try {
+        $("#divGroupId > form").kendoValidator();
+        $("#divGroupId").find("span.k-tooltip-validation").hide();
+      } catch (e) { /* ignore if validator not present */ }
+
+      // Reset status text
+      var status = $(".status");
+      status.text("").removeClass("invalid").removeClass("valid");
+
+      // Clear global module array
+      try { if (typeof allmoduleArray !== "undefined") allmoduleArray.length = 0; } catch (e) {}
+
+      // Ensure first tab selected
+      var tabStrip = $("#tabstrip").data("kendoTabStrip");
+      if (tabStrip) {
+        tabStrip.select(0); // Select the first tab
+      }
+    } catch (e) {
+      console.warn("GroupInfoHelper.clearGroupInfo error:", e);
     }
   },
-
-  //clearGroupInfo: function () {
-  //  $('.form-check-input').prop('checked', false); // Use .prop() instead of .prop()
-  //  $('#txtGroupName').val('');
-  //  $("#hdnGroupId").val('0');
-  //  $("#divGroupId > form").kendoValidator();
-  //  $("#divGroupId").find("span.k-tooltip-validation").hide();
-  //  var status = $(".status");
-  //  status.text("").removeClass("invalid");
-
-  //  // Ensure the Kendo TabStrip is fully initialized
-  //  var tabStrip = $("#tabstrip").data("kendoTabStrip");
-  //  if (tabStrip) {
-  //    tabStrip.select(0); // Select the first tab
-  //  } else {
-  //    Message.ErrorWithHeaderText(error);
-  //  }
-  //},
 
   populateGroupInfoDetails: function (objGroup) {
     $("#hdnGroupId").val(objGroup.GroupId);

@@ -12,7 +12,6 @@ var moduleArray = [];
 
 var GroupPermissionManager = {
 
-
   groupPermissionbyGroupId: async function (groupId) {
     debugger;
     if (!groupId) {
@@ -79,22 +78,35 @@ var GroupPermissionHelper = {
   },
 
   clearGroupPermissionForm: function () {
-    moduleArray = [];
-    var comboBox = $("#cmbApplicationForModule").data("kendoComboBox");
-    if (comboBox) {
-      //$('#cmbApplicationForModule').val('');
-      comboBox.value("");
-      //comboBox.setDataSource(new kendo.data.DataSource({ data: moduleArray }))
+    try {
+      moduleArray = [];
+      var comboBox = $("#cmbApplicationForModule").data("kendoComboBox");
+      if (comboBox) {
+        comboBox.value("");
+        comboBox.setDataSource(new kendo.data.DataSource({ data: [] }));
+      } else {
+        $("#cmbApplicationForModule").val("");
+      }
+
+      // Ensure menu tree and related arrays cleared if MenuPermissionHelper exists
+      try {
+        if (typeof MenuPermissionHelper !== "undefined" && typeof MenuPermissionHelper.clearMenuPermission === "function") {
+          MenuPermissionHelper.clearMenuPermission();
+        } else {
+          if (typeof menuArray !== "undefined") menuArray.length = 0;
+          if ($("#treeview").length) {
+            var tv = $("#treeview").data("kendoTreeView");
+            if (tv && typeof tv.destroy === "function") tv.destroy();
+            $("#treeview").empty();
+          }
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+
+    } catch (e) {
+      console.warn("GroupPermissionHelper.clearGroupPermissionForm error:", e);
     }
-    else {
-      $("#cmbApplicationForModule").kendoComboBox({
-        placeholder: "Select a module",
-        dataTextField: "ModuleName",
-        dataValueField: "ReferenceID",
-        dataSource: moduleArray
-      });
-    }
-    
   },
 
   onSelect: function (e) {
@@ -151,7 +163,6 @@ var GroupPermissionHelper = {
         type: 'error',
       });
       return false;
-      //Message.ErrorWithHeaderText('Login Failed', xhr.responseJSON?.statusCode + ": " + xhr.responseJSON?.message, null);
     }
     
   },
@@ -160,7 +171,5 @@ var GroupPermissionHelper = {
     objGroup.ModuleList = moduleArray;
     return objGroup;
   },
-
-
 
 };

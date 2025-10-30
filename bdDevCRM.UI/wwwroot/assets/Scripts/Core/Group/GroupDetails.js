@@ -271,44 +271,73 @@ var GroupDetailsHelper = {
     }
   },
 
-  //ClearInformation: function () {
-  //  $("#hdGroupId").val("0");
-  //  $("#hdSorOrder").val("0");
-  //  $("#Group-name").val("");
-  //  $("#Group-path").val("");
-
-  //  var cmbModule = $("#cmd-module").data("kendoComboBox");
-  //  if (cmbModule) {
-  //    cmbModule.value("");
-  //    cmbModule.text("");
-  //  }
-
-  //  var cmbParentGroup = $("#cmb-parent-Group").data("kendoComboBox");
-  //  if (cmbParentGroup) {
-  //    cmbParentGroup.value("");
-  //    cmbParentGroup.text("");
-  //  }
-  //  cmbParentGroup.destroy();
-
-  //  GroupDetailsHelper.InitGroupByModuleId();
-
-  //  $('#chkIsQuickLink').prop('checked', false); // Use prop() for checkboxes
-  //},
-
   clearGroupForm: function () {
-    $("#btnSave").text("Save");
+    // set button text and enable
+    try { $("#btnSave").text("Save").show().prop("disabled", false); } catch (e) { }
 
-    GroupInfoHelper.clearGroupInfo();
-    GroupPermissionHelper.clearGroupPermissionForm();
-    MenuPermissionHelper.clearMenuPermission();
-    AccessControlHelper.clearAccessPermission();
-    StateHelper.clearStatusPermission();
-    ActionHelper.clearActionPermission();
-    ReportPermissionHelper.clearReportPermission();
+    // call helper clears defensively
+    try { if (typeof GroupInfoHelper !== "undefined" && typeof GroupInfoHelper.clearGroupInfo === "function") GroupInfoHelper.clearGroupInfo(); } catch (e) { console.warn(e); }
+    try { if (typeof GroupPermissionHelper !== "undefined" && typeof GroupPermissionHelper.clearGroupPermissionForm === "function") GroupPermissionHelper.clearGroupPermissionForm(); } catch (e) { console.warn(e); }
+    try { if (typeof MenuPermissionHelper !== "undefined" && typeof MenuPermissionHelper.clearMenuPermission === "function") MenuPermissionHelper.clearMenuPermission(); } catch (e) { console.warn(e); }
+    try { if (typeof AccessControlHelper !== "undefined" && typeof AccessControlHelper.clearAccessPermission === "function") AccessControlHelper.clearAccessPermission(); } catch (e) { console.warn(e); }
+    try { if (typeof StateHelper !== "undefined" && typeof StateHelper.clearStatusPermission === "function") StateHelper.clearStatusPermission(); } catch (e) { console.warn(e); }
+    try { if (typeof ActionHelper !== "undefined" && typeof ActionHelper.clearActionPermission === "function") ActionHelper.clearActionPermission(); } catch (e) { console.warn(e); }
+    try { if (typeof ReportPermissionHelper !== "undefined" && typeof ReportPermissionHelper.clearReportPermission === "function") ReportPermissionHelper.clearReportPermission(); } catch (e) { console.warn(e); }
+
+    // DOM widget resets (defensive)
+    try {
+      // basic fields
+      $("#hdnGroupId").val("0");
+      $("#txtGroupName").val("");
+      $("#chkIsDefault").prop("checked", false);
+
+      // dynamic checkbox area
+      $("#dynamicCheckBoxForModule").empty();
+
+      // kendo combobox resets
+      var cmdModule = $("#cmd-module").data("kendoComboBox");
+      if (cmdModule) { cmdModule.value(""); cmdModule.setDataSource(new kendo.data.DataSource({ data: [] })); }
+
+      var cmbParent = $("#cmb-parent-Group").data("kendoComboBox");
+      if (cmbParent) { cmbParent.value(""); cmbParent.setDataSource(new kendo.data.DataSource({ data: [] })); }
+
+      var cmbAppModule = $("#cmbApplicationForModule").data("kendoComboBox");
+      if (cmbAppModule) { cmbAppModule.value(""); cmbAppModule.setDataSource(new kendo.data.DataSource({ data: [] })); }
+
+      // destroy / clear treeview
+      if ($("#treeview").length) {
+        var tv = $("#treeview").data("kendoTreeView");
+        if (tv && typeof tv.destroy === "function") tv.destroy();
+        $("#treeview").empty();
+      }
+
+      // validation / status
+      $("#divdetailsForDetails").find(".k-tooltip-validation").hide();
+      $("#divdetailsForDetails").find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid");
+      $(".status").text("").removeClass("invalid valid");
+
+      // reset tabs
+      var tabStrip = $("#tabstrip").data("kendoTabStrip");
+      if (tabStrip) tabStrip.select(0);
+
+    } catch (e) {
+      console.warn("Error resetting DOM widgets:", e);
+    }
+
+    // reset in-memory arrays used across permission helpers
+    try { if (typeof moduleArray !== "undefined") moduleArray.length = 0; } catch (e) {}
+    try { if (typeof menuArray !== "undefined") menuArray.length = 0; } catch (e) {}
+    try { if (typeof allmenuArray !== "undefined") allmenuArray.length = 0; } catch (e) {}
+    try { if (typeof allmoduleArray !== "undefined") allmoduleArray.length = 0; } catch (e) {}
+    try { if (typeof accessArray !== "undefined") accessArray.length = 0; } catch (e) {}
+    try { if (typeof groupPermisionArray !== "undefined") groupPermisionArray.length = 0; } catch (e) {}
+
+    console.debug("GroupDetailsHelper.clearGroupForm: UI widgets and in-memory permission arrays cleared.");
   },
 
   SaveInformation: function () {
     //if (groupDetailsHelper.validateGroupForm()) {
+
 
 
     //}
@@ -349,7 +378,7 @@ var GroupDetailsHelper = {
       cmbParentGroup.value("");
       cmbParentGroup.text("");
     }
-    cmbParentGroup.destroy();
+    try { if (cmbParentGroup && typeof cmbParentGroup.destroy === "function") cmbParentGroup.destroy(); } catch (e) {}
 
     GroupDetailsHelper.InitGroupByModuleId();
 
@@ -381,63 +410,4 @@ var GroupDetailsHelper = {
     return objGroupInfo;
   },
 
-  //PopulateObject: function (obj) {
-  //  GroupDetailsHelper.ClearInformation();
-  //  AjaxManager.PopupWindow("divDetails", "Details Information", "50%");
-
-  //  $("#hdGroupId").val(obj.GroupId);
-  //  $("#hdSorOrder").val(obj.SortOrder);
-  //  $("#Group-name").val(obj.GroupName);
-  //  $("#Group-path").val(obj.GroupPath);
-  //  $('#chkIsQuickLink').prop('checked', false);
-  //  if (obj.ToDo == 1) {
-  //    $('#chkIsQuickLink').prop('checked', true);
-  //  } else {
-  //    $('#chkIsQuickLink').prop('checked', false);
-  //  }
-
-  //  // Populate combo box value
-  //  var cmbModule = $("#cmd-module").data("kendoComboBox");
-  //  if (obj.ModuleId != 0) {
-  //    cmbModule.value(obj.ModuleId);
-
-  //    var comboParentGroup = $("#cmb-parent-Group").data("kendoComboBox");
-  //    if (comboParentGroup) {
-  //      comboParentGroup.destroy();
-  //    }
-
-  //    // Call function to load data and set the value
-  //    GroupDetailsManager.GetAllGroupByModuleId(obj.ModuleId);
-  //    var comboParentGroup = $("#cmb-parent-Group").data("kendoComboBox");
-  //    if (comboParentGroup && obj.ParentGroup !== 0) {
-  //      comboParentGroup.value(obj.ParentGroup); // Set the value after data is bound
-  //    }
-  //  };
-  //},
-
-  //InitGroupByModuleId: function () {
-  //  $("#cmb-parent-Group").kendoComboBox({
-  //    placeholder: "Select Group Name",
-  //    dataTextField: "GroupName",
-  //    dataValueField: "GroupId",
-  //    filter: "contains",
-  //    suggest: true,
-  //    index: -1,
-  //    dataSource: [],
-  //    clearButton: true 
-  //  }).data("kendoComboBox");
-  //},
-
-  //InitModules: function () {
-  //  $("#cmd-module").kendoComboBox({
-  //    placeholder: "Select Module Name",
-  //    dataTextField: "ModuleName",
-  //    dataValueField: "ModuleId",
-  //    filter: "contains",
-  //    suggest: true,
-  //    index: -1,
-  //    dataSource: [],
-  //    clearButton: true 
-  //  }).data("kendoComboBox");
-  //},
 };

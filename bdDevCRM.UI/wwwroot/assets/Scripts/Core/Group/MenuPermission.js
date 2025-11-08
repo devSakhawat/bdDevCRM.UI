@@ -41,71 +41,93 @@ var MenuPermissionManager = {
 var MenuPermissionHelper = {
 
   populateMenuTreeByModuleId: async function (moduleId) {
+
     $("#treeview").remove();
 
-    $('#menuContent').html('<div id="treeview"></div>');
-    var objMenuList = new Object();
-    var newMenuArray = [];
-    objMenuList = await MenuPermissionManager.renderMenuByModuleId(moduleId);
-    gbmoduleId = moduleId;
-    var treeview = $("#treeview").kendoTreeView({
-      checkboxes: {
-        checkChildren: true,
-        template: "<input type='checkbox' id='chkMenu#= item.id #' onclick='MenuPermissionHelper.onSelect(#= item.id #,event)' />"
+    var loaderContainer = $('#menuSectionLoader');
+    var loader = loaderContainer.kendoLoader({
+      size: 'large',
+      type: 'infinite-spinner',
+      themeColor: 'primary'
+    }).data("kendoLoader");
 
-      },
-      select: MenuPermissionHelper.changeMenu,
-      dataSource: {},
-      check: function (e) {
-        this.expandRoot = e.node;
-        this.expand($(this.expandRoot).find(".k-item").addBack());
-      },
-      dataBound: function (e) {
-        if (this.expandRoot) {
-          this.expand(e.node.find(".k-item"));
+    try {
+      $("#menuContent").css("min-height", "50px");
+      loaderContainer.show();
+      loader.show();
+
+      $('#menuContent').html('<div id="treeview"></div>');
+      var objMenuList = new Object();
+      var newMenuArray = [];
+      objMenuList = await MenuPermissionManager.renderMenuByModuleId(moduleId);
+      gbmoduleId = moduleId;
+      var treeview = $("#treeview").kendoTreeView({
+        checkboxes: {
+          checkChildren: true,
+          template: "<input type='checkbox' id='chkMenu#= item.id #' onclick='MenuPermissionHelper.onSelect(#= item.id #,event)' />"
+
+        },
+        select: MenuPermissionHelper.changeMenu,
+        dataSource: {},
+        check: function (e) {
+          this.expandRoot = e.node;
+          this.expand($(this.expandRoot).find(".k-item").addBack());
+        },
+        dataBound: function (e) {
+          if (this.expandRoot) {
+            this.expand(e.node.find(".k-item"));
+          }
+        },
+      }).data("kendoTreeView");
+      treeview.remove();
+
+      var chiledMenuArray = [];
+      for (var i = 0; i < objMenuList.length; i++) {
+
+        if (objMenuList[i].ParentMenu == null || objMenuList[i].ParentMenu == 0) {
+
+          var objMenu = new Object();
+          objMenu.id = objMenuList[i].MenuId;
+          objMenu.itemId = objMenuList[i].MenuId;
+          objMenu.text = objMenuList[i].MenuName;
+          objMenu.value = objMenuList[i].MenuId;
+          chiledMenuArray = MenuPermissionHelper.chiledMenu(objMenu, objMenuList[i].MenuId, objMenuList);
+          objMenu.items = chiledMenuArray;
+          objMenu.expanded = true;
+
+          if (objMenu.items.length > 0) {
+
+            //objMenu.spriteCssClass = "folder"
+            //    ;
+          }
+          else {
+            objMenu.spriteCssClass = "html";
+            objMenu.items = [];
+
+          }
+          objMenu.itemValue = objMenuList[i].MenuId;
+          newMenuArray.push(objMenu);
         }
-      },
-    }).data("kendoTreeView");
-    treeview.remove();
-
-    var chiledMenuArray = [];
-    for (var i = 0; i < objMenuList.length; i++) {
-
-      if (objMenuList[i].ParentMenu == null || objMenuList[i].ParentMenu == 0) {
-
-        var objMenu = new Object();
-        objMenu.id = objMenuList[i].MenuId;
-        objMenu.itemId = objMenuList[i].MenuId;
-        objMenu.text = objMenuList[i].MenuName;
-        objMenu.value = objMenuList[i].MenuId;
-        chiledMenuArray = MenuPermissionHelper.chiledMenu(objMenu, objMenuList[i].MenuId, objMenuList);
-        objMenu.items = chiledMenuArray;
-        objMenu.expanded = true;
-
-        if (objMenu.items.length > 0) {
-
-          //objMenu.spriteCssClass = "folder"
-          //    ;
-        }
-        else {
-          objMenu.spriteCssClass = "html";
-          objMenu.items = [];
-
-        }
-        objMenu.itemValue = objMenuList[i].MenuId;
-        newMenuArray.push(objMenu);
       }
+
+      var dataSource = new kendo.data.HierarchicalDataSource({
+        data: newMenuArray
+      });
+
+      $("#treeview").data("kendoTreeView").setDataSource(dataSource);
+      MenuPermissionHelper.autoSelectExistingMenu();
     }
-
-    var dataSource = new kendo.data.HierarchicalDataSource({
-      data: newMenuArray
-    });
-
-    $("#treeview").data("kendoTreeView").setDataSource(dataSource);
-    MenuPermissionHelper.autoSelectExistingMenu();
+    catch (error) {
+      console.error(error);
+    }
+    finally {
+      loader.hide();
+      $("#menuContent").css("min-height", "auto");
+      loaderContainer.hide();
+    }
   },
 
-  onSelect: function (menuId, e) {
+  onSelect: async function (menuId, e) {
 
     debugger;
 
@@ -131,7 +153,8 @@ var MenuPermissionHelper = {
 
       //Chiled Menu Add in Array
       MenuPermissionHelper.checkChiledMenuArray(menuId);
-      StateHelper.GetStatusByMenuId(menuId);
+      StateHelper.clearStatusPermission();
+      await StateHelper.GetStatusByMenuId(menuId);
     }
     else {
       for (var j = 0; j < menuArray.length; j++) {
@@ -279,7 +302,7 @@ var MenuPermissionHelper = {
     $('#menuContent').html('<div id="treeview"></div>');
     for (var i = 0; i < menuArray.length; i++) {
       if (menuArray[i].ParentPermission == moduleId) {
-        stateHelper.RemoveStatusByMenuId(menuArray[i].ReferenceID);
+        StateHelper.RemoveStatusByMenuId(menuArray[i].ReferenceID);
         menuArray.splice(i, 1);
         i = i - 1;
       }

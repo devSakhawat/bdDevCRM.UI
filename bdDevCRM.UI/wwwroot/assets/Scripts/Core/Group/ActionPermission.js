@@ -65,14 +65,13 @@ var ActionHelper = {
             </div>
           `;
 
-
-
-      stateArray.push(objActionList[i]);
+      actionArray.push(objActionList[i]);
     }
     $("#checkboxActionPermission").html(link);
     ActionHelper.checkedExistingActionChangeByStatus(statusId);
 
   },
+
   populateActionArray: function (actionId, statusId) {
     if ($("#chkAction" + actionId).is(':checked') == true) {
       var obj = new Object();

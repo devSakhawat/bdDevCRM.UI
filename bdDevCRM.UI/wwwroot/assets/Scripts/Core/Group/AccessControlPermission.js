@@ -1,4 +1,5 @@
-﻿/// <reference path="actionpermission.js" />
+﻿
+/// <reference path="actionpermission.js" />
 /// <reference path="group.js" />
 /// <reference path="groupdetails.js" />
 /// <reference path="groupinfo.js" />
@@ -13,115 +14,180 @@ var accessPermissionArray = [];
 var gbModuleId = 0;
 
 var AccessControlManager = {
-  getAllAccessControl: function () {
+  getAllAccessControl: async function () {
+    const serviceUrl = "/getaccess";
 
-    var jsonParams = "";
-    var serviceUrl = "/getaccess";
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        resolve(jsonData);
+      if (response && response.IsSuccess === true) {
+        return response.Data;
+      } else {
+        throw new Error(response?.Message || "Failed to load access control data");
       }
-
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, false, false, onSuccess, onFailed);
-    });
+    } catch (error) {
+      console.error("Error loading access control:", error);
+      throw error;
+    }
   }
 };
 
 var AccessControlHelper = {
+
+  //getAllAccessControl: async function (moduleId) {
+  //  var mediumLoader = $('#checkboxAccess').kendoLoader({ size: 'medium', type: 'infinite-spinner' }).data("kendoLoader");
+
+  //  try {
+  //    accessArray = [];
+  //    gbModuleId = moduleId;
+  //    const objAccessList = await AccessControlManager.getAllAccessControl();
+  //    if (!objAccessList || objAccessList.length === 0) {
+  //      $("#checkboxAccess").html('<div class="col-12"><p class="text-muted">No access controls available</p></div>');
+  //      return;
+  //    }
+
+  //    const checkboxHtml = objAccessList.map(access => {
+  //      accessArray.push(access);
+
+  //      return `
+  //        <div class="col-12">
+  //          <div class="d-flex justify-content-start align-items-center access-item">
+  //            <input type="checkbox"
+  //                   class="form-check-input"
+  //                   id="chkAccess${access.AccessId}"
+  //                   onclick="AccessControlHelper.populateAccessPermissionArray(${access.AccessId}, '${access.AccessName}')" />
+  //            <label for="chkAccess${access.AccessId}" class="tree-label ms-1">${access.AccessName}</label>
+  //          </div>
+  //        </div>
+  //      `;
+  //    }).join('');
+
+  //    $("#checkboxAccess").html(checkboxHtml);
+  //    AccessControlHelper.checkExistingAccessPermission(moduleId);
+
+  //  } catch (error) {
+  //    console.error("Error in getAllAccessControl:", error);
+  //    // Error already shown by VanillaApiCallManager
+  //    $("#checkboxAccess").html('<div class="col-12"><p class="text-danger">Failed to load access controls</p></div>');
+  //  } finally {
+  //    mediumLoader.hide();
+  //  }
+  //},
+
   getAllAccessControl: async function (moduleId) {
+    $("#checkboxAccess").empty();
     accessArray = [];
     gbModuleId = moduleId;
-    var objAccessList = await AccessControlManager.getAllAccessControl();
-    var link = "";
 
-    for (var i = 0; i < objAccessList.length; i++) {
+    var loaderContainer = $('#accessSectionLoader');
+    var loader = loaderContainer.kendoLoader({
+      size: 'large',
+      type: 'infinite-spinner',
+      themeColor: 'primary'
+    }).data("kendoLoader");
 
-      link += `
-                <div class="col-12">
-                  <div class="d-flex justify-content-start align-items-center">
-                   <input type="checkbox" class="form-check-input" id="chkAccess${objAccessList[i].AccessId}" onclick="AccessControlHelper.populateAccessPermissionArray(${objAccessList[i].AccessId}, '${objAccessList[i].AccessName}', this.id)" /><span class = "">${objAccessList[i].AccessName}</span>
-                   
-                  </div>
-                </div>
-                `;
+    try {
 
-      accessArray.push(objAccessList[i]);
+      loaderContainer.show();
+      loader.show();
+
+      const objAccessList = await AccessControlManager.getAllAccessControl();
+
+      if (!objAccessList || objAccessList.length === 0) {
+        $("#checkboxAccess").html('<div class="col-12"><p class="text-muted">No access controls available</p></div>');
+        return;
+      }
+
+      const checkboxHtml = objAccessList.map(access => {
+        accessArray.push(access);
+
+        return `
+          <div class="col-12">
+            <div class="d-flex justify-content-start align-items-center access-item">
+              <input type="checkbox" 
+                     class="form-check-input" 
+                     id="chkAccess${access.AccessId}" 
+                     onclick="AccessControlHelper.populateAccessPermissionArray(${access.AccessId}, '${access.AccessName}')" />
+              <label for="chkAccess${access.AccessId}" class="tree-label ms-2">${access.AccessName}</label>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      $("#checkboxAccess").html(checkboxHtml);
+      AccessControlHelper.checkExistingAccessPermission(moduleId);
+
+    } catch (error) {
+      console.error("Error in getAllAccessControl:", error);
+      $("#checkboxAccess").html('<div class="col-12"><p class="text-danger">Failed to load access controls</p></div>');
+    } finally {
+      loaderContainer.hide();
     }
-    $("#checkboxAccess").html(link);
-    AccessControlHelper.checkExistingAccessPermission(moduleId);
   },
 
   populateAccessPermissionArray: function (accessId, accessName) {
+    const isChecked = $(`#chkAccess${accessId}`).is(':checked');
 
-    if ($("#chkAccess" + accessId).is(':checked') == true) {
-      var obj = new Object();
-      obj.ReferenceID = accessId;
-      obj.ParentPermission = gbModuleId;
-      obj.PermissionTableName = "Access";
-      accessPermissionArray.push(obj);
-    }
-    else {
-      for (var i = 0; i < accessPermissionArray.length; i++) {
-        if (accessPermissionArray[i].ReferenceID == accessId && accessPermissionArray[i].ParentPermission == gbModuleId) {
-          accessPermissionArray.splice(i, 1);
-          break;
-        }
+    if (isChecked) {
+      const exists = accessPermissionArray.some(
+        item => item.ReferenceID === accessId && item.ParentPermission === gbModuleId
+      );
+
+      if (!exists) {
+        accessPermissionArray.push({
+          ReferenceID: accessId,
+          ParentPermission: gbModuleId,
+          PermissionTableName: "Access"
+        });
+      }
+    } else {
+      const index = accessPermissionArray.findIndex(
+        item => item.ReferenceID === accessId && item.ParentPermission === gbModuleId
+      );
+
+      if (index !== -1) {
+        accessPermissionArray.splice(index, 1);
       }
     }
   },
 
   createAccessPermission: function (objGroupInfo) {
-    objGroupInfo.AccessList = accessPermissionArray;
+    objGroupInfo.AccessList = [...accessPermissionArray];
     return objGroupInfo;
   },
 
   clearAccessPermission: function () {
     accessPermissionArray = [];
     gbModuleId = 0;
-    $('.chkBox').prop('checked', false);
+    $('.form-check-input[id^="chkAccess"]').prop('checked', false);
   },
 
   PopulateExistingAccessInArray: function (objGroupPermission) {
-    accessPermissionArray = [];
-    for (var i = 0; i < objGroupPermission.length; i++) {
-      if (objGroupPermission[i].PermissionTableName == "Access") {
-        var obj = new Object();
-        obj.ReferenceID = objGroupPermission[i].ReferenceID;
-        obj.ParentPermission = objGroupPermission[i].ParentPermission;
-        obj.PermissionTableName = "Access";
-        accessPermissionArray.push(obj);
-        //$('#chkAccess' + objGroupPermission[i].ReferenceID).prop('checked', true);
-      }
+    if (!objGroupPermission || !Array.isArray(objGroupPermission)) {
+      console.warn("Invalid group permission data");
+      return;
     }
+
+    accessPermissionArray = objGroupPermission
+      .filter(item => item.PermissionTableName === "Access")
+      .map(item => ({
+        ReferenceID: item.ReferenceID,
+        ParentPermission: item.ParentPermission,
+        PermissionTableName: "Access"
+      }));
   },
 
   removeAccessPermissionByModuleId: function (moduleId) {
-    for (var i = 0; i < accessPermissionArray.length; i++) {
-      if (accessPermissionArray[i].ParentPermission == moduleId) {
-        accessPermissionArray.splice(i, 1);
-        i = i - 1;
-      }
-    }
+    accessPermissionArray = accessPermissionArray.filter(
+      item => item.ParentPermission !== moduleId
+    );
   },
 
   checkExistingAccessPermission: function (moduleId) {
-    for (var j = 0; j < accessPermissionArray.length; j++) {
-      if (accessPermissionArray[j].ParentPermission == moduleId) {
-        $('#chkAccess' + accessPermissionArray[j].ReferenceID).prop('checked', true);
-      }
-    }
+    accessPermissionArray
+      .filter(item => item.ParentPermission === moduleId)
+      .forEach(item => {
+        $(`#chkAccess${item.ReferenceID}`).prop('checked', true);
+      });
   }
-
 };

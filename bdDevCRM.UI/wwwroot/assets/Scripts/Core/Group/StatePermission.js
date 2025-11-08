@@ -12,31 +12,24 @@ var stateArray = [];
 var statePermissionArray = [];
 
 var StateManager = {
-  GetStatusByMenuId: function (menuId) {
-    var jsonParams = $.param({
-      menuId: menuId
-    });
-    var serviceUrl = "/status/key/";
 
-    return new Promise(function (resolve, reject) {
-      function onSuccess(jsonData) {
-        resolve(jsonData);
+  GetStatusByMenuId: async function (menuId) {
+    debugger;
+    const serviceUrl = `/status/key/${menuId}`;
+    try {
+      const response = await VanillaApiCallManager.get(baseApi, serviceUrl);
+      if (response && response.IsSuccess === true) {
+        return Promise.resolve(response.Data);
+      } else {
+        throw new Error("Failed to load data");
       }
+    } catch (error) {
+      console.log("Error loading data:" + error);
+      VanillaApiCallManager.handleApiError(error);
+      return Promise.reject(error);
+    }
+  },
 
-      function onFailed(jqXHR, textStatus, errorThrown) {
-        ToastrMessage.showToastrNotification({
-          preventDuplicates: true,
-          closeButton: true,
-          timeOut: 0,
-          message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
-          type: 'error',
-        });
-        reject(errorThrown);
-      }
-
-      AjaxManager.GetDataForDotnetCoreAsync(baseApi, serviceUrl, jsonParams, false, false, onSuccess, onFailed);
-    });
-  }
 
 };
 
@@ -48,27 +41,21 @@ var StateHelper = {
     var link = "";
 
     for (var i = 0; i < objStatusList.length; i++) {
-
-      //link += "<div><input type=\"checkbox\" class=\"form-check-input me-2\" id=\"chkStatus" + objStatusList[i].WfstateId + "\" onclick=\"StateHelper.populateStateArray(" + objStatusList[i].WfstateId + ", '" + objStatusList[i].MenuId + "', this.id)\"/>" +
-      //  "<a class=\"alinkGroup \" title=\"View Action Permission\"  id=\"astatus" + objStatusList[i].WfstateId + "\" onclick=\"StateHelper.populateStateArray(" + objStatusList[i].WfstateId + ", '" + objStatusList[i].MenuId + "', this.id)\">" + objStatusList[i].StateName + "</a></div>";
-
-
       link += `
-              <div class="col-12 mb-1">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="d-flex align-items-center">
-                    <input type="checkbox" class="form-check-input me-2" id="chkStatus${objStatusList[i].WfstateId}"
-                           onclick="StateHelper.populateStateArray(${objStatusList[i].WfstateId}, '${objStatusList[i].MenuId}', this.id)" />
-                    <a class="alinkGroup" title="View Action Permission" id="astatus${objStatusList[i].WfstateId}"
-                       onclick="StateHelper.populateStateArray(${objStatusList[i].WfstateId}, '${objStatusList[i].MenuId}', this.id)"> ${objStatusList[i].StateName}
-                    </a>
-                  </div>
+              <div class="col-12">
+                <div class="d-flex justify-content-start align-items-center access-item">
+                  <input type="checkbox"
+                         class="form-check-input"
+                         id="chkStatus${objStatusList[i].WfStateId}"
+                         onclick="StateHelper.populateStateArray(${objStatusList[i].WfStateId}, '${objStatusList[i].MenuId}', this.id)" />
+                  <label for="chkAccess${objStatusList[i].WfStateId}" class="tree-label ms-2">${objStatusList[i].StateName}</label>
                 </div>
               </div>
             `;
 
       stateArray.push(objStatusList[i]);
-
+      console.log(objStatusList);
+      console.log(stateArray);
     }
     $("#checkboxStatePermission").html(link);
     StateHelper.checkedExistingStatusChangeByMenu(menuId);
@@ -76,8 +63,6 @@ var StateHelper = {
   },
 
   populateStateArray: function (stateId, menuId) {
-
-
     if ($("#chkStatus" + stateId).is(':checked') == true) {
       var obj = new Object();
       obj.ReferenceID = stateId;
@@ -117,8 +102,12 @@ var StateHelper = {
   },
 
   clearStatusPermission: function () {
-    statePermissionArray = [];
     $('.chkBox').prop('checked', false);
+    stateArray = [];
+    statePermissionArray = [];
+    if ($("#checkboxStatePermission").length > 0) {
+      $("#checkboxStatePermission").empty();
+    }
   },
 
   populateExistingStatusInArray: function (objGroupPermission) {

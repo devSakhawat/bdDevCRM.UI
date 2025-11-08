@@ -73,6 +73,12 @@ var GroupPermissionHelper = {
     var comboBox = $("#cmbApplicationForModule").data("kendoComboBox");
     if (comboBox) {
       comboBox.setDataSource(moduleArray);
+
+      // Unbind existing select event first to avoid duplicates
+      comboBox.unbind("select");
+
+      // Rebind select event
+      comboBox.bind("select", GroupPermissionHelper.onSelect);
     } else {
       $("#cmbApplicationForModule").kendoComboBox({
         placeholder: "Select a module",
@@ -98,7 +104,7 @@ var GroupPermissionHelper = {
       // Ensure menu tree and related arrays cleared if MenuPermissionHelper exists
       try {
         if (typeof MenuPermissionHelper !== "undefined" && typeof MenuPermissionHelper.clearMenuPermission === "function") {
-          MenuPermissionHelper.clearMenuPermission();
+          //MenuPermissionHelper.clearMenuPermission();
         } else {
           if (typeof menuArray !== "undefined") menuArray.length = 0;
           if ($("#treeview").length) {
@@ -108,21 +114,28 @@ var GroupPermissionHelper = {
           }
         }
       } catch (e) {
-        console.warn(e);
+        //console.warn(e);
+        VanillaApiCallManager.handleApiError(e);
       }
 
     } catch (e) {
-      console.warn("GroupPermissionHelper.clearGroupPermissionForm error:", e);
+      //console.warn("GroupPermissionHelper.clearGroupPermissionForm error:", e);
+      VanillaApiCallManager.handleApiError(e);
     }
   },
 
-  onSelect: function (e) {
+  onSelect: async function (e) {
     debugger;
-    var dataItem = this.dataItem(e.item.index());
-    MenuPermissionHelper.populateMenuTreeByModuleId(dataItem.ReferenceID);
-    AccessControlHelper.getAllAccessControl(dataItem.ReferenceID);
-    var mdl = $("#cmbApplicationForModule").data("kendoComboBox");
-    mdl.value(dataItem.ReferenceID);
+    try {
+      var dataItem = this.dataItem(e.item.index());
+      await AccessControlHelper.getAllAccessControl(dataItem.ReferenceID);
+      await MenuPermissionHelper.populateMenuTreeByModuleId(dataItem.ReferenceID);
+      var mdl = $("#cmbApplicationForModule").data("kendoComboBox");
+      mdl.value(dataItem.ReferenceID);
+    } catch (e) {
+      //console.error("Error in onSelect:", error);
+      VanillaApiCallManager.handleApiError(e);
+    }
   },
 
   populateExistingModule: async function (objGroup) {
@@ -147,13 +160,22 @@ var GroupPermissionHelper = {
         }
       }
 
-      $("#cmbApplicationForModule").kendoComboBox({
-        placeholder: "Select a module",
-        dataTextField: "ModuleName",
-        dataValueField: "ReferenceID",
-        select: GroupPermissionHelper.onSelect,
-        dataSource: moduleArray
-      });
+      var applicationForModule = $("#cmbApplicationForModule").data("kendoComboBox");
+      if (applicationForModule) {
+        applicationForModule.setDataSource(moduleArray);
+        applicationForModule.unbind("select");
+        applicationForModule.bind("select", GroupPermissionHelper.onSelect);
+      }
+      else {
+        $("#cmbApplicationForModule").kendoComboBox({
+          placeholder: "Select a module",
+          dataTextField: "ModuleName",
+          dataValueField: "ReferenceID",
+          select: GroupPermissionHelper.onSelect,
+          dataSource: moduleArray
+        });
+      }
+      
 
       MenuPermissionHelper.populateExistingMenuInArray(objGroupPermission);
       AccessControlHelper.PopulateExistingAccessInArray(objGroupPermission);
@@ -161,14 +183,15 @@ var GroupPermissionHelper = {
       ActionHelper.populateExistingActionInArray(objGroupPermission);
       ReportPermissionHelper.populateExistingReportInArray(objGroupPermission);
     } catch (error) {
-      console.log(error);
-      ToastrMessage.showToastrNotification({
-        preventDuplicates: true,
-        closeButton: true,
-        timeOut: 0,
-        message: error,
-        type: 'error',
-      });
+      VanillaApiCallManager.handleApiError(error);
+      //console.log(error);
+      //ToastrMessage.showToastrNotification({
+      //  preventDuplicates: true,
+      //  closeButton: true,
+      //  timeOut: 0,
+      //  message: error,
+      //  type: 'error',
+      //});
       return false;
     }
     

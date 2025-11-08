@@ -77,7 +77,7 @@ var GroupInfoHelper = {
     try {
       // Uncheck and remove dynamic checkboxes
       $("#dynamicCheckBoxForModule").find('input[type="checkbox"]').prop('checked', false);
-      $("#dynamicCheckBoxForModule").empty();
+      //$("#dynamicCheckBoxForModule").empty();
 
       // Reset text fields and hidden ids
       $('#txtGroupName').val('');
@@ -93,8 +93,9 @@ var GroupInfoHelper = {
       var status = $(".status");
       status.text("").removeClass("invalid").removeClass("valid");
 
-      // Clear global module array
-      try { if (typeof allmoduleArray !== "undefined") allmoduleArray.length = 0; } catch (e) {}
+      //// Clear global module array
+      //// this array should not be cleared because of this array are responsible after clear the form.
+      //try { if (typeof allmoduleArray !== "undefined") allmoduleArray.length = 0; } catch (e) {}
 
       // Ensure first tab selected
       var tabStrip = $("#tabstrip").data("kendoTabStrip");

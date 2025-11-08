@@ -312,7 +312,7 @@ html {
   --dashui-font-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
   --dashui-gradient: linear-gradient(180deg,hsla(0,0%,100%,.15),hsla(0,0%,100%,0));
   --dashui-body-font-family: "Inter","sans-serif";
-  --dashui-body-font-size: 0.875rem;
+  --dashui-body-font-size: 1rem;
   --dashui-body-font-weight: 400;
   --dashui-body-line-height: 1.5;
   --dashui-body-color: #475569;

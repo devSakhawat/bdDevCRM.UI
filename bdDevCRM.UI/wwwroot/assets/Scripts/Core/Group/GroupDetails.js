@@ -11,11 +11,11 @@
 
 var GroupDetailsManager = {
 
-  SaveData: function () {
+  SaveData: async function () {
     debugger;
     var isToUpdateOrCreate = $("#hdnGroupId").val();
     var successmsg = isToUpdateOrCreate == 0 ? "New Data Saved Successfully." : "Information Updated Successfully.";
-    var serviceUrl = isToUpdateOrCreate == 0 ? "/Group" : "/Group/" + isToUpdateOrCreate;
+    var serviceUrl = isToUpdateOrCreate == 0 ? "/group" : "/group/" + isToUpdateOrCreate;
     var confmsg = isToUpdateOrCreate == 0 ? "Do you want to save information?" : "Do you want to update information?";
     var httpType = isToUpdateOrCreate > 0 ? "PUT" : "POST";
    
@@ -28,27 +28,44 @@ var GroupDetailsManager = {
         {
           addClass: 'btn btn-primary',
           text: 'Yes',
-          onClick: function ($noty) {
+          onClick: async function ($noty) {
             $noty.close();
+            //var jsonObject = GroupDetailsHelper.CreateObject();
             var obj = GroupDetailsHelper.CreateObject();
+            var jsonObject = JSON.stringify(obj);
+            console.log(jsonObject);
+            try {
+              const response = await VanillaApiCallManager.put(baseApi, serviceUrl, jsonObject);
+              //const response = await VanillaApiCallManager.SendRequestVanilla(baseApi, serviceUrl, jsonObject, httpType);
+              if (response && response.IsSuccess === true) {
+                return Promise.resolve(response.Data);
+              } else {
+                throw new Error("Failed to load data");
+              }
+            } catch (error) {
+              console.log("Error loading data:" + error);
+              VanillaApiCallManager.handleApiError(error);
+              return Promise.reject(error);
+            }
+
             // when you use replease you must your use replace on .net
             //var jsonObject = 'strGroupInfo=' + JSON.stringify(obj).replace(/&/g, "^");
-            var jsonObject = JSON.stringify(obj);
-            var responseData = AjaxManager.PostDataForDotnetCoreWithHttp(baseApi, serviceUrl, jsonObject, httpType ,onSuccess ,onFailed);
-            function onSuccess(responseData) {
-              Message.Success(successmsg);
-              GroupDetailsHelper.clearGroupForm();
-              $("#gridSummary").data("kendoGrid").dataSource.read();
-            }
-            function onFailed(jqXHR, textStatus, errorThrown) {
-              ToastrMessage.showToastrNotification({
-                preventDuplicates: true,
-                closeButton: true,
-                timeOut: 0,
-                message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
-                type: 'error',
-              });
-            }
+            //var jsonObject = JSON.stringify(obj);
+            //var responseData = AjaxManager.PostDataForDotnetCoreWithHttp(baseApi, serviceUrl, jsonObject, httpType ,onSuccess ,onFailed);
+            //function onSuccess(responseData) {
+            //  Message.Success(successmsg);
+            //  GroupDetailsHelper.clearGroupForm();
+            //  $("#gridSummary").data("kendoGrid").dataSource.read();
+            //}
+            //function onFailed(jqXHR, textStatus, errorThrown) {
+            //  ToastrMessage.showToastrNotification({
+            //    preventDuplicates: true,
+            //    closeButton: true,
+            //    timeOut: 0,
+            //    message: jqXHR.responseJSON?.statusCode + ": " + jqXHR.responseJSON?.message,
+            //    type: 'error',
+            //  });
+            //}
 
           }
         },
@@ -271,28 +288,151 @@ var GroupDetailsHelper = {
     }
   },
 
+  //clearGroupForm: function () {
+  //  // set button text and enable
+  //  try { $("#btnSave").text("Save").show().prop("disabled", false); } catch (e) { }
+
+  //  // call helper clears for all sections
+  //  try {
+  //    if (typeof GroupInfoHelper !== "undefined" && typeof GroupInfoHelper.clearGroupInfo === "function") {
+  //      GroupInfoHelper.clearGroupInfo();
+  //    }
+  //  } catch (e) {
+  //    console.warn("Error clearing GroupInfo:", e);
+  //  }
+
+  //  try {
+  //    if (typeof GroupPermissionHelper !== "undefined" && typeof GroupPermissionHelper.clearGroupPermissionForm === "function") {
+  //      GroupPermissionHelper.clearGroupPermissionForm();
+  //    }
+  //  } catch (e) {
+  //    console.warn("Error clearing GroupPermission:", e);
+  //  }
+
+  //  try {
+  //    if (typeof MenuPermissionHelper !== "undefined" && typeof MenuPermissionHelper.clearMenuPermission === "function") {
+  //      MenuPermissionHelper.clearMenuPermission();
+  //    }
+  //  } catch (e) {
+  //    console.warn("Error clearing MenuPermission:", e);
+  //  }
+
+  //  try {
+  //    if (typeof AccessControlHelper !== "undefined" && typeof AccessControlHelper.clearAccessPermission === "function") {
+  //      AccessControlHelper.clearAccessPermission();
+  //    }
+  //  } catch (e) {
+  //    console.warn("Error clearing AccessControl:", e);
+  //  }
+
+  //  try {
+  //    if (typeof StateHelper !== "undefined" && typeof StateHelper.clearStatusPermission === "function") {
+  //      StateHelper.clearStatusPermission();
+  //    }
+  //  } catch (e) {
+  //    console.warn("Error clearing StatePermission:", e);
+  //  }
+
+  //  try {
+  //    if (typeof ActionHelper !== "undefined" && typeof ActionHelper.clearActionPermission === "function") {
+  //      ActionHelper.clearActionPermission();
+  //    }
+  //  } catch (e) {
+  //    console.warn("Error clearing ActionPermission:", e);
+  //  }
+
+  //  try {
+  //    if (typeof ReportPermissionHelper !== "undefined" && typeof ReportPermissionHelper.clearReportPermission === "function") {
+  //      ReportPermissionHelper.clearReportPermission();
+  //    }
+  //  } catch (e) {
+  //    console.warn("Error clearing ReportPermission:", e);
+  //  }
+
+  //  // DOM widget resets (defensive)
+  //  try {
+  //    // basic fields
+  //    $("#hdnGroupId").val("0");
+  //    $("#txtGroupName").val("");
+  //    $("#chkIsDefault").prop("checked", false);
+
+  //    // kendo combobox resets
+  //    var cmdModule = $("#cmd-module").data("kendoComboBox");
+  //    if (cmdModule) { cmdModule.value(""); cmdModule.setDataSource(new kendo.data.DataSource({ data: [] })); }
+
+  //    var cmbParent = $("#cmb-parent-Group").data("kendoComboBox");
+  //    if (cmbParent) { cmbParent.value(""); cmbParent.setDataSource(new kendo.data.DataSource({ data: [] })); }
+
+  //    var cmbAppModule = $("#cmbApplicationForModule").data("kendoComboBox");
+  //    if (cmbAppModule) { cmbAppModule.value(""); cmbAppModule.setDataSource(new kendo.data.DataSource({ data: [] })); }
+
+  //    // destroy / clear treeview
+  //    if ($("#treeview").length) {
+  //      var tv = $("#treeview").data("kendoTreeView");
+  //      if (tv && typeof tv.destroy === "function") tv.destroy();
+  //      $("#treeview").empty();
+  //    }
+
+  //    // validation / status
+  //    $("#divdetailsForDetails").find(".k-tooltip-validation").hide();
+  //    $("#divdetailsForDetails").find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid");
+  //    $(".status").text("").removeClass("invalid valid");
+
+  //    // reset tabs
+  //    var tabStrip = $("#tabstrip").data("kendoTabStrip");
+  //    if (tabStrip) tabStrip.select(0);
+
+  //  } catch (e) {
+  //    console.warn("Error resetting DOM widgets:", e);
+  //  }
+
+  //  // reset in-memory arrays used across permission helpers
+  //  try { if (typeof moduleArray !== "undefined") moduleArray.length = 0; } catch (e) { }
+  //  try { if (typeof menuArray !== "undefined") menuArray.length = 0; } catch (e) { }
+  //  try { if (typeof allmenuArray !== "undefined") allmenuArray.length = 0; } catch (e) { }
+  //  try { if (typeof allmoduleArray !== "undefined") allmoduleArray.length = 0; } catch (e) { }
+  //  try { if (typeof accessArray !== "undefined") accessArray.length = 0; } catch (e) { }
+  //  try { if (typeof groupPermisionArray !== "undefined") groupPermisionArray.length = 0; } catch (e) { }
+
+  //  console.debug("GroupDetailsHelper.clearGroupForm: All sections cleared - UI widgets, permission arrays, and helper forms reset.");
+  //},
+
   clearGroupForm: function () {
     // set button text and enable
     try { $("#btnSave").text("Save").show().prop("disabled", false); } catch (e) { }
 
     // call helper clears defensively
-    try { if (typeof GroupInfoHelper !== "undefined" && typeof GroupInfoHelper.clearGroupInfo === "function") GroupInfoHelper.clearGroupInfo(); } catch (e) { console.warn(e); }
-    try { if (typeof GroupPermissionHelper !== "undefined" && typeof GroupPermissionHelper.clearGroupPermissionForm === "function") GroupPermissionHelper.clearGroupPermissionForm(); } catch (e) { console.warn(e); }
-    try { if (typeof MenuPermissionHelper !== "undefined" && typeof MenuPermissionHelper.clearMenuPermission === "function") MenuPermissionHelper.clearMenuPermission(); } catch (e) { console.warn(e); }
-    try { if (typeof AccessControlHelper !== "undefined" && typeof AccessControlHelper.clearAccessPermission === "function") AccessControlHelper.clearAccessPermission(); } catch (e) { console.warn(e); }
-    try { if (typeof StateHelper !== "undefined" && typeof StateHelper.clearStatusPermission === "function") StateHelper.clearStatusPermission(); } catch (e) { console.warn(e); }
-    try { if (typeof ActionHelper !== "undefined" && typeof ActionHelper.clearActionPermission === "function") ActionHelper.clearActionPermission(); } catch (e) { console.warn(e); }
-    try { if (typeof ReportPermissionHelper !== "undefined" && typeof ReportPermissionHelper.clearReportPermission === "function") ReportPermissionHelper.clearReportPermission(); } catch (e) { console.warn(e); }
+    //try { if (typeof GroupInfoHelper !== "undefined" && typeof GroupInfoHelper.clearGroupInfo === "function") GroupInfoHelper.clearGroupInfo(); } catch (e) { console.warn(e); }
+    //try { if (typeof GroupPermissionHelper !== "undefined" && typeof GroupPermissionHelper.clearGroupPermissionForm === "function") GroupPermissionHelper.clearGroupPermissionForm(); } catch (e) { console.warn(e); }
+    //try { if (typeof MenuPermissionHelper !== "undefined" && typeof MenuPermissionHelper.clearMenuPermission === "function") MenuPermissionHelper.clearMenuPermission(); } catch (e) { console.warn(e); }
+    //try { if (typeof AccessControlHelper !== "undefined" && typeof AccessControlHelper.clearAccessPermission === "function") AccessControlHelper.clearAccessPermission(); } catch (e) { console.warn(e); }
+    //try { if (typeof StateHelper !== "undefined" && typeof StateHelper.clearStatusPermission === "function") StateHelper.clearStatusPermission(); } catch (e) { console.warn(e); }
+    //try { if (typeof ActionHelper !== "undefined" && typeof ActionHelper.clearActionPermission === "function") ActionHelper.clearActionPermission(); } catch (e) { console.warn(e); }
+    //try { if (typeof ReportPermissionHelper !== "undefined" && typeof ReportPermissionHelper.clearReportPermission === "function") ReportPermissionHelper.clearReportPermission(); } catch (e) { console.warn(e); }
 
     // DOM widget resets (defensive)
     try {
       // basic fields
       $("#hdnGroupId").val("0");
       $("#txtGroupName").val("");
+
+      // 01. Clear "Is Default" checkbox
       $("#chkIsDefault").prop("checked", false);
 
-      // dynamic checkbox area
-      $("#dynamicCheckBoxForModule").empty();
+      // 02. Clear dynamically generated Module Permission checkboxes
+      $("#dynamicCheckBoxForModule .module-checkbox").prop("checked", false);
+
+      // Clear access control
+      accessArray = [];
+      if ($("#checkboxAccess").length > 0) {
+        $("#checkboxAccess").empty();
+      }
+
+      // 03. Clear Customized Report Permission checkboxes
+      reportPermissionArray = [];
+      if ($("#checkboxReportPermission").length > 0) {
+        $("#checkboxReportPermission input[type='checkbox']").prop("checked", false);
+      }
 
       // kendo combobox resets
       var cmdModule = $("#cmd-module").data("kendoComboBox");
@@ -311,14 +451,27 @@ var GroupDetailsHelper = {
         $("#treeview").empty();
       }
 
+      // Clear State Section
+      stateArray = [];
+      statePermissionArray = [];
+      if ($("#checkboxStatePermission").length > 0) {
+        $("#checkboxStatePermission").empty();
+      }
+
+      // Clear Action Section
+      actionArray = [];
+      if ($("#checkboxActionPermission").length > 0) {
+        $("#checkboxActionPermission").empty();
+      }
+
       // validation / status
       $("#divdetailsForDetails").find(".k-tooltip-validation").hide();
       $("#divdetailsForDetails").find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid");
       $(".status").text("").removeClass("invalid valid");
 
-      // reset tabs
-      var tabStrip = $("#tabstrip").data("kendoTabStrip");
-      if (tabStrip) tabStrip.select(0);
+      //// reset tabs
+      //var tabStrip = $("#tabstrip").data("kendoTabStrip");
+      //if (tabStrip) tabStrip.select(0);
 
     } catch (e) {
       console.warn("Error resetting DOM widgets:", e);
@@ -328,7 +481,6 @@ var GroupDetailsHelper = {
     try { if (typeof moduleArray !== "undefined") moduleArray.length = 0; } catch (e) {}
     try { if (typeof menuArray !== "undefined") menuArray.length = 0; } catch (e) {}
     try { if (typeof allmenuArray !== "undefined") allmenuArray.length = 0; } catch (e) {}
-    try { if (typeof allmoduleArray !== "undefined") allmoduleArray.length = 0; } catch (e) {}
     try { if (typeof accessArray !== "undefined") accessArray.length = 0; } catch (e) {}
     try { if (typeof groupPermisionArray !== "undefined") groupPermisionArray.length = 0; } catch (e) {}
 
@@ -402,11 +554,11 @@ var GroupDetailsHelper = {
   CreateObject: function () {
     var objGroupInfo = GroupInfoHelper.createGroupInfo();
     objGroupInfo = GroupPermissionHelper.createModulePermission(objGroupInfo);
-    objGroupInfo = MenuPermissionHelper.createMenuPermission(objGroupInfo);
-    objGroupInfo = AccessControlHelper.createAccessPermission(objGroupInfo);
-    objGroupInfo = StateHelper.createStatusPermission(objGroupInfo);
-    objGroupInfo = ActionHelper.createActionPermission(objGroupInfo);
-    objGroupInfo = ReportPermissionHelper.createReportPermission(objGroupInfo);
+    //objGroupInfo = MenuPermissionHelper.createMenuPermission(objGroupInfo);
+    //objGroupInfo = AccessControlHelper.createAccessPermission(objGroupInfo);
+    //objGroupInfo = StateHelper.createStatusPermission(objGroupInfo);
+    //objGroupInfo = ActionHelper.createActionPermission(objGroupInfo);
+    //objGroupInfo = ReportPermissionHelper.createReportPermission(objGroupInfo);
     return objGroupInfo;
   },
 

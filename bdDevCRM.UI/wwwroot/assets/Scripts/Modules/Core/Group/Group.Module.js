@@ -18,47 +18,54 @@ var GroupModule = (function () {
   var _config = {
     name: 'Group',
     version: '1.0.0',
-    dependencies: ['GroupService']
+    author: 'devSakhawat',
+    dependencies: []
   };
 
-  // Initialize module
-  function _init(options = {}) {
+  /**
+   * Initialize module
+   */
+  function _init(options) {
     if (_initialized) {
-      console.warn('Group module already initialized');
+      console.warn('GroupModule: Already initialized');
       return;
     }
 
-    App.Logger.info('Initializing Group module...');
+    options = options || {};
 
-    // Check dependencies
-    if (!_checkDependencies()) {
-      App.Logger.error('Group module dependencies not met');
-      return;
+    App.Logger.info('GroupModule: Initializing...');
+
+    try {
+      // Create controller
+      _controller = new GroupController(options);
+
+      // Initialize components
+      _initializeComponents();
+
+      // Setup module events
+      _setupEvents();
+
+      _initialized = true;
+
+      App.Logger.info('GroupModule: Initialized successfully');
+
+      // Emit event
+      if (App.EventBus) {
+        App.EventBus.emit('module:initialized', { name: _config.name });
+      }
+
+    } catch (error) {
+      App.Logger.error('GroupModule: Initialization failed', error);
+      throw error;
     }
-
-    // Get service from DI
-    const groupService = App.DI.resolve('GroupService');
-
-    // Create controller
-    _controller = new GroupController({
-      service: groupService
-    });
-
-    // Initialize components
-    _initializeComponents();
-
-    // Setup module events
-    _setupEvents();
-
-    _initialized = true;
-    App.Logger.info('Group module initialized successfully');
   }
 
-  function _checkDependencies() {
-    return _config.dependencies.every(dep => App.DI.has(dep));
-  }
-
+  /**
+   * Initialize components
+   */
   function _initializeComponents() {
+    App.Logger.debug('GroupModule: Initializing components...');
+
     // Initialize Summary Grid
     _components.summary = new GroupSummaryComponent({
       el: '#divSummary',
@@ -67,74 +74,78 @@ var GroupModule = (function () {
     });
     _components.summary.init();
 
-    // Initialize Details Form
+    // Initialize Details Container
     _components.details = new GroupDetailsComponent({
       el: '#divDetails',
       controller: _controller
     });
     _components.details.init();
 
-    // Initialize Info Component
+    // Initialize Group Info Component
     _components.info = new GroupInfoComponent({
       el: '#divGroupId',
       controller: _controller
     });
     _components.info.init();
 
-    // Initialize Permission Components
-    _components.modulePermission = new ModulePermissionComponent({
-      el: '#divGroupPermision',
-      controller: _controller
-    });
-    _components.modulePermission.init();
+    // Set child components in details
+    _components.details.setChildComponents(_components.info, null);
 
-    _components.menuPermission = new MenuPermissionComponent({
-      el: '#divMenuPermission',
-      controller: _controller
-    });
-    _components.menuPermission.init();
+    App.Logger.info('GroupModule: Components initialized');
   }
 
+  /**
+   * Setup module events
+   */
   function _setupEvents() {
-    // Listen to group events
+    App.Logger.debug('GroupModule: Setting up events...');
+
+    // Listen to application events
     App.EventBus.on('group:selected', _onGroupSelected);
     App.EventBus.on('group:saved', _onGroupSaved);
     App.EventBus.on('group:deleted', _onGroupDeleted);
+
+    App.Logger.debug('GroupModule: Events setup complete');
   }
 
+  /**
+   * Event: Group selected
+   */
   function _onGroupSelected(data) {
-    App.Logger.debug('Group selected:', data);
-    _controller.loadGroup(data.groupId);
+    App.Logger.debug('GroupModule: Group selected', data);
+
+    if (_controller) {
+      _controller.loadGroup(data.groupId);
+    }
   }
 
+  /**
+   * Event: Group saved
+   */
   function _onGroupSaved(data) {
-    App.Logger.debug('Group saved:', data);
-    ToastrMessage.showSuccess('Group saved successfully');
-
-    // Refresh grid
-    if (_components.summary) {
-      _components.summary.refreshGrid();
-    }
+    App.Logger.info('GroupModule: Group saved', data);
   }
 
+  /**
+   * Event: Group deleted
+   */
   function _onGroupDeleted(data) {
-    App.Logger.debug('Group deleted:', data);
-    ToastrMessage.showSuccess('Group deleted successfully');
-
-    // Refresh grid
-    if (_components.summary) {
-      _components.summary.refreshGrid();
-    }
+    App.Logger.info('GroupModule: Group deleted', data);
   }
 
-  // Destroy module
+  /**
+   * Destroy module
+   */
   function _destroy() {
-    if (!_initialized) return;
+    if (!_initialized) {
+      return;
+    }
 
-    App.Logger.info('Destroying Group module...');
+    App.Logger.info('GroupModule: Destroying...');
 
     // Destroy all components
-    Object.values(_components).forEach(component => {
+    Object.keys(_components).forEach(function (key) {
+      var component = _components[key];
       if (component && typeof component.destroy === 'function') {
         component.destroy();
       }
@@ -145,29 +156,55 @@ var GroupModule = (function () {
     App.EventBus.off('group:saved', _onGroupSaved);
     App.EventBus.off('group:deleted', _onGroupDeleted);
 
+    // Clear references
     _components = {};
     _controller = null;
     _initialized = false;
 
-    App.Logger.info('Group module destroyed');
+    App.Logger.info('GroupModule: Destroyed');
   }
 
   // Public API
   return {
+    /**
+     * Module configuration
+     */
+    config: _config,
+
+    /**
+     * Initialize module
+     */
     init: _init,
+
+    /**
+     * Destroy module
+     */
     destroy: _destroy,
 
+    /**
+     * Get component by name
+     */
     getComponent: function (name) {
-      return _components[name];
+      return _components[name] || null;
     },
 
+    /**
+     * Get controller
+     */
     getController: function () {
       return _controller;
     },
 
-    config: _config
+    /**
+     * Check if initialized
+     */
+    isInitialized: function () {
+      return _initialized;
+    }
   };
 })();
 
 // Register module with App
-App.registerModule('Group', GroupModule);
+if (typeof App !== 'undefined') {
+  App.registerModule('Group', GroupModule);
+}

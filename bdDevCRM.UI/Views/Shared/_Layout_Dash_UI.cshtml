@@ -285,15 +285,43 @@
   <!-- Theme JS -->
   <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
 
+  <!-- ========================================== -->
+  <!-- 1. LOAD CONFIG FIRST (No dependencies)    -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Config/AppConfig.js"></script>
 
-  <!-- Core Framework Scripts - Load First -->
+
+  <!-- ========================================== -->
+  <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
+  <!-- ========================================== -->
   <script src="~/assets/Scripts/Core/Logger.js"></script>
   <script src="~/assets/Scripts/Core/EventBus.js"></script>
   <script src="~/assets/Scripts/Core/StateManager.js"></script>
   <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
-  <script src="~/assets/scripts/core/app.js"></script>
-  <!-- Base Component -->
+  <script src="~/assets/Scripts/Core/App.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 3. LOAD BASE COMPONENT                     -->
+  <!-- ========================================== -->
   <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 4. LOAD MANAGERS & HELPERS                 -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Core/Managers/VanillaApiCallManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/BaseManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/TokenManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/CacheManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/LoadingManager.js"></script>
+
+  <!-- Helpers -->
+  <script src="~/assets/Scripts/Core/Helpers/GridHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/ValidationHelper.js"></script>
+
+
+
 
 
   <!-- Common js -->
@@ -327,7 +355,6 @@
       }
     });
   </script> *@
-
   <script src="~/assets/scripts/app.bootstrap.js"></script>
 </body>
 </html>

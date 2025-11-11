@@ -1,102 +1,206 @@
 ﻿/*=========================================================
  * Group Controller
  * File: GroupController.js
- * Description: Business logic for Group module
+ * Description: Group business logic controller
  * Author: devSakhawat
  * Date: 2025-11-11
 =========================================================*/
 
-class GroupController {
-  constructor(options = {}) {
-    this.service = options.service;
-    this.currentGroup = null;
-  }
+var GroupController = (function () {
+  'use strict';
 
-  // Load group by ID
-  async loadGroup(groupId) {
-    try {
-      App.Logger.debug(`Loading group: ${groupId}`);
+  /**
+   * Constructor
+   */
+  function GroupController(options) {
+    options = options || {};
 
-      const group = await this.service.getById(groupId);
-      this.currentGroup = group;
+    this.service = options.service || null;
+    this.currentGroup = new GroupModel();
 
-      // Publish event
-      App.EventBus.emit('group:loaded', { group: group });
+    // Get service from DI if not provided
+    if (!this.service && typeof App !== 'undefined' && App.DI) {
+      // We'll create GroupService later, for now use placeholder
+      this.service = {
+        getById: function (id) { return Promise.resolve(null); },
+        create: function (data) { return Promise.resolve(null); },
+        update: function (id, data) { return Promise.resolve(null); },
+        delete: function (id) { return Promise.resolve(null); }
+      };
+    }
 
-      return group;
-    } catch (error) {
-      App.Logger.error('Failed to load group:', error);
-      throw error;
+    if (typeof App !== 'undefined' && App.Logger) {
+      App.Logger.debug('GroupController created');
     }
   }
 
-  // Save or update group
-  async saveGroup(groupData) {
+  /**
+   * Load group by ID
+   */
+  GroupController.prototype.loadGroup = async function (groupId) {
     try {
-      const isCreate = !groupData.GroupId || groupData.GroupId == 0;
-
-      App.Logger.debug(`${isCreate ? 'Creating' : 'Updating'} group`, groupData);
-
-      let result;
-      if (isCreate) {
-        result = await this.service.create(groupData);
-      } else {
-        result = await this.service.update(groupData.GroupId, groupData);
+      if (typeof App !== 'undefined' && App.Logger) {
+        App.Logger.info('Loading group:', groupId);
       }
 
-      this.currentGroup = result;
+      // For now, emit event with groupId
+      // Later we'll fetch from API
+      if (typeof App !== 'undefined' && App.EventBus) {
+        App.EventBus.emit('group:loading', { groupId: groupId });
+      }
 
-      // Publish event
-      App.EventBus.emit('group:saved', {
-        group: result,
-        isCreate: isCreate
-      });
+      // TODO: Fetch from API when service is ready
+      // const group = await this.service.getById(groupId);
+      // this.currentGroup = new GroupModel(group);
 
-      return result;
+      if (typeof App !== 'undefined' && App.EventBus) {
+        App.EventBus.emit('group:loaded', {
+          groupId: groupId,
+          group: this.currentGroup
+        });
+      }
+
+      return this.currentGroup;
+
     } catch (error) {
-      App.Logger.error('Failed to save group:', error);
+      if (typeof App !== 'undefined' && App.Logger) {
+        App.Logger.error('Failed to load group:', error);
+      }
       throw error;
     }
-  }
+  };
 
-  // Delete group
-  async deleteGroup(groupId) {
+  /**
+   * Save group (create or update)
+   */
+  GroupController.prototype.saveGroup = async function (groupData) {
     try {
-      App.Logger.debug(`Deleting group: ${groupId}`);
+      // Create model from data
+      var group = new GroupModel(groupData);
 
-      await this.service.delete(groupId);
+      // Validate
+      var validation = group.validate();
+      if (!validation.isValid) {
+        if (typeof ToastrMessage !== 'undefined') {
+          validation.errors.forEach(function (error) {
+            ToastrMessage.showWarning(error);
+          });
+        }
+        return null;
+      }
 
-      // Publish event
-      App.EventBus.emit('group:deleted', { groupId: groupId });
+      var isCreate = group.isNew();
 
-      this.currentGroup = null;
+      if (typeof App !== 'undefined' && App.Logger) {
+        App.Logger.info(isCreate ? 'Creating group' : 'Updating group', group.toJSON());
+      }
+
+      // Emit saving event
+      if (typeof App !== 'undefined' && App.EventBus) {
+        App.EventBus.emit('group:saving', {
+          group: group,
+          isCreate: isCreate
+        });
+      }
+
+      // TODO: Save to API when service is ready
+      // let result;
+      // if (isCreate) {
+      //     result = await this.service.create(group.toJSON());
+      // } else {
+      //     result = await this.service.update(group.GroupId, group.toJSON());
+      // }
+
+      // For now, just update current group
+      this.currentGroup = group;
+
+      // Emit saved event
+      if (typeof App !== 'undefined' && App.EventBus) {
+        App.EventBus.emit('group:saved', {
+          group: group,
+          isCreate: isCreate
+        });
+      }
+
+      return group;
+
     } catch (error) {
-      App.Logger.error('Failed to delete group:', error);
+      if (typeof App !== 'undefined' && App.Logger) {
+        App.Logger.error('Failed to save group:', error);
+      }
+
+      if (typeof App !== 'undefined' && App.EventBus) {
+        App.EventBus.emit('group:save-failed', { error: error });
+      }
+
       throw error;
     }
-  }
+  };
 
-  // Validate group data
-  validateGroup(groupData) {
-    const errors = [];
+  /**
+   * Delete group
+   */
+  GroupController.prototype.deleteGroup = async function (groupId) {
+    try {
+      if (typeof App !== 'undefined' && App.Logger) {
+        App.Logger.info('Deleting group:', groupId);
+      }
 
-    if (!groupData.GroupName || groupData.GroupName.trim() === '') {
-      errors.push('Group name is required');
+      // Emit deleting event
+      if (typeof App !== 'undefined' && App.EventBus) {
+        App.EventBus.emit('group:deleting', { groupId: groupId });
+      }
+
+      // TODO: Delete from API when service is ready
+      // await this.service.delete(groupId);
+
+      // Clear current group if it's the deleted one
+      if (this.currentGroup.GroupId === groupId) {
+        this.currentGroup.clear();
+      }
+
+      // Emit deleted event
+      if (typeof App !== 'undefined' && App.EventBus) {
+        App.EventBus.emit('group:deleted', { groupId: groupId });
+      }
+
+    } catch (error) {
+      if (typeof App !== 'undefined' && App.Logger) {
+        App.Logger.error('Failed to delete group:', error);
+      }
+      throw error;
+    }
+  };
+
+  /**
+   * Clear current group
+   */
+  GroupController.prototype.clearGroup = function () {
+    this.currentGroup.clear();
+
+    if (typeof App !== 'undefined' && App.EventBus) {
+      App.EventBus.emit('group:cleared');
     }
 
-    if (groupData.ModuleList && groupData.ModuleList.length === 0) {
-      errors.push('At least one module must be selected');
+    if (typeof App !== 'undefined' && App.Logger) {
+      App.Logger.debug('Group cleared');
     }
+  };
 
-    return {
-      isValid: errors.length === 0,
-      errors: errors
-    };
-  }
+  /**
+   * Get current group
+   */
+  GroupController.prototype.getCurrentGroup = function () {
+    return this.currentGroup;
+  };
 
-  // Clear current group
-  clearGroup() {
-    this.currentGroup = null;
-    App.EventBus.emit('group:cleared');
-  }
-}
+  /**
+   * Validate group
+   */
+  GroupController.prototype.validateGroup = function (groupData) {
+    var group = new GroupModel(groupData);
+    return group.validate();
+  };
+
+  return GroupController;
+})();

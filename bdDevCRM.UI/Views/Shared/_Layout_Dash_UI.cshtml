@@ -313,15 +313,14 @@
   <script src="~/assets/Scripts/Core/Managers/VanillaApiCallManager.js"></script>
   <script src="~/assets/Scripts/Core/Managers/BaseManager.js"></script>
   <script src="~/assets/Scripts/Core/Managers/TokenManager.js"></script>
-  <script src="~/assets/Scripts/Core/Managers/CacheManager.js"></script>
-  <script src="~/assets/Scripts/Core/Managers/LoadingManager.js"></script>
+  <script src="~/assets/scripts/infrastructure/cache/cachemanager.js"></script>
 
   <!-- Helpers -->
-  <script src="~/assets/Scripts/Core/Helpers/GridHelper.js"></script>
-  <script src="~/assets/Scripts/Core/Helpers/ValidationHelper.js"></script>
-
-
-
+  <script src="~/assets/scripts/common/helpers/stringhelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/datehelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/formhelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/validationhelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/gridhelper.js"></script>
 
 
   <!-- Common js -->
@@ -331,6 +330,8 @@
   <script src="~/assets/scripts/common/date.js"></script>
   <script src="~/assets/scripts/common/approverrecomendar.js"></script>
 
+  <!-- Bootstrap App before any module -->
+  <script src="~/assets/scripts/app.bootstrap.js"></script>
 
   @await RenderSectionAsync("Scripts", required: false)
 
@@ -355,6 +356,11 @@
       }
     });
   </script> *@
-  <script src="~/assets/scripts/app.bootstrap.js"></script>
+
+  <!-- Debug Helper (Development only) -->
+  @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+  {
+    <script src="~/assets/Scripts/debug-helper.js"></script>
+  }
 </body>
 </html>

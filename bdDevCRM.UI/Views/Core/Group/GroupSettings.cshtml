@@ -1,25 +1,81 @@
 ﻿@{
-	ViewData["Title"] = "Group Settings";
-	Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+  ViewData["Title"] = "Group Settings";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
 }
-
 
 <!-- row -->
 <div class="row">
-	<h3 class="k-header text-center">Group Settings</h3>
+  <h3 class="k-header text-center">Group Settings</h3>
 
-	<div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-		<div id="divSummary ">
-			<partial name="Group/_GroupSummary" />
-		</div>
-	</div>
+  <div class="col-3">
+    <div id="divSummary">
+      <partial name="Group/_GroupSummary" />
+    </div>
+  </div>
 
-	<div class="col-sm-6 col-md-6 col-lg-9 col-xl-9">
-		<div id="divDetails">
-			<partial name="Group/_GroupDetails" />
-		</div>
-	</div>
+  <div class="col-9">
+    <div id="divDetails">
+      <partial name="Group/_GroupDetails" />
+    </div>
+  </div>
 </div>
 
-<script src="~/assets/scripts/modules/core/group/group.js"></script>
+@section Scripts {
+  <!-- ========================================== -->
+  <!-- GROUP MODULE SCRIPTS                       -->
+  <!-- ========================================== -->
+  <!-- Models -->
+  <script src="~/assets/Scripts/Modules/Core/Group/Models/GroupModel.js"></script>
 
+  <!-- Controllers -->
+  <script src="~/assets/Scripts/Modules/Core/Group/Controllers/GroupController.js"></script>
+
+  <!-- Components -->
+  <script src="~/assets/Scripts/Modules/Core/Group/Components/GroupInfo.Component.js"></script>
+  <script src="~/assets/Scripts/Modules/Core/Group/Components/GroupSummary.Component.js"></script>
+  <script src="~/assets/Scripts/Modules/Core/Group/Components/GroupDetails.Component.js"></script>
+
+  <!-- Main Module -->
+  <script src="~/assets/Scripts/Modules/Core/Group/Group.Module.js"></script>
+
+  <!-- Initialize Module -->
+  <script>
+    $(document).ready(function() {
+        console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #FF5722; font-weight: bold');
+        console.log('%c   🚀 Starting Group Module...', 'color: #FF5722; font-size: 14px; font-weight: bold');
+        console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #FF5722; font-weight: bold');
+
+        try {
+          console.log(App);
+            // Check if App is initialized
+            if (typeof App === 'undefined' || !App.isInitialized()) {
+                console.error('❌ App not initialized. Cannot start Group module.');
+                return;
+            }
+
+            // Start Group Module
+            App.startModule('Group');
+
+            console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #4CAF50; font-weight: bold');
+            console.log('%c   ✅ Group Module Started!', 'color: #4CAF50; font-size: 14px; font-weight: bold');
+            console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #4CAF50; font-weight: bold');
+
+            // Log module info
+            var groupModule = App.getModule('Group');
+            if (groupModule) {
+                console.log('📦 Group Module Info:', {
+                    name: groupModule.config.name,
+                    version: groupModule.config.version,
+                    initialized: groupModule.isInitialized()
+                });
+            }
+
+        } catch (error) {
+            console.error('❌ Failed to start Group module:', error);
+            if (typeof App !== 'undefined' && App.Logger) {
+                App.Logger.error('Group module start failed:', error);
+            }
+        }
+    });
+  </script>
+}

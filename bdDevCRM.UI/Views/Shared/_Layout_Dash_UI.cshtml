@@ -4,14 +4,12 @@
 <head>
   <!-- Required meta tags -->
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
+  @* <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /> *@
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Favicon icon-->
   <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico" />
 
-  <!-- Color modes -->
-  @* <script src="~/assets/js/vendors/color-modes.js"></script> *@
 
   <!-- Libs CSS -->
   <link href="~/assets/libs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
@@ -28,57 +26,16 @@
   <!-- common css -->
   <link href="~/assets/css/commonsize.css" rel="stylesheet" />
   <link href="~/assets/css/common.css" rel="stylesheet" />
+  <link rel="stylesheet" href="~/assets/css/theme.min.css">
+  <link href="~/assets/css/bddevs.css" rel="stylesheet" />
 
   <!-- Scripts -->
   <!-- Libs JS -->
   @* <script src="~/assets/kendo_2023_r1/js/jquery.min.js"></script> *@
   <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-  <!-- jszip.min.js -->
-  @* Kendo 2023_r1 jquery version is jQuery v1.12.4 but we are using jquery v3.7.0 *@
   <script src="~/assets/kendo_2023_r1/js/jszip.min.js"></script>
 
-
-
-  <!-- Theme CSS with bootstrap -->
-  <link rel="stylesheet" href="~/assets/css/theme.min.css">
-
-  <!-- CRM CSS -->
-  <link href="~/assets/css/bddevs.css" rel="stylesheet" />
-
-
-
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-      // Call the function to populate the menu
-      MenuHelper.GetMenuInformation();
-
-      // // Initialize feather icons after the menu is populated
-      // if (typeof feather !== 'undefined') {
-      //   feather.replace();
-      // }
-
-      // // Update arrow icon when menu is expanded
-      // $('#sideNavbar').on('shown.bs.collapse', '.collapse', function () {
-      //   const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
-      //   arrowIcon.attr('data-feather', 'chevron-down'); // Change to down arrow
-      //   if (typeof feather !== 'undefined') {
-      //     feather.replace(); // Re-render feather icons
-      //   }
-      // });
-
-      // // Update arrow icon when menu is collapsed
-      // $('#sideNavbar').on('hidden.bs.collapse', '.collapse', function () {
-      //   const arrowIcon = $(this).prev('.nav-link').find('[data-feather]');
-      //   arrowIcon.attr('data-feather', 'chevron-right'); // Change to right arrow
-      //   if (typeof feather !== 'undefined') {
-      //     feather.replace(); // Re-render feather icons
-      //   }
-      // });
-
-    });
-  </script>
 
 
   <title>bdDevs CRM System</title>
@@ -97,8 +54,8 @@
           </a> *@
 
           <!-- Brand logo -->
-          <a class="navbar-brand" href="../index.html">
-            @* <img src="~/images/logo/sountwels.png" alt="Brand Logo" class="bran-logo" /> *@
+          <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+            @* <img src="~/assets/images/logo/sountwels.png" alt="Brand Logo" class="bran-logo" /> *@
             <img alt="Brand Logo" id="bran-logo" />
           </a>
           <a id="nav-toggle" href="#!" class="ms-auto ms-md-0 me-0 me-lg-3">
@@ -114,7 +71,7 @@
               <div class="input-group">
                 <input class="form-control rounded-3 bg-transparent ps-9" type="search" value="" id="searchInput"
                        placeholder="Search" />
-                <span class="">
+                <span class="position-absolute start-0">
                   <button class="btn position-absolute start-0" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -225,6 +182,7 @@
               </div>
             </li>
             <!-- List -->
+
             <li class="dropdown ms-2">
               <a class="rounded-circle" href="#!" role="button" id="dropdownUser" data-bs-toggle="dropdown"
                  aria-haspopup="true" aria-expanded="false">
@@ -320,8 +278,6 @@
   <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
    @* <script src="~/assets/kendo_2023_r1/js/kendo.core.min.js"></script> *@
 
-
-
   <!-- Common js -->
   <script src="~/assets/scripts/common/common.js"></script>
   <script src="~/assets/scripts/common/commonmessage.js"></script>
@@ -330,21 +286,32 @@
   <script src="~/assets/scripts/common/date.js"></script>
   <script src="~/assets/scripts/common/filebrower.js"></script>
   <script src="~/assets/scripts/common/filesaver.js"></script>
-@*   <script src="~/assets/scripts/common/postify.js"></script> *@
   <script src="~/assets/scripts/common/approverrecomendar.js"></script>
   <script src="~/assets/scripts/common/xlsx.full.min.js"></script>
   <script src="~/assets/scripts/common/jquery.cookie.js"></script>
   <script src="~/assets/scripts/common/kendo.common.control.js"></script>
   <script src="~/assets/scripts/common/kendo.common.datasource.js"></script>
 
-
-
-
-  <!-- CRM Solution JS -->
-  @* <script src="~/assets/scripts/common/crmcommon.js"></script> *@
-
   @await RenderSectionAsync("Scripts", required: false)
-</body>
 
-<!-- Mirrored from codescandy.com/dashui/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 23 Jan 2025 01:31:54 GMT -->
+  <!-- ✅ Menu Initialization Script -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      try {
+        // Check if MenuHelper exists
+        if (typeof MenuHelper === 'undefined') {
+          console.error('MenuHelper is not defined. Make sure common.js is loaded.');
+          return;
+        }
+
+        // Initialize menu
+        MenuHelper.GetMenuInformation();
+        
+        console.log('Menu initialized successfully');
+      } catch (error) {
+        console.error('Error initializing menu:', error);
+      }
+    });
+  </script>
+</body>
 </html>

@@ -1,0 +1,33 @@
+﻿<script src="~/assets/scripts/modules/crmadmin/crminstitutetype/institutetypedetails.js"></script>
+@* <script src="~/assets/scripts/modules/core/crminstitutetype/institutetypedetails.js"></script> *@
+
+<div class="col-xl-5 col-lg-5 col-md-6 col-sm-12 col-12" id="InstituteTypeFrom">
+	<fieldset class="reset">
+		<legend class="reset">InstituteType Form</legend>
+
+		<div class="row mb-2">
+			<!-- InstituteTypeId : hidden field -->
+			<input id="InstituteTypeId" type="hidden" value="0" />
+
+			<!-- InstituteType Name -->
+			<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+				<label for="InstituteTypeName">Institute Type Name <span class="redstart">*</span></label>
+				<input type="text" class="form-control" id="InstituteTypeName" name="InstituteTypeName" placeholder="Institute Type name" required validationMessage="Institute Type name is required" />
+			</div>
+
+		</div>
+
+		<div class="btnDiv mt-2">
+			<ul>
+				<li class="d-flex justify-content-end">
+					<button type="button" class="btn btn-primary me-2" id="btnInstituteTypeSaveOrUpdate" onclick="InstituteTypeDetailsManager.saveOrUpdateItem();">+ Add Institute Type</button>
+					<button type="button" class="btn btn-secondary me-2" onclick="InstituteTypeDetailsHelper.clearForm();">Clear</button>
+					<button type="button" class="btn btn-danger btn-close-generic" onclick="window.location.href='/'">Close</button>
+				</li>
+			</ul>
+		</div>
+	</fieldset>
+</div>
+
+
+@* <button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#InstituteTypePopUp")'>Close</button> *@

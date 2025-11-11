@@ -1,10 +1,13 @@
 ﻿
-<script src="~/assets/scripts/crm/crmapplication/crmadditionalinformation.js"></script>
+<script src="~/assets/scripts/modules/crm/crmapplication/crmadditionalinformation.js"></script>
+@* <script src="~/assets/scripts/crm/crmapplication/crmadditionalinformation.js"></script> *@
 
 <div id="gridParrentDivOverflowHidden">
 	<!-- Education Details -->
-	<fieldset class="reset">
-		<legend class="reset">Reference Details</legend>
+	@* <fieldset class="reset">
+		<legend class="reset">Reference Details</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Reference Details</legend>
 		<div class="row">
 			<h4 class=""k-header mb-2">Please provide details of the individuals who will be prepared to serve as your references.</h4>
 			<!-- Hidden Fields -->
@@ -16,10 +19,14 @@
 	</fieldset>
 
 	<!-- Statement of Purpose -->
-	<fieldset class="reset">
-		<legend class="reset">Statement of Purpose</legend>
+	@* <fieldset class="reset">
+		<legend class="reset">Statement of Purpose</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Statement of Purpose</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnStatementOfPurposeId" value="0" />
+
 			<!-- Statement of Purpose -->
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
 				<label for="StatementOfPurposeRemarks" class="lbl widthSize100_per">State your reason for applying and providing any further information which you would wish to give in support of your application(e.g. attendance on short course, experience, career development, ambitions etc.)</label>
@@ -29,10 +36,18 @@
 			</div>
 
 			<!-- Statement of Purpose Document -->
-			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
 				<label for="StatementOfPurpose" class="lbl widthSize100_per">Please upload the document(if any)</label>
 				<div class="">
-					<input id="fileStatementOfPurpose" name="StatementOfPurpose" class="w-100" />
+					<input type="file" id="fileStatementOfPurpose" name="StatementOfPurpose" class="form-control w-100" />
+				</div>
+			</div>
+
+			<!-- Statement of Purpose Document View -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="StatementOfPurposeViewDocument" class="lbl widthSize100_per">View Document</label>
+				<div class="">
+					<input id="statementOfPurposeViewDocument" name="StatementOfPurposeViewDocument" class="w-100" />
 				</div>
 			</div>
 
@@ -40,32 +55,33 @@
 	</fieldset>
 
 	<!-- Additional Information Detials -->
-	<fieldset class="reset">
-		<legend class="reset">Additional Information</legend>
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Additional Information</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnAdditionalInfoId" value="0" />
 			<!-- Do you require Accommodation  -->
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2 custom-checkbox">
 				<span class="me-5">Do you require Accommodation</span>
 
-				<input name="requireAccommodation " type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">Yes</label>
+				<input id="RequireAccommodation_True" name="RequireAccommodation" value="true" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="RequireAccommodation_True">Yes</label>
 
-				<input name="requireAccommodation" type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">No</label>
+				<input id="RequireAccommodation_False" name="RequireAccommodation" value="false" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="RequireAccommodation_False" >No</label>
 			</div>
 
+			<!-- Health & medical Needs.  -->
 			<h4 class="" k-header mb-2">Health & medical Needs.</h4>
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2 custom-checkbox">
 				<span class="me-5">Do you suffer from any health or medical needs which requires additional support to be provided by the institutions to which you have made an application? By providing such information early the institution may be able to make special arrangements.</span>
 
-				<input name="HealthNMedicalNeeds " type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">Yes</label>
+				<input name="HealthNMedicalNeeds" value="true" id="HealthNMedicalNeeds_True" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="HealthNMedicalNeeds_True">Yes</label>
 
-				<input name="HealthNMedicalNeeds" type="radio" class="form-check-input inputRadio" />
-				<label class="lbl">No</label>
+				<input name="HealthNMedicalNeeds" value="false" id="HealthNMedicalNeeds_False" type="radio" class="form-check-input inputRadio" />
+				<label class="lbl" for="HealthNMedicalNeeds_False" >No</label>
 			</div>
-
 
 			<!-- Health & medical Needs -->
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
@@ -76,7 +92,7 @@
 			</div>
 
 			<!-- Additional Information -->
-			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-12">
 				<label for="AdditionalInformation" class="lbl widthSize100_per">Additional Information</label>
 				<div class="">
 					<textarea id="txtAdditionalInformationRemarks" name="AdditionalInformation" class="w-100" rows="4"></textarea>
@@ -87,24 +103,16 @@
 	</fieldset>
 
 	<!-- Additional Documents -->
-	<fieldset class="reset">
-		<legend class="reset">Additional Documents</legend>
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Additional Documents</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
 			<h4 class="k-header mb-3">Please upload the documents either in a single pdf file or zip file for any additional documents that institution may require to process your application.</h4>
 			<!-- Education Grid -->
-			<div class="col-12 mb-2">
+			<div class="col-12">
 				<div id="griAdditionalDocumentsSummary" class="min-width_100"></div>
 			</div>
 		</div>
 	</fieldset>
 
-  <div class="btnDiv mt-2">
-    <ul>
-      <li class="d-flex justify-content-end">
-        <button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
-        <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearStateForm()">Clear</button>
-      </li>
-    </ul>
-  </div>
 </div>

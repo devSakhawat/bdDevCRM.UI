@@ -1,7 +1,7 @@
 ﻿
 @* input field pattern type, id, class, name, validationmessage and others *@
 
-<script src="~/assets/scripts/core/workflow/statedetails.js"></script>
+<script src="~/assets/scripts/modules/core/workflow/statedetails.js"></script>
 
 <div id="divStateDetails">
   <div class="divDetails">
@@ -24,9 +24,14 @@
         <input id="cmbIsClose" class="width_100_Per_Important " name="IsClose" validationMessage="Please Select" required="required" />
       </li>
 
+      <li class="mb-2">
+        <label for="SequenceNo" class="lbl widthSize100_per">Sequence No:</label>
+        <input type="text" id="txtSequenceNo" class="k-textbox width_100_Per_Important" name="StateName" />
+      </li>
+
       <li class="mb-2 custom-checkbox">
-        <label for="IsActive" class="lbl">Is Default:</label>
-        <input type="checkbox" id="chkIsDefault" name="IsActive" class="chkBox " />
+        <label class="form-check-label" for="Status">Is Default</label>
+        <input type="checkbox" id="chkIsDefault" name="IsActive" class="form-check-input" />
       </li>
     </ul>
   </div>

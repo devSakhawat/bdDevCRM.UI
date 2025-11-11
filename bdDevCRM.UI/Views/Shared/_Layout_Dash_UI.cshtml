@@ -271,29 +271,43 @@
   <script src="~/assets/scripts/vendors/tooltip.js"></script>
 
 
-  <!-- Theme JS -->
-  <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
-
   <!-- Kendo js -->
   <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
-   @* <script src="~/assets/kendo_2023_r1/js/kendo.core.min.js"></script> *@
-
-  <!-- Common js -->
-  <script src="~/assets/scripts/common/common.js"></script>
-  <script src="~/assets/scripts/common/commonmessage.js"></script>
-  <script src="~/assets/scripts/common/tdtblockui.js"></script>
-  <script src="~/assets/scripts/common/cescommon.js"></script>
-  <script src="~/assets/scripts/common/date.js"></script>
-  <script src="~/assets/scripts/common/filebrower.js"></script>
-  <script src="~/assets/scripts/common/filesaver.js"></script>
-  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
   <script src="~/assets/scripts/common/xlsx.full.min.js"></script>
   <script src="~/assets/scripts/common/jquery.cookie.js"></script>
   <script src="~/assets/scripts/common/kendo.common.control.js"></script>
   <script src="~/assets/scripts/common/kendo.common.datasource.js"></script>
+  <script src="~/assets/scripts/common/tdtblockui.js"></script>
+  <script src="~/assets/scripts/common/filebrower.js"></script>
+  <script src="~/assets/scripts/common/filesaver.js"></script>
+
+
+  <!-- Theme JS -->
+  <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
+
+
+  <!-- Core Framework Scripts - Load First -->
+  <script src="~/assets/Scripts/Core/Logger.js"></script>
+  <script src="~/assets/Scripts/Core/EventBus.js"></script>
+  <script src="~/assets/Scripts/Core/StateManager.js"></script>
+  <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
+  <script src="~/assets/scripts/core/app.js"></script>
+  <!-- Base Component -->
+  <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
+
+
+  <!-- Common js -->
+  <script src="~/assets/scripts/common/common.js"></script>
+  <script src="~/assets/scripts/common/commonmessage.js"></script>
+  <script src="~/assets/scripts/common/cescommon.js"></script>
+  <script src="~/assets/scripts/common/date.js"></script>
+  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
+
 
   @await RenderSectionAsync("Scripts", required: false)
 
+
+@* 
   <!-- ✅ Menu Initialization Script -->
   <script type="text/javascript">
     $(document).ready(function() {
@@ -312,6 +326,8 @@
         console.error('Error initializing menu:', error);
       }
     });
-  </script>
+  </script> *@
+
+  <script src="~/assets/scripts/app.bootstrap.js"></script>
 </body>
 </html>

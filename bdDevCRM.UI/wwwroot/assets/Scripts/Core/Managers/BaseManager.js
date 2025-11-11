@@ -11,7 +11,7 @@ var BaseManager = {
   // Standard fetch with error handling
   fetchData: async function(endpoint, errorMsg = "Failed to load data") {
     try {
-      const response = await VanillaApiCallManager.get(AppConfig.getApiUrl(), endpoint);
+      const response = await VanillaApiManager.get(AppConfig.getApiUrl(), endpoint);
       
       if (response && response.IsSuccess === true) {
         return response.Data;
@@ -19,7 +19,7 @@ var BaseManager = {
       throw new Error(errorMsg);
     } catch (error) {
       console.error(`Error fetching ${endpoint}:`, error);
-      VanillaApiCallManager.handleApiError(error);
+      VanillaApiManager.handleApiError(error);
       throw error;
     }
   },
@@ -27,7 +27,7 @@ var BaseManager = {
   // Fetch with custom base URL
   fetchDataWithUrl: async function(baseUrl, endpoint, errorMsg = "Failed to load data") {
     try {
-      const response = await VanillaApiCallManager.get(baseUrl, endpoint);
+      const response = await VanillaApiManager.get(baseUrl, endpoint);
       
       if (response && response.IsSuccess === true) {
         return response.Data;
@@ -35,7 +35,7 @@ var BaseManager = {
       throw new Error(errorMsg);
     } catch (error) {
       console.error(`Error fetching ${endpoint}:`, error);
-      VanillaApiCallManager.handleApiError(error);
+      VanillaApiManager.handleApiError(error);
       throw error;
     }
   },
@@ -73,7 +73,7 @@ var BaseManager = {
             onClick: async function($noty) {
               $noty.close();
               try {
-                const response = await VanillaApiCallManager.SendRequestVanilla(
+                const response = await VanillaApiManager.SendRequestVanilla(
                   AppConfig.getApiUrl(),
                   serviceUrl,
                   data,
@@ -95,7 +95,7 @@ var BaseManager = {
                 }
               } catch (error) {
                 console.error("Save/Update error:", error);
-                VanillaApiCallManager.handleApiError(error);
+                VanillaApiManager.handleApiError(error);
                 if (onError) onError(error);
                 reject(error);
               }
@@ -141,7 +141,7 @@ var BaseManager = {
             onClick: async function($noty) {
               $noty.close();
               try {
-                const response = await VanillaApiCallManager.delete(
+                const response = await VanillaApiManager.delete(
                   AppConfig.getApiUrl(),
                   serviceUrl
                 );
@@ -161,7 +161,7 @@ var BaseManager = {
                 }
               } catch (error) {
                 console.error("Delete error:", error);
-                VanillaApiCallManager.handleApiError(error);
+                VanillaApiManager.handleApiError(error);
                 if (onError) onError(error);
                 reject(error);
               }
@@ -184,7 +184,7 @@ var BaseManager = {
   // Get single item by ID
   getById: async function(endpoint, id, errorMsg = "Failed to load item") {
     try {
-      const response = await VanillaApiCallManager.get(
+      const response = await VanillaApiManager.get(
         AppConfig.getApiUrl(), 
         `${endpoint}/${id}`
       );
@@ -195,13 +195,13 @@ var BaseManager = {
       throw new Error(errorMsg);
     } catch (error) {
       console.error(`Error fetching item by ID ${id}:`, error);
-      VanillaApiCallManager.handleApiError(error);
+      VanillaApiManager.handleApiError(error);
       throw error;
     }
   },
 
   // Create grid data source
   createGridDataSource: function(config) {
-    return VanillaApiCallManager.GenericGridDataSource(config);
+    return VanillaApiManager.GenericGridDataSource(config);
   }
 };

@@ -1,65 +1,63 @@
 /*=========================================================
- * CRM Course Information Service
- * File: CRMCourseInformationService.js
- * Description: Handles CRM Course Information API calls
+ * CRM Application Service
+ * File: CRMApplicationService.js
+ * Description: Handles CRM Application API calls
  * Author: devSakhawat
  * Date: 2025-11-08
 =========================================================*/
 
-var CRMCourseInformationService = {
-  
-  // Get institute dropdown for CRM
-  getInstituteDropdown: async function() {
-    return await BaseManager.fetchData(
-      AppConfig.endpoints.instituteDropdown,
-      "Failed to load institute data"
-    );
+var CRMApplicationService = GenericService.createService({
+  entityName: "Application",
+  endpoint: "/crm-application",
+  summaryEndpoint: "/crm-application-summary",
+  dropdownEndpoint: "/crm-application-ddl",
+  gridId: "gridSummaryApplication",
+  modelFields: {
+    ApplicationDate: { type: "date" },
+    CreatedDate: { type: "date" }
   },
+  useFormData: false,
+  cacheTime: 5 * 60 * 1000 // 5 minutes
+});
 
-  // Get courses by institute ID for CRM
-  getCoursesByInstituteId: async function(instituteId) {
-    if (!instituteId) {
-      return Promise.resolve([]);
-    }
-    
-    return await BaseManager.fetchData(
-      `${AppConfig.endpoints.courseByInstitute}/${instituteId}`,
-      "Failed to load course data"
-    );
-  },
+// Custom method for updating application status
+CRMApplicationService.updateApplicationStatus = async function (applicationId, status, onSuccess, onError) {
+  return await this.customPost(
+    "/status",
+    { ApplicationId: applicationId, Status: status },
+    "Failed to update application status"
+  ).then(result => {
+    ToastrMessage.showSuccess("Application status updated successfully.");
+    if (onSuccess) onSuccess(result);
+    return result;
+  }).catch(error => {
+    if (onError) onError(error);
+    throw error;
+  });
+};
 
-  // Get currency dropdown for CRM
-  getCurrencyDropdown: async function() {
-    return await BaseManager.fetchData(
-      AppConfig.endpoints.currency,
-      "Failed to load currency data"
-    );
-  },
+// Backward compatibility
+CRMApplicationService.getApplicationSummary = function () {
+  return this.getGridDataSource();
+};
 
-  // Get course details with institute
-  getCourseDetailsWithInstitute: async function(courseId) {
-    return await BaseManager.getById(
-      "/crm-course/details",
-      courseId,
-      "Failed to load course details"
-    );
-  },
+CRMApplicationService.getApplicationById = async function (applicationId) {
+  return await this.getById(applicationId);
+};
 
-  // Get all course information for dropdown with caching
-  getCourseInformationCached: async function() {
-    const cacheKey = 'crm-course-information';
-    const cached = CacheManager.get(cacheKey);
-    
-    if (cached) {
-      return cached;
-    }
-    
-    const data = await BaseManager.fetchData(
-      "/crm-course-information",
-      "Failed to load course information"
-    );
-    
-    CacheManager.set(cacheKey, data, 5 * 60 * 1000); // Cache for 5 minutes
-    return data;
-  }
+CRMApplicationService.createApplication = async function (applicationData, onSuccess, onError) {
+  return await this.create(applicationData, {
+    confirmMsg: "Do you want to submit this application?",
+    successMsg: "Application submitted successfully.",
+    onSuccess,
+    onError
+  });
+};
+
+CRMApplicationService.updateApplication = async function (applicationId, applicationData, onSuccess, onError) {
+  return await this.update(applicationId, applicationData, { onSuccess, onError });
+};
+
+CRMApplicationService.deleteApplication = async function (applicationId, onSuccess, onError) {
+  return await this.delete(applicationId, { onSuccess, onError });
 };

@@ -6,7 +6,7 @@
  * Date: 2025-11-08
 =========================================================*/
 
-var VanillaApiCallManager = {
+var VanillaApiManager = {
   
   // Base request method with proper error handling
   request: async function(baseUrl, endpoint, options = {}) {

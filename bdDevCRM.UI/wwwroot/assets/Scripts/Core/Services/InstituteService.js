@@ -6,84 +6,37 @@
  * Date: 2025-11-08
 =========================================================*/
 
-var InstituteService = {
-  
-  // Get institute summary (grid data)
-  getInstituteSummary: function() {
-    return BaseManager.createGridDataSource({
-      apiUrl: AppConfig.getApiUrl() + AppConfig.endpoints.instituteSummary,
-      requestType: "POST",
-      async: true,
-      modelFields: { 
-        CreatedDate: { type: "date" },
-        EstablishedDate: { type: "date" }
-      },
-      pageSize: 20,
-      serverPaging: true,
-      serverSorting: true,
-      serverFiltering: true,
-      allowUnsort: true,
-      schemaData: "Data.Items",
-      schemaTotal: "Data.TotalCount"
-    });
+var InstituteService = GenericService.createService({
+  entityName: "Institute",
+  endpoint: "/crm-institute",
+  summaryEndpoint: "/crm-institute-summary",
+  dropdownEndpoint: "/crm-institute-ddl",
+  gridId: "gridSummaryInstitute",
+  modelFields: {
+    CreatedDate: { type: "date" },
+    EstablishedDate: { type: "date" }
   },
+  useFormData: true, // Institute uses FormData for file uploads
+  cacheTime: 10 * 60 * 1000 // 10 minutes
+});
 
-  // Get institute by ID
-  getInstituteById: async function(instituteId) {
-    return await BaseManager.getById(
-      AppConfig.endpoints.institute,
-      instituteId,
-      "Failed to load institute details"
-    );
-  },
+// Backward compatibility methods
+InstituteService.getInstituteSummary = function () {
+  return this.getGridDataSource();
+};
 
-  // Get institute dropdown data
-  getInstituteDropdown: async function() {
-    return await BaseManager.fetchData(
-      AppConfig.endpoints.instituteDropdown,
-      "Failed to load institute list"
-    );
-  },
+InstituteService.getInstituteDropdown = async function () {
+  return await this.getDropdownCached();
+};
 
-  // Create new institute
-  createInstitute: async function(formData, onSuccess, onError) {
-    return await BaseManager.saveOrUpdate({
-      id: 0,
-      endpoint: AppConfig.endpoints.institute,
-      data: formData,
-      isFormData: true,
-      confirmMsg: "Do you want to save this institute?",
-      successMsg: "Institute saved successfully.",
-      gridId: "gridSummaryInstitute",
-      onSuccess: onSuccess,
-      onError: onError
-    });
-  },
+InstituteService.createInstitute = async function (formData, onSuccess, onError) {
+  return await this.create(formData, { onSuccess, onError });
+};
 
-  // Update existing institute
-  updateInstitute: async function(instituteId, formData, onSuccess, onError) {
-    return await BaseManager.saveOrUpdate({
-      id: instituteId,
-      endpoint: AppConfig.endpoints.institute,
-      data: formData,
-      isFormData: true,
-      confirmMsg: "Do you want to update this institute?",
-      successMsg: "Institute updated successfully.",
-      gridId: "gridSummaryInstitute",
-      onSuccess: onSuccess,
-      onError: onError
-    });
-  },
+InstituteService.updateInstitute = async function (instituteId, formData, onSuccess, onError) {
+  return await this.update(instituteId, formData, { onSuccess, onError });
+};
 
-  // Delete institute
-  deleteInstitute: async function(instituteId, onSuccess, onError) {
-    return await BaseManager.deleteItem({
-      id: instituteId,
-      endpoint: AppConfig.endpoints.institute,
-      itemName: "institute",
-      gridId: "gridSummaryInstitute",
-      onSuccess: onSuccess,
-      onError: onError
-    });
-  }
+InstituteService.deleteInstitute = async function (instituteId, onSuccess, onError) {
+  return await this.delete(instituteId, { onSuccess, onError });
 };

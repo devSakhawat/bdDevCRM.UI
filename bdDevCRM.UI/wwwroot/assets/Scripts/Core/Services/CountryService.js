@@ -6,27 +6,22 @@
  * Date: 2025-11-08
 =========================================================*/
 
-var CountryService = {
-  
-  // Get country dropdown data
-  getCountryDropdown: async function() {
-    return await BaseManager.fetchData(
-      AppConfig.endpoints.country,
-      "Failed to load country list"
-    );
-  },
+var CountryService = GenericService.createService({
+  entityName: "Country",
+  endpoint: "/country",
+  summaryEndpoint: null,
+  dropdownEndpoint: "/countryddl",
+  gridId: null,
+  modelFields: {},
+  useFormData: false,
+  cacheTime: 60 * 60 * 1000 // 1 hour (rarely changes)
+});
 
-  // Get cached country dropdown
-  getCountryDropdownCached: async function() {
-    const cacheKey = 'country-dropdown';
-    const cached = CacheManager.get(cacheKey);
-    
-    if (cached) {
-      return cached;
-    }
-    
-    const data = await this.getCountryDropdown();
-    CacheManager.set(cacheKey, data, 30 * 60 * 1000); // Cache for 30 minutes
-    return data;
-  }
+// Backward compatibility
+CountryService.getCountryDropdown = async function () {
+  return await this.getDropdownCached();
+};
+
+CountryService.getCountryDropdownCached = async function () {
+  return await this.getDropdownCached();
 };

@@ -6,27 +6,22 @@
  * Date: 2025-11-08
 =========================================================*/
 
-var InstituteTypeService = {
-  
-  // Get institute type dropdown data
-  getInstituteTypeDropdown: async function() {
-    return await BaseManager.fetchData(
-      AppConfig.endpoints.instituteType,
-      "Failed to load institute type list"
-    );
-  },
+var InstituteTypeService = GenericService.createService({
+  entityName: "InstituteType",
+  endpoint: "/crm-institutetype",
+  summaryEndpoint: null, // No grid for institute types
+  dropdownEndpoint: "/crm-institutetype-ddl",
+  gridId: null,
+  modelFields: {},
+  useFormData: false,
+  cacheTime: 30 * 60 * 1000 // 30 minutes (rarely changes)
+});
 
-  // Get cached institute type dropdown
-  getInstituteTypeDropdownCached: async function() {
-    const cacheKey = 'instituteType-dropdown';
-    const cached = CacheManager.get(cacheKey);
-    
-    if (cached) {
-      return cached;
-    }
-    
-    const data = await this.getInstituteTypeDropdown();
-    CacheManager.set(cacheKey, data, 10 * 60 * 1000); // Cache for 10 minutes
-    return data;
-  }
+// Backward compatibility
+InstituteTypeService.getInstituteTypeDropdown = async function () {
+  return await this.getDropdownCached();
+};
+
+InstituteTypeService.getInstituteTypeDropdownCached = async function () {
+  return await this.getDropdownCached();
 };

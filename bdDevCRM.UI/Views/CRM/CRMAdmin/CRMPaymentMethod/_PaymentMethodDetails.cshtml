@@ -1,0 +1,75 @@
+<script src="~/assets/scripts/modules/crmadmin/crmpaymentmethod/paymentmethoddetails.js"></script>
+
+
+@* <script src="~/assets/scripts/modules/core/crmpaymentmethod/paymentmethoddetails.js"></script> *@
+
+@* <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
+  <fieldset class="reset">
+    <legend class="reset">Payment Method Form</legend>
+    <form id="PaymentMethodForm"> *@
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
+  <fieldset class="border p-3 fieldsetCommon">
+    <legend class="legendCommon legendCommonModalBGImportant">Payment Method Form</legend>
+    <form id="PaymentMethodForm">
+      <div class="row mb-2">
+        <input id="paymentMethodId" name="PaymentMethodId" type="hidden" value="0" />
+
+        <!-- Payment Method Name -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
+          <label for="PaymentMethodName">Payment Method Name <span class="redstart">*</span></label>
+          <input type="text" class="form-control" id="paymentMethodName" name="PaymentMethodName" required />
+        </div>
+
+        <!-- Payment Method Code -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
+          <label for="PaymentMethodCode">Payment Method Code</label>
+          <input type="text" class="form-control" id="paymentMethodCode" name="PaymentMethodCode" maxlength="10" />
+        </div>
+
+        <!-- Processing Fee -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
+          <label for="ProcessingFee">Processing Fee</label>
+          <input type="number" class="form-control" id="processingFee" name="ProcessingFee" step="0.01" min="0" />
+        </div>
+
+        <!-- Processing Fee Type -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2">
+          <label for="ProcessingFeeType">Processing Fee Type</label>
+          <select class="form-control" id="processingFeeType" name="ProcessingFeeType">
+            <option value="">-- Select Type --</option>
+            <option value="Fixed">Fixed Amount</option>
+            <option value="Percentage">Percentage</option>
+          </select>
+        </div>
+
+        <!-- Is Online Payment Checkbox -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2 custom-checkbox">
+          <label class="form-check-label" for="IsOnlinePayment">Is Online Payment</label>
+          <input type="checkbox" id="chkIsOnlinePayment" name="IsOnlinePayment" class="form-check-input" />
+        </div>
+
+        <!-- Status Checkbox -->
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-2 custom-checkbox">
+          <label class="form-check-label" for="IsActive">Active Status</label>
+          <input type="checkbox" id="chkIsActivePaymentMethod" name="IsActive" class="form-check-input" />
+        </div>
+
+        <!-- Description -->
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+          <label for="Description">Description</label>
+          <textarea class="form-control" id="description" name="Description" rows="3" maxlength="500" placeholder="Enter description (optional)"></textarea>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="btnDiv mt-2">
+        <ul>
+          <li class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" id="btnPaymentMethodSaveOrUpdate" onclick="PaymentMethodDetailsManager.saveOrUpdateItem();"> + Add Payment Method </button>
+            <button type="button" class="btn btn-secondary me-2" onclick="PaymentMethodDetailsHelper.clearForm();"> Clear </button>
+          </li>
+        </ul>
+      </div>
+    </form>
+  </fieldset>
+</div>

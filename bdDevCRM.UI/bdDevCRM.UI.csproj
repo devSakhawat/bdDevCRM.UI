@@ -7,14 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\assets\Scripts\CRMSolution\Core\Login\" />
-    <Folder Include="wwwroot\assets\Scripts\Dashboard\" />
+    <Compile Remove="wwwroot\assets\Scripts\CRMSolution\**" />
+    <Compile Remove="wwwroot\assets\Scripts\Dashboard\**" />
+    <Content Remove="wwwroot\assets\Scripts\CRMSolution\**" />
+    <Content Remove="wwwroot\assets\Scripts\Dashboard\**" />
+    <EmbeddedResource Remove="wwwroot\assets\Scripts\CRMSolution\**" />
+    <EmbeddedResource Remove="wwwroot\assets\Scripts\Dashboard\**" />
+    <None Remove="wwwroot\assets\Scripts\CRMSolution\**" />
+    <None Remove="wwwroot\assets\Scripts\Dashboard\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\assets\Scripts\Modules\System\" />
   </ItemGroup>
 
 </Project>

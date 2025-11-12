@@ -1,16 +1,26 @@
 ﻿
 
 @* input field pattern type, id, class, name, validationmessage and others *@
-<script src="~/assets/scripts/core/workflow/actiondetail.js"></script>
+<script src="~/assets/scripts/modules/core/workflow/actiondetail.js"></script>
 
 
-  <div class="row mb-2"> 
+@*   <div class="row mb-2"> 
     <div class="">
       <div id="gridSummaryAction"></div>
     </div>
+  </div> *@
+
+<!-- Grid Section - Responsive -->
+<!-- row -->
+<div id="row gy-2 gx-1">
+  <div class="col-12">
+    <div id="divSummary" >
+      <div class="table-responsive-wrapper">
+        <div id="gridSummaryAction" class="responsiveGrid"></div>
+      </div>
+    </div>
   </div>
-
-
+</div>
 
 <div class="row gy-2 gx-1">
   <div id="divActionDetails">
@@ -19,7 +29,6 @@
       <ul>
         <li class="mb-2">
           <input type="hidden" id="actionID" value="0" />
-
 
           <label for="StateName" class="lbl widthSize100_per">State Name:<span class="redstart">*</span></label>
           <input id="txtStateName_Action" class="width_100_Per_Important k-textbox" name="StateName" validationMessage="Please input valid State Name" required="required" disabled="disabled" />
@@ -71,5 +80,4 @@
       </ul>
     </div>
   </div>
-
 </div>

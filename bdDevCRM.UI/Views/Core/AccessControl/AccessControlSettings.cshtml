@@ -5,20 +5,177 @@
 
 
 <!-- row -->
-<div class="row">
+<div class="row gx-2 gy-3">
 	<h3 class="k-header text-center">Access Control Settings</h3>
 
-	<div class="col-7">
-		<div id="divSummary ">
-			<partial name="AccessControl/_AccessControlSummary" />
+	<div class="col-lg-5 col-md-12 col-sm-12">
+		<div class="divDetails">
+			<partial name="AccessControl/_AccessControlDetails" />
 		</div>
 	</div>
 
-	<div class="col-5">
-		<div id="divDetails">
-			<partial name="AccessControl/_AccessControlDetails" />
+	<!-- Grid Section - Responsive -->
+	<div class="col-lg-7 col-md-12 col-sm-12">
+		<div class="divSummary pe-3">
+			<partial name="AccessControl/_AccessControlSummary" />
 		</div>
 	</div>
 </div>
 
-<script src="~/assets/scripts/core/accesscontrol/accesscontrolsettings.js"></script>
+
+<script src="~/assets/scripts/modules/core/accesscontrol/accesscontrolsettings.js"></script>
+@* <style>
+/* 
+  .fieldsetCommon {
+    position: relative;
+    text-align: left;
+  }
+
+  fieldset legend.legendCommon {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    font-weight: bold;
+    font-size: 14px;
+    margin-left: 12px;
+  }
+ */
+  /* Mobile Responsive CSS */
+/*   .workflow-container {
+    padding: 15px;
+  } */
+
+  /* Grid Container Styling */
+/*   .grid-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  } */
+
+  /* Kendo Grid Responsive Overrides */
+/*   .responsiveGrid {
+    width: 100% !important;
+    min-width: auto !important;
+    margin-top: 10px;
+  }
+ */
+  /* Mobile View (phones) */
+  @@media (max-width: 576px) {
+    .responsiveGrid {
+      height: 400px !important;
+      font-size: 12px;
+    }
+    /* Hide less important columns on mobile */
+    .k-grid td:nth-child(2),
+    .k-grid th:nth-child(2) {
+      display: none;
+    }
+    /* Make action buttons stack vertically */
+   /*  .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    } */
+
+      .action-buttons .btn {
+        width: 100%;
+        margin: 2px 0;
+      }
+    /* Adjust form spacing */
+    .divDetails {
+      margin-top: 20px;
+    }
+  }
+
+  /* Tablet View */
+  @@media (min-width: 577px) and (max-width: 991px) {
+    /* .workflow-container .col-7 {
+      width: 100%;
+      max-width: 100%;
+      flex: 0 0 100%;
+    }
+
+    .workflow-container .col-5 {
+      width: 100%;
+      max-width: 100%;
+      flex: 0 0 100%;
+      margin-top: 20px;
+    } */
+
+    .responsiveGrid {
+      height: 450px !important;
+    }
+  }
+
+  /* Desktop View */
+  @@media (min-width: 992px) {
+    .responsiveGrid {
+      height: calc(100vh - 300px) !important;
+      max-height: 600px;
+    }
+  }
+
+  /* Grid Scrolling Improvements */
+  .k-grid-content {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+
+  /* Prevent Grid Overflow */
+/*   .gridParrentDivOverflowHidden {
+    overflow: visible !important;
+    width: 100%;
+  } */
+
+  /* Responsive Table Wrapper */
+  .table-responsive-wrapper {
+    position: relative;
+    width: 100%;
+    /* overflow-x: auto; */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Action Buttons Responsive */
+  .btn-action {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin: 2px;
+  }
+
+  @@media (max-width: 768px) {
+    .btn-action {
+      display: block;
+      width: 100%;
+      margin: 2px 0;
+    }
+  }
+
+  /* Form Elements Responsive */
+  .form-control, .k-textbox, .k-dropdown {
+    width: 100% !important;
+  }
+
+  /* Header Responsive */
+  .k-header {
+    font-size: 1.5rem;
+  }
+
+  .k-column-title {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  @@media (max-width: 576px) {
+    .k-header {
+      font-size: 1.2rem;
+    }
+  }
+</style>
+ *@
+
+
+
+
+

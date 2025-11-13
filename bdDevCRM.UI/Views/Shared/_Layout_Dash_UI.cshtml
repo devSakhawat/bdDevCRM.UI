@@ -271,29 +271,72 @@
   <script src="~/assets/scripts/vendors/tooltip.js"></script>
 
 
-  <!-- Theme JS -->
-  <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
-
   <!-- Kendo js -->
   <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
-   @* <script src="~/assets/kendo_2023_r1/js/kendo.core.min.js"></script> *@
-
-  <!-- Common js -->
-  <script src="~/assets/scripts/common/common.js"></script>
-  <script src="~/assets/scripts/common/commonmessage.js"></script>
-  <script src="~/assets/scripts/common/tdtblockui.js"></script>
-  <script src="~/assets/scripts/common/cescommon.js"></script>
-  <script src="~/assets/scripts/common/date.js"></script>
-  <script src="~/assets/scripts/common/filebrower.js"></script>
-  <script src="~/assets/scripts/common/filesaver.js"></script>
-  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
   <script src="~/assets/scripts/common/xlsx.full.min.js"></script>
   <script src="~/assets/scripts/common/jquery.cookie.js"></script>
   <script src="~/assets/scripts/common/kendo.common.control.js"></script>
   <script src="~/assets/scripts/common/kendo.common.datasource.js"></script>
+  <script src="~/assets/scripts/common/tdtblockui.js"></script>
+  <script src="~/assets/scripts/common/filebrower.js"></script>
+  <script src="~/assets/scripts/common/filesaver.js"></script>
+
+
+  <!-- Theme JS -->
+  <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
+
+  <!-- ========================================== -->
+  <!-- 1. LOAD CONFIG FIRST (No dependencies)    -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Config/AppConfig.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Core/Logger.js"></script>
+  <script src="~/assets/Scripts/Core/EventBus.js"></script>
+  <script src="~/assets/Scripts/Core/StateManager.js"></script>
+  <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
+  <script src="~/assets/Scripts/Core/App.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 3. LOAD BASE COMPONENT                     -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 4. LOAD MANAGERS & HELPERS                 -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Core/Managers/VanillaApiCallManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/BaseManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/TokenManager.js"></script>
+  <script src="~/assets/scripts/infrastructure/cache/cachemanager.js"></script>
+
+  <!-- Helpers -->
+  <script src="~/assets/scripts/common/helpers/stringhelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/datehelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/formhelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/validationhelper.js"></script>
+  <script src="~/assets/scripts/common/helpers/gridhelper.js"></script>
+
+
+  <!-- Common js -->
+  <script src="~/assets/scripts/common/common.js"></script>
+  <script src="~/assets/scripts/common/commonmessage.js"></script>
+  <script src="~/assets/scripts/common/cescommon.js"></script>
+  <script src="~/assets/scripts/common/date.js"></script>
+  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
+
+  <!-- Bootstrap App before any module -->
+  <script src="~/assets/scripts/app.bootstrap.js"></script>
 
   @await RenderSectionAsync("Scripts", required: false)
 
+
+@* 
   <!-- ✅ Menu Initialization Script -->
   <script type="text/javascript">
     $(document).ready(function() {
@@ -312,6 +355,12 @@
         console.error('Error initializing menu:', error);
       }
     });
-  </script>
+  </script> *@
+
+  <!-- Debug Helper (Development only) -->
+  @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+  {
+    <script src="~/assets/Scripts/debug-helper.js"></script>
+  }
 </body>
 </html>

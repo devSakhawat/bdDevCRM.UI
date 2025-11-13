@@ -57,8 +57,8 @@ var ActionHelper = {
               <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                   <input type="checkbox" class="form-check-input me-2"
-                         id="chkAction${objActionList[i].WfActionId}"
-                         onclick="ActionHelper.populateActionArray(${objActionList[i].WfActionId}, '${objActionList[i].WfStateId}', this.id)" />
+                         id="chkAction${objActionList[i].WfactionId}"
+                         onclick="ActionHelper.populateActionArray(${objActionList[i].WfactionId}, '${objActionList[i].WfstateId}', this.id)" />
                   <span>${objActionList[i].ActionName}</span>
                 </div>
               </div>

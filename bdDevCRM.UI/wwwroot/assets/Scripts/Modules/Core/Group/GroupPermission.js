@@ -128,18 +128,12 @@ var GroupPermissionHelper = {
     debugger;
     try {
       var dataItem = this.dataItem(e.item.index());
-      
-      // First load access controls
       await AccessControlHelper.getAllAccessControl(dataItem.ReferenceID);
-      
-      // Then populate menu tree
       await MenuPermissionHelper.populateMenuTreeByModuleId(dataItem.ReferenceID);
-      
-      // Set the combobox value
       var mdl = $("#cmbApplicationForModule").data("kendoComboBox");
       mdl.value(dataItem.ReferenceID);
-      
     } catch (e) {
+      //console.error("Error in onSelect:", error);
       VanillaApiCallManager.handleApiError(e);
     }
   },
@@ -182,20 +176,22 @@ var GroupPermissionHelper = {
         });
       }
       
-      // Populate existing permissions in arrays
+
       MenuPermissionHelper.populateExistingMenuInArray(objGroupPermission);
       AccessControlHelper.PopulateExistingAccessInArray(objGroupPermission);
       StateHelper.populateExistingStatusInArray(objGroupPermission);
       ActionHelper.populateExistingActionInArray(objGroupPermission);
       ReportPermissionHelper.populateExistingReportInArray(objGroupPermission);
-      
-      if (moduleArray.length > 0 && gbmoduleId > 0) {
-        console.log("Re-selecting existing menus for module:", gbmoduleId);
-        MenuPermissionHelper.autoSelectExistingMenu();
-      }
-      
     } catch (error) {
       VanillaApiCallManager.handleApiError(error);
+      //console.log(error);
+      //ToastrMessage.showToastrNotification({
+      //  preventDuplicates: true,
+      //  closeButton: true,
+      //  timeOut: 0,
+      //  message: error,
+      //  type: 'error',
+      //});
       return false;
     }
     

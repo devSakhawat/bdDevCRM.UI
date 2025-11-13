@@ -60,9 +60,6 @@ var MenuPermissionHelper = {
       var objMenuList = new Object();
       var newMenuArray = [];
       objMenuList = await MenuPermissionManager.renderMenuByModuleId(moduleId);
-      
-      allmenuArray = objMenuList; 
-  
       gbmoduleId = moduleId;
       var treeview = $("#treeview").kendoTreeView({
         checkboxes: {
@@ -99,11 +96,14 @@ var MenuPermissionHelper = {
           objMenu.expanded = true;
 
           if (objMenu.items.length > 0) {
-            //objMenu.spriteCssClass = "folder";
+
+            //objMenu.spriteCssClass = "folder"
+            //    ;
           }
           else {
             objMenu.spriteCssClass = "html";
             objMenu.items = [];
+
           }
           objMenu.itemValue = objMenuList[i].MenuId;
           newMenuArray.push(objMenu);
@@ -231,32 +231,15 @@ var MenuPermissionHelper = {
   },
 
   autoSelectExistingMenu: function () {
-    // Debug: Check arrays before processing
-    console.log("autoSelectExistingMenu called");
-    console.log("allmenuArray length:", allmenuArray.length);
-    console.log("menuArray length:", menuArray.length);
-    
-    if (menuArray.length === 0) {
-      console.warn("menuArray is empty. No existing menus to select.");
-      return;
-    }
-    
-    if (allmenuArray.length === 0) {
-      console.warn("allmenuArray is empty. Cannot match menu items.");
-      return;
-    }
-    
-    // Select existing menus
-    for (var j = 0; j < menuArray.length; j++) {
-      var menuId = menuArray[j].ReferenceID;
-      var parentPermission = menuArray[j].ParentPermission;
-      
-      // Only select if this menu belongs to current module
-      if (parentPermission === gbmoduleId) {
-        $('#chkMenu' + menuId).prop('checked', true);
-        console.log("Selected menu:", menuId);
+    for (var i = 0; i < allmenuArray.length; i++) {
+      for (var j = 0; j < menuArray.length; j++) {
+        if (allmenuArray[i].MenuId == menuArray[j].ReferenceID) {
+          $('#chkMenu' + menuArray[j].ReferenceID).prop('checked', true);
+          break;
+        }
       }
     }
+
   },
 
   clearMenuPermission: function () {

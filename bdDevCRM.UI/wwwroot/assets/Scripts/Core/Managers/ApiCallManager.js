@@ -71,6 +71,7 @@ var ApiCallManager = (function () {
 
     try {
       data = await response.json();
+      console.log(data);
     } catch (e) {
       // If JSON parsing fails, create error object
       data = {

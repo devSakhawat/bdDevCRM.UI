@@ -1,4 +1,5 @@
-﻿/*=========================================================
+﻿/// <reference path="../../core/managers/apicallmanager.js" />
+/*=========================================================
  * Course Service
  * File: CourseService.js
  * Path: wwwroot/assets/Scripts/Core/Services/CourseService.js
@@ -6,6 +7,7 @@
  * Author: devSakhawat
  * Date: 2025-01-13
 =========================================================*/
+
 
 var CourseService = (function () {
   'use strict';
@@ -19,7 +21,13 @@ var CourseService = (function () {
       base: '/crm-course',
       summary: '/crm-course-summary',
       ddl: '/crm-course-ddl',
-      byInstituteId: '/crm-course-by-instituteid-ddl'
+      instituteDDL: '/crm-institute-ddl',
+      byInstituteId: '/crm-course-by-instituteid-ddl',
+      currencyDropdownEndpoint: "/currencyddl",
+      //summaryEndpoint: "/crm-institute-summary",
+      //dropdownEndpoint: "/crm-institute-ddl",
+      //instituteDropdownEndpoint: "/crm-institute-ddl",
+      //currencyDropdownEndpoint: "/currencyddl",
     },
     gridId: 'gridSummaryCourse',
     modelFields: {
@@ -81,6 +89,23 @@ var CourseService = (function () {
 
     try {
       return await ApiCallManager.get(`${_config.endpoints.byInstituteId}/${instituteId}`);
+    } catch (error) {
+      console.error('CourseService.getCoursesByInstituteId error:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get availableInstitute
+   */
+  async function getInstitute() {
+    //if (!instituteId || instituteId <= 0) {
+    //  console.warn('CourseService: Invalid institute ID, returning empty array');
+    //  return [];
+    //}
+
+    try {
+      return await ApiCallManager.get(`${_config.endpoints.instituteDDL}`);
     } catch (error) {
       console.error('CourseService.getCoursesByInstituteId error:', error);
       return [];
@@ -346,7 +371,7 @@ var CourseService = (function () {
    * Save or Update with confirmation
    */
   async function saveOrUpdateWithConfirm(courseData, options) {
-    const isCreate = !courseData.CourseId || courseData.CourseId === 0;
+    const isCreate = !courseData.CourseId || courseData.CourseId == 0;
 
     if (isCreate) {
       return await createWithConfirm(courseData, options);
@@ -393,6 +418,9 @@ var CourseService = (function () {
     update: update,
     delete: deleteCourse,
     saveOrUpdate: saveOrUpdate,
+
+    // DDL
+    getInstitute: getInstitute,
 
     // Grid
     getGridDataSource: getGridDataSource,

@@ -1,4 +1,11 @@
-﻿/*=========================================================
+﻿/// <reference path="../../../core/managers/apicallmanager.js" />
+/// <reference path="../../../core/managers/messagemanager.js" />
+/// <reference path="../../../services/module/courseservice.js" />
+/// <reference path="course.js" />
+/// <reference path="coursesummary.js" />
+
+
+/*=========================================================
  * Course Details Manager
  * File: CourseDetails.js
  * Description: Course form management (uses CourseService)
@@ -9,17 +16,17 @@
 var CourseDetailsManager = {
 
   /**
-   * Fetch institute combo data (via InstituteService)
+   * Fetch institute combo data (via CourseService)
    */
   fetchInstituteComboBoxData: async function () {
     try {
-      // Use InstituteService if available, fallback to direct API call
-      if (typeof InstituteService !== 'undefined') {
-        return await InstituteService.getAll();
+      // Use CourseService if available, fallback to direct API call
+      if (typeof CourseService !== 'undefined') {
+        return await CourseService.getInstitute();
       }
 
       // Fallback
-      return await ApiCallManager.get('/crm-institute-ddl');
+      // return await ApiCallManager.get('/crm-institute-ddl');
     } catch (error) {
       console.error('Error loading institute data:', error);
       return [];

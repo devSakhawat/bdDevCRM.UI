@@ -11,6 +11,8 @@ var InstituteService = GenericService.createService({
   endpoint: "/crm-institute",
   summaryEndpoint: "/crm-institute-summary",
   dropdownEndpoint: "/crm-institute-ddl",
+  instituteDropdownEndpoint: "/crm-institute-ddl",
+  currencyDropdownEndpoint: "/currencyddl",
   gridId: "gridSummaryInstitute",
   modelFields: {
     CreatedDate: { type: "date" },

@@ -60,7 +60,8 @@ var GenericService = {
 
       // Get by ID
       getById: async function (id) {
-        return await BaseManager.getById(
+        return await BaseManager.
+        (
           endpoint,
           id,
           `Failed to load ${entityName.toLowerCase()} details`

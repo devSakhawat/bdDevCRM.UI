@@ -9,7 +9,7 @@ public class CRMAdminController : Controller
   {
     //if (Session["CurrentUser"] != null)
     //{
-    return View("CRM/CRMAdmin/CRMCourse/Course");
+    return View("../CRM/CRMAdmin/CRMCourse/Course");
     //}
     //else
     //{

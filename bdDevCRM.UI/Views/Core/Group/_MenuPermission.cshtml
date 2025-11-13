@@ -1,10 +1,13 @@
 ﻿@* @model bdDevCRM.UI.Models.ErrorViewModel *@
 
-<script src="~/assets/scripts/core/group/menupermission.js"></script>
+<script src="~/assets/scripts/modules/core/group/menupermission.js"></script>
 
 
 
 <div id="divMenuPermission" class="menuPermission widthSize100_per">
+  <!-- Loader Container -->
+  <div id="menuSectionLoader"> </div>
+
   <div class="mb-2">
     <h4 class="k-header mb-3 mb-2">Menu Permission</h4>
     <div id="menuContent" class="menuContent">
@@ -13,7 +16,17 @@
   </div>
 </div>
 
+
 <style>
+  #menuSectionLoader {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 16.67%;
+    margin-left: -40px !important;
+    margin-top: -45px !important;
+  }
+
   .tree-label {
     margin-bottom: 0;
     cursor: pointer;

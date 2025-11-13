@@ -1,13 +1,13 @@
-﻿
-
-<script src="~/assets/scripts/crm/crmapplication/crmeducationnenglishlanguage.js"></script>
-
+﻿@* <script src="~/assets/scripts/crm/crmapplication/crmeducationnenglishlanguage.js"></script> *@
+<script src="~/assets/scripts/modules/crm/crmapplication/crmeducationnenglishlanguage.js"></script>
 <div class="gridParrentDivOverflowHidden">
+
 	<!-- Education Details -->
-	<fieldset class="reset">
-		<legend class="reset">Education Details</legend>
+@* 	<fieldset class="reset">
+		<legend class="reset">Education Details</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Education Details</legend>
 		<div class="row">
-			<!-- Hidden Fields -->
 			<h4 class="k-header mb-3">Please list your five qualifications taken with most recent first.</h4>
 			<!-- Education Grid -->
 			<div class="col-12 mb-2">
@@ -21,10 +21,14 @@
 	<h4 class="k-header mb-3">Please list your five Qualification taken with most recent first.</h4>
 
 	<!-- IELTS Information -->
-	<fieldset class="reset">
-		<legend class="reset">IELTS Information</legend>
+@* 	<fieldset class="reset">
+		<legend class="reset">IELTS Information</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">IELTS Information</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnIELTSInformationId" value="0" />
+
 
 			<!-- IELTS Listening -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
@@ -62,7 +66,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="IELTSOverallScore" class="lbl widthSize100_per">IELTS Overall Score</label>
 				<div class="">
-					<input id="txtIELTSOverallScore" name="IELTSOverallScore" placeholder="IELTS Overall Score" class="w-100" />
+					<input type="number" id="txtIELTSOverallScore" name="IELTSOverallScore" placeholder="IELTS Overall Score" class="w-100" />
 				</div>
 			</div>
 
@@ -78,7 +82,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="IELTSScanCopy" class="lbl widthSize100_per">Browse Scanned Copy</label>
 				<div class="">
-					<input id="fileIELTSScanCopy" name="IELTSScanCopy" class="w-100" />
+					<input type="file" id="fileIELTSScanCopy" name="IELTSScanCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -91,7 +95,7 @@
 			</div>
 
 			<!-- IELTS Additional Information -->
-			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-12">
 				<label for="IELTSAdditionalInformation" class="lbl widthSize100_per">IELTS Additional Information</label>
 				<div class="">
 					<textarea id="txtIELTSAdditionalInformation" name="IELTSAdditionalInformation" class="w-100" rows="4" placeholder="IELTS Additional Information"></textarea>
@@ -102,10 +106,14 @@
 	</fieldset>
 
 	<!-- TOEFL Information -->
-	<fieldset class="reset">
-		<legend class="reset">TOEFL Information</legend>
+@* 	<fieldset class="reset">
+		<legend class="reset">TOEFL Information</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">TOEFL Information</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnTOEFLInformationId" value="0" />
+
 			<!-- TOEFL Listening -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="TOEFLListening" class="lbl widthSize100_per">TOEFL Listening</label>
@@ -150,7 +158,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="TOEFLDate" class="lbl widthSize100_per">TOEFL Date</label>
 				<div class="">
-					<input id="dateTOEFLDate" name="TOEFLDate" placeholder="TOEFL Date" class="w-100" />
+					<input type="number" id="dateTOEFLDate" name="TOEFLDate" placeholder="TOEFL Date" class="w-100" />
 				</div>
 			</div>
 
@@ -158,7 +166,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="TOEFLScanCopy" class="lbl widthSize100_per">Browse Scanned Copy</label>
 				<div class="">
-					<input id="fileTOEFLScanCopy" name="TOEFLScanCopy" class="w-100" />
+					<input type="file" id="fileTOEFLScanCopy" name="TOEFLScanCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -171,7 +179,7 @@
 			</div>
 
 			<!-- TOEFL Additional Information -->
-			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-12">
 				<label for="TOEFLAdditionalInformation" class="lbl widthSize100_per">TOEFL Additional Information</label>
 				<div class="">
 					<textarea id="txtTOEFLAdditionalInformation" name="TOEFLAdditionalInformation" class="w-100" rows="4" placeholder="TOEFL Additional Information"></textarea>
@@ -180,12 +188,16 @@
 
 		</div>
 	</fieldset>
-	
+
 	<!-- PTE Information -->
-	<fieldset class="reset">
-		<legend class="reset">PTE Information</legend>
+@* 	<fieldset class="reset">
+		<legend class="reset">PTE Information</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">PTE Information</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnPTEInformationId" value="0" />
+
 			<!-- PTE Listening -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PTEListening" class="lbl widthSize100_per">PTE Listening</label>
@@ -230,7 +242,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PTEDate" class="lbl widthSize100_per">PTE Date</label>
 				<div class="">
-					<input id="datePTEDate" name="PTEDate" placeholder="PTE Date" class="w-100" />
+					<input type="number" id="datePTEDate" name="PTEDate" placeholder="PTE Date" class="w-100" />
 				</div>
 			</div>
 
@@ -238,7 +250,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="PTEScanCopy" class="lbl widthSize100_per">Browse Scanned Copy</label>
 				<div class="">
-					<input id="filePTEScanCopy" name="PTEScanCopy" class="w-100" />
+					<input type="file" id="filePTEScanCopy" name="filePTEScanCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -251,7 +263,7 @@
 			</div>
 
 			<!-- PTE Additional Information -->
-			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-12">
 				<label for="PTEAdditionalInformation" class="lbl widthSize100_per">PTE Additional Information</label>
 				<div class="">
 					<textarea id="txtPTEAdditionalInformation" name="PTEAdditionalInformation" class="w-100" rows="4" placeholder="PTE  Additional Information"></textarea>
@@ -262,10 +274,14 @@
 	</fieldset>
 
 	<!-- GMAT Information -->
-	<fieldset class="reset">
-		<legend class="reset">GMAT Information</legend>
+@* 	<fieldset class="reset">
+		<legend class="reset">GMAT Information</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">GMAT Information</legend>
 		<div class="row">
 			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnGMATInformationId" value="0" />
+
 			<!-- GMAT Listening -->
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="GMATListening" class="lbl widthSize100_per">GMAT Listening</label>
@@ -310,7 +326,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="GMATDate" class="lbl widthSize100_per">GMAT Date</label>
 				<div class="">
-					<input id="dateGMATDate" name="GMATDate" placeholder="GMAT Date" class="w-100" />
+					<input type="number" id="dateGMATDate" name="GMATDate" placeholder="GMAT Date" class="w-100" />
 				</div>
 			</div>
 
@@ -318,7 +334,7 @@
 			<div class="col-xl-3 col-lg-3 col-md-6 col-12 mb-2">
 				<label for="GMATScanCopy" class="lbl widthSize100_per">Browse Scanned Copy</label>
 				<div class="">
-					<input id="fileGMATScanCopy" name="GMATScanCopy" class="w-100" />
+					<input type="file" id="fileGMATScanCopy" name="GMATScanCopy" class="form-control w-100" />
 				</div>
 			</div>
 
@@ -331,7 +347,7 @@
 			</div>
 
 			<!-- GMAT Additional Information -->
-			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
+			<div class="col-xl-12 col-lg-12 col-md-12 col-12">
 				<label for="GMATAdditionalInformation" class="lbl widthSize100_per">GMAT Additional Information</label>
 				<div class="">
 					<textarea id="txtGMATAdditionalInformation" name="GMATAdditionalInformation" class="w-100" rows="4" placeholder="GMAT  Additional Information"></textarea>
@@ -342,51 +358,77 @@
 	</fieldset>
 
 	<!-- OTHERS  Information -->
-	<fieldset class="reset">
-		<legend class="reset">OTHERS Information</legend>
+@* 	<fieldset class="reset">
+		<legend class="reset">OTHERS Information</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">OTHERS Information</legend>
 		<div class="row">
-			<!-- Hidden Fields
+			<!-- Hidden Fields -->
+			<input type="hidden" id="hdnOTHERSInformationId" value="0" />
 
 			<!-- OTHERS Additional Information -->
 			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
 				<label for="OTHERSAdditionalInformation" class="lbl widthSize100_per">OTHERS Additional Information</label>
 				<div class="">
-					<textarea id="txtOTHERSAdditionalInformation" name="OTHERSAdditionalInformation" class="w-100" rows="4" placeholder="OTHERS  Additional Information"></textarea>
+					<textarea id="txtAdditionalInformation" name="OTHERSAdditionalInformation" class="w-100" rows="4" placeholder="OTHERS  Additional Information"></textarea>
 				</div>
 			</div>
-			
+
 
 			<!-- OTHERS Scanned Copy -->
-			<div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-2">
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-2">
+				<label for="OTHERSScannedCopy" class="lbl widthSize100_per">Browse OTHERS Scanned Copy</label>
+				<div class="">
+					<input type="file" id="fileOTHERSScannedCopy" name="OTHERSScannedCopy" class="form-control w-100" />
+				</div>
+			</div>
+
+
+			<!-- OTHERS Scanned Copy -->
+			<div class="col-xl-6 col-lg-6 col-md-6 col-12">
 				<label for="OTHERSScannedCopy" class="lbl widthSize100_per">OTHERS Scanned Copy</label>
 				<div class="">
-					<input id="fileOTHERSScannedCopy" name="OTHERSScannedCopy" class="w-100" />
+					<input id="oTHERSScannedCopy" name="OTHERSScannedCopy" class="w-100" />
 				</div>
 			</div>
 
 		</div>
 	</fieldset>
 
-	<!-- Buttons -->
-	<div class="btnDiv mt-2">
-		<ul>
-			<li class="d-flex justify-content-end">
-				<button type="button" id="btnSaveOrUpdate" class="btn btn-primary me-2" onclick="StateDetailsManager.saveOrUpdate()">+ Add Item</button>
-				<button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="StateDetailsHelper.clearStateForm()">Clear</button>
-			</li>
-		</ul>
-	</div>
 
-
-
-
-
-
+	<!-- Work Experience Information -->
+@* 	<fieldset class="reset">
+		<legend class="reset">Work Experience</legend> *@
+	<fieldset class="border p-3 fieldsetCommon mt-5">
+		<legend class="legendCommon topAfterDiv_Backgorup">Work Experience</legend>
+		<div class="row">
+			<!-- Title -->
+			<h4 class="k-header mb-3">Please give details of your experience which should include the name of the employer and other releated information.</h4>
+			<!-- Education Grid -->
+			<div class="col-12">
+				<div id="gridWorkExperience" class="min-width_100"></div>
+			</div>
+		</div>
+	</fieldset>
 
 </div>
 
+<!-- File Upload Modal Window -->
+<div style="display:none" id="windDocumentPhotoUpload" class="">
+	<div class="row">
+		<div class="col-12">
+			<h4>Upload Education Document (PDF Only)</h4>
+			<div id="uploadDocumentPhoto"></div>
+		</div>
+	</div>
+	<div class="btnDiv mt-2">
+		<ul>
+			<li class="d-flex justify-content-end">
+				<button type="button" class="btn btn-secondary me-2" onclick="CommonManager.closeKendoWindow('#windDocumentPhotoUpload')">Close</button>
+			</li>
+		</ul>
+	</div>
+</div>
 
-<style>
-
-
-</style>
+<!-- Include Preview Window for Document Preview -->
+<partial name="~/Views/Shared/_previewWindow.cshtml" />

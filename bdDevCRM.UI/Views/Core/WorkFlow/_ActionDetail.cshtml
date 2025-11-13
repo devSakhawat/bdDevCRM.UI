@@ -1,16 +1,26 @@
 ﻿
 
 @* input field pattern type, id, class, name, validationmessage and others *@
-<script src="~/assets/scripts/core/workflow/actiondetail.js"></script>
+<script src="~/assets/scripts/modules/core/workflow/actiondetail.js"></script>
 
 
-  <div class="row mb-2"> 
+@*   <div class="row mb-2"> 
     <div class="">
       <div id="gridSummaryAction"></div>
     </div>
+  </div> *@
+
+<!-- Grid Section - Responsive -->
+<!-- row -->
+<div id="row gy-2 gx-1">
+  <div class="col-12">
+    <div id="divSummary" >
+      <div class="table-responsive-wrapper">
+        <div id="gridSummaryAction" class="responsiveGrid"></div>
+      </div>
+    </div>
   </div>
-
-
+</div>
 
 <div class="row gy-2 gx-1">
   <div id="divActionDetails">
@@ -19,7 +29,6 @@
       <ul>
         <li class="mb-2">
           <input type="hidden" id="actionID" value="0" />
-
 
           <label for="StateName" class="lbl widthSize100_per">State Name:<span class="redstart">*</span></label>
           <input id="txtStateName_Action" class="width_100_Per_Important k-textbox" name="StateName" validationMessage="Please input valid State Name" required="required" disabled="disabled" />
@@ -41,14 +50,24 @@
         </li>
 
         <li class="mb-2 custom-checkbox">
-          <label for="IsEmail" class="lbl">Is Email:</label>
-          <input type="checkbox" id="chkIsEmail" name="IsEmail" class="chkBox " />
+          <label class="form-check-label" for="IsEmail">Is Email:</label>
+          <input type="checkbox" id="chkIsEmail" name="IsEmail" class="form-check-input" />
         </li>
 
         <li class="mb-2 custom-checkbox">
+          <label class="form-check-label" for="IsSms">Is SMS:</label>
+          <input type="checkbox" id="chkIsSms" name="IsSms" class="form-check-input" />
+        </li>
+
+        @* <li class="mb-2 custom-checkbox">
+          <label for="IsEmail" class="lbl">Is Email:</label>
+          <input type="checkbox" id="chkIsEmail" name="IsEmail" class="chkBox " />
+        </li> *@
+
+        @* <li class="mb-2 custom-checkbox">
           <label for="IsSms" class="lbl">Is SMS:</label>
           <input type="checkbox" id="chkIsSms" name="IsSms" class="chkBox" />
-        </li>
+        </li> *@
       </ul>
     </div>
 
@@ -61,5 +80,4 @@
       </ul>
     </div>
   </div>
-
 </div>

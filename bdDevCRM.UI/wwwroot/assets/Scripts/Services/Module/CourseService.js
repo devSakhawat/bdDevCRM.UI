@@ -44,11 +44,6 @@ var CourseService = (function () {
 
   /**
    * Get all courses (dropdown)
-   * Backend: [HttpGet] CourseDDL
-   * @returns {Promise<Array>}
-   * 
-   * @example
-   * const courses = await CourseService.getAll();
    */
   async function getAll() {
     try {
@@ -61,11 +56,6 @@ var CourseService = (function () {
 
   /**
    * Get course by ID
-   * @param {number} id - Course ID
-   * @returns {Promise<object>}
-   * 
-   * @example
-   * const course = await CourseService.getById(123);
    */
   async function getById(id) {
     if (!id || id <= 0) {
@@ -82,12 +72,6 @@ var CourseService = (function () {
 
   /**
    * Get courses by institute ID
-   * Backend: [HttpGet] CourseByInstituteIdDDL
-   * @param {number} instituteId - Institute ID
-   * @returns {Promise<Array>}
-   * 
-   * @example
-   * const courses = await CourseService.getCoursesByInstituteId(5);
    */
   async function getCoursesByInstituteId(instituteId) {
     if (!instituteId || instituteId <= 0) {
@@ -105,12 +89,6 @@ var CourseService = (function () {
 
   /**
    * Create new course
-   * Backend: [HttpPost] CreateNewRecord
-   * @param {object} courseData - Course data
-   * @returns {Promise<object>}
-   * 
-   * @example
-   * const newCourse = await CourseService.create(courseData);
    */
   async function create(courseData) {
     if (!courseData) {
@@ -127,13 +105,6 @@ var CourseService = (function () {
 
   /**
    * Update existing course
-   * Backend: [HttpPut] UpdateCourse
-   * @param {number} id - Course ID
-   * @param {object} courseData - Course data
-   * @returns {Promise<object>}
-   * 
-   * @example
-   * const updated = await CourseService.update(123, courseData);
    */
   async function update(id, courseData) {
     if (!id || id <= 0) {
@@ -154,13 +125,6 @@ var CourseService = (function () {
 
   /**
    * Delete course
-   * Backend: [HttpDelete] DeleteCourse
-   * @param {number} id - Course ID
-   * @param {object} courseData - Course data (for audit)
-   * @returns {Promise<void>}
-   * 
-   * @example
-   * await CourseService.delete(123, courseData);
    */
   async function deleteCourse(id, courseData) {
     if (!id || id <= 0) {
@@ -168,10 +132,28 @@ var CourseService = (function () {
     }
 
     try {
-      // Backend expects course data in body for delete operation
-      return await ApiCallManager.delete(`${_config.endpoints.base}/${id}`, {
-        data: courseData
+      // Backend expects DELETE with body
+      const baseUrl = typeof baseApi !== 'undefined' ? baseApi : '';
+      const response = await fetch(baseUrl + `${_config.endpoints.base}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + (typeof AppConfig !== 'undefined' && AppConfig.getToken ? AppConfig.getToken() : localStorage.getItem('jwtToken') || '')
+        },
+        body: JSON.stringify(courseData)
       });
+
+      if (!response.ok) {
+        throw new Error('Delete failed');
+      }
+
+      const data = await response.json();
+
+      if (data.IsSuccess) {
+        return data.Data;
+      } else {
+        throw new Error(data.Message || 'Delete failed');
+      }
     } catch (error) {
       console.error('CourseService.delete error:', error);
       throw error;
@@ -179,12 +161,7 @@ var CourseService = (function () {
   }
 
   /**
-   * Smart Save or Update (auto-detect create/update)
-   * @param {object} courseData - Course data
-   * @returns {Promise<object>}
-   * 
-   * @example
-   * const result = await CourseService.saveOrUpdate(courseData);
+   * Smart Save or Update
    */
   async function saveOrUpdate(courseData) {
     if (!courseData) {
@@ -206,15 +183,33 @@ var CourseService = (function () {
 
   /**
    * Get Kendo Grid DataSource
-   * Backend: [HttpPost] SummaryGrid
-   * @param {object} config - Grid configuration (optional)
-   * @returns {kendo.data.DataSource}
-   * 
-   * @example
-   * const dataSource = CourseService.getGridDataSource({ pageSize: 50 });
-   * $('#grid').kendoGrid({ dataSource: dataSource });
    */
   function getGridDataSource(config) {
+    // Check if ApiCallManager exists
+    if (typeof ApiCallManager === 'undefined') {
+      console.error('ApiCallManager not loaded! Using VanillaApiCallManager as fallback.');
+
+      // Fallback to VanillaApiCallManager
+      if (typeof VanillaApiCallManager !== 'undefined') {
+        const baseUrl = typeof baseApi !== 'undefined' ? baseApi : '';
+        return VanillaApiCallManager.GenericGridDataSource({
+          apiUrl: baseUrl + _config.endpoints.summary,
+          requestType: 'POST',
+          async: true,
+          modelFields: _config.modelFields,
+          pageSize: config?.pageSize || 20,
+          serverPaging: true,
+          serverSorting: true,
+          serverFiltering: true,
+          allowUnsort: true,
+          schemaData: 'Data.Items',
+          schemaTotal: 'Data.TotalCount'
+        });
+      }
+
+      throw new Error('No API manager available');
+    }
+
     const gridConfig = Object.assign({}, {
       endpoint: _config.endpoints.summary,
       pageSize: 20,
@@ -229,10 +224,6 @@ var CourseService = (function () {
 
   /**
    * Refresh grid data
-   * @param {string} gridId - Grid element ID (optional, uses default)
-   * 
-   * @example
-   * CourseService.refreshGrid();
    */
   function refreshGrid(gridId) {
     const id = gridId || _config.gridId;
@@ -246,32 +237,35 @@ var CourseService = (function () {
   }
 
   // ============================================
-  // PUBLIC - With Confirmation & UI Integration
+  // PUBLIC - With Confirmation (if MessageManager available)
   // ============================================
 
   /**
    * Create with confirmation dialog
-   * @param {object} courseData - Course data
-   * @param {object} options - Options { onSuccess, onError }
-   * @returns {Promise<object>}
-   * 
-   * @example
-   * await CourseService.createWithConfirm(courseData, {
-   *   onSuccess: () => { console.log('Created!'); }
-   * });
    */
   async function createWithConfirm(courseData, options) {
     options = options || {};
 
-    return await MessageManager.confirm.save(async () => {
-      const result = await MessageManager.loading.wrap(
-        create(courseData),
-        'Creating course...'
-      );
+    // Check if MessageManager available
+    if (typeof MessageManager !== 'undefined' && MessageManager.confirm) {
+      return await MessageManager.confirm.save(async () => {
+        const result = await MessageManager.loading.wrap(
+          create(courseData),
+          'Creating course...'
+        );
 
-      MessageManager.notify.success('Course created successfully!');
+        MessageManager.notify.success('Course created successfully!');
+        refreshGrid();
 
-      // Refresh grid
+        if (options.onSuccess) {
+          options.onSuccess(result);
+        }
+
+        return result;
+      }, options.onCancel);
+    } else {
+      // Fallback without MessageManager
+      const result = await create(courseData);
       refreshGrid();
 
       if (options.onSuccess) {
@@ -279,31 +273,34 @@ var CourseService = (function () {
       }
 
       return result;
-    }, options.onCancel);
+    }
   }
 
   /**
    * Update with confirmation dialog
-   * @param {number} id - Course ID
-   * @param {object} courseData - Course data
-   * @param {object} options - Options { onSuccess, onError }
-   * @returns {Promise<object>}
-   * 
-   * @example
-   * await CourseService.updateWithConfirm(123, courseData);
    */
   async function updateWithConfirm(id, courseData, options) {
     options = options || {};
 
-    return await MessageManager.confirm.update(async () => {
-      const result = await MessageManager.loading.wrap(
-        update(id, courseData),
-        'Updating course...'
-      );
+    if (typeof MessageManager !== 'undefined' && MessageManager.confirm) {
+      return await MessageManager.confirm.update(async () => {
+        const result = await MessageManager.loading.wrap(
+          update(id, courseData),
+          'Updating course...'
+        );
 
-      MessageManager.notify.success('Course updated successfully!');
+        MessageManager.notify.success('Course updated successfully!');
+        refreshGrid();
 
-      // Refresh grid
+        if (options.onSuccess) {
+          options.onSuccess(result);
+        }
+
+        return result;
+      }, options.onCancel);
+    } else {
+      // Fallback without MessageManager
+      const result = await update(id, courseData);
       refreshGrid();
 
       if (options.onSuccess) {
@@ -311,47 +308,42 @@ var CourseService = (function () {
       }
 
       return result;
-    }, options.onCancel);
+    }
   }
 
   /**
    * Delete with confirmation dialog
-   * @param {number} id - Course ID
-   * @param {object} courseData - Course data
-   * @param {object} options - Options { onSuccess, onError }
-   * @returns {Promise<void>}
-   * 
-   * @example
-   * await CourseService.deleteWithConfirm(123, courseData);
    */
   async function deleteWithConfirm(id, courseData, options) {
     options = options || {};
 
-    return await MessageManager.confirm.delete('course', async () => {
-      await MessageManager.loading.wrap(
-        deleteCourse(id, courseData),
-        'Deleting course...'
-      );
+    if (typeof MessageManager !== 'undefined' && MessageManager.confirm) {
+      return await MessageManager.confirm.delete('course', async () => {
+        await MessageManager.loading.wrap(
+          deleteCourse(id, courseData),
+          'Deleting course...'
+        );
 
-      MessageManager.notify.success('Course deleted successfully!');
+        MessageManager.notify.success('Course deleted successfully!');
+        refreshGrid();
 
-      // Refresh grid
+        if (options.onSuccess) {
+          options.onSuccess();
+        }
+      }, options.onCancel);
+    } else {
+      // Fallback without MessageManager
+      await deleteCourse(id, courseData);
       refreshGrid();
 
       if (options.onSuccess) {
         options.onSuccess();
       }
-    }, options.onCancel);
+    }
   }
 
   /**
-   * Save or Update with confirmation (smart operation)
-   * @param {object} courseData - Course data
-   * @param {object} options - Options { onSuccess, onError }
-   * @returns {Promise<object>}
-   * 
-   * @example
-   * await CourseService.saveOrUpdateWithConfirm(courseData);
+   * Save or Update with confirmation
    */
   async function saveOrUpdateWithConfirm(courseData, options) {
     const isCreate = !courseData.CourseId || courseData.CourseId === 0;
@@ -424,4 +416,8 @@ if (typeof console !== 'undefined' && console.log) {
     '%c[CourseService] ✓ Loaded successfully',
     'color: #2196F3; font-weight: bold; font-size: 12px;'
   );
+
+  if (console.table) {
+    console.table(CourseService.getInfo());
+  }
 }

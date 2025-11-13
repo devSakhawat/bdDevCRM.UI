@@ -29,6 +29,7 @@ $(document).ready(function () {
 
   // Initialize components
   try {
+    debugger;
     CourseSummaryHelper.initCourseSummary();
     CourseDetailsHelper.intCourseDetails();
 

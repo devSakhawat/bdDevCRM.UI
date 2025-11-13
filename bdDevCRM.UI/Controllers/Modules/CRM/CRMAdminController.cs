@@ -2,19 +2,14 @@
 
 namespace bdDevCRM.UI.Controllers.Modules.CRM;
 
+[Route("CRMAdmin")]
 public class CRMAdminController : Controller
 {
 
+  [Route("CRMCourse")]
   public ActionResult CRMCourse()
   {
-    //if (Session["CurrentUser"] != null)
-    //{
-    return View("../CRM/CRMAdmin/CRMCourse/Course");
-    //}
-    //else
-    //{
-    //    return RedirectToAction("Logoff", "Home");
-    //}
+    return View("~/Views/CRM/CRMAdmin/CRMCourse/Course.cshtml");
   }
 
   public ActionResult CRMInstitute()

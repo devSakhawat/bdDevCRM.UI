@@ -1,184 +1,13 @@
-﻿var menuSummaryManager = {
+﻿///*=========================================================
+// * Menu Summary Details
+// * File: MenuSummary.js
+// * Description: CMenu Summary Details
+// * Author: devSakhawat
+// * Date: 2025-01-13
+//=========================================================*/
 
-  getSummaryGridDataSource: function () {
-    return AjaxManager.GenericGridDataSource({
-      apiUrl: baseApi + "/menu-summary",
-      requestType: "POST",
-      async: true,
-      //contentType: "application/json; charset=utf-8",
-      modelFields: {
-        createdDate: { type: "date" }
-      },
-      pageSize: 15,
-      serverPaging: true,
-      serverSorting: true,
-      serverFiltering: true,
-      allowUnsort: true,
-      schemaData: "Items", 
-      schemaTotal: "TotalCount" 
-    });
-  },
-
-  getMenuSummaryGridDataSource2: function () {
-    debugger;
-    return AjaxManager.GenericGridDataSource({
-      apiUrl: baseApi + "/menu-summary",
-      requestType: "POST",
-      async: true, 
-      contentType: "application/json; charset=utf-8",
-      modelFields: {
-        createdDate: { type: "date" },
-        //updateDate: { type: "date" },
-        //historyDate: { type: "date" }
-      },
-      pageSize: 15,
-      //serverPaging: true,
-      //serverSorting: true,
-      //allowUnsort: true,
-      //schemaData: "items", // Name from your API response
-      //schemaTotal: "totalCount", // Name from your API response
-      //async: false
-    });
-  },
-
-  gridDataSourceForHistory: function (menuId) {
-
-    var apiUrl = coreManagement + "/Menu/GetMenuHistorySummary/?menuId=" + menuId;
-
-    var gridDataSource = new kendo.data.DataSource({
-      type: "json",
-      serverPaging: true,
-      serverSorting: false,
-      serverFiltering: true,
-      allowUnsort: false,
-      pageSize: 10,
-      transport: {
-        read: {
-          url: apiUrl,
-          type: "POST",
-          dataType: "json",
-          async: false,
-          contentType: "application/json; charset=utf-8"
-        },
-        parameterMap: function (options) {
-          return JSON.stringify(options);
-        }
-      },
-      schema: {
-        data: "items", total: "totalCount",
-        model: {
-          fields: {
-            createdDate: {
-              type: "date"
-            },
-            //updateDate: {
-            //  type: "date"
-            //},
-            //historyDate: {
-            //  type: "date"
-            //},
-
-          }
-        }
-      }
-    });
-
-    return gridDataSource;
-  },
-};
-
-var MenuSummaryHelper = {
-
-  initMenuSummary: function () {
-    debugger;
-    MenuSummaryHelper.initializeSummaryGrid();
-
-    //MenuSummaryHelper.GenerateSummaryGrid();
-
-  },
-
-  initializeSummaryGrid: function () {
-    debugger;
-    const gridOptions = {
-      toolbar: [
-        { template: '<button type="button" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text"> + Create New </span></button>' },
-        { name: "excel" },
-        { name: "pdf" },
-        { template: '<button type="button" id="btnExportCsv" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
-
-      ],
-      excel: {
-        fileName: "MenuExport.xlsx",
-        filterable: true,
-        allPages: true,
-        columnInfo: true,
-      },
-      pdf: {
-          fileName: "Menu_Information.pdf",
-          allPages: true,
-          paperSize: "A4",
-          landscape: true,
-          margin: { top: "1cm", right: "1cm", bottom: "1cm", left: "1cm" },
-          scale: 0.9, // Slight scaling to prevent overflow
-          repeatHeaders: true,
-          columns: [
-             { field: "Name", width: 150 },
-             { field: "ParentMenu", width: 120 },
-             { field: "ModuleName", width: 150 },
-             { field: "Type", width: 80 },
-             { field: "Status", width: 80 }
-          ],
-          // Custom styles for PDF export
-          styles: [
-             {
-                type: "text",
-                style: {
-                   fontFamily: "Helvetica",
-                   fontSize: 10
-                }
-             }
-          ]
-       },
-      dataSource: [],
-      pageable: {
-        refresh: true,
-        pageSizes: [10, 15, 20, 30, 50],
-        buttonCount: 5,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      },
-      height: 600,
-      filterable: true,
-      sortable: true,
-      columns: MenuSummaryHelper.GenerateColumns(),
-      editable: false, // Disable inline editing
-      navigatable: true, // Enable keyboard navigation
-      selectable: "row", // Enable row selection
-    };
-
-    // Initialize the Kendo Grid
-    $("#gridSummary").kendoGrid(gridOptions);
-
-    // If you need to attach an event handler to the button
-    $("#btnAddNew").on("click", function (e) {
-      e.preventDefault();
-      MenuDetailsHelper.AddNewInformation();
-    });
-
-    $("#btnExportCsv").on("click", function () {
-      debugger;
-      AjaxManager.GenerateCSVFileAllPages("gridSummary", "MenuListCSV", "Actions");
-    });
-
-    // Fetch and set the data source after the grid is initialized
-    const gridInstance = $("#gridSummary").data("kendoGrid");
-    if (gridInstance) {
-      const dataSource = menuSummaryManager.getSummaryGridDataSource();
-      gridInstance.setDataSource(dataSource);
-     }
-
-  },
+var MenuSummary = {
+  gridId: "menuGrid",
 
   GenerateColumns: function () {
     return columns = [
@@ -211,57 +40,247 @@ var MenuSummaryHelper = {
       {
         field: "Edit", title: "Actions", filterable: false, width: 200,
         template: `
-        <input type="button" class="btn btn-outline-success widthSize30_per" style="cursor: pointer;" value="View" id="btnView" onClick="MenuSummaryHelper.clickEventForViewButton(event)"/>
-        <input type="button" class="btn btn-outline-dark widthSize30_per" style="cursor: pointer;" value="Edit" id="btnEdit" onClick="MenuSummaryHelper.clickEventForEditButton(event)"/>
-        <input type="button" class="btn btn-outline-danger widthSize33_per" style="cursor: pointer;" value="Delete" id="btnDelete" onClick="MenuSummaryHelper.clickEventForDeleteButton(event)"/>`
+        <input type="button" class="btn btn-outline-success widthSize30_per" style="cursor: pointer;" value="View" id="btnView" onClick="MenuDetails.clickEventForViewButton(event)"/>
+        <input type="button" class="btn btn-outline-dark widthSize30_per" style="cursor: pointer;" value="Edit" id="btnEdit" onClick="MenuSummary.edit(#:MenuId#)"/>
+        <input type="button" class="btn btn-outline-danger widthSize33_per" style="cursor: pointer;" value="Delete" id="btnDelete" onClick="MenuDetails.clickEventForDeleteButton(event)"/>`
         , sortable: false, exportable: false
       }
     ];
   },
 
-  clickEventForViewButton: function (e) {
-    debugger;
-
-    var grid = $("#gridSummary").data("kendoGrid");
-    var row = $(e.target).closest("tr");
-    var dataItem = grid.dataItem(row);
-
-    if (dataItem) {
-      MenuDetailsHelper.PopulateObject(dataItem);
-      CommonManager.MakeFormReadOnly("#divdetailsForDetails");
-    }
-
+  loadGrid: function () {
+    GridHelper.generateKendoGrid(this.gridId, {
+      columns: MenuSummary.GenerateColumns(),
+      dataSource: {
+        transport: {
+          read: {
+            url: "/CRM/Menu/GetAll",
+            dataType: "json"
+          }
+        }
+      }
+    });
   },
 
-  clickEventForDeleteButton: function (e) {
-    debugger;
-
-    var grid = $("#gridSummary").data("kendoGrid");
-    var row = $(e.target).closest("tr");
-    var dataItem = grid.dataItem(row);
-
-    if (dataItem) {
-      MenuDetailsManager.DeleteData(dataItem);
-    }
+  refresh: function () {
+    GridHelper.refreshGrid(this.gridId);
   },
 
-  clickEventForEditButton: function (e) {
-    debugger;
-     $("#btnSave").text("Update");
-     console.log($("#btnSave").text());
-
-    // not working
-    //var entityGrid = $("#gridMenu").data("kendoGrid");
-    //var selectedItem = entityGrid.dataItem(entityGrid.select());
-
-    var grid = $("#gridSummary").data("kendoGrid");
-    var row = $(e.target).closest("tr");
-    var dataItem = grid.dataItem(row);
-
-    if (dataItem) {
-      CommonManager.MakeFormEditable("#divdetailsForDetails");
-      MenuDetailsHelper.PopulateObject(dataItem);
-    }
-  },
-
+  edit: function (id) {
+    MenuDetails.loadData(id);
+  }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//var CourseSummaryManager = {
+
+//  /**
+//   * Get summary grid data source (using CourseService)
+//   */
+//  getSummaryCourseGridDataSource: function () {
+//    return CourseService.getGridDataSource({
+//      pageSize: 20
+//    });
+//  }
+//};
+
+//var CourseSummaryHelper = {
+
+//  initCourseSummary: function () {
+//    this.initializeSummaryGrid();
+//  },
+
+//  initializeSummaryGrid: function () {
+//    var Columns = this.generateColumns();
+//    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(Columns);
+//    var containerWidth = $('#divSummary').width() || (window.innerWidth - 323);
+//    var gridWidth = totalColumnsWidth > containerWidth ? '100%' : `${totalColumnsWidth}px`;
+
+//    const gridOptions = {
+//      toolbar: [
+//        { template: '<button type="button" id="btnAddNewCourse" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base" onclick="CourseDetailsHelper.openCoursePopUp()"><span class="k-icon k-i-plus"></span> Add New</button>' },
+//        { name: 'excel' },
+//        { name: 'pdf' },
+//        { template: '<button type="button" id="btnExportCsvCourse" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">Export to CSV</span></button>' }
+//      ],
+//      excel: {
+//        fileName: 'CourseList' + Date.now() + '.xlsx',
+//        filterable: true,
+//        allPages: true,
+//        columnInfo: true,
+//      },
+//      pdf: {
+//        fileName: 'Course_Information.pdf',
+//        allPages: true,
+//        paperSize: 'A4',
+//        landscape: true,
+//        margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' },
+//        scale: 0.9,
+//        repeatHeaders: true,
+//        columns: [
+//          { field: 'CourseTitle', width: 200 }
+//        ]
+//      },
+//      dataSource: [],
+//      autoBind: true,
+//      navigatable: true,
+//      scrollable: true,
+//      resizable: true,
+//      width: gridWidth,
+//      filterable: true,
+//      sortable: true,
+//      pageable: {
+//        refresh: true,
+//        pageSizes: [10, 20, 30, 50, 100],
+//        buttonCount: 5,
+//        input: false,
+//        numeric: true,
+//        serverPaging: true,
+//        serverFiltering: true,
+//        serverSorting: true
+//      },
+//      columns: Columns,
+//      editable: false,
+//      selectable: 'row'
+//    };
+
+//    $('#gridSummaryCourse').kendoGrid(gridOptions);
+
+//    $('#btnExportCsvCourse').on('click', function () {
+//      CommonManager.GenerateCSVFileAllPages('gridSummaryCourse', 'CourseListCSV', 'Actions');
+//    });
+
+//    const grid = $('#gridSummaryCourse').data('kendoGrid');
+//    if (grid) {
+//      // Get DataSource from CourseService
+//      const ds = CourseSummaryManager.getSummaryCourseGridDataSource();
+//      grid.setDataSource(ds);
+//    }
+//  },
+
+//  generateColumns: function () {
+//    return [
+//      { field: 'CourseId', hidden: true },
+//      { field: 'InstituteId', hidden: true },
+//      { field: 'CurrencyId', hidden: true },
+//      { field: 'CourseTitle', title: 'Title', width: '200px' },
+//      { field: 'InstituteName', title: 'Institute', width: '150px' },
+//      { field: 'CourseLevel', title: 'Level', width: '100px' },
+//      { field: 'CourseFee', title: 'Course Fee', width: '100px' },
+//      { field: 'ApplicationFee', title: 'Application Fee', width: '100px' },
+//      { field: 'MonthlyLivingCost', title: 'Monthly Living Cost', width: '120px' },
+//      { field: 'StartDate', title: 'Start Date', width: '120px', template: "#= kendo.toString(StartDate, 'yyyy-MM-dd') #" },
+//      { field: 'EndDate', title: 'End Date', width: '120px', template: "#= kendo.toString(EndDate, 'yyyy-MM-dd') #" },
+//      { field: 'Status', title: 'Status', width: '80px', template: "#= Status ? 'Active' : 'Inactive' #" },
+//      {
+//        field: 'Action',
+//        title: '#',
+//        filterable: false,
+//        width: '230px',
+//        template: `
+//          <input type="button" class="btn btn-outline-success widthSize30_per"
+//              value="View" onClick="CourseSummaryHelper.clickEventForViewButton(event)" />
+//          <input type="button" class="btn btn-outline-dark me-1 widthSize30_per"
+//              value="Edit" onClick="CourseSummaryHelper.clickEventForEditButton(event)" />
+//          <input type="button" class="btn btn-outline-danger widthSize33_per"
+//              value="Delete" onClick="CourseSummaryHelper.clickEventForDeleteButton(event)" />
+//        `
+//      }
+//    ];
+//  },
+
+//  _getGridItem: function (event) {
+//    const grid = $('#gridSummaryCourse').data('kendoGrid');
+//    const tr = $(event.target).closest('tr');
+//    return grid.dataItem(tr);
+//  },
+
+//  clickEventForViewButton: function (event) {
+//    const item = this._getGridItem(event);
+//    if (item) {
+//      CourseDetailsHelper.clearForm();
+//      const windowId = 'CoursePopUp';
+//      CommonManager.openKendoWindow(windowId, 'View Course', '80%');
+//      CommonManager.appandCloseButton(windowId);
+//      CourseDetailsHelper.populateObject(item);
+//      CommonManager.MakeFormReadOnly('#CourseForm');
+//      $('#btnCourseSaveOrUpdate').prop('disabled', true);
+//    }
+//  },
+
+//  clickEventForEditButton: function (event) {
+//    const item = this._getGridItem(event);
+//    if (item) {
+//      // Clear form first but don't destroy ComboBox dataSource
+//      CourseDetailsHelper.clearForm();
+
+//      const windowId = 'CoursePopUp';
+//      CommonManager.openKendoWindow(windowId, 'Edit Course', '80%');
+//      CommonManager.appandCloseButton(windowId);
+
+//      // Ensure ComboBoxes are initialized before populating
+//      const ensureComboBoxInit = () => {
+//        const instituteCombo = $('#cmbInstitute_Course').data('kendoComboBox');
+//        const currencyCombo = $('#cmbCurrency_Course').data('kendoComboBox');
+
+//        if (!instituteCombo || !currencyCombo) {
+//          // Re-initialize if ComboBoxes are not found
+//          CourseDetailsHelper.generateInstituteCombo();
+//          CourseDetailsHelper.generateCurrencyCombo();
+//          setTimeout(() => CourseDetailsHelper.populateObject(item), 200);
+//        } else {
+//          CourseDetailsHelper.populateObject(item);
+//        }
+//      };
+
+//      // Small delay to ensure popup is fully opened
+//      setTimeout(ensureComboBoxInit, 100);
+
+//      CommonManager.MakeFormEditable('#CourseForm');
+//    }
+//  },
+
+//  clickEventForDeleteButton: function (event) {
+//    const item = this._getGridItem(event);
+//    if (item) {
+//      CourseDetailsManager.deleteItem(item);
+//    }
+//  },
+
+//  afterInstituteChanged: function () {
+//    if (typeof CourseDetailsHelper !== 'undefined') {
+//      CourseDetailsHelper.refreshInstituteCombo();
+//    }
+//  },
+
+//  afterCurrencyChanged: function () {
+//    if (typeof CourseDetailsHelper !== 'undefined') {
+//      CourseDetailsHelper.refreshCurrencyCombo();
+//    }
+//  }
+//};

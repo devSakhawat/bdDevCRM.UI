@@ -466,22 +466,6 @@ var ApiCallManager = (function () {
   // PUBLIC - Grid DataSource Builder
   // ============================================
 
-  /**
-   * Create Kendo Grid DataSource (matching backend pattern)
-   * @param {object} config - DataSource configuration
-   * @returns {kendo.data.DataSource}
-   * 
-   * @example
-   * const dataSource = ApiCallManager.createGridDataSource({
-   *   endpoint: '/crm-course-summary',
-   *   pageSize: 20,
-   *   modelFields: {
-   *     CourseId: { type: 'number' },
-   *     CourseTitle: { type: 'string' },
-   *     StartDate: { type: 'date' }
-   *   }
-   * });
-   */
   function createGridDataSource(config) {
     if (!config || !config.endpoint) {
       throw new Error('ApiCallManager.createGridDataSource: endpoint is required');

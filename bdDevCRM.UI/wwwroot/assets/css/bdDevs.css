@@ -203,6 +203,10 @@ textarea {
   color: #444 !important;
 }
 
+.form-blocked {
+  pointer-events: none;
+  opacity: 0.6;
+}
 
 
 /************************ Responsive kendo grid with scroll bar *************************************/

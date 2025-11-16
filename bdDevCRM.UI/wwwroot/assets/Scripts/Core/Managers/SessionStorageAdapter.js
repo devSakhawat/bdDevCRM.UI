@@ -1,4 +1,8 @@
-﻿/*=========================================================
+﻿/// <reference path="apicallmanager.js" />
+/// <reference path="messagemanager.js" />
+
+
+/*=========================================================
  * Session Storage Adapter
  * File: SessionStorageAdapter.js
  * Description: SessionStorage wrapper with error handling

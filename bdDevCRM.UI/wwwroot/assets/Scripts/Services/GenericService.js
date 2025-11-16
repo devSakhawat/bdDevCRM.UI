@@ -1,4 +1,13 @@
-﻿var GenericService = {
+﻿
+///*=========================================================
+// * Generic Service
+// * File: GenericService.js
+// * Description: Generic CRUD service for all entities
+// * Author: devSakhawat
+// * Date: 2025-11-08
+//=========================================================*/
+
+var GenericService = {
   get: function (url, onSuccess, onError) {
     $.ajax({
       url: url,

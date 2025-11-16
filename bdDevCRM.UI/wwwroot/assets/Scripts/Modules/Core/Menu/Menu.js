@@ -19,7 +19,10 @@ var MenuModule = {
       pageSize: 20
     });
 
-    GridHelper.loadGrid('gridSummaryMenu', this.getColumns(), dataSource);
+    GridHelper.loadGrid('gridSummaryMenu', this.getColumns(), dataSource, 
+    {
+    toolbar: [ { template: '<button type="button" onclick="MenuModule.openNew()" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text"> + Create New </span></button>' } ]
+    });
   },
 
   getColumns: function () {

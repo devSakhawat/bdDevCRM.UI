@@ -15,7 +15,49 @@ var GridHelper = {
   * @param {kendo.data.DataSource | Array} dataSource - Grid data source
   * @param {Object} options - Extra grid options
   */
+ 
 
+  createGrid: function (gridId, dataSource, generateColumnsFunc, options = {}) {
+    if (!generateColumnsFunc || typeof generateColumnsFunc !== 'function') {
+      console.error('generateColumns function is required for grid:', gridId);
+      return;
+    }
+
+    var columns = generateColumnsFunc();
+    var totalColumnsWidth = GridHelper.calculateTotalColumnsWidth(columns);
+    var containerWidth = $('#' + gridId).width() || (window.innerWidth - 323);
+    var gridWidth = totalColumnsWidth > containerWidth ? '100%' : `${totalColumnsWidth}px`;
+
+    var gridOptions = Object.assign({
+      dataSource: dataSource,
+      toolbar: options.toolbar || [],
+      excel: options.excel || {},
+      pdf: options.pdf || {},
+      autoBind: true,
+      navigatable: true,
+      scrollable: true,
+      resizable: true,
+      width: gridWidth,
+      filterable: true,
+      sortable: true,
+      pageable: options.pageable || {
+        refresh: true,
+        pageSizes: [10, 20, 50, 100],
+        buttonCount: 5,
+        input: false,
+        numeric: true,
+        serverPaging: true,
+        serverFiltering: true,
+        serverSorting: true
+      },
+      columns: columns,
+      editable: false,
+      selectable: 'row'
+    }, options.extraOptions || {});
+
+    $('#' + gridId).kendoGrid(gridOptions);
+    return $('#' + gridId).data('kendoGrid');
+  },
 
   // Generic: Initialize any Kendo grid
   loadGrid: function (gridId, columns, dataSource = [], options = {}) {
@@ -39,7 +81,7 @@ var GridHelper = {
         buttonCount: 5,
         numeric: true
       },
-      toolbar: [],
+      toolbar: ["excel", "pdf", ...options.toolbar || []],
       width: gridWidth,
       editable: false,
       selectable: 'row',
@@ -74,48 +116,6 @@ var GridHelper = {
     });
     
     return items;
-  },
-
-  createGrid: function (gridId, dataSource, generateColumnsFunc, options = {}) {
-    if (!generateColumnsFunc || typeof generateColumnsFunc !== 'function') {
-      console.error('generateColumns function is required for grid:', gridId);
-      return;
-    }
-
-    var columns = generateColumnsFunc();
-    var totalColumnsWidth = CommonManager.calculateTotalColumnsWidth(columns);
-    var containerWidth = $('#' + gridId).width() || (window.innerWidth - 323);
-    var gridWidth = totalColumnsWidth > containerWidth ? '100%' : `${totalColumnsWidth}px`;
-
-    var gridOptions = Object.assign({
-      dataSource: dataSource,
-      toolbar: options.toolbar || [],
-      excel: options.excel || {},
-      pdf: options.pdf || {},
-      autoBind: true,
-      navigatable: true,
-      scrollable: true,
-      resizable: true,
-      width: gridWidth,
-      filterable: true,
-      sortable: true,
-      pageable: options.pageable || {
-        refresh: true,
-        pageSizes: [10, 20, 50, 100],
-        buttonCount: 5,
-        input: false,
-        numeric: true,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      },
-      columns: columns,
-      editable: false,
-      selectable: 'row'
-    }, options.extraOptions || {});
-
-    $('#' + gridId).kendoGrid(gridOptions);
-    return $('#' + gridId).data('kendoGrid');
   },
 
   // Refresh grid
@@ -309,7 +309,24 @@ var GridHelper = {
   bindGridEvent(gridSelector, event, callback) {
     const grid = $(gridSelector).data("kendoGrid");
     if (grid) grid.bind(event, callback);
-  }
+  },
+
+  calculateTotalColumnsWidth: function (columns) {
+    let totalWidthOfTheGrid = 0;
+    columns.forEach(column => {
+      if (column.width != undefined && column.width && !column.hidden) {
+        const widthValue = parseInt(column.width.toString().replace(/px|%/g, ''));
+        if (!isNaN(widthValue)) {
+          totalWidthOfTheGrid += widthValue;
+        }
+      }
+      else if (!column.hidden && !column.width) {
+        totalWidthOfTheGrid != 120;
+      }
+
+    });
+    return totalWidthOfTheGrid;
+  },
 };
 
 

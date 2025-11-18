@@ -4,43 +4,93 @@
 /// <reference path="../../../core/managers/apicallmanager.js" />
 /// <reference path="../../../core/managers/messagemanager.js" />
 
+/*=========================================================
+ * Menu Module (Complete CRUD with FormHelper)
+ * File: Menu.js
+ * Description: Menu management with FormHelper integration
+ * Author: devSakhawat
+ * Date: 2025-01-18
+=========================================================*/
+
 
 var MenuModule = {
-  init: function () {
-    this.initGrid();
-    this.initForm();
-    this.bindEvents();
+
+  // Configuration
+  config: {
+    gridId: 'gridSummaryMenu',
+    formId: 'menuForm',
+    modalId: 'MenuPopUp',
+    moduleComboId: 'cmbModule',
+    parentMenuComboId: 'cmbParentMenu'
   },
 
-  // Grid initialization
+  /**
+  * Initialize module
+  */
+  init: function () {
+    console.log('🔧 Initializing Menu Module...');
+    this.initGrid();
+    this.initModal();
+    this.initForm();
+
+    //this.bindEvents();
+  },
+
+  /**
+   * Initialize Kendo Grid
+   */
   initGrid: function () {
     const dataSource = ApiCallManager.createGridDataSource({
-      endpoint: '/menu-summary',
-      pageSize: 20
+      endpoint: AppConfig.endpoints.menuGrid || '/menu-summary',
+      pageSize: 20,
+      modelFields: {
+        MenuId: { type: 'number' },
+        ModuleId: { type: 'number' },
+        ParentMenu: { type: 'number' },
+        MenuName: { type: 'string' },
+        MenuPath: { type: 'string' },
+        ParentMenuName: { type: 'string' },
+        ModuleName: { type: 'string' },
+        MenuCode: { type: 'string' },
+        MenuType: { type: 'number' },
+        SortOrder: { type: 'number' },
+        IsQuickLink: { type: 'boolean' },
+        IsActive: { type: 'boolean' }
+      }
     });
 
-    GridHelper.loadGrid('gridSummaryMenu', this.getColumns(), dataSource, {
+    GridHelper.loadGrid(this.config.gridId, this.getColumns(), dataSource, {
       toolbar: [
         {
-          template: '<button type="button" onclick="MenuModule.openNew()" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">+ Create New</span></button>'
+          template: `<button type="button" onclick="MenuModule.openCreateModal()" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary">
+                      <span class="k-icon k-i-plus"></span>
+                      <span class="k-button-text">Create New</span>
+                    </button>`
         }
       ],
-      fileName: "Menu",
+      fileName: "MenuList",
       heightConfig: {
         headerHeight: 65,
         footerHeight: 50,
         paddingBuffer: 30
       }
-    });
 
-    // Enable auto resize
-    GridHelper.enableAutoResize('gridSummaryMenu', {
-      headerHeight: 65,
-      footerHeight: 50,
-      paddingBuffer: 30
+      //heightConfig: {
+      //  headerHeight: 65,
+      //  footerHeight: 50,
+      //  paddingBuffer: 30,
+      //  toolbarHeight: 45,
+      //  pagerHeight: 50,
+      //  gridHeaderHeight: 40,
+      //  rowHeight: 40,
+      //  minHeight: 300
+      //}
     });
   },
 
+  /**
+   * Get grid columns
+   */
   getColumns: function () {
     return columns = [
       { field: "MenuId", title: "Menu Id", width: 0, hidden: true },
@@ -83,11 +133,501 @@ var MenuModule = {
     ];
   },
 
-  // Form initialization
-  initForm: function () {
-    FormHelper.initForm('menuForm');
-    this.loadComboBoxes();
+  /**
+    * Initialize Kendo Window (Modal)
+    */
+  initModal: function () {
+    const modal = $('#' + this.config.modalId);
+    if (modal.length === 0) {
+      console.error('Modal element not found:', this.config.modalId);
+      return;
+    }
+
+    // Use FormHelper to initialize Kendo Window
+    if (typeof FormHelper !== 'undefined' && FormHelper.initKendoWindow) {
+      FormHelper.initKendoWindow('#' + this.config.modalId, 'Menu Details', '80%', '90%');
+    } else {
+      // Fallback manual initialization
+      modal.kendoWindow({
+        width: "80%",
+        maxHeight: "90%",
+        title: "Menu Details",
+        visible: false,
+        modal: true,
+        actions: ["Close"],
+        close: this.onModalClose.bind(this)
+      });
+    }
   },
+
+  /**
+   * Initialize Form with FormHelper
+   */
+  initForm: function () {
+    // Initialize form using FormHelper if available
+    if (typeof FormHelper !== 'undefined' && FormHelper.initForm) {
+      FormHelper.initForm(this.config.formId);
+    }
+
+    this.initComboBoxes();
+  },
+
+  /**
+   * Initialize ComboBoxes
+   */
+  initComboBoxes: function () {
+    // Module ComboBox
+    $('#' + this.config.moduleComboId).kendoComboBox({
+      placeholder: "Select Module...",
+      dataTextField: "ModuleName",
+      dataValueField: "ModuleId",
+      filter: "contains",
+      suggest: true,
+      dataSource: [],
+      change: this.onModuleChange.bind(this)
+    });
+
+    // Parent Menu ComboBox
+    $('#' + this.config.parentMenuComboId).kendoComboBox({
+      placeholder: "Select Parent Menu...",
+      dataTextField: "MenuName",
+      dataValueField: "MenuId",
+      filter: "contains",
+      suggest: true,
+      dataSource: []
+    });
+
+    // Load modules
+    this.loadModules();
+  },
+
+  /**
+   * Load modules for dropdown
+   */
+  loadModules: async function () {
+    try {
+      const modules = await MenuService.getModules();
+      const combo = $('#' + this.config.moduleComboId).data('kendoComboBox');
+      if (combo) {
+        combo.setDataSource(modules || []);
+      }
+    } catch (error) {
+      console.error('Error loading modules:', error);
+    }
+  },
+
+  /**
+    * On module change - load parent menus
+    */
+  onModuleChange: async function (e) {
+    const moduleId = e.sender.value();
+    if (!moduleId) return;
+
+    try {
+      const menus = await MenuService.getMenusByModuleId(moduleId);
+      const combo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
+      if (combo) {
+        combo.setDataSource(menus || []);
+      }
+    } catch (error) {
+      console.error('Error loading parent menus:', error);
+    }
+  },
+
+  /**
+   * Open modal for creating new menu
+   */
+  openCreateModal: function () {
+    // Clear form using FormHelper
+    this.clearForm();
+
+    // Open modal
+    this.openModal('Create New Menu');
+
+    // Set form mode
+    this.setFormMode('create');
+  },
+
+  /**
+   * View menu (read-only)
+   */
+  viewMenu: async function (menuId) {
+    if (!menuId || menuId <= 0) {
+      MessageManager.notify.warning('Invalid menu ID');
+      return;
+    }
+
+    try {
+      const menu = await MenuService.getById(menuId);
+
+      // Populate form using FormHelper
+      this.populateForm(menu);
+
+      // Open modal
+      this.openModal('View Menu Details');
+
+      // Set form to read-only using FormHelper
+      this.setFormMode('view');
+    } catch (error) {
+      console.error('Error loading menu:', error);
+    }
+  },
+
+  /**
+   * Edit menu
+   */
+  editMenu: async function (menuId) {
+    if (!menuId || menuId <= 0) {
+      MessageManager.notify.warning('Invalid menu ID');
+      return;
+    }
+
+    try {
+      const menu = await MenuService.getById(menuId);
+
+      // Populate form using FormHelper
+      this.populateForm(menu);
+
+      // Open modal
+      this.openModal('Edit Menu');
+
+      // Set form to editable
+      this.setFormMode('edit');
+    } catch (error) {
+      console.error('Error loading menu:', error);
+    }
+  },
+
+  /**
+   * Delete menu with confirmation
+   */
+  deleteMenu: async function (menuId) {
+    if (!menuId || menuId <= 0) {
+      MessageManager.notify.warning('Invalid menu ID');
+      return;
+    }
+
+    MessageManager.confirm.delete('this menu', async () => {
+      try {
+        await MessageManager.loading.wrap(
+          MenuService.delete(menuId),
+          'Deleting menu...'
+        );
+
+        MessageManager.notify.success('Menu deleted successfully!');
+        GridHelper.refreshGrid(this.config.gridId);
+      } catch (error) {
+        console.error('Delete error:', error);
+      }
+    });
+  },
+
+  /**
+   * Save or update menu
+   */
+  saveOrUpdate: async function () {
+    // Validate form using FormHelper
+    if (!this.validateForm()) {
+      return;
+    }
+
+    // Get form data using FormHelper
+    const menuData = this.getFormData();
+    const isCreate = !menuData.MenuId || menuData.MenuId === 0;
+
+    try {
+      if (isCreate) {
+        await MessageManager.loading.wrap(
+          MenuService.create(menuData),
+          'Creating menu...'
+        );
+        MessageManager.notify.success('Menu created successfully!');
+      } else {
+        await MessageManager.loading.wrap(
+          MenuService.update(menuData.MenuId, menuData),
+          'Updating menu...'
+        );
+        MessageManager.notify.success('Menu updated successfully!');
+      }
+
+      // Close modal
+      this.closeModal();
+
+      // Refresh grid
+      GridHelper.refreshGrid(this.config.gridId);
+    } catch (error) {
+      console.error('Save/Update error:', error);
+    }
+  },
+
+  /**
+  * Open modal
+  */
+  openModal: function (title) {
+    const window = $('#' + this.config.modalId).data('kendoWindow');
+    if (window) {
+      window.title(title || 'Menu Details');
+      window.center();
+      window.open();
+    }
+  },
+
+  /**
+   * Close modal
+   */
+  closeModal: function () {
+    const window = $('#' + this.config.modalId).data('kendoWindow');
+    if (window) {
+      window.close();
+    }
+  },
+
+  /**
+   * On modal close
+   */
+  onModalClose: function () {
+    this.clearForm();
+  },
+
+  /**
+   * Set form mode (create/edit/view)
+   */
+  setFormMode: function (mode) {
+    const form = $('#' + this.config.formId);
+    const saveBtn = $('#btnMenuSaveOrUpdate');
+
+    if (mode === 'view') {
+      form.find('input, select, textarea').prop('disabled', true);
+      form.find('.k-widget input').prop('disabled', true);
+      saveBtn.hide();
+    } else {
+      form.find('input, select, textarea').prop('disabled', false);
+      form.find('.k-widget input').prop('disabled', false);
+      saveBtn.show();
+
+      if (mode === 'create') {
+        saveBtn.html('<span class="k-icon k-i-plus"></span> Add Menu');
+      } else if (mode === 'edit') {
+        saveBtn.html('<span class="k-icon k-i-check"></span> Update Menu');
+      }
+    }
+  },
+
+  /**
+   * Open modal using FormHelper
+   */
+  openModal: function (title) {
+    if (typeof FormHelper !== 'undefined' && FormHelper.openKendoWindow) {
+      FormHelper.openKendoWindow(this.config.modalId, title || 'Menu Details', '80%', '90%');
+    } else {
+      // Fallback
+      const window = $('#' + this.config.modalId).data('kendoWindow');
+      if (window) {
+        window.title(title || 'Menu Details');
+        window.center();
+        window.open();
+      }
+    }
+  },
+
+  /**
+   * Close modal using FormHelper
+   */
+  closeModal: function () {
+    if (typeof FormHelper !== 'undefined' && FormHelper.closeKendoWindow) {
+      FormHelper.closeKendoWindow(this.config.modalId);
+    } else {
+      // Fallback
+      const window = $('#' + this.config.modalId).data('kendoWindow');
+      if (window) {
+        window.close();
+      }
+    }
+  },
+
+  /**
+   * On modal close
+   */
+  onModalClose: function () {
+    this.clearForm();
+  },
+
+  /**
+   * Set form mode (create/edit/view) using FormHelper
+   */
+  setFormMode: function (mode) {
+    const saveBtn = $('#btnMenuSaveOrUpdate');
+
+    if (mode === 'view') {
+      // Make form read-only using FormHelper
+      if (typeof FormHelper !== 'undefined' && FormHelper.makeFormReadOnly) {
+        FormHelper.makeFormReadOnly('#' + this.config.formId);
+      } else {
+        // Fallback
+        $('#' + this.config.formId).find('input, select, textarea').prop('disabled', true);
+        $('#' + this.config.formId).find('.k-widget input').prop('disabled', true);
+      }
+      saveBtn.hide();
+    } else {
+      // Make form editable using FormHelper
+      if (typeof FormHelper !== 'undefined' && FormHelper.makeFormEditable) {
+        FormHelper.makeFormEditable('#' + this.config.formId);
+      } else {
+        // Fallback
+        $('#' + this.config.formId).find('input, select, textarea').prop('disabled', false);
+        $('#' + this.config.formId).find('.k-widget input').prop('disabled', false);
+      }
+      saveBtn.show();
+
+      if (mode === 'create') {
+        saveBtn.html('<span class="k-icon k-i-plus"></span> Add Menu');
+      } else if (mode === 'edit') {
+        saveBtn.html('<span class="k-icon k-i-check"></span> Update Menu');
+      }
+    }
+  },
+
+  /**
+   * Clear form using FormHelper
+   */
+  clearForm: function () {
+    // Use FormHelper to clear form fields
+    if (typeof FormHelper !== 'undefined' && FormHelper.clearFormFields) {
+      FormHelper.clearFormFields('#' + this.config.formId);
+    } else {
+      // Fallback
+      const form = $('#' + this.config.formId)[0];
+      if (form) {
+        form.reset();
+      }
+    }
+
+    // Clear hidden fields
+    $('#hdMenuId').val(0);
+    $('#hdSortOrder').val(0);
+
+    // Clear ComboBoxes
+    const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
+    const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
+
+    if (moduleCbo) {
+      moduleCbo.value('');
+      moduleCbo.text('');
+    }
+
+    if (parentCbo) {
+      parentCbo.value('');
+      parentCbo.text('');
+      parentCbo.setDataSource([]);
+    }
+
+    // Uncheck checkbox
+    $('#chkIsQuickLink').prop('checked', false);
+  },
+
+  /**
+   * Populate form with data using FormHelper
+   */
+  populateForm: function (data) {
+    if (!data) return;
+
+    // Use FormHelper to set form data if available
+    if (typeof FormHelper !== 'undefined' && FormHelper.setFormData) {
+      FormHelper.setFormData('#' + this.config.formId, data);
+    } else {
+      // Fallback manual population
+      $('#hdMenuId').val(data.MenuId || 0);
+      $('#menu-name').val(data.MenuName || '');
+      $('#menu-path').val(data.MenuPath || '');
+      $('#hdSortOrder').val(data.SortOrder || 0);
+      $('#chkIsQuickLink').prop('checked', data.IsQuickLink || false);
+    }
+
+    // Set ComboBox values (ComboBoxes need manual handling)
+    const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
+    if (moduleCbo && data.ModuleId) {
+      moduleCbo.value(data.ModuleId);
+    }
+
+    // Set parent menu after loading parent menus for the module
+    if (data.ModuleId) {
+      MenuService.getMenusByModuleId(data.ModuleId).then(menus => {
+        const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
+        if (parentCbo) {
+          parentCbo.setDataSource(menus || []);
+          if (data.ParentMenu) {
+            setTimeout(() => parentCbo.value(data.ParentMenu), 100);
+          }
+        }
+      });
+    }
+  },
+
+  /**
+   * Get form data using FormHelper
+   */
+  getFormData: function () {
+    let formData;
+
+    // Use FormHelper to get form data if available
+    if (typeof FormHelper !== 'undefined' && FormHelper.getFormData) {
+      formData = FormHelper.getFormData('#' + this.config.formId);
+    } else {
+      // Fallback manual data collection
+      formData = {
+        MenuId: parseInt($('#hdMenuId').val()) || 0,
+        MenuName: $('#menu-name').val() || '',
+        MenuPath: $('#menu-path').val() || '',
+        SortOrder: parseInt($('#hdSortOrder').val()) || 0,
+        IsQuickLink: $('#chkIsQuickLink').is(':checked')
+      };
+    }
+
+    // Add ComboBox values (need manual handling)
+    const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
+    const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
+
+    formData.ModuleId = moduleCbo ? parseInt(moduleCbo.value()) || 0 : 0;
+    formData.ParentMenu = parentCbo ? parseInt(parentCbo.value()) || 0 : 0;
+
+    return formData;
+  },
+
+  /**
+   * Validate form using FormHelper
+   */
+  validateForm: function () {
+    // Use FormHelper validation if available
+    if (typeof FormHelper !== 'undefined' && FormHelper.validate) {
+      if (!FormHelper.validate('#' + this.config.formId)) {
+        return false;
+      }
+    }
+
+    // Additional custom validations
+    const data = this.getFormData();
+
+    if (!data.MenuName || data.MenuName.trim() === '') {
+      MessageManager.notify.error('Menu name is required');
+      $('#menu-name').focus();
+      return false;
+    }
+
+    if (!data.ModuleId || data.ModuleId === 0) {
+      MessageManager.notify.error('Please select a module');
+      $('#' + this.config.moduleComboId).focus();
+      return false;
+    }
+
+    return true;
+  },
+
+
+  //// Form initialization
+  //initForm: function () {
+  //  FormHelper.initForm('menuForm');
+  //  this.loadComboBoxes();
+  //},
 
   loadComboBoxes: async function () {
     const modules = await MenuService.getModules();
@@ -178,8 +718,36 @@ var MenuModule = {
   }
 };
 
-// Initialize
-$(document).ready(() => MenuModule.init());
+// Initialize on document ready
+$(document).ready(function () {
+  // Check dependencies
+  if (typeof MenuService === 'undefined') {
+    console.error('MenuService not loaded!');
+    return;
+  }
+
+  if (typeof ApiCallManager === 'undefined') {
+    console.error('ApiCallManager not loaded!');
+    return;
+  }
+
+  if (typeof MessageManager === 'undefined') {
+    console.error('MessageManager not loaded!');
+    return;
+  }
+
+  if (typeof FormHelper === 'undefined') {
+    console.warn('⚠️ FormHelper not loaded! Using fallback methods.');
+  }
+
+  if (typeof GridHelper === 'undefined') {
+    console.error('GridHelper not loaded!');
+    return;
+  }
+
+  // Initialize module
+  MenuModule.init();
+});
 
 
 //**কাকে ব্যবহার করে:**

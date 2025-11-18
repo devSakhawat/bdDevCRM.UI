@@ -9,35 +9,14 @@
 var GridHelper = {
 
   /**
-  * Initialize generic grid
-  * @param {string} gridSelector - Grid container selector (id/class)
-  * @param {Array} columns - Grid columns definition
-  * @param {kendo.data.DataSource | Array} dataSource - Grid data source
-  * @param {Object} options - Extra grid options
-  */
-
-  // Auto adjust grid height on window resize
-  enableAutoResize: function (gridId, heightConfig = {}) {
-    let resizeTimer;
-    $(window).on('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        const grid = $('#' + gridId).data('kendoGrid');
-        if (grid) {
-          const newHeight = this.calculateGridHeight(heightConfig);
-          grid.setOptions({ height: newHeight });
-        }
-      }, 250); // Debounce 250ms
-    });
-  },
-
-  // Calculate dynamic grid height based on window size
+     * Calculate dynamic grid height based on window size
+     */
   calculateGridHeight: function (options = {}) {
     const headerHeight = options.headerHeight || 65;
     const footerHeight = options.footerHeight || 50;
     const paddingBuffer = options.paddingBuffer || 30;
-    const toolbarHeight = options.toolbarHeight || 40;  // Grid toolbar
-    const pagerHeight = options.pagerHeight || 50;      // Grid pager
+    const toolbarHeight = options.toolbarHeight || 40;
+    const pagerHeight = options.pagerHeight || 50;
 
     const availableHeight = window.innerHeight
       - headerHeight
@@ -49,7 +28,75 @@ var GridHelper = {
     return availableHeight > 300 ? availableHeight : 300; // Minimum 300px
   },
 
-  // Generic: Initialize any Kendo grid
+  /**
+  * Calculate actual content height based on data rows
+  * @param {number} rowCount - Number of rows in grid
+  * @param {number} rowHeight - Height per row (default: 40px)
+  * @param {number} headerHeight - Grid header height (default: 40px)
+  * @param {number} pagerHeight - Pager height (default: 50px)
+  * @param {number} toolbarHeight - Toolbar height (default: 40px)
+  * @returns {number} Calculated height in pixels
+  */
+  calculateContentHeight: function (rowCount, options = {}) {
+    const rowHeight = options.rowHeight || 40;
+    const headerHeight = options.gridHeaderHeight || 40;
+    const pagerHeight = options.pagerHeight || 50;
+    const toolbarHeight = options.toolbarHeight || 40;
+    const minHeight = options.minHeight || 300;
+
+    // Total content height
+    const contentHeight = (rowCount * rowHeight) + headerHeight + pagerHeight + toolbarHeight + 20; // 20px padding
+
+    return contentHeight < minHeight ? minHeight : contentHeight;
+  },
+
+  /**
+   * Get optimal grid height
+   * Returns the smaller of: calculated window height OR actual content height
+   */
+  getOptimalGridHeight: function (rowCount, heightConfig = {}) {
+    const windowBasedHeight = this.calculateGridHeight(heightConfig);
+    const contentBasedHeight = this.calculateContentHeight(rowCount, heightConfig);
+
+    // Return the smaller height to avoid empty space
+    return Math.min(windowBasedHeight, contentBasedHeight);
+  },
+
+  /**
+  * Auto adjust grid height on window resize
+  */
+  enableAutoResize: function (gridId, heightConfig = {}) {
+    let resizeTimer;
+    $(window).on('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const grid = $('#' + gridId).data('kendoGrid');
+        if (grid) {
+          const rowCount = grid.dataSource.total();
+          const newHeight = this.getOptimalGridHeight(rowCount, heightConfig);
+          grid.setOptions({ height: newHeight });
+        }
+      }, 250);
+    });
+  },
+
+  /**
+  * Update grid height after data load
+  */
+  updateGridHeightAfterDataBound: function (gridId, heightConfig = {}) {
+    const grid = $('#' + gridId).data('kendoGrid');
+    if (!grid) return;
+
+    grid.bind('dataBound', function (e) {
+      const rowCount = e.sender.dataSource.total();
+      const optimalHeight = GridHelper.getOptimalGridHeight(rowCount, heightConfig);
+      e.sender.setOptions({ height: optimalHeight });
+    });
+  },
+
+  /**
+     * Initialize generic grid with dynamic height
+     */
   loadGrid: function (gridId, columns, dataSource = [], options = {}) {
     const $grid = $('#' + gridId);
     if ($grid.length === 0) return;
@@ -58,8 +105,11 @@ var GridHelper = {
     const totalColumnsWidth = columns.reduce((sum, col) => sum + (parseInt(col.width) || 100), 0);
     const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
 
-    // Dynamic height calculation
-    const gridHeight = this.calculateGridHeight(options.heightConfig || {});
+    // Initial height calculation (will be updated after data loads)
+    const initialHeight = this.calculateGridHeight(options.heightConfig || {});
+
+    const defaultExports = ["excel", "pdf"];
+    const finalToolbar = Array.isArray(options.toolbar) ? options.toolbar.concat(defaultExports) : defaultExports;
 
 
     const defaultOptions = {
@@ -85,20 +135,29 @@ var GridHelper = {
         buttonCount: 5,
         numeric: true
       },
-      toolbar: ["pdf", "excel",  ...(options.toolbar || [])],
-      height: gridHeight,
+      toolbar: finalToolbar,
+      //height: initialHeight,
       width: gridWidth,
       editable: false,
       selectable: 'row',
-      autoBind: true
+      autoBind: true,
+      dataBound: function (e) {
+        // Update height after data is loaded
+        const rowCount = e.sender.dataSource.total();
+        const heightConfig = options.heightConfig || {};
+        const optimalHeight = GridHelper.getOptimalGridHeight(rowCount, heightConfig);
+        e.sender.setOptions({ height: optimalHeight });
+      }
     };
 
-    //$grid.kendoGrid($.extend(true, {}, defaultOptions, options));
     const finalOptions = $.extend(true, {}, defaultOptions, options);
     delete finalOptions.heightConfig;
     delete finalOptions.fileName;
 
     $grid.kendoGrid(finalOptions);
+
+    //// Enable auto resize
+    //this.enableAutoResize(gridId, options.heightConfig || {});
   },
   
   // Get selected row from grid
@@ -396,6 +455,7 @@ var GridHelper = {
     if (grid) grid.bind(event, callback);
   },
 
+  // Calculate total columns width
   calculateTotalColumnsWidth: function (columns) {
     let totalWidthOfTheGrid = 0;
     columns.forEach(column => {
@@ -404,14 +464,12 @@ var GridHelper = {
         if (!isNaN(widthValue)) {
           totalWidthOfTheGrid += widthValue;
         }
+      } else if (!column.hidden && !column.width) {
+        totalWidthOfTheGrid += 120;
       }
-      else if (!column.hidden && !column.width) {
-        totalWidthOfTheGrid != 120;
-      }
-
     });
     return totalWidthOfTheGrid;
-  },
+  }
 };
 
 

@@ -421,10 +421,9 @@ var ApiCallManager = (function () {
     }
   }
 
-  // ============================================
+  // ================================================================
   // PUBLIC - Grid-Specific Method (matching CRMGridOptions)
-  // ============================================
-
+  // ================================================================
   /**
    * POST for Kendo Grid (matching backend CRMGridOptions pattern)
    * @param {string} endpoint - API endpoint (e.g., '/crm-course-summary')
@@ -465,23 +464,6 @@ var ApiCallManager = (function () {
   // ============================================
   // PUBLIC - Grid DataSource Builder
   // ============================================
-
-  /**
-   * Create Kendo Grid DataSource (matching backend pattern)
-   * @param {object} config - DataSource configuration
-   * @returns {kendo.data.DataSource}
-   * 
-   * @example
-   * const dataSource = ApiCallManager.createGridDataSource({
-   *   endpoint: '/crm-course-summary',
-   *   pageSize: 20,
-   *   modelFields: {
-   *     CourseId: { type: 'number' },
-   *     CourseTitle: { type: 'string' },
-   *     StartDate: { type: 'date' }
-   *   }
-   * });
-   */
   function createGridDataSource(config) {
     if (!config || !config.endpoint) {
       throw new Error('ApiCallManager.createGridDataSource: endpoint is required');
@@ -548,7 +530,6 @@ var ApiCallManager = (function () {
       serverFiltering: config.serverFiltering !== false,
       error: function (e) {
         console.error('DataSource Error:', e);
-
         // Handle xhr errors
         if (e.xhr) {
           try {

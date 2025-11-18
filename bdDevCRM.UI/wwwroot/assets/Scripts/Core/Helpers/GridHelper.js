@@ -16,66 +16,37 @@ var GridHelper = {
   * @param {Object} options - Extra grid options
   */
 
-  calculateGridHeight: function () {
-    const headerHeight = 70;       // Your header height
-    const footerHeight = window.AppFooterHeight || 0; // Future footer support
-    const extraPadding = 12;
-
-    return window.innerHeight - (headerHeight + footerHeight + extraPadding);
+  // Auto adjust grid height on window resize
+  enableAutoResize: function (gridId, heightConfig = {}) {
+    let resizeTimer;
+    $(window).on('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const grid = $('#' + gridId).data('kendoGrid');
+        if (grid) {
+          const newHeight = this.calculateGridHeight(heightConfig);
+          grid.setOptions({ height: newHeight });
+        }
+      }, 250); // Debounce 250ms
+    });
   },
 
-  applyDynamicGridHeight: function (gridId) {
-    const height = this.calculateGridHeight();
+  // Calculate dynamic grid height based on window size
+  calculateGridHeight: function (options = {}) {
+    const headerHeight = options.headerHeight || 65;
+    const footerHeight = options.footerHeight || 50;
+    const paddingBuffer = options.paddingBuffer || 30;
+    const toolbarHeight = options.toolbarHeight || 40;  // Grid toolbar
+    const pagerHeight = options.pagerHeight || 50;      // Grid pager
 
-    const wrapper = document.querySelector(`#${gridId}`).closest('.k-grid');
+    const availableHeight = window.innerHeight
+      - headerHeight
+      - footerHeight
+      - paddingBuffer
+      - toolbarHeight
+      - pagerHeight;
 
-    if (wrapper) {
-      wrapper.style.maxHeight = height + "px";
-      wrapper.style.height = "auto";
-      wrapper.style.overflowY = "auto";
-    }
-  },
-
-  createGrid: function (gridId, dataSource, generateColumnsFunc, options = {}) {
-    if (!generateColumnsFunc || typeof generateColumnsFunc !== 'function') {
-      console.error('generateColumns function is required for grid:', gridId);
-      return;
-    }
-
-    var columns = generateColumnsFunc();
-    var totalColumnsWidth = GridHelper.calculateTotalColumnsWidth(columns);
-    var containerWidth = $('#' + gridId).width() || (window.innerWidth - 323);
-    var gridWidth = totalColumnsWidth > containerWidth ? '100%' : `${totalColumnsWidth}px`;
-
-    var gridOptions = Object.assign({
-      dataSource: dataSource,
-      toolbar: options.toolbar || [],
-      excel: options.excel || {},
-      pdf: options.pdf || {},
-      autoBind: true,
-      navigatable: true,
-      scrollable: true,
-      resizable: true,
-      width: gridWidth,
-      filterable: true,
-      sortable: true,
-      pageable: options.pageable || {
-        refresh: true,
-        pageSizes: [10, 20, 50, 100],
-        buttonCount: 5,
-        input: false,
-        numeric: true,
-        serverPaging: true,
-        serverFiltering: true,
-        serverSorting: true
-      },
-      columns: columns,
-      editable: false,
-      selectable: 'row'
-    }, options.extraOptions || {});
-
-    $('#' + gridId).kendoGrid(gridOptions);
-    return $('#' + gridId).data('kendoGrid');
+    return availableHeight > 300 ? availableHeight : 300; // Minimum 300px
   },
 
   // Generic: Initialize any Kendo grid
@@ -87,7 +58,21 @@ var GridHelper = {
     const totalColumnsWidth = columns.reduce((sum, col) => sum + (parseInt(col.width) || 100), 0);
     const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
 
+    // Dynamic height calculation
+    const gridHeight = this.calculateGridHeight(options.heightConfig || {});
+
+
     const defaultOptions = {
+      pdf: {
+        fileName: (options.fileName || gridId) + "_" + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + ".pdf",
+        allPages: true,
+      },
+      excel: {
+        fileName: (options.fileName || gridId) + "_" + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + ".xlsx",
+        filterable: true,
+        allPages: true,
+        columnInfo: true,
+      },
       dataSource: dataSource,
       columns: columns,
       scrollable: true,
@@ -100,14 +85,20 @@ var GridHelper = {
         buttonCount: 5,
         numeric: true
       },
-      toolbar: ["excel", "pdf", ...options.toolbar || []],
+      toolbar: ["pdf", "excel",  ...(options.toolbar || [])],
+      height: gridHeight,
       width: gridWidth,
       editable: false,
       selectable: 'row',
       autoBind: true
     };
 
-    $grid.kendoGrid($.extend(true, {}, defaultOptions, options));
+    //$grid.kendoGrid($.extend(true, {}, defaultOptions, options));
+    const finalOptions = $.extend(true, {}, defaultOptions, options);
+    delete finalOptions.heightConfig;
+    delete finalOptions.fileName;
+
+    $grid.kendoGrid(finalOptions);
   },
   
   // Get selected row from grid
@@ -271,6 +262,49 @@ var GridHelper = {
       return html;
     };
   },
+
+  //// don't use now.
+  //createGrid: function (gridId, dataSource, generateColumnsFunc, options = {}) {
+  //  if (!generateColumnsFunc || typeof generateColumnsFunc !== 'function') {
+  //    console.error('generateColumns function is required for grid:', gridId);
+  //    return;
+  //  }
+
+  //  var columns = generateColumnsFunc();
+  //  var totalColumnsWidth = GridHelper.calculateTotalColumnsWidth(columns);
+  //  var containerWidth = $('#' + gridId).width() || (window.innerWidth - 323);
+  //  var gridWidth = totalColumnsWidth > containerWidth ? '100%' : `${totalColumnsWidth}px`;
+
+  //  var gridOptions = Object.assign({
+  //    dataSource: dataSource,
+  //    toolbar: options.toolbar || [],
+  //    excel: options.excel || {},
+  //    pdf: options.pdf || {},
+  //    autoBind: true,
+  //    navigatable: true,
+  //    scrollable: true,
+  //    resizable: true,
+  //    width: gridWidth,
+  //    filterable: true,
+  //    sortable: true,
+  //    pageable: options.pageable || {
+  //      refresh: true,
+  //      pageSizes: [20, 50, 100, 500, 1000],
+  //      buttonCount: 5,
+  //      input: false,
+  //      numeric: true,
+  //      serverPaging: true,
+  //      serverFiltering: true,
+  //      serverSorting: true
+  //    },
+  //    columns: columns,
+  //    editable: false,
+  //    selectable: 'row'
+  //  }, options.extraOptions || {});
+
+  //  $('#' + gridId).kendoGrid(gridOptions);
+  //  return $('#' + gridId).data('kendoGrid');
+  //},
 
   //createActionColumn: function (config) {
   //  const {

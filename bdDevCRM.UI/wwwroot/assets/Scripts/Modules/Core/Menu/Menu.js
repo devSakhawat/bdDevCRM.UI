@@ -19,9 +19,25 @@ var MenuModule = {
       pageSize: 20
     });
 
-    GridHelper.loadGrid('gridSummaryMenu', this.getColumns(), dataSource, 
-    {
-      //toolbar: [ { template: '<button type="button" onclick="MenuModule.openNew()" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text"> + Create New </span></button>' } ]
+    GridHelper.loadGrid('gridSummaryMenu', this.getColumns(), dataSource, {
+      toolbar: [
+        {
+          template: '<button type="button" onclick="MenuModule.openNew()" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text">+ Create New</span></button>'
+        }
+      ],
+      fileName: "Menu",
+      heightConfig: {
+        headerHeight: 65,
+        footerHeight: 50,
+        paddingBuffer: 30
+      }
+    });
+
+    // Enable auto resize
+    GridHelper.enableAutoResize('gridSummaryMenu', {
+      headerHeight: 65,
+      footerHeight: 50,
+      paddingBuffer: 30
     });
   },
 
@@ -63,27 +79,6 @@ var MenuModule = {
           deleteCallback: 'MenuModule.delete',
           viewCallback: 'MenuModule.view'
         })
-      }
-    ];
-  },
-
-  getColumns2: function () {
-    return [
-      { field: 'MenuId', hidden: true },
-      { field: 'MenuName', title: 'Name', width: 140 },
-      { field: 'ModuleName', title: 'Module', width: 120 },
-      {
-        field: 'Actions',
-        title: 'Actions',
-        width: 200,
-        template: GridHelper.createActionColumn({
-          edit: { show: true, callback: 'MenuModule.edit' },
-          delete: { show: true, callback: 'MenuModule.delete' }
-        }),
-        //template: GridHelper.generateActionButtons({
-        //  edit: { show: true, callback: 'MenuModule.edit' },
-        //  delete: { show: true, callback: 'MenuModule.delete' }
-        //})
       }
     ];
   },

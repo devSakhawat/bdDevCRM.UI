@@ -36,7 +36,7 @@ var AppConfig = (function () {
 
     // Grid Configuration
     grid: {
-      defaultPageSizes: [10, 20, 30, 50, 100],
+      defaultPageSizes: [20, 50, 100, 500, 1000],
       defaultHeight: 600,
       buttonCount: 5,
       defaultPageSize: 20
@@ -84,8 +84,9 @@ var AppConfig = (function () {
       modules: '/modules',
       modulesByGroupId: '/Groups-by-moduleId/',
 
-      // Menu
+      // Menus End Points
       menus: '/menus-by-moduleId',
+      menuGrid: '/menu-summary',
 
       // Access Control
       access: '/getaccess',

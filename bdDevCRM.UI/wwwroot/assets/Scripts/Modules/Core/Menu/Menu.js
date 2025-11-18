@@ -21,7 +21,7 @@ var MenuModule = {
 
     GridHelper.loadGrid('gridSummaryMenu', this.getColumns(), dataSource, 
     {
-    toolbar: [ { template: '<button type="button" onclick="MenuModule.openNew()" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text"> + Create New </span></button>' } ]
+      //toolbar: [ { template: '<button type="button" onclick="MenuModule.openNew()" id="btnAddNew" class="btn-primary k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"><span class="k-button-text"> + Create New </span></button>' } ]
     });
   },
 
@@ -58,7 +58,7 @@ var MenuModule = {
         title: "Actions",
         width: 200,
         template: GridHelper.createActionColumn({
-          idField: 'MenuId',  // ← Primary key specify
+          idField: 'MenuId',  // field value from gridDataSource.
           editCallback: 'MenuModule.edit',
           deleteCallback: 'MenuModule.delete',
           viewCallback: 'MenuModule.view'
@@ -115,6 +115,22 @@ var MenuModule = {
   openNew: function () {
     FormHelper.clearFormFields('menuForm');
     FormHelper.formShowGridHide('menuForm', 'menuGrid');
+  },
+
+  // View Menu
+  view: function (menuId) {
+    // Data From Grid
+    const grid = $('#gridSummaryMenu').data('kendoGrid');
+    const dataItem = grid.dataSource.get(menuId);  // ← ID দিয়ে data পাবেন
+
+    if (dataItem) {
+      // Details populate
+      FormHelper.setFormData('detailsForm', dataItem);
+      FormHelper.makeFormReadOnly('detailsForm');
+
+      // window open
+      FormHelper.openKendoWindow('detailsWindow', 'View Menu Details');
+    }
   },
 
   // Edit menu

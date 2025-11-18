@@ -15,7 +15,26 @@ var GridHelper = {
   * @param {kendo.data.DataSource | Array} dataSource - Grid data source
   * @param {Object} options - Extra grid options
   */
- 
+
+  calculateGridHeight: function () {
+    const headerHeight = 70;       // Your header height
+    const footerHeight = window.AppFooterHeight || 0; // Future footer support
+    const extraPadding = 12;
+
+    return window.innerHeight - (headerHeight + footerHeight + extraPadding);
+  },
+
+  applyDynamicGridHeight: function (gridId) {
+    const height = this.calculateGridHeight();
+
+    const wrapper = document.querySelector(`#${gridId}`).closest('.k-grid');
+
+    if (wrapper) {
+      wrapper.style.maxHeight = height + "px";
+      wrapper.style.height = "auto";
+      wrapper.style.overflowY = "auto";
+    }
+  },
 
   createGrid: function (gridId, dataSource, generateColumnsFunc, options = {}) {
     if (!generateColumnsFunc || typeof generateColumnsFunc !== 'function') {
@@ -223,51 +242,83 @@ var GridHelper = {
   // Create action column template
   createActionColumn: function (config) {
     const {
+      viewCallback = null,
       editCallback = null,
       deleteCallback = null,
-      viewCallback = null,
-      customButtons = [],
-      idField = 'Id'  // ← Default primary key field name
+      idField = 'Id'
     } = config;
 
     return function (dataItem) {
-      const id = dataItem[idField];  // ← Primary key value
-
-      let html = '<div class="btn-group btn-group" role="group">';
+      const id = dataItem[idField];
+      let html = '<div class="btn-group" role="group">';
 
       if (viewCallback) {
-        html += `<button type="button" class="btn btn-info btn" 
-               onclick="${viewCallback}(${id})">
-                <i class="fa fa-eye"></i> View
-              </button>`;
+        html += `<button type="button" class="btn btn-outline-success" 
+               onclick="${viewCallback}(${id})">View</button>`;
       }
 
       if (editCallback) {
-        html += `<button type="button" class="btn btn-primary btn" 
-               onclick="${editCallback}(${id})">
-                <i class="fa fa-edit"></i> Edit
-              </button>`;
+        html += `<button type="button" class="btn btn-outline-dark" 
+               onclick="${editCallback}(${id})">Edit</button>`;
       }
 
       if (deleteCallback) {
-        html += `<button type="button" class="btn btn-danger btn" 
-               onclick="${deleteCallback}(${id})">
-                <i class="fa fa-trash"></i> Delete
-              </button>`;
+        html += `<button type="button" class="btn btn-outline-danger" 
+               onclick="${deleteCallback}(${id})">Delete</button>`;
       }
-
-      // Custom buttons
-      customButtons.forEach(btn => {
-        html += `<button type="button" class="btn ${btn.class} btn" 
-               onclick="${btn.callback}(${id})">
-                <i class="${btn.icon}"></i>
-              </button>`;
-      });
 
       html += '</div>';
       return html;
     };
   },
+
+  //createActionColumn: function (config) {
+  //  const {
+  //    editCallback = null,
+  //    deleteCallback = null,
+  //    viewCallback = null,
+  //    customButtons = [],
+  //    idField = 'Id'  // ← Default primary key field name
+  //  } = config;
+
+  //  return function (dataItem) {
+  //    const id = dataItem[idField];  // ← Primary key value
+
+  //    let html = '<div class="btn-group btn-group" role="group">';
+
+  //    if (viewCallback) {
+  //      html += `<button type="button" class="btn btn-info btn" 
+  //             onclick="${viewCallback}(${id})">
+  //              <i class="fa fa-eye"></i> View
+  //            </button>`;
+  //    }
+
+  //    if (editCallback) {
+  //      html += `<button type="button" class="btn btn-outline-success widthSize30_per" 
+  //             onclick="${editCallback}(${id})">
+  //              <i class="fa fa-edit"></i> Edit
+  //            </button>`;
+  //    }
+
+  //    if (deleteCallback) {
+  //      html += `<button type="button" class="btn btn-danger btn" 
+  //             onclick="${deleteCallback}(${id})">
+  //              <i class="fa fa-trash"></i> Delete
+  //            </button>`;
+  //    }
+
+  //    // Custom buttons
+  //    customButtons.forEach(btn => {
+  //      html += `<button type="button" class="btn ${btn.class} btn" 
+  //             onclick="${btn.callback}(${id})">
+  //              <i class="${btn.icon}"></i>
+  //            </button>`;
+  //    });
+
+  //    html += '</div>';
+  //    return html;
+  //  };
+  //},
 
   formatCurrency: function(value, currencySymbol = '$') {
     if (!value) return `${currencySymbol}0.00`;

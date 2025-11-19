@@ -1,0 +1,376 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  @* <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /> *@
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Favicon icon-->
+  <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico" />
+
+
+  <!-- Libs CSS -->
+  <link href="~/assets/libs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="~/assets/libs/mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
+  <link href="~/assets/libs/simplebar/dist/simplebar.min.css" rel="stylesheet" />
+  <link href="~/assets/libs/toastr/toastr_2.1.4.min.css" rel="stylesheet" />
+
+  <!-- Kendo CSS -->
+  <link href="~/assets/kendo_2023_r1/styles/kendo.common.min.css" rel="stylesheet" />
+  <link href="~/assets/kendo_2023_r1/styles/kendo.default.min.css" rel="stylesheet" />
+  <link href="~/assets/kendo_2023_r1/styles/kendo.default.mobile.min.css" rel="stylesheet" />
+
+
+  <!-- common css -->
+  <link href="~/assets/css/commonsize.css" rel="stylesheet" />
+  <link href="~/assets/css/common.css" rel="stylesheet" />
+  <link rel="stylesheet" href="~/assets/css/theme.min.css">
+  <link href="~/assets/css/bddevs.css" rel="stylesheet" />
+
+  <!-- Scripts -->
+  <!-- Libs JS -->
+  @* <script src="~/assets/kendo_2023_r1/js/jquery.min.js"></script> *@
+  <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="~/assets/kendo_2023_r1/js/jszip.min.js"></script>
+
+
+
+  <title>bdDevs CRM System</title>
+</head>
+
+<body>
+  <!-- Wrapper -->
+  <main id="main-wrapper" class="main-wrapper">
+    <!-- Top Header -->
+    <div class="header">
+      <!-- header navbar -->
+      <div class="navbar-custom navbar navbar-expand-lg">
+        <div class="container-fluid px-0">
+         @*  <a class="navbar-brand d-block d-md-none" href="../index-2.html">
+            <img src="../assets/images/brand/logo/logo-2.svg" alt="Image" />
+          </a> *@
+
+          <!-- Brand logo -->
+          <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+            @* <img src="~/assets/images/logo/sountwels.png" alt="Brand Logo" class="bran-logo" /> *@
+            <img alt="Brand Logo" id="bran-logo" />
+          </a>
+          <a id="nav-toggle" href="#!" class="ms-auto ms-md-0 me-0 me-lg-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
+                 class="bi bi-text-indent-left text-muted" viewBox="0 0 16 16">
+              <path d="M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm.646 2.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L4.293 8 2.646 6.354a.5.5 0 0 1 0-.708zM7 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm-5 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z" />
+            </svg>
+          </a>
+
+          <div class="d-none d-md-none d-lg-block">
+            <!-- Form -->
+            <form action="#">
+              <div class="input-group">
+                <input class="form-control rounded-3 bg-transparent ps-9" type="search" value="" id="searchInput"
+                       placeholder="Search" />
+                <span class="position-absolute start-0">
+                  <button class="btn position-absolute start-0" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-search text-dark">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </button>
+                </span>
+              </div>
+            </form>
+          </div>
+
+
+          <!--Navbar nav -->
+          <ul class="navbar-nav navbar-right-wrap ms-lg-auto d-flex nav-top-wrap align-items-center ms-4 ms-lg-0">
+            <li>
+              <div class="dropdown">
+                <button class="btn btn-ghost btn-icon rounded-circle" id="theme-toggle" type="button" aria-expanded="false"
+                        data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+                  <i class="bi theme-icon-active"></i>
+                  <span class="visually-hidden bs-theme-text">Toggle theme</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bs-theme-text">
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light"
+                            aria-pressed="false">
+                      <i class="bi theme-icon bi-sun-fill"></i>
+                      <span class="ms-2">Light</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark"
+                            aria-pressed="false">
+                      <i class="bi theme-icon bi-moon-stars-fill"></i>
+                      <span class="ms-2">Dark</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center active"
+                            data-bs-theme-value="auto" aria-pressed="true">
+                      <i class="bi theme-icon bi-circle-half"></i>
+                      <span class="ms-2">Auto</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="dropdown stopevent ms-2">
+              <a class="btn btn-ghost btn-icon rounded-circle" href="#!" role="button" id="dropdownNotification"
+                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon-xs" data-feather="bell"></i>
+              </a>
+              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end" aria-labelledby="dropdownNotification">
+                <div>
+                  <div class="border-bottom px-3 pt-2 pb-3 d-flex justify-content-between align-items-center">
+                    <p class="mb-0 text-dark fw-medium fs-4">Notifications</p>
+                    <a href="#!" class="text-muted">
+                      <span>
+                        <i class="me-1 icon-xs" data-feather="settings"></i>
+                      </span>
+                    </a>
+                  </div>
+                  <div data-simplebar style="height: 250px">
+                    <!-- List group -->
+                    <ul class="list-group list-group-flush notification-list-scroll">
+                      <!-- List group item -->
+                      <li class="list-group-item bg-light">
+                        <a href="#!" class="text-muted">
+                          <h5 class="mb-1">Rishi Chopra</h5>
+                          <p class="mb-0">Mauris blandit erat id nunc blandit, ac eleifend dolor pretium.</p>
+                        </a>
+                      </li>
+                      <!-- List group item -->
+                      <li class="list-group-item">
+                        <a href="#!" class="text-muted">
+                          <h5 class="mb-1">Neha Kannned</h5>
+                          <p class="mb-0">
+                            Proin at elit vel est condimentum elementum id in ante. Maecenas et sapien
+                            metus.
+                          </p>
+                        </a>
+                      </li>
+                      <!-- List group item -->
+                      <li class="list-group-item">
+                        <a href="#!" class="text-muted">
+                          <h5 class="mb-1">Nirmala Chauhan</h5>
+                          <p class="mb-0">
+                            Morbi maximus urna lobortis elit sollicitudin sollicitudieget elit vel
+                            pretium.
+                          </p>
+                        </a>
+                      </li>
+                      <!-- List group item -->
+                      <li class="list-group-item">
+                        <a href="#!" class="text-muted">
+                          <h5 class="mb-1">Sina Ray</h5>
+                          <p class="mb-0">Sed aliquam augue sit amet mauris volutpat hendrerit sed nunc eu diam.</p>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="border-top px-3 py-2 text-center">
+                    <a href="#!" class="text-inherit">View all Notifications</a>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <!-- List -->
+
+            <li class="dropdown ms-2">
+              <a class="rounded-circle" href="#!" role="button" id="dropdownUser" data-bs-toggle="dropdown"
+                 aria-haspopup="true" aria-expanded="false">
+                <div class="avatar avatar-md avatar-indicators avatar-online">
+                  <img alt="avatar" id="profilePicture" class="rounded-circle" />
+                </div>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
+                <div class="px-4 pb-0 pt-2">
+                  <div class="lh-1">
+                    <h5 class="mb-1" id="userName"></h5>
+                    <a href="#!" class="text-inherit fs-6">View my profile</a>
+                  </div>
+                  <div class="dropdown-divider mt-3 mb-2"></div>
+                </div>
+
+                <ul class="list-unstyled">
+                  @* <li>
+                    <a class="dropdown-item d-flex align-items-center" href="#!">
+                      <i class="me-2 icon-xxs dropdown-item-icon" data-feather="user"></i>
+                      Edit Profile
+                    </a>
+                  </li>
+                  <li> 
+                    <a class="dropdown-item" href="#!">
+                      <i class="me-2 icon-xxs dropdown-item-icon" data-feather="activity"></i>
+                      Activity Log
+                    </a>
+                  </li> *@
+
+                  <li>
+                    <a class="dropdown-item d-flex align-items-center" href="#!">
+                      <i class="me-2 icon-xxs dropdown-item-icon" data-feather="settings"></i>
+                      Settings
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" onclick="MenuManager.Logout(event)">
+                      <i class="me-2 icon-xxs dropdown-item-icon" data-feather="power"></i>
+                      Sign Out
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="navbar-vertical navbar">
+      @* <div class="h-100" data-simplebar> *@
+      <div class="h100-60px" data-simplebar>
+        <!-- Navbar nav -->
+        <ul class="navbar-nav flex-column" id="sideNavbar">
+          <!-- Dynamic menu will be inserted here -->
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div id="app-content">
+
+      <!-- Container fluid -->
+      <div class="app-content-area">
+        <div class="container-fluid">
+           @RenderBody()
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Scripts -->
+  <!-- Common JS -->
+  <!-- Libs JS --> 
+  <script src="~/assets/libs/feather-icons/dist/feather.min.js"></script>
+  <script src="~/assets/libs/simplebar/dist/simplebar.min.js"></script>
+  <script src="~/assets/libs/popperjs/core/dist/umd/popper.min.js"></script>
+  <script src="~/assets/libs/tippy.js/dist/tippy-bundle.umd.min.js"></script>
+  <script src="~/assets/libs/sweetalert2/sweetalert2.all.min.js"></script>
+  <script src="~/assets/libs/toastr/toastr_2.1.4.min.js"></script>
+@*   <script src="~/assets/scripts/vendors/tooltip.js"></script>
+ *@
+
+  <!-- Kendo js -->
+  <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
+  <script src="~/assets/scripts/common/xlsx.full.min.js"></script>
+  <script src="~/assets/scripts/common/jquery.cookie.js"></script>
+  <script src="~/assets/scripts/common/kendo.common.control.js"></script>
+  <script src="~/assets/scripts/common/kendo.common.datasource.js"></script>
+  <script src="~/assets/scripts/common/tdtblockui.js"></script>
+  <script src="~/assets/scripts/common/filebrower.js"></script>
+  <script src="~/assets/scripts/common/filesaver.js"></script>
+
+
+  <!-- Theme JS -->
+  <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
+
+  <!-- ========================================== -->
+  <!-- 1. LOAD CONFIG FIRST (No dependencies)    -->
+  <!-- ========================================== -->
+    <script src="~/assets/scripts/config/appconfig.js"></script>
+
+@*   <!-- ========================================== -->
+  <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
+  <!-- ========================================== -->  
+  <script src="~/assets/Scripts/Core/Logger.js"></script>
+  <script src="~/assets/Scripts/Core/EventBus.js"></script>
+  <script src="~/assets/Scripts/Core/StateManager.js"></script>
+  <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
+  <script src="~/assets/Scripts/Core/App.js"></script> *@
+
+@* 
+  <!-- ========================================== -->
+  <!-- 3. LOAD BASE COMPONENT                     -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
+ *@
+
+  <!-- ========================================== -->
+  <!-- 4. LOAD MANAGERS & HELPERS                 -->
+  <!-- ========================================== -->
+  <!-- Managers -->
+  <script src="~/assets/scripts/core/managers/messagemanager.js"></script>
+  <script src="~/assets/scripts/core/managers/apicallmanager.js"></script>
+  <script src="~/assets/scripts/core/managers/sessionstorageadapter.js"></script>
+  <script src="~/assets/scripts/core/managers/statemanager.js"></script>
+  <script src="~/assets/scripts/core/managers/storagemanager.js"></script>
+  <script src="~/assets/scripts/core/managers/tokenmanager.js"></script>
+  <script src="~/assets/scripts/core/managers/vanillaapicallmanager.js"></script>
+
+  <!-- Helpers -->
+  <script src="~/assets/scripts/core/helpers/datehelper.js"></script>
+  <script src="~/assets/scripts/core/helpers/formhelper.js"></script>
+  <script src="~/assets/scripts/core/helpers/gridhelper.js"></script>
+  <script src="~/assets/scripts/core/helpers/numberhelper.js"></script>
+  <script src="~/assets/scripts/core/helpers/stringhelper.js"></script>
+  <script src="~/assets/scripts/core/helpers/validationhelper.js"></script>
+
+  <!-- ========================================== -->
+  <!-- 5. Services Layer                          -->
+  <!-- ========================================== -->
+  <script src="~/assets/scripts/services/genericservice.js"></script>
+
+  <!-- Common js -->
+  <script src="~/assets/scripts/common/common.js"></script>
+  <script src="~/assets/scripts/common/commonmessage.js"></script>
+  <script src="~/assets/scripts/common/cescommon.js"></script>
+  <script src="~/assets/scripts/common/date.js"></script>
+  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
+
+  <!-- Bootstrap App before any module -->
+@*   <script src="~/assets/scripts/app.bootstrap.js"></script> *@
+
+  @await RenderSectionAsync("Scripts", required: false)
+
+
+
+  <!-- ✅ Menu Initialization Script -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      try {
+        // Check if MenuHelper exists
+        if (typeof MenuHelper === 'undefined') {
+          console.error('MenuHelper is not defined. Make sure common.js is loaded.');
+          return;
+        }
+
+        // Initialize menu
+        MenuHelper.GetMenuInformation();
+        
+        console.log('Menu initialized successfully');
+      } catch (error) {
+        console.error('Error initializing menu:', error);
+      }
+    });
+  </script>
+
+
+
+  <!-- Debug Helper (Development only) -->
+  @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+  {
+    <script src="~/assets/Scripts/debug-helper.js"></script>
+  }
+</body>
+</html>

@@ -1,22 +1,22 @@
 ﻿/*=========================================================
  * Grid Helper
  * File: GridHelper.js
- * Description: Kendo Grid utilities and helpers
+ * Description: Kendo Grid utilities with dynamic height
  * Author: devSakhawat
- * Date: 2025-11-08
+ * Date: 2025-01-18
 =========================================================*/
 
 var GridHelper = {
 
   /**
-     * Calculate dynamic grid height based on window size
-     */
+   * Calculate dynamic grid height based on window size
+   */
   calculateGridHeight: function (options = {}) {
     const headerHeight = options.headerHeight || 65;
-    const footerHeight = options.footerHeight || 50;
-    const paddingBuffer = options.paddingBuffer || 30;
-    const toolbarHeight = options.toolbarHeight || 40;
-    const pagerHeight = options.pagerHeight || 50;
+    const footerHeight = options.footerHeight || 40;
+    const paddingBuffer = options.paddingBuffer || 0; //30;
+    const toolbarHeight = options.toolbarHeight || 0;// 40;
+    const pagerHeight = options.pagerHeight || 0; // 30;
 
     const availableHeight = window.innerHeight
       - headerHeight
@@ -37,6 +37,10 @@ var GridHelper = {
   * @param {number} toolbarHeight - Toolbar height (default: 40px)
   * @returns {number} Calculated height in pixels
   */
+
+  /**
+   * Calculate actual content height based on data rows
+   */
   calculateContentHeight: function (rowCount, options = {}) {
     const rowHeight = options.rowHeight || 40;
     const headerHeight = options.gridHeaderHeight || 40;
@@ -45,15 +49,15 @@ var GridHelper = {
     const minHeight = options.minHeight || 300;
 
     // Total content height
-    const contentHeight = (rowCount * rowHeight) + headerHeight + pagerHeight + toolbarHeight + 20; // 20px padding
+    const contentHeight = (rowCount * rowHeight) + headerHeight + pagerHeight + toolbarHeight + 20;
 
     return contentHeight < minHeight ? minHeight : contentHeight;
   },
 
+
   /**
-   * Get optimal grid height
-   * Returns the smaller of: calculated window height OR actual content height
-   */
+  * Get optimal grid height
+  */
   getOptimalGridHeight: function (rowCount, heightConfig = {}) {
     const windowBasedHeight = this.calculateGridHeight(heightConfig);
     const contentBasedHeight = this.calculateContentHeight(rowCount, heightConfig);
@@ -63,18 +67,33 @@ var GridHelper = {
   },
 
   /**
-  * Auto adjust grid height on window resize
-  */
+     * Auto adjust grid height on window resize
+     */
   enableAutoResize: function (gridId, heightConfig = {}) {
+    const selector = gridId.startsWith('#') ? gridId : '#' + gridId;
     let resizeTimer;
     $(window).on('resize', () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        const grid = $('#' + gridId).data('kendoGrid');
+        const grid = $(selector).data('kendoGrid');
         if (grid) {
           const rowCount = grid.dataSource.total();
-          const newHeight = this.getOptimalGridHeight(rowCount, heightConfig);
-          grid.setOptions({ height: newHeight });
+          const optimalHeight = this.getOptimalGridHeight(rowCount, heightConfig);
+
+          const wrapper = grid.wrapper;
+          if (wrapper) {
+            wrapper.height(optimalHeight);
+
+            const content = wrapper.find('.k-grid-content');
+            if (content.length > 0) {
+              const headerHeight = wrapper.find('.k-grid-header').outerHeight() || 40;
+              const pagerHeight = wrapper.find('.k-grid-pager').outerHeight() || 50;
+              const toolbarHeight = wrapper.find('.k-grid-toolbar').outerHeight() || 0;
+
+              const contentHeight = optimalHeight - headerHeight - pagerHeight - toolbarHeight;
+              content.height(contentHeight);
+            }
+          }
         }
       }, 250);
     });
@@ -90,27 +109,30 @@ var GridHelper = {
     grid.bind('dataBound', function (e) {
       const rowCount = e.sender.dataSource.total();
       const optimalHeight = GridHelper.getOptimalGridHeight(rowCount, heightConfig);
-      e.sender.setOptions({ height: optimalHeight });
+      //e.sender.setOptions({ height: optimalHeight });
     });
   },
 
   /**
-     * Initialize generic grid with dynamic height
+     * Initialize generic grid with FIXED height (will update after data loads)
      */
   loadGrid: function (gridId, columns, dataSource = [], options = {}) {
-    const $grid = $('#' + gridId);
-    if ($grid.length === 0) return;
+    const selector = gridId.startsWith('#') ? gridId : '#' + gridId;
+    const $grid = $(selector);
+    if ($grid.length === 0) {
+      console.error('Grid element not found:', gridId);
+      return;
+    }
 
     const containerWidth = $grid.parent().width() || (window.innerWidth - 323);
     const totalColumnsWidth = columns.reduce((sum, col) => sum + (parseInt(col.width) || 100), 0);
     const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
 
-    // Initial height calculation (will be updated after data loads)
+    // ✅ Use window-based height initially
     const initialHeight = this.calculateGridHeight(options.heightConfig || {});
 
     const defaultExports = ["excel", "pdf"];
     const finalToolbar = Array.isArray(options.toolbar) ? options.toolbar.concat(defaultExports) : defaultExports;
-
 
     const defaultOptions = {
       pdf: {
@@ -135,157 +157,193 @@ var GridHelper = {
         buttonCount: 5,
         numeric: true
       },
-      toolbar: finalToolbar,
-      //height: initialHeight,
+      toolbar: finalToolbar || ["pdf", "excel"],
+      height: initialHeight,
       width: gridWidth,
       editable: false,
       selectable: 'row',
-      autoBind: true,
-      dataBound: function (e) {
-        // Update height after data is loaded
-        const rowCount = e.sender.dataSource.total();
-        const heightConfig = options.heightConfig || {};
-        const optimalHeight = GridHelper.getOptimalGridHeight(rowCount, heightConfig);
-        e.sender.setOptions({ height: optimalHeight });
-      }
+      autoBind: true
     };
 
     const finalOptions = $.extend(true, {}, defaultOptions, options);
     delete finalOptions.heightConfig;
     delete finalOptions.fileName;
 
+    // ✅ Initialize grid
     $grid.kendoGrid(finalOptions);
 
-    //// Enable auto resize
-    //this.enableAutoResize(gridId, options.heightConfig || {});
+    // ✅ Get grid instance
+    const grid = $grid.data('kendoGrid');
+
+    if (grid) {
+      // ✅ Bind dataBound event to adjust height AFTER data loads
+      grid.bind('dataBound', function (e) {
+        const rowCount = e.sender.dataSource.total();
+        const heightConfig = options.heightConfig || {};
+
+        // Calculate optimal height
+        const optimalHeight = GridHelper.getOptimalGridHeight(rowCount, heightConfig);
+
+        // ✅ Use wrapper element to set height
+        const wrapper = e.sender.wrapper;
+        if (wrapper) {
+          wrapper.height(optimalHeight);
+
+          // Also adjust content area
+          const content = wrapper.find('.k-grid-content');
+          if (content.length > 0) {
+            // Calculate content area height (total - header - pager - toolbar)
+            const headerHeight = wrapper.find('.k-grid-header').outerHeight() || 40;
+            const pagerHeight = wrapper.find('.k-grid-pager').outerHeight() || 50;
+            const toolbarHeight = wrapper.find('.k-grid-toolbar').outerHeight() || 0;
+
+            const contentHeight = optimalHeight - headerHeight - pagerHeight - toolbarHeight;
+            content.height(contentHeight);
+          }
+
+          console.log('✅ Grid height adjusted:', optimalHeight + 'px', 'for', rowCount, 'rows');
+        }
+      });
+    }
+
+    // Enable auto resize on window resize
+    this.enableAutoResize(gridId, options.heightConfig || {});
   },
-  
+
   // Get selected row from grid
-  getSelectedRow: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  getSelectedRow: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (!grid) return null;
-    
+
     const selectedRow = grid.select();
     if (!selectedRow || selectedRow.length === 0) return null;
-    
+
     return grid.dataItem(selectedRow);
   },
 
   // Get all selected rows from grid
-  getSelectedRows: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  getSelectedRows: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (!grid) return [];
-    
+
     const selectedRows = grid.select();
     const items = [];
-    
-    selectedRows.each(function() {
+
+    selectedRows.each(function () {
       const dataItem = grid.dataItem(this);
       items.push(dataItem);
     });
-    
+
     return items;
   },
 
   // Refresh grid
-  refreshGrid: function (gridId) {
-    const grid = $('#' + gridId).data('kendoGrid');
+  refreshGrid: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data('kendoGrid');
     if (grid && grid.dataSource) grid.dataSource.read();
   },
 
   // Clear grid selection
-  clearSelection: function (gridId) {
-    const grid = $('#' + gridId).data('kendoGrid');
+  clearSelection: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data('kendoGrid');
     if (grid) grid.clearSelection();
   },
 
-  goToPage: function (gridId, pageNumber) {
-    const grid = $('#' + gridId).data('kendoGrid');
+  // Go to specific page
+  goToPage: function (gridSelector, pageNumber) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data('kendoGrid');
     if (grid && grid.dataSource) grid.dataSource.page(pageNumber);
   },
 
-  getSelectedItem: function (gridId, event) {
-    const grid = $('#' + gridId).data('kendoGrid');
+  getSelectedItem: function (gridSelector, event) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data('kendoGrid');
     if (!grid) return null;
     const tr = $(event.target).closest('tr');
     return grid.dataItem(tr);
   },
 
   // Export grid to Excel
-  exportToExcel: function(gridId, fileName = "Export") {
-    const grid = $("#" + gridId).data("kendoGrid");
+  exportToExcel: function (gridSelector, fileName = "Export") {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid) {
       grid.saveAsExcel();
     }
   },
 
   // Export grid to PDF
-  exportToPDF: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  exportToPDF: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid) {
       grid.saveAsPDF();
     }
   },
 
   // Get grid data
-  getGridData: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  getGridData: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (!grid) return [];
     return grid.dataSource.data();
   },
 
   // Get total records count
-  getTotalCount: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  getTotalCount: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (!grid) return 0;
     return grid.dataSource.total();
   },
 
   // Go to first page
-  goToFirstPage: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  goToFirstPage: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid) {
       grid.dataSource.page(1);
     }
   },
 
-  // Go to specific page
-  goToPage: function(gridId, pageNumber) {
-    const grid = $("#" + gridId).data("kendoGrid");
-    if (grid) {
-      grid.dataSource.page(pageNumber);
-    }
-  },
-
   // Add new row to grid
-  addRow: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  addRow: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid) {
       grid.addRow();
     }
   },
 
   // Remove row from grid
-  removeRow: function(gridId, dataItem) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  removeRow: function (gridSelector, dataItem) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid && dataItem) {
       grid.dataSource.remove(dataItem);
     }
   },
 
   // Show loading indicator
-  showLoading: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  showLoading: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid) {
-      kendo.ui.progress($("#" + gridId), true);
+      kendo.ui.progress($(selector), true);
     }
   },
 
   // Hide loading indicator
-  hideLoading: function(gridId) {
-    const grid = $("#" + gridId).data("kendoGrid");
+  hideLoading: function (gridSelector) {
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid) {
-      kendo.ui.progress($("#" + gridId), false);
+      kendo.ui.progress($(selector), false);
     }
   },
 
@@ -321,6 +379,126 @@ var GridHelper = {
       return html;
     };
   },
+
+  //// Get all selected rows from grid
+  //getSelectedRows: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (!grid) return [];
+
+  //  const selectedRows = grid.select();
+  //  const items = [];
+
+  //  selectedRows.each(function() {
+  //    const dataItem = grid.dataItem(this);
+  //    items.push(dataItem);
+  //  });
+
+  //  return items;
+  //},
+
+  //// Refresh grid
+  //refreshGrid: function (gridId) {
+  //  const grid = $('#' + gridId).data('kendoGrid');
+  //  if (grid && grid.dataSource) {
+  //    grid.dataSource.read();
+  //  }
+  //},
+
+  //// Clear grid selection
+  //clearSelection: function (gridId) {
+  //  const grid = $('#' + gridId).data('kendoGrid');
+  //  if (grid) grid.clearSelection();
+  //},
+
+  //goToPage: function (gridId, pageNumber) {
+  //  const grid = $('#' + gridId).data('kendoGrid');
+  //  if (grid && grid.dataSource) grid.dataSource.page(pageNumber);
+  //},
+
+  //getSelectedItem: function (gridId, event) {
+  //  const grid = $('#' + gridId).data('kendoGrid');
+  //  if (!grid) return null;
+  //  const tr = $(event.target).closest('tr');
+  //  return grid.dataItem(tr);
+  //},
+
+  //// Export grid to Excel
+  //exportToExcel: function(gridId, fileName = "Export") {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid) {
+  //    grid.saveAsExcel();
+  //  }
+  //},
+
+  //// Export grid to PDF
+  //exportToPDF: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid) {
+  //    grid.saveAsPDF();
+  //  }
+  //},
+
+  //// Get grid data
+  //getGridData: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (!grid) return [];
+  //  return grid.dataSource.data();
+  //},
+
+  //// Get total records count
+  //getTotalCount: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (!grid) return 0;
+  //  return grid.dataSource.total();
+  //},
+
+  //// Go to first page
+  //goToFirstPage: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid) {
+  //    grid.dataSource.page(1);
+  //  }
+  //},
+
+  //// Go to specific page
+  //goToPage: function(gridId, pageNumber) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid) {
+  //    grid.dataSource.page(pageNumber);
+  //  }
+  //},
+
+  //// Add new row to grid
+  //addRow: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid) {
+  //    grid.addRow();
+  //  }
+  //},
+
+  //// Remove row from grid
+  //removeRow: function(gridId, dataItem) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid && dataItem) {
+  //    grid.dataSource.remove(dataItem);
+  //  }
+  //},
+
+  //// Show loading indicator
+  //showLoading: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid) {
+  //    kendo.ui.progress($("#" + gridId), true);
+  //  }
+  //},
+
+  //// Hide loading indicator
+  //hideLoading: function(gridId) {
+  //  const grid = $("#" + gridId).data("kendoGrid");
+  //  if (grid) {
+  //    kendo.ui.progress($("#" + gridId), false);
+  //  }
+  //},
 
   //// don't use now.
   //createGrid: function (gridId, dataSource, generateColumnsFunc, options = {}) {
@@ -451,25 +629,32 @@ var GridHelper = {
   },
 
   bindGridEvent(gridSelector, event, callback) {
-    const grid = $(gridSelector).data("kendoGrid");
+    const selector = gridSelector.startsWith('#') ? gridSelector : '#' + gridSelector;
+    const grid = $(selector).data("kendoGrid");
     if (grid) grid.bind(event, callback);
   },
 
+  //bindGridEvent(gridSelector, event, callback) {
+  //  const grid = $(gridSelector).data("kendoGrid");
+  //  if (grid) grid.bind(event, callback);
+  //},
+
   // Calculate total columns width
   calculateTotalColumnsWidth: function (columns) {
-    let totalWidthOfTheGrid = 0;
+    let totalWidth = 0;
     columns.forEach(column => {
-      if (column.width != undefined && column.width && !column.hidden) {
+      if (column.width && !column.hidden) {
         const widthValue = parseInt(column.width.toString().replace(/px|%/g, ''));
         if (!isNaN(widthValue)) {
-          totalWidthOfTheGrid += widthValue;
+          totalWidth += widthValue;
         }
       } else if (!column.hidden && !column.width) {
-        totalWidthOfTheGrid += 120;
+        totalWidth += 120;
       }
     });
-    return totalWidthOfTheGrid;
+    return totalWidth;
   }
+
 };
 
 
@@ -529,12 +714,12 @@ const GridHelper23 = {
     return grid.dataItem(selectedRow);
   },
 
-  getSelectedRows(gridSelector) {
-    const grid = $(gridSelector).data("kendoGrid");
-    if (!grid) return [];
-    const selectedRows = grid.select();
-    return selectedRows.map((_, tr) => grid.dataItem(tr)).get();
-  },
+  //getSelectedRows(gridSelector) {
+  //  const grid = $(gridSelector).data("kendoGrid");
+  //  if (!grid) return [];
+  //  const selectedRows = grid.select();
+  //  return selectedRows.map((_, tr) => grid.dataItem(tr)).get();
+  //},
 
   refreshGrid(gridSelector) {
     const grid = $(gridSelector).data("kendoGrid");

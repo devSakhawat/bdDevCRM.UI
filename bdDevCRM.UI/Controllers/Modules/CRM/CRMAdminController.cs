@@ -29,8 +29,7 @@ namespace bdDevCRM.UI.Controllers.Modules.CRM
     // =========================
 
     [HttpGet("CRMCourse")]
-    public IActionResult CRMCourse()
-    
+    public IActionResult CRMCourse()    
     {
       //if (!IsUserLoggedIn())
       //  return RedirectToLogin();

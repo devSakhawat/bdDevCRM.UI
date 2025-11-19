@@ -273,19 +273,22 @@ var MenuModule = {
       return;
     }
 
-    const menuData = this.getFormData();
+    // ✅ (Type-safe)
+    const menuData = FormHelper.getFormDataTyped('menuForm');
+
+    //const menuData = this.getFormData();
     const isCreate = !menuData.MenuId || menuData.MenuId === 0;
 
     try {
       if (isCreate) {
         await MessageManager.loading.wrap(
-          MenuService.createMenu(menuData),
+          MenuService.create(menuData),
           'Creating menu...'
         );
         MessageManager.notify.success('Menu created successfully!');
       } else {
         await MessageManager.loading.wrap(
-          MenuService.updateMenu(menuData),
+          MenuService.update(menuData),
           'Updating menu...'
         );
         MessageManager.notify.success('Menu updated successfully!');

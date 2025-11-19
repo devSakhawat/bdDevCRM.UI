@@ -96,6 +96,92 @@ var FormHelper = {
       });
   },
 
+  /**
+ * Get form data with type conversion (Type-safe version)
+ * @param {string} formId - Form ID
+ * @returns {object} Type-converted form data
+ */
+  getFormDataTyped: function (formId) {
+    const $form = $('#' + formId);
+    const data = {};
+
+    $form.find('[name]').each(function () {
+      const $field = $(this);
+      const name = $field.attr('name');
+
+      if (!name) return; // Skip fields without name
+
+      // Get data-type attribute
+      let fieldType = $field.attr('data-type') || 'string';
+      let rawValue;
+
+      // Special handling for different input types
+      if ($field.is(':checkbox')) {
+        rawValue = $field.prop('checked');
+        fieldType = 'bool'; // Force boolean for checkbox
+      }
+      else if ($field.is(':radio')) {
+        if ($field.is(':checked')) {
+          rawValue = $field.val();
+        } else {
+          return; // Skip unchecked radio
+        }
+      }
+      else if ($field.is('select')) {
+        rawValue = $field.val();
+      }
+      else {
+        rawValue = $field.val();
+      }
+
+      // Type conversion করা TypeConverter দিয়ে
+      data[name] = TypeConverter.convert(rawValue, fieldType);
+    });
+
+    return data;
+  },
+
+  /**
+ * Set form data with type awareness
+ * @param {string} formId - Form ID  
+ * @param {object} data - Data object to populate
+ */
+  setFormDataTyped: function (formId, data) {
+    const $form = $('#' + formId);
+
+    for (let key in data) {
+      if (!data.hasOwnProperty(key)) continue;
+
+      const $field = $form.find('[name="' + key + '"]');
+      if (!$field.length) continue;
+
+      const fieldType = $field.attr('data-type') || 'string';
+      const value = data[key];
+
+      // Set value based on field type
+      if ($field.is(':checkbox')) {
+        $field.prop('checked', TypeConverter.toBool(value));
+      }
+      else if ($field.is(':radio')) {
+        $form.find('[name="' + key + '"][value="' + value + '"]')
+          .prop('checked', true);
+      }
+      else if (fieldType === 'date' || fieldType === 'datetime') {
+        // Kendo DatePicker check
+        const datePicker = $field.data('kendoDatePicker') ||
+          $field.data('kendoDateTimePicker');
+        if (datePicker) {
+          datePicker.value(value ? new Date(value) : null);
+        } else {
+          $field.val(value || '');
+        }
+      }
+      else {
+        $field.val(value || '');
+      }
+    }
+  },
+
   makeFormReadOnly: function (formSelector) {
     const selector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
     $(selector)

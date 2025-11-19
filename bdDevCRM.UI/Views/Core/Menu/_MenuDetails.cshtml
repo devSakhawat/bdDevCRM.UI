@@ -3,10 +3,159 @@
 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
   <fieldset class="border p-3 fieldsetCommon">
     <legend class="legendCommon legendCommonModalBGImportant">Menu Form</legend>
+        <form id="menuForm" enctype="multipart/form-data">
+            <div class="row mb-2">
+
+                <!-- MenuId (int?) -->
+                <input type="hidden"
+                       id="hdMenuId"
+                       name="MenuId"
+                       value="0"
+                       data-type="int" />
+
+                <!-- SortOrder (int?) -->
+                <input type="hidden"
+                       id="hdSortOrder"
+                       name="SortOrder"
+                       value="0"
+                       data-type="int" />
+
+                <!-- Menu Name (string?) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label for="menu-name">Menu Name <span class="redstart">*</span></label>
+                    <input type="text"
+                           class="form-control"
+                           id="menu-name"
+                           name="MenuName"
+                           placeholder="Enter Menu Name"
+                           data-type="string"
+                           required />
+                </div>
+
+                <!-- ModuleId (int?) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label for="cmd-module" class="lbl widthSize100_per">Module Name <span class="redstart">*</span></label>
+                    <div class="d-flex align-items-start icon-wrapper">
+                        <input id="cmd-module"
+                               name="ModuleId"
+                               class="flex-grow-1 border-right-strait"
+                               data-type="int"
+                               required
+                               validationMessage="Please Select Module" />
+                        <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn">
+                            <span class="k-icon k-i-plus"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Menu Path (string?) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label for="menu-path">Menu Path</label>
+                    <input type="text"
+                           class="form-control"
+                           id="menu-path"
+                           name="MenuPath"
+                           placeholder="Enter Menu Path"
+                           data-type="string" />
+                </div>
+
+                <!-- ParentMenu (int?) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label for="cmb-parent-menu" class="lbl widthSize100_per">Parent Menu Name</label>
+                    <div class="d-flex align-items-start icon-wrapper">
+                        <input id="cmb-parent-menu"
+                               name="ParentMenu"
+                               class="flex-grow-1 border-right-strait"
+                               data-type="int" />
+                        <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn">
+                            <span class="k-icon k-i-plus"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- IsQuickLink (int but bool-like UI) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2 custom-checkbox">
+                    <label class="form-check-label" for="chkIsQuickLink">Is Quick Link</label>
+                    <input type="checkbox"
+                           id="chkIsQuickLink"
+                           name="IsQuickLink"
+                           class="form-check-input"
+                           data-type="bool" />
+                </div>
+
+                <!-- MenuType (int?) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label for="menu-type">Menu Type</label>
+                    <input type="number"
+                           class="form-control"
+                           id="menu-type"
+                           name="MenuType"
+                           data-type="int"
+                           placeholder="Enter Menu Type" />
+                </div>
+
+                <!-- MenuCode (string?) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label for="menu-code">Menu Code</label>
+                    <input type="text"
+                           class="form-control"
+                           id="menu-code"
+                           name="MenuCode"
+                           data-type="string"
+                           placeholder="Enter Menu Code" />
+                </div>
+
+                <!-- IsActive (int?) -->
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+                    <label for="is-active">Is Active</label>
+                    <select id="is-active"
+                            name="IsActive"
+                            class="form-control"
+                            data-type="int">
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="btnDiv mt-2">
+                <ul>
+                    <li class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary me-2"
+                                id="btnMenuSaveOrUpdate"
+                                onclick="MenuModule.saveOrUpdate();">
+                            + Add Menu
+                        </button>
+
+                        <button type="button" class="btn btn-secondary me-2"
+                                onclick="MenuModule.clearForm('menuForm');">
+                            Clear
+                        </button>
+
+                        <button type="button" class="btn btn-light"
+                                onclick="MenuModule.closeModal();">
+                            Close
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </form>
+
+  </fieldset>
+</div>
+
+
+
+@* 
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
+  <fieldset class="border p-3 fieldsetCommon">
+    <legend class="legendCommon legendCommonModalBGImportant">Menu Form</legend>
     <form id="menuForm" enctype="multipart/form-data">
       <div class="row mb-2">
-        <input type="hidden" id="hdMenuId" name="MenuId" value="0" />
-        <input type="hidden" id="hdSorOrder" name="SortOrder" value="0" />
+        <input type="hidden" id="hdMenuId" name="MenuId" value= "0" />
+        <input type="hidden" id="hdSorOrder" name="SortOrder" value= "0" />
 
         <!-- Menu Name -->
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
@@ -53,12 +202,12 @@
       <div class="btnDiv mt-2">
         <ul>
           <li class="d-flex justify-content-end">
-            <button type="button" class="btn btn-primary me-2" id="btnMenuSaveOrUpdate" onclick="MenuDetailsManager.saveOrUpdateItem();"> + Add Menu </button>
-            <button type="button" class="btn btn-secondary me-2" onclick="MenuDetailsHelper.clearForm();"> Clear </button>
-            <button type="button" class="btn btn-light" onclick="MenuDetailsHelper.closeForm();"> Close </button>
+                        <button type="button" class="btn btn-primary me-2" id="btnMenuSaveOrUpdate" onclick="MenuModule.saveOrUpdate();"> + Add Menu </button>
+                        <button type="button" class="btn btn-secondary me-2" onclick="MenuModule.clearForm('menuForm');"> Clear </button>
+                        <button type="button" class="btn btn-light" onclick="MenuModule.closeModal();"> Close </button>
           </li>
         </ul>
       </div>
     </form>
   </fieldset>
-</div>
+</div> *@

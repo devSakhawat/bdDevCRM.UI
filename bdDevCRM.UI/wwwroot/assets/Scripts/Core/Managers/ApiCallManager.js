@@ -27,6 +27,128 @@ var ApiCallManager = (function () {
   // ============================================
 
   /**
+   * Create Grid DataSource
+   */
+  function createGridDataSource(config) {
+    if (!config || !config.endpoint) {
+      throw new Error('ApiCallManager.createGridDataSource: endpoint is required');
+    }
+
+    const baseUrl = _getBaseUrl();
+    const token = _getToken();
+
+    return new kendo.data.DataSource({
+      type: 'json',
+      transport: {
+        read: {
+          url: baseUrl + config.endpoint,
+          type: 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          beforeSend: function (xhr) {
+            if (token) {
+              xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            }
+          }
+        },
+        parameterMap: function (data, operation) {
+          if (operation === 'read') {
+            return JSON.stringify({
+              Skip: data.skip || 0,
+              Take: data.take || config.pageSize || 20,
+              Page: data.page || 1,
+              PageSize: data.pageSize || config.pageSize || 20,
+              Sort: data.sort || null,
+              Filter: data.filter || null
+            });
+          }
+          return data;
+        }
+      },
+      schema: {
+        data: function (response) {
+          console.log('📥 Grid DataSource Response:', response);
+
+          // ✅ NULL check
+          if (!response) {
+            console.error('❌ Response is NULL or undefined');
+            return [];
+          }
+
+          // ✅ Check if response is successful
+          if (response.IsSuccess === false) {
+            console.error('❌ API returned error:', response.Message);
+            _handleError(response);
+            return [];
+          }
+
+          // ✅ Extract data
+          if (response && response.IsSuccess && response.Data) {
+            const items = response.Data.Items || [];
+            console.log('✅ Grid data loaded:', items.length, 'items');
+            return items;
+          }
+
+          console.warn('⚠️ Unexpected response format:', response);
+          return [];
+        },
+        total: function (response) {
+          // ✅ NULL check
+          if (!response) {
+            return 0;
+          }
+
+          if (response && response.IsSuccess && response.Data) {
+            return response.Data.TotalCount || 0;
+          }
+          return 0;
+        },
+        errors: function (response) {
+          if (response && response.IsSuccess === false) {
+            return response.Message || 'An error occurred';
+          }
+          return null;
+        },
+        model: {
+          fields: config.modelFields || {}
+        }
+      },
+      pageSize: config.pageSize || 20,
+      serverPaging: config.serverPaging !== false,
+      serverSorting: config.serverSorting !== false,
+      serverFiltering: config.serverFiltering !== false,
+      error: function (e) {
+        console.error('❌ DataSource Error:', e);
+
+        // ✅ Handle XHR errors
+        if (e.xhr) {
+          console.error('XHR Status:', e.xhr.status);
+          console.error('XHR Response:', e.xhr.responseText);
+
+          try {
+            const errorData = JSON.parse(e.xhr.responseText);
+            _handleError(errorData);
+          } catch {
+            _handleError({
+              StatusCode: e.xhr.status,
+              Message: e.xhr.statusText || 'DataSource error'
+            });
+          }
+        } else if (e.errorThrown) {
+          _handleError({
+            StatusCode: 500,
+            Message: e.errorThrown || 'DataSource error'
+          });
+        } else {
+          console.error('Unknown DataSource error:', e);
+        }
+      }
+    });
+  }
+
+
+
+  /**
    * Get base API URL
    */
   function _getBaseUrl() {

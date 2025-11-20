@@ -3,7 +3,7 @@
  * File: AppConfig.js
  * Description: Centralized configuration management
  * Author: devSakhawat
- * Date: 2025-11-11
+ * Date: 2025-01-18
 =========================================================*/
 
 var AppConfig = (function () {
@@ -80,13 +80,27 @@ var AppConfig = (function () {
       groupSummary: '/group-summary',
       groupPermission: '/grouppermission/key/',
 
-      // Module
-      modules: '/modules',
-      modulesByGroupId: '/Groups-by-moduleId/',
+      // ========================================
+      // MODULE ENDPOINTS (From Screenshot)
+      // ========================================
+      modules: '/modules',                          // GET - Get all modules
+      moduleSummary: '/module-summary',             // POST - Get module summary grid
+      moduleCreate: '/module',                      // POST - Create module
+      moduleUpdate: '/module',                      // PUT - Update module /{key}
+      moduleDelete: '/module',                      // DELETE - Delete module /{key}
 
-      // Menus End Points
-      menus: '/menus-by-moduleId',
-      menuGrid: '/menu-summary',
+      // ========================================
+      // MENU ENDPOINTS (From Screenshot)
+      // ========================================
+      menus: '/menus',                              // GET - Get all menus
+      menusByModuleId: '/menus-by-moduleId',        // GET - Get menus by module /{moduleId}
+      menusByUserPermission: '/menus-by-user-permission', // GET - Get menus by user permission
+      parentMenuByMenu: '/parent-Menu-By-Menu',     // GET - Get parent menu by menu
+      menuSummary: '/menu-summary',                 // POST - Get menu summary grid
+      menuCreate: '/menu',                          // POST - Create menu
+      menuUpdate: '/menu',                          // PUT - Update menu /{key}
+      menuDelete: '/menu',                          // DELETE - Delete menu /{key}
+      menuDDL: '/menus-4-ddl',                      // GET - Get menus dropdown
 
       // Access Control
       access: '/getaccess',
@@ -416,4 +430,5 @@ if (AppConfig.isDevelopment()) {
   console.log('Environment:', AppConfig.isDevelopment() ? 'Development' : 'Production');
   console.log('API URL:', AppConfig.getApiUrl());
   console.log('UI URL:', AppConfig.getUiUrl());
+  console.log("Pass AppConfig.js file");
 }

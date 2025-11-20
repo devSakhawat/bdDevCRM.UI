@@ -275,7 +275,7 @@ var MenuModule = {
 
     // ✅ (Type-safe)
     const menuData = FormHelper.getFormDataTyped('menuForm');
-
+    console.log(menuData);
     //const menuData = this.getFormData();
     const isCreate = !menuData.MenuId || menuData.MenuId === 0;
 

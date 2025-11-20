@@ -78,6 +78,7 @@ var MenuService = {
    * Create menu
    */
   create: async function (menuData) {
+    console.log(menuData);
     if (!this.validateMenu(menuData)) {
       throw new Error('Invalid menu data');
     }

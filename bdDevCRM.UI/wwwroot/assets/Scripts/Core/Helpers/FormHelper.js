@@ -111,6 +111,9 @@ var FormHelper = {
 
       if (!name) return; // Skip fields without name
 
+      // Ignore Kendo ComboBox text inputs
+      if (name.endsWith('_input')) return;
+
       // Get data-type attribute
       let fieldType = $field.attr('data-type') || 'string';
       let rawValue;

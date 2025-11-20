@@ -110,6 +110,7 @@ var ApiCallManager = (function () {
           return null;
         },
         model: {
+          id: config.primaryKey || 'Id',
           fields: config.modelFields || {}
         }
       },
@@ -583,95 +584,95 @@ var ApiCallManager = (function () {
     }
   }
 
-  // ============================================
-  // PUBLIC - Grid DataSource Builder
-  // ============================================
-  function createGridDataSource(config) {
-    if (!config || !config.endpoint) {
-      throw new Error('ApiCallManager.createGridDataSource: endpoint is required');
-    }
+  //// ============================================
+  //// PUBLIC - Grid DataSource Builder
+  //// ============================================
+  //function createGridDataSource(config) {
+  //  if (!config || !config.endpoint) {
+  //    throw new Error('ApiCallManager.createGridDataSource: endpoint is required');
+  //  }
 
-    const baseUrl = _getBaseUrl();
-    const token = _getToken();
+  //  const baseUrl = _getBaseUrl();
+  //  const token = _getToken();
 
-    return new kendo.data.DataSource({
-      type: 'json',
-      transport: {
-        read: {
-          url: baseUrl + config.endpoint,
-          type: 'POST',
-          dataType: 'json',
-          contentType: 'application/json',
-          beforeSend: function (xhr) {
-            if (token) {
-              xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-            }
-          }
-        },
-        parameterMap: function (data, operation) {
-          if (operation === 'read') {
-            return JSON.stringify({
-              Skip: data.skip || 0,
-              Take: data.take || config.pageSize || 20,
-              Page: data.page || 1,
-              PageSize: data.pageSize || config.pageSize || 20,
-              Sort: data.sort || null,
-              Filter: data.filter || null
-            });
-          }
-          return data;
-        }
-      },
-      schema: {
-        data: function (response) {
-          // Backend pattern: { IsSuccess: true, Data: { Items: [], TotalCount: 0 } }
-          if (response && response.IsSuccess && response.Data) {
-            return response.Data.Items || [];
-          }
-          return [];
-        },
-        total: function (response) {
-          if (response && response.IsSuccess && response.Data) {
-            return response.Data.TotalCount || 0;
-          }
-          return 0;
-        },
-        errors: function (response) {
-          if (response && response.IsSuccess === false) {
-            return response.Message || 'An error occurred';
-          }
-          return null;
-        },
-        model: {
-          fields: config.modelFields || {}
-        }
-      },
-      pageSize: config.pageSize || 20,
-      serverPaging: config.serverPaging !== false,
-      serverSorting: config.serverSorting !== false,
-      serverFiltering: config.serverFiltering !== false,
-      error: function (e) {
-        console.error('DataSource Error:', e);
-        // Handle xhr errors
-        if (e.xhr) {
-          try {
-            const errorData = JSON.parse(e.xhr.responseText);
-            _handleError(errorData);
-          } catch {
-            _handleError({
-              StatusCode: e.xhr.status,
-              Message: e.xhr.statusText || 'DataSource error'
-            });
-          }
-        } else {
-          _handleError({
-            StatusCode: 500,
-            Message: e.errorThrown || 'DataSource error'
-          });
-        }
-      }
-    });
-  }
+  //  return new kendo.data.DataSource({
+  //    type: 'json',
+  //    transport: {
+  //      read: {
+  //        url: baseUrl + config.endpoint,
+  //        type: 'POST',
+  //        dataType: 'json',
+  //        contentType: 'application/json',
+  //        beforeSend: function (xhr) {
+  //          if (token) {
+  //            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+  //          }
+  //        }
+  //      },
+  //      parameterMap: function (data, operation) {
+  //        if (operation === 'read') {
+  //          return JSON.stringify({
+  //            Skip: data.skip || 0,
+  //            Take: data.take || config.pageSize || 20,
+  //            Page: data.page || 1,
+  //            PageSize: data.pageSize || config.pageSize || 20,
+  //            Sort: data.sort || null,
+  //            Filter: data.filter || null
+  //          });
+  //        }
+  //        return data;
+  //      }
+  //    },
+  //    schema: {
+  //      data: function (response) {
+  //        // Backend pattern: { IsSuccess: true, Data: { Items: [], TotalCount: 0 } }
+  //        if (response && response.IsSuccess && response.Data) {
+  //          return response.Data.Items || [];
+  //        }
+  //        return [];
+  //      },
+  //      total: function (response) {
+  //        if (response && response.IsSuccess && response.Data) {
+  //          return response.Data.TotalCount || 0;
+  //        }
+  //        return 0;
+  //      },
+  //      errors: function (response) {
+  //        if (response && response.IsSuccess === false) {
+  //          return response.Message || 'An error occurred';
+  //        }
+  //        return null;
+  //      },
+  //      model: {
+  //        fields: config.modelFields || {}
+  //      }
+  //    },
+  //    pageSize: config.pageSize || 20,
+  //    serverPaging: config.serverPaging !== false,
+  //    serverSorting: config.serverSorting !== false,
+  //    serverFiltering: config.serverFiltering !== false,
+  //    error: function (e) {
+  //      console.error('DataSource Error:', e);
+  //      // Handle xhr errors
+  //      if (e.xhr) {
+  //        try {
+  //          const errorData = JSON.parse(e.xhr.responseText);
+  //          _handleError(errorData);
+  //        } catch {
+  //          _handleError({
+  //            StatusCode: e.xhr.status,
+  //            Message: e.xhr.statusText || 'DataSource error'
+  //          });
+  //        }
+  //      } else {
+  //        _handleError({
+  //          StatusCode: 500,
+  //          Message: e.errorThrown || 'DataSource error'
+  //        });
+  //      }
+  //    }
+  //  });
+  //}
 
   // ============================================
   // PUBLIC - Specialized Methods

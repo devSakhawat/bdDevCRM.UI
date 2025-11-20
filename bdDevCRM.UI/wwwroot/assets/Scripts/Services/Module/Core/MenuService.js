@@ -161,6 +161,7 @@ var MenuService = {
       serverPaging: true,
       serverSorting: true,
       serverFiltering: true,
+      //idField: "MenuId",
       modelFields: {
         MenuId: { type: 'number' },
         ModuleId: { type: 'number' },
@@ -174,7 +175,8 @@ var MenuService = {
         SortOrder: { type: 'number' },
         IsQuickLink: { type: 'boolean' },
         IsActive: { type: 'boolean' }
-      }
+      },
+      primaryKey: 'MenuId' 
     }, config || {});
 
     return ApiCallManager.createGridDataSource(gridConfig);

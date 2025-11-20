@@ -9,11 +9,28 @@
 var TypeConverter = {
 
   /**
-   * Convert value to specified type
-   * @param {any} value - Raw value from form
-   * @param {string} targetType - Target data type (int, string, bool, date, decimal)
-   * @returns {any} Converted value
+ * Convert value to specified type
+ * @param {any} value - Raw value from form
+ * @param {string} targetType - Target data type (int, string, bool, date, decimal)
+ * @returns {any} Converted value
+  */
+
+
+  /**
+   * Convert checkbox to int (0 or 1) for backend
    */
+  toBoolAsInt: function (value) {
+    if (typeof value === 'boolean') return value ? 1 : 0;
+    if (typeof value === 'number') return value !== 0 ? 1 : 0;
+    if (typeof value === 'string') {
+      const lower = value.toLowerCase().trim();
+      return (lower === 'true' || lower === '1' || lower === 'yes') ? 1 : 0;
+    }
+    return 0;
+  },
+
+
+
   convert: function (value, targetType) {
     // Null/undefined/empty check
     if (value === null || value === undefined) {
@@ -34,6 +51,9 @@ var TypeConverter = {
       case 'bool':
       case 'boolean':
         return this.toBool(value);
+
+      case 'boolasint':
+        return this.toBoolAsInt(value);
 
       case 'date':
       case 'datetime':

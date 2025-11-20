@@ -35,24 +35,25 @@ var MenuModule = {
    * Initialize Kendo Grid
    */
   initGrid: function () {
-    const dataSource = ApiCallManager.createGridDataSource({
-      endpoint: AppConfig.endpoints.menuSummary,
-      pageSize: 20,
-      modelFields: {
-        MenuId: { type: 'number' },
-        ModuleId: { type: 'number' },
-        ParentMenu: { type: 'number' },
-        MenuName: { type: 'string' },
-        MenuPath: { type: 'string' },
-        ParentMenuName: { type: 'string' },
-        ModuleName: { type: 'string' },
-        MenuCode: { type: 'string' },
-        MenuType: { type: 'number' },
-        SortOrder: { type: 'number' },
-        IsQuickLink: { type: 'boolean' },
-        IsActive: { type: 'boolean' }
-      }
-    });
+    //const dataSource = ApiCallManager.createGridDataSource({
+    //  endpoint: AppConfig.endpoints.menuSummary,
+    //  pageSize: 20,
+    //  modelFields: {
+    //    MenuId: { type: 'number' },
+    //    ModuleId: { type: 'number' },
+    //    ParentMenu: { type: 'number' },
+    //    MenuName: { type: 'string' },
+    //    MenuPath: { type: 'string' },
+    //    ParentMenuName: { type: 'string' },
+    //    ModuleName: { type: 'string' },
+    //    MenuCode: { type: 'string' },
+    //    MenuType: { type: 'number' },
+    //    SortOrder: { type: 'number' },
+    //    IsQuickLink: { type: 'boolean' },
+    //    IsActive: { type: 'boolean' }
+    //  }
+    //});
+    const dataSource = MenuService.getGridDataSource({});
 
     GridHelper.loadGrid(this.config.gridId, this.getColumns(), dataSource, {
       toolbar: [
@@ -207,6 +208,21 @@ var MenuModule = {
   /**
    * View menu (read-only)
    */
+    //view: function (menuId) {
+    //  // Data From Grid
+    //  const grid = $('#gridSummaryMenu').data('kendoGrid');
+    //  const dataItem = grid.dataSource.get(menuId);  // ← ID দিয়ে data পাবেন
+
+    //  if (dataItem) {
+    //    // Details populate
+    //    FormHelper.setFormData('detailsForm', dataItem);
+    //    FormHelper.makeFormReadOnly('detailsForm');
+
+    //    // window open
+    //    FormHelper.openKendoWindow('detailsWindow', 'View Menu Details');
+    //  }
+    //},
+
   view: async function (menuId) {
     if (!menuId || menuId <= 0) {
       MessageManager.notify.warning('Invalid menu ID');
@@ -214,10 +230,16 @@ var MenuModule = {
     }
 
     try {
-      const menu = await MenuService.getMenuById(menuId);
-      MenuModule.populateForm(menu);
-      MenuModule.openModal('View Menu Details');
-      MenuModule.setFormMode('view');
+      // Data From Grid
+      const grid = $('#gridSummaryMenu').data('kendoGrid');
+      const dataItem = grid.dataSource.get(menuId);
+
+      /*const menu = await MenuService.getMenuById(menuId);*/
+      if (dataItem) {
+        MenuModule.populateForm(dataItem);
+        MenuModule.openModal('View Menu Details');
+        MenuModule.setFormMode('view');
+      }
     } catch (error) {
       console.error('Error loading menu:', error);
     }
@@ -274,7 +296,7 @@ var MenuModule = {
     }
 
     // ✅ (Type-safe)
-    const menuData = FormHelper.getFormDataTyped('menuForm');
+    const menuData = this.getFormData();
     console.log(menuData);
     //const menuData = this.getFormData();
     const isCreate = !menuData.MenuId || menuData.MenuId === 0;
@@ -398,13 +420,21 @@ var MenuModule = {
    * Get form data
    */
   getFormData: function () {
-    let formData = FormHelper.getFormData('#' + this.config.formId);
+    // ✅ Type-safe form data
+    let formData = FormHelper.getFormDataTyped('menuForm');
 
+    // ✅ Manual conversion for ComboBoxes
     const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
     const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
 
     formData.ModuleId = moduleCbo ? parseInt(moduleCbo.value()) || 0 : 0;
     formData.ParentMenu = parentCbo ? parseInt(parentCbo.value()) || 0 : 0;
+
+    // ✅ Ensure IsQuickLink is int (0 or 1)
+    formData.IsQuickLink = formData.IsQuickLink ? 1 : 0;
+
+    // ✅ Ensure IsActive is int
+    formData.IsActive = parseInt(formData.IsActive) || 0;
 
     return formData;
   },

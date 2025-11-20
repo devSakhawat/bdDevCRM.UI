@@ -137,7 +137,6 @@ var FormHelper = {
         rawValue = $field.val();
       }
 
-      // Type conversion করা TypeConverter দিয়ে
       data[name] = TypeConverter.convert(rawValue, fieldType);
     });
 

@@ -78,6 +78,7 @@ var MenuService = {
    * Create menu
    */
   create: async function (menuData) {
+    console.log(menuData);
     if (!this.validateMenu(menuData)) {
       throw new Error('Invalid menu data');
     }
@@ -160,6 +161,7 @@ var MenuService = {
       serverPaging: true,
       serverSorting: true,
       serverFiltering: true,
+      //idField: "MenuId",
       modelFields: {
         MenuId: { type: 'number' },
         ModuleId: { type: 'number' },
@@ -172,8 +174,9 @@ var MenuService = {
         MenuType: { type: 'number' },
         SortOrder: { type: 'number' },
         IsQuickLink: { type: 'boolean' },
-        IsActive: { type: 'boolean' }
-      }
+        IsActive: { type: 'number' }
+      },
+      primaryKey: 'MenuId' 
     }, config || {});
 
     return ApiCallManager.createGridDataSource(gridConfig);
@@ -291,16 +294,7 @@ console.log('%c[MenuService] ✓ Loaded', 'color: #2196F3; font-weight: bold;');
 //   //----------------------------------
 //   //** DELETE MENU
 //   //----------------------------------
-//  deleteMenu: async function (id) {
-//    try {
-//      const result = await ApiCallManager.delete(this.baseUrl + '/Delete/' + id);
-//      MessageManager.notify.success('Menu deleted successfully!');
-//      return result;
-//    } catch (error) {
-//      console.error('Error deleting menu:', error);
-//      throw error;
-//    }
-//  },
+
 
 //  //----------------------------------
 //  //** Business Logic: Validation

@@ -18,7 +18,8 @@ var MenuModule = {
     formId: 'menuForm',
     modalId: 'MenuPopUp',
     moduleComboId: 'cmd-module',
-    parentMenuComboId: 'cmb-parent-menu'
+    parentMenuComboId: 'cmb-parent-menu',
+    isActive : 'is-active'
   },
 
   /**
@@ -35,24 +36,7 @@ var MenuModule = {
    * Initialize Kendo Grid
    */
   initGrid: function () {
-    const dataSource = ApiCallManager.createGridDataSource({
-      endpoint: AppConfig.endpoints.menuSummary,
-      pageSize: 20,
-      modelFields: {
-        MenuId: { type: 'number' },
-        ModuleId: { type: 'number' },
-        ParentMenu: { type: 'number' },
-        MenuName: { type: 'string' },
-        MenuPath: { type: 'string' },
-        ParentMenuName: { type: 'string' },
-        ModuleName: { type: 'string' },
-        MenuCode: { type: 'string' },
-        MenuType: { type: 'number' },
-        SortOrder: { type: 'number' },
-        IsQuickLink: { type: 'boolean' },
-        IsActive: { type: 'boolean' }
-      }
-    });
+    const dataSource = MenuService.getGridDataSource({});
 
     GridHelper.loadGrid(this.config.gridId, this.getColumns(), dataSource, {
       toolbar: [
@@ -159,6 +143,18 @@ var MenuModule = {
       dataSource: []
     });
 
+    $('#' + this.config.isActive).kendoDropDownList({
+      dataTextField: "text",
+      dataValueField: "value",
+      filter: "contains",
+      optionLabel: "Select Status...", 
+      suggest: true,
+      dataSource: [
+        { text: "Active", value: 1 },
+        { text: "Inactive", value: 0 }
+      ]
+    });
+
     this.loadModules();
   },
 
@@ -204,9 +200,6 @@ var MenuModule = {
     this.setFormMode('create');
   },
 
-  /**
-   * View menu (read-only)
-   */
   view: async function (menuId) {
     if (!menuId || menuId <= 0) {
       MessageManager.notify.warning('Invalid menu ID');
@@ -214,10 +207,15 @@ var MenuModule = {
     }
 
     try {
-      const menu = await MenuService.getMenuById(menuId);
-      MenuModule.populateForm(menu);
-      MenuModule.openModal('View Menu Details');
-      MenuModule.setFormMode('view');
+      // Data From Grid
+      this.clearForm();
+      const grid = $('#gridSummaryMenu').data('kendoGrid');
+      const dataItem = grid.dataSource.get(menuId);
+      if (dataItem) {
+        MenuModule.populateForm(dataItem);
+        MenuModule.openModal('View Menu Details');
+        MenuModule.setFormMode('view');
+      }
     } catch (error) {
       console.error('Error loading menu:', error);
     }
@@ -233,10 +231,13 @@ var MenuModule = {
     }
 
     try {
-      const menu = await MenuService.getMenuById(menuId);
-      MenuModule.populateForm(menu);
-      MenuModule.openModal('Edit Menu');
-      MenuModule.setFormMode('edit');
+      const grid = $('#gridSummaryMenu').data('kendoGrid');
+      const dataItem = grid.dataSource.get(menuId);
+      if (dataItem) {
+        MenuModule.populateForm(dataItem);
+        MenuModule.openModal('Edit Menu');
+        MenuModule.setFormMode('edit');
+      }
     } catch (error) {
       console.error('Error loading menu:', error);
     }
@@ -254,7 +255,7 @@ var MenuModule = {
     MessageManager.confirm.delete('this menu', async () => {
       try {
         await MessageManager.loading.wrap(
-          MenuService.deleteMenu(menuId),
+          MenuService.delete(menuId),
           'Deleting menu...'
         );
         MessageManager.notify.success('Menu deleted successfully!');
@@ -274,8 +275,8 @@ var MenuModule = {
     }
 
     // ✅ (Type-safe)
-    const menuData = FormHelper.getFormDataTyped('menuForm');
-
+    const menuData = this.getFormData();
+    console.log(menuData);
     //const menuData = this.getFormData();
     const isCreate = !menuData.MenuId || menuData.MenuId === 0;
 
@@ -288,7 +289,7 @@ var MenuModule = {
         MessageManager.notify.success('Menu created successfully!');
       } else {
         await MessageManager.loading.wrap(
-          MenuService.update(menuData),
+          MenuService.update(menuData.MenuId ,menuData),
           'Updating menu...'
         );
         MessageManager.notify.success('Menu updated successfully!');
@@ -353,6 +354,7 @@ var MenuModule = {
 
     const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
     const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
+    const isActiveCbo = $('#' + this.config.isActive).data('kendoDropDownList');
 
     if (moduleCbo) {
       moduleCbo.value('');
@@ -365,6 +367,11 @@ var MenuModule = {
       parentCbo.setDataSource([]);
     }
 
+    if (isActiveCbo) {
+      isActiveCbo.value('');
+      isActiveCbo.text('');
+    }
+
     $('#chkIsQuickLink').prop('checked', false);
   },
 
@@ -373,8 +380,14 @@ var MenuModule = {
    */
   populateForm: function (data) {
     if (!data) return;
+    this.clearForm();
 
     FormHelper.setFormData('#' + this.config.formId, data);
+
+    const isActiveCbo = $('#' + this.config.isActive).data('kendoDropDownList');
+    if (isActiveCbo && data.IsActive) {
+      isActiveCbo.value(data.IsActive);
+    }
 
     const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
     if (moduleCbo && data.ModuleId) {
@@ -398,13 +411,21 @@ var MenuModule = {
    * Get form data
    */
   getFormData: function () {
-    let formData = FormHelper.getFormData('#' + this.config.formId);
+    // ✅ Type-safe form data
+    let formData = FormHelper.getFormDataTyped('menuForm');
 
+    // ✅ Manual conversion for ComboBoxes
     const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
     const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
 
     formData.ModuleId = moduleCbo ? parseInt(moduleCbo.value()) || 0 : 0;
     formData.ParentMenu = parentCbo ? parseInt(parentCbo.value()) || 0 : 0;
+
+    // ✅ Ensure IsQuickLink is int (0 or 1)
+    formData.IsQuickLink = formData.IsQuickLink ? 1 : 0;
+
+    // ✅ Ensure IsActive is int
+    formData.IsActive = parseInt(formData.IsActive) || 0;
 
     return formData;
   },

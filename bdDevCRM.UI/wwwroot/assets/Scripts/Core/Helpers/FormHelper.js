@@ -186,9 +186,29 @@ var FormHelper = {
 
   makeFormReadOnly: function (formSelector) {
     const selector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
-    $(selector)
-      .find("input, select, textarea")
-      .prop("disabled", true);
+    $(selector).find("input, select, textarea").prop("disabled", true);
+
+    // disable Kendo ComboBox
+    $(selector).find("[data-role='combobox']").each(function () {
+      $(this).data("kendoComboBox").enable(false);
+    });
+
+    // disable Kendo DropDownList
+    $(selector).find("[data-role='dropdownlist']").each(function () {
+      $(this).data("kendoDropDownList").enable(false);
+    });
+
+    // disable Kendo DatePicker
+    $(selector).find("[data-role='datepicker']").each(function () {
+      $(this).data("kendoDatePicker").enable(false);
+    });
+
+    // disable Kendo CheckBox / Switch
+    $(selector).find("[data-role='switch'], [data-role='checkbox']").each(function () {
+      const widget = $(this).data("kendoSwitch") || $(this).data("kendoCheckBox");
+      if (widget) widget.enable(false);
+    });
+
   },
 
   makeFormEditable: function (formSelector) {

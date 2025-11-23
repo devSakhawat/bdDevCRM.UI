@@ -100,7 +100,17 @@ var AppConfig = (function () {
       menuCreate: '/menu',                          // POST - Create menu
       menuUpdate: '/menu',                          // PUT - Update menu /{key}
       menuDelete: '/menu',                          // DELETE - Delete menu /{key}
-      menuDDL: '/menus-4-ddl',                      // GET - Get menus dropdown
+      menuDDL: '/menus-4-ddl',
+
+      // ========================================
+      // AccessControl ENDPOINTS (From Screenshot)
+      // ========================================
+      accessControllSummary: '/access-control-summary', // POST - Get access control summary grid
+      accessControls: '/access-controls',           // GET - Get all access controls
+      accessControlById: '/access-control/',        // GET - Get access control by ID
+      accessControlCreate: '/access-control',      // POST - Create access control
+      accessControlUpdate: '/access-control',      // PUT - Update access control /{key}
+      accessControlDelete: '/access-control',      // DELETE - Delete access control /{key}
 
       // Access Control
       access: '/getaccess',

@@ -9,138 +9,89 @@
 var AccessControlService = {
 
   /**
-   * Get all menus
-   */
-  getAllMenus: async function () {
-    try {
-      const data = await ApiCallManager.get(AppConfig.endpoints.menus);
-      return data;
-    } catch (error) {
-      console.error('Error loading menus:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Get menu by ID
+   * Get accessControl by ID
    */
   getById: async function (id) {
     if (!id || id <= 0) {
-      throw new Error('Invalid menu ID');
+      throw new Error('Invalid accessControl ID');
     }
 
     try {
-      const data = await ApiCallManager.get(`${AppConfig.endpoints.menuUpdate}/${id}`);
+      const data = await ApiCallManager.get(`${AppConfig.endpoints.accessControlUpdate}/${id}`);
       return data;
     } catch (error) {
-      console.error('Error loading menu:', error);
+      console.error('Error loading accessControl:', error);
       throw error;
     }
   },
 
   /**
-   * Get modules for dropdown
+   * Create AccessControl
    */
-  getModules: async function () {
-    try {
-      console.log('📡 Loading modules from:', AppConfig.endpoints.modules);
-      const data = await ApiCallManager.get(AppConfig.endpoints.modules);
-      console.log('✅ Modules loaded:', data);
-      return data;
-    } catch (error) {
-      console.error('❌ Error loading modules:', error);
-      return [];
-    }
-  },
-
-  /**
-   * Get menus by module ID
-   */
-  getMenusByModuleId: async function (moduleId) {
-    if (!moduleId || moduleId <= 0) {
-      console.warn('Invalid module ID');
-      return [];
+  create: async function (accessControlData) {
+    console.log(accessControlData);
+    if (!this.validateAccessControl(accessControlData)) {
+      throw new Error('Invalid accessControl data');
     }
 
     try {
-      const endpoint = `${AppConfig.endpoints.menusByModuleId}/${moduleId}`;
-      console.log('📡 Loading menus from:', endpoint);
-      const data = await ApiCallManager.get(endpoint);
-      console.log('✅ Menus loaded:', data);
-      return data;
-    } catch (error) {
-      console.error('❌ Error loading menus by module:', error);
-      return [];
-    }
-  },
-
-  /**
-   * Create menu
-   */
-  create: async function (menuData) {
-    console.log(menuData);
-    if (!this.validateMenu(menuData)) {
-      throw new Error('Invalid menu data');
-    }
-
-    try {
-      const result = await ApiCallManager.post(AppConfig.endpoints.menuCreate, menuData);
+      const result = await ApiCallManager.post(AppConfig.endpoints.accessControlCreate, accessControlData);
       return result;
     } catch (error) {
-      console.error('Error creating menu:', error);
+      console.error('Error creating accessControl:', error);
       throw error;
     }
   },
 
   /**
-   * Update menu
+   * Update AccessControl
    */
-  update: async function (id, menuData) {
+  update: async function (id, accessControlData) {
     if (!id || id <= 0) {
-      throw new Error('Invalid menu ID');
+      throw new Error('Invalid accessControl ID');
     }
 
-    if (!this.validateMenu(menuData)) {
-      throw new Error('Invalid menu data');
+    if (!this.validateAccessControl(accessControlData)) {
+      throw new Error('Invalid accessControl data');
     }
 
     try {
-      const result = await ApiCallManager.put(`${AppConfig.endpoints.menuUpdate}/${id}`, menuData);
+      const result = await ApiCallManager.put(`${AppConfig.endpoints.accessControlUpdate}/${id}`, accessControlData);
       return result;
     } catch (error) {
-      console.error('Error updating menu:', error);
+      console.error('Error updating accessControl:', error);
       throw error;
     }
   },
 
   /**
-   * Delete menu
+   * Delete AccessControl
    */
   delete: async function (id) {
     if (!id || id <= 0) {
-      throw new Error('Invalid menu ID');
+      throw new Error('Invalid accessControl ID');
     }
 
     try {
-      const result = await ApiCallManager.delete(`${AppConfig.endpoints.menuDelete}/${id}`);
+      const result = await ApiCallManager.delete(`${AppConfig.endpoints.accessControlDelete}/${id}`);
       return result;
     } catch (error) {
-      console.error('Error deleting menu:', error);
+      console.error('Error deleting accessControl:', error);
       throw error;
     }
   },
 
   /**
-   * Validate menu data
+   * Validate accessControl data
    */
-  validateMenu: function (menuData) {
-    if (!menuData.MenuName || menuData.MenuName.trim() === '') {
+  validateAccessControl: function (accessControlData) {
+    if (!accessControlData.AccessControlName || accessControlData.AccessControlName.trim() === '') {
       if (typeof MessageManager !== 'undefined') {
-        MessageManager.notify.error('Menu name is required');
+        MessageManager.notify.error('AccessControl name is required');
       }
       return false;
     }
-    if (!menuData.ModuleId || menuData.ModuleId === 0) {
+    if (!accessControlData.ModuleId || accessControlData.ModuleId === 0) {
       if (typeof MessageManager !== 'undefined') {
         MessageManager.notify.error('Module is required');
       }
@@ -153,15 +104,15 @@ var AccessControlService = {
    * Get grid data source
    */
   getGridDataSource: function (config) {
-    console.log('🔧 Creating grid DataSource with endpoint:', AppConfig.endpoints.accessControllSummary);
+    console.log('🔧 Creating grid DataSource with endpoint:', AppConfig.endpoints.accessControlSummary);
 
     const gridConfig = Object.assign({}, {
-      endpoint: AppConfig.endpoints.accessControllSummary,
+      endpoint: AppConfig.endpoints.accessControlSummary,
       pageSize: 20,
       serverPaging: true,
       serverSorting: true,
       serverFiltering: true,
-      //idField: "MenuId",
+      //idField: "AccessControlId",
       modelFields: {
         AccessId: { type: 'number' },
         AccessName: { type: 'string' },
@@ -175,5 +126,5 @@ var AccessControlService = {
 };
 
 // Log initialization
-console.log('%c[MenuService] ✓ Loaded', 'color: #2196F3; font-weight: bold;');
+console.log('%c[AccessControlService] ✓ Loaded', 'color: #2196F3; font-weight: bold;');
 

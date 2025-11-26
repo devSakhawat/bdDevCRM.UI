@@ -128,7 +128,6 @@ var GridHelper = {
     const totalColumnsWidth = columns.reduce((sum, col) => sum + (parseInt(col.width) || 100), 0);
     const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
 
-    // ✅ Use window-based height initially
     const initialHeight = this.calculateGridHeight(options.heightConfig || {});
 
     const defaultExports = ["excel", "pdf"];

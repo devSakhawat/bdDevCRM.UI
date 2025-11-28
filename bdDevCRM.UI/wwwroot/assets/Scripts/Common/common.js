@@ -1435,6 +1435,8 @@ var MenuManager = {
   },
 
 };
+
+
 var MenuHelper = {
 
   GetMenuInformation: function () {

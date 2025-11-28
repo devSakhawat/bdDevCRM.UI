@@ -3,9 +3,7 @@
 /// <reference path="../../../core/helpers/gridhelper.js" />
 /// <reference path="../../../core/managers/apicallmanager.js" />
 /// <reference path="../../../core/managers/messagemanager.js" />
-/// <reference path="../../../core/managers/appinitializer.js" />
 /// <reference path="../../../core/moduleregistry.js" />
-/// <reference path="../../../core/appinitializer.js" />
 
 /*=========================================================
  * Menu Module (Complete CRUD with FormHelper)
@@ -29,40 +27,10 @@ var MenuModule = {
    * Initialize module
    */
   init: function () {
-    console.log('🔧 Initializing Menu Module.. .');
-
-    // Check dependencies (now done by ModuleRegistry, but good to double-check)
-    if (!this._checkDependencies()) {
-      throw new Error('Menu Module dependencies not satisfied');
-    }
-
+    console.log('🔧 Initializing Menu Module...');
     this.initGrid();
     this.initModal();
     this.initForm();
-
-    console.log('✅ Menu Module initialized successfully');
-  },
-
-  /**
-   * Check module dependencies
-   */
-  _checkDependencies: function () {
-    var deps = {
-      MenuService: typeof MenuService !== 'undefined',
-      ApiCallManager: typeof ApiCallManager !== 'undefined',
-      MessageManager: typeof MessageManager !== 'undefined',
-      FormHelper: typeof FormHelper !== 'undefined',
-      GridHelper: typeof GridHelper !== 'undefined'
-    };
-
-    for (var dep in deps) {
-      if (!deps[dep]) {
-        console.error('❌ Missing dependency:', dep);
-        return false;
-      }
-    }
-
-    return true;
   },
 
   /**
@@ -505,57 +473,45 @@ var MenuDetailsHelper = {
   }
 };
 
-//// Initialize on document ready
-//$(document).ready(function () {
-//  // Check dependencies
-//  if (typeof MenuService === 'undefined') {
-//    console.error('❌ MenuService not loaded!');
-//    return;
-//  }
+// Initialize on document ready
+$(document).ready(function () {
+  // Check dependencies
+  if (typeof MenuService === 'undefined') {
+    console.error('❌ MenuService not loaded!');
+    return;
+  }
 
-//  if (typeof ApiCallManager === 'undefined') {
-//    console.error('❌ ApiCallManager not loaded!');
-//    return;
-//  }
+  if (typeof ApiCallManager === 'undefined') {
+    console.error('❌ ApiCallManager not loaded!');
+    return;
+  }
 
-//  if (typeof MessageManager === 'undefined') {
-//    console.error('❌ MessageManager not loaded!');
-//    return;
-//  }
+  if (typeof MessageManager === 'undefined') {
+    console.error('❌ MessageManager not loaded!');
+    return;
+  }
 
-//  if (typeof FormHelper === 'undefined') {
-//    console.warn('⚠️ FormHelper not loaded!');
-//    return;
-//  }
+  if (typeof FormHelper === 'undefined') {
+    console.warn('⚠️ FormHelper not loaded!');
+    return;
+  }
 
-//  if (typeof GridHelper === 'undefined') {
-//    console.error('❌ GridHelper not loaded!');
-//    return;
-//  }
+  if (typeof GridHelper === 'undefined') {
+    console.error('❌ GridHelper not loaded!');
+    return;
+  }
 
-//  // Initialize module
-//  try {
-//    MenuModule.init();
-//    console.log('✅ Menu Module initialized successfully');
-//  } catch (error) {
-//    console.error('❌ Failed to initialize Menu module:', error);
-//  }
-//});
+  // Initialize module
+  try {
+    MenuModule.init();
+    console.log('✅ Menu Module initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize Menu module:', error);
+  }
+});
 
 
-// ✅ NEW WAY - Register with ModuleRegistry
-if (typeof ModuleRegistry !== 'undefined') {
-  ModuleRegistry.register('MenuModule', MenuModule, {
-    dependencies: ['MenuService', 'ApiCallManager', 'MessageManager', 'FormHelper', 'GridHelper'],
-    priority: 5,
-    autoInit: false,  // Will be initialized by route
-    route: '/Menu/.*'  // Only initialize when on Menu pages
-  });
 
-  console.log('✅ MenuModule registered');
-} else {
-  console.error('❌ ModuleRegistry not loaded!  Cannot register MenuModule');
-}
 
 
 

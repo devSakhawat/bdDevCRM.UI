@@ -29,13 +29,40 @@
   <link rel="stylesheet" href="~/assets/css/theme.min.css">
   <link href="~/assets/css/bddevs.css" rel="stylesheet" />
 
+  <!-- Skeleton Loader CSS -->
+  <style>
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1. 5s infinite;
+      border-radius: 4px;
+    }
+
+    .skeleton-line {
+      height: 20px;
+      margin-bottom: 10px;
+    }
+
+    @@keyframes skeleton-loading {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
+    }
+  </style>
+
   <!-- Scripts -->
-  <!-- Libs JS -->
-  @* <script src="~/assets/kendo_2023_r1/js/jquery.min.js"></script> *@
+  <!-- ========================================== -->
+  <!-- CORE DEPENDENCIES (ALWAYS LOADED)         -->
+  <!-- ========================================== -->
   <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="~/assets/kendo_2023_r1/js/jszip.min.js"></script>
-
+  @* <script src="~/lib/kendo-ui/js/kendo.all.min.js"></script> *@
+  <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
 
 
   <title>bdDevs CRM System</title>
@@ -272,7 +299,6 @@
  *@
 
   <!-- Kendo js -->
-  <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
   <script src="~/assets/scripts/common/xlsx.full.min.js"></script>
   <script src="~/assets/scripts/common/jquery.cookie.js"></script>
   <script src="~/assets/scripts/common/kendo.common.control.js"></script>
@@ -281,14 +307,21 @@
   <script src="~/assets/scripts/common/filebrower.js"></script>
   <script src="~/assets/scripts/common/filesaver.js"></script>
 
+  <!-- ========================================== -->
+  <!-- 4. LOAD COMMON (Menu Helper)               -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Common/common.js"></script>
+  <script src="~/assets/scripts/common/commonmessage.js"></script>
+  <script src="~/assets/scripts/common/cescommon.js"></script>
+  <script src="~/assets/scripts/common/date.js"></script>
+  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
+
 
   <!-- Theme JS -->
   <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
 
-  <!-- ========================================== -->
-  <!-- 1. LOAD CONFIG FIRST (No dependencies)    -->
-  <!-- ========================================== -->
-  <script src="~/assets/scripts/config/appconfig.js"></script>
+  <!-- Config (No dependencies) -->
+  <script src="~/assets/Scripts/Config/AppConfig.js"></script>
 
 
 @*   <!-- ========================================== -->
@@ -307,69 +340,120 @@
   <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
  *@
 
+
+  <!-- Core Managers -->
+  <script src="~/assets/Scripts/Core/Managers/StorageManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/MessageManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/TokenManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/ApiCallManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/StateManager.js"></script>
+
+
+  <!-- Core Helpers -->
+  <script src="~/assets/Scripts/Core/Helpers/TypeConverter.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/DateHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/FormHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/GridHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/NumberHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/StringHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/ValidationHelper.js"></script>
+
+  <!-- Event System -->
+  <script src="~/assets/Scripts/Core/EventBus.js"></script>
+  <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
+
+
+
   <!-- ========================================== -->
-  <!-- 4. LOAD MANAGERS & HELPERS                 -->
-  <!-- ========================================== -->
-
-  
-  <!-- Helpers -->
-    <script src="~/assets/Scripts/Core/Helpers/TypeConverter.js"></script>
-  <script src="~/assets/scripts/core/helpers/datehelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/formhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/gridhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/numberhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/stringhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/validationhelper.js"></script>
-
-
-  <!-- Managers -->
-  <script src="~/assets/scripts/core/managers/messagemanager.js"></script>
-  <script src="~/assets/scripts/core/managers/apicallmanager.js"></script>
-  <script src="~/assets/scripts/core/managers/sessionstorageadapter.js"></script>
-  <script src="~/assets/scripts/core/managers/statemanager.js"></script>
-  <script src="~/assets/scripts/core/managers/storagemanager.js"></script>
-  <script src="~/assets/scripts/core/managers/tokenmanager.js"></script>
-  <script src="~/assets/scripts/core/managers/vanillaapicallmanager.js"></script>
-
+<!-- 5. LOAD MODULE REGISTRY & APP INITIALIZER  -->
+<!-- ========================================== -->
+<script src="~/assets/Scripts/Core/ModuleRegistry.js"></script>
+<script src="~/assets/Scripts/Core/Managers/AppInitializer.js"></script>
 
   <!-- ========================================== -->
-  <!-- 5. Services Layer                          -->
+  <!-- CONDITIONAL LOADING (LOGIN VS DASHBOARD)  -->
   <!-- ========================================== -->
-  <script src="~/assets/scripts/services/genericservice.js"></script>
-
-  <!-- Common js -->
-  <script src="~/assets/scripts/common/common.js"></script>
-  <script src="~/assets/scripts/common/commonmessage.js"></script>
-  <script src="~/assets/scripts/common/cescommon.js"></script>
-  <script src="~/assets/scripts/common/date.js"></script>
-  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
 
   <!-- Bootstrap App before any module -->
 @*   <script src="~/assets/scripts/app.bootstrap.js"></script> *@
 
+  <!-- ========================================== -->
+  <!-- 8. PAGE-SPECIFIC SCRIPTS                   -->
+  <!-- ========================================== -->
   @await RenderSectionAsync("Scripts", required: false)
 
+  <!-- ========================================== -->
+  <!-- 9. ✅ SINGLE INITIALIZATION POINT          -->
+  <!-- ========================================== -->
+  @if (ViewContext.RouteData.Values["controller"]?.ToString() == "Home" &&
+    ViewContext.RouteData.Values["action"]?.ToString() == "Login")
+  {
+    <!-- ========================================== -->
+    <!-- LOGIN PAGE ONLY                            -->
+    <!-- ========================================== -->
+    <script src="~/assets/scripts/modules/core/authentication/loginmodule.js"></script>
 
+    <script type="text/javascript">
+      // ✅ SINGLE document.ready for LOGIN page
+      $(document).ready(function() {
+          console.log('%c🔐 Initializing Login Page...', 'color: #2196F3; font-weight: bold;');
 
-  <!-- ✅ Menu Initialization Script -->
-  <script type="text/javascript">
-    $(document).ready(function() {
-      try {
-        // Check if MenuHelper exists
-        if (typeof MenuHelper === 'undefined') {
-          console.error('MenuHelper is not defined. Make sure common.js is loaded.');
-          return;
-        }
+          try {
+              LoginModule.init();
+              console.log('✅ Login Page initialized');
+          } catch (error) {
+              console.error('❌ Failed to initialize login page:', error);
+              alert('Failed to initialize login page. Please refresh.');
+          }
+      });
+    </script>
+  }
+  else
+  {
+    <!-- ========================================== -->
+    <!-- AUTHENTICATED PAGES (DASHBOARD, etc.)      -->
+    <!-- ========================================== -->
+    <!-- Module System -->
+    <script src="~/assets/Scripts/Core/ModuleRegistry.js"></script>
+    <script src="~/assets/Scripts/Core/AppInitializer.js"></script>
 
-        // Initialize menu
-        MenuHelper.GetMenuInformation();
-        
-        console.log('Menu initialized successfully');
-      } catch (error) {
-        console.error('Error initializing menu:', error);
-      }
-    });
-  </script>
+    <!-- Common (Menu Helper) -->
+    <script src="~/assets/Scripts/Common/common.js"></script>
+
+    <!-- Services -->
+    <script src="~/assets/Scripts/Services/Module/MenuService.js"></script>
+    @* Add other services as needed *@
+
+    <!-- Modules -->
+    <script src="~/assets/Scripts/Modules/Core/Menu/Menu.js"></script>
+    @* Add other modules as needed *@
+
+    <!-- Page-specific scripts -->
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script type="text/javascript">
+      // ✅ SINGLE document. ready for AUTHENTICATED pages
+      $(document).ready(function() {
+          console.log('%c🚀 Initializing Application...', 'color: #2196F3; font-weight: bold;');
+
+          try {
+              // Single entry point - handles EVERYTHING
+              AppInitializer.init();
+          } catch (error) {
+              console.error('❌ Failed to initialize application:', error);
+
+              if (typeof MessageManager !== 'undefined') {
+                  MessageManager.alert.error(
+                      'Initialization Failed',
+                      'Failed to initialize application. Please refresh the page.'
+                  );
+              } else {
+                  alert('Failed to initialize application.  Please refresh the page.');
+              }
+          }
+      });
+    </script>
+  }
 
   <!-- Debug Helper (Development only) -->
   @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")

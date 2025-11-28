@@ -7,7 +7,7 @@
  * Date: 2025-01-13
 =========================================================*/
 
-var ApiCallManager = (function () {
+var ApiCallManager_Copy = (function () {
   'use strict';
 
   // ============================================
@@ -146,6 +146,8 @@ var ApiCallManager = (function () {
       }
     });
   }
+
+
 
   /**
    * Get base API URL
@@ -434,134 +436,6 @@ var ApiCallManager = (function () {
   // ============================================
 
   /**
-   * GET Request With Refresh Token
-   * @param {string} baseUrl - Base API url
-   * @param {string} endpoint - API endpoint
-   * @param {object} options - Request options
-   * @param {object} options.params - Query parameters
-   * @param {boolean} options.retry - Enable retry (default: true)
-   * @param {number} options.maxRetries - Max retry attempts
-   * @param {AbortSignal} options.signal - Abort signal
-   * @returns {Promise<*>} Response data
-   * 
-   * @example
-   * const users = await ApiCallManager.get('/crm-course-ddl');
-   * const filtered = await ApiCallManager.get('/users', { params: { status: 'active' } });
-   */
-  async function getWithRefreshToken(baseUrl, endpoint, options) {
-    options = _prepareRequestOptions(options);
-
-    return await _executeWithTokenRefresh(async function () {
-      try {
-        // Build query string if params provided
-        let url = endpoint;
-        if (options?.params) {
-          const queryString = new URLSearchParams(options.params).toString();
-          url = endpoint.includes('?') ? `${endpoint}&${queryString}` : `${endpoint}?${queryString}`;
-        }
-
-        const response = await _executeRequest('GET', url, null, options);
-        return response.Data;
-      } catch (error) {
-        _handleError(error);
-        throw error;
-      }
-    }, options);
-  }
-
-  /**
-   * POST Request
-   * @param {string} endpoint - API endpoint
-   * @param {object|FormData} data - Request payload
-   * @param {object} options - Request options
-   * @returns {Promise<*>} Response data
-   * 
-   * @example
-   * const newCourse = await ApiCallManager.post('/crm-course', courseData);
-   */
-  async function postWithRefreshToken(endpoint, data, options) {
-    options = _prepareRequestOptions(options);
-
-    return await _executeWithTokenRefresh(async function () {
-      try {
-        const response = await _executeRequest('POST', endpoint, data, options);
-        return response.Data;
-      } catch (error) {
-        _handleError(error);
-        throw error;
-      }
-    }, options);
-  }
-
-  /**
-   * PUT Request
-   * @param {string} endpoint - API endpoint
-   * @param {object|FormData} data - Request payload
-   * @param {object} options - Request options
-   * @returns {Promise<*>} Response data
-   * 
-   * @example
-   * const updated = await ApiCallManager.put('/crm-course/123', courseData);
-   */
-  async function putWithRefreshToken(endpoint, data, options) {
-    options = _prepareRequestOptions(options);
-
-    return await _executeWithTokenRefresh(async function () {
-      try {
-        const response = await _executeRequest('PUT', endpoint, data, options);
-        return response.Data;
-      } catch (error) {
-        _handleError(error);
-        throw error;
-      }
-    }, options);
-  }
-
-  /**
-   * DELETE Request
-   * @param {string} endpoint - API endpoint
-   * @param {object} options - Request options
-   * @returns {Promise<*>} Response data
-   * 
-   * @example
-   * await ApiCallManager.delete('/crm-course/123');
-   */
-  async function deleteWithRefreshToken(endpoint, options) {
-    options = _prepareRequestOptions(options);
-
-    return await _executeWithTokenRefresh(async function () {
-      try {
-        const response = await _executeRequest('DELETE', endpoint, null, options);
-        return response.Data;
-      } catch (error) {
-        _handleError(error);
-        throw error;
-      }
-    }, options);
-  }
-
-  /**
-   * PATCH Request
-   * @param {string} endpoint - API endpoint
-   * @param {object} data - Request payload
-   * @param {object} options - Request options
-   * @returns {Promise<*>} Response data
-   */
-  async function patchWithRefreshToken(endpoint, data, options) {
-    options = _prepareRequestOptions(options);
-
-    return await _executeWithTokenRefresh(async function () {
-      try {
-        const response = await _executeRequest('PATCH', endpoint, data, options);
-        return response.Data;
-      } catch (error) {
-        _handleError(error);
-        throw error;
-      }
-    }, options);
-  }
-
-  /**
    * GET Request
    * @param {string} endpoint - API endpoint
    * @param {object} options - Request options
@@ -577,6 +451,41 @@ var ApiCallManager = (function () {
    */
   async function get(endpoint, options) {
     try {
+      // Build query string if params provided
+      let url = endpoint;
+      if (options?.params) {
+        const queryString = new URLSearchParams(options.params).toString();
+        url = endpoint.includes('?') ? `${endpoint}&${queryString}` : `${endpoint}?${queryString}`;
+      }
+
+      const response = await _executeRequest('GET', url, null, options);
+
+      // Return only Data field for cleaner API (matching backend pattern)
+      return response.Data;
+    } catch (error) {
+      _handleError(error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET Request With Refresh Token
+   * @param {string} baseUrl - Base API url
+   * @param {string} endpoint - API endpoint
+   * @param {object} options - Request options
+   * @param {object} options.params - Query parameters
+   * @param {boolean} options.retry - Enable retry (default: true)
+   * @param {number} options.maxRetries - Max retry attempts
+   * @param {AbortSignal} options.signal - Abort signal
+   * @returns {Promise<*>} Response data
+   * 
+   * @example
+   * const users = await ApiCallManager.get('/crm-course-ddl');
+   * const filtered = await ApiCallManager.get('/users', { params: { status: 'active' } });
+   */
+  async function getWithRefreshToken(baseUrl, endpoint, options) {
+    try {
+      options = _prepareRequestOptions(options);
       // Build query string if params provided
       let url = endpoint;
       if (options?.params) {
@@ -930,8 +839,7 @@ var ApiCallManager = (function () {
       timeout: 30000,
       showLoadingIndicator: false,
       showErrorNotifications: true,
-      skipTokenRefresh: false, // 🆕 New option
-      params: {}
+      skipTokenRefresh: false // 🆕 New option
     };
 
     return Object.assign({}, defaultOptions, options || {});

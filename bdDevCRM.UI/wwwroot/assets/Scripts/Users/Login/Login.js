@@ -130,7 +130,7 @@ var loginManager = {
 			data: JSON.stringify(obj),
 			success: function (response) {
 				debugger;
-				localStorage.setItem("jwtToken", response);
+				localStorage.setItem("jwtToken", response.Data.AccessToken);
 				loginHelper.getLoggedInUserInfo();
 			},
 			error: function (xhr, status, error) {

@@ -1,230 +1,331 @@
 ﻿/*=========================================================
  * Storage Manager
  * File: StorageManager.js
- * Description: Unified localStorage and sessionStorage wrapper
+ * Description: Enhanced storage manager with token management
  * Author: devSakhawat
- * Date: 2025-11-13
+ * Date: 2025-11-26
 =========================================================*/
 
 var StorageManager = (function () {
   'use strict';
 
-  /**
-   * Local Storage Adapter
-   */
-  var LocalStorageAdapter = {
-    set: function (key, value) {
-      try {
-        var serialized = JSON.stringify(value);
-        localStorage.setItem(key, serialized);
-        return true;
-      } catch (e) {
-        console.error('LocalStorage set error:', e);
-        return false;
-      }
-    },
-
-    get: function (key, defaultValue) {
-      try {
-        var item = localStorage.getItem(key);
-        if (item === null) return defaultValue;
-        return JSON.parse(item);
-      } catch (e) {
-        console.error('LocalStorage get error:', e);
-        return defaultValue;
-      }
-    },
-
-    remove: function (key) {
-      try {
-        localStorage.removeItem(key);
-        return true;
-      } catch (e) {
-        console.error('LocalStorage remove error:', e);
-        return false;
-      }
-    },
-
-    clear: function () {
-      try {
-        localStorage.clear();
-        return true;
-      } catch (e) {
-        console.error('LocalStorage clear error:', e);
-        return false;
-      }
-    },
-
-    has: function (key) {
-      return localStorage.getItem(key) !== null;
-    },
-
-    keys: function () {
-      return Object.keys(localStorage);
-    }
+  // ============================================
+  // PRIVATE - Storage Keys
+  // ============================================
+  var _keys = {
+    accessToken: 'accessToken',
+    refreshToken: 'refreshToken',
+    accessTokenExpiry: 'accessTokenExpiry',
+    refreshTokenExpiry: 'refreshTokenExpiry',
+    userInfo: 'userInfo',
+    menuCache: 'menuCache'
   };
 
+  // ============================================
+  // PUBLIC - Token Management
+  // ============================================
+
   /**
-   * Session Storage Adapter
+   * Store authentication tokens
+   * @param {object} tokenResponse - { AccessToken, RefreshToken, AccessTokenExpiry, RefreshTokenExpiry }
    */
-  var SessionStorageAdapter = {
-    set: function (key, value) {
-      try {
-        var serialized = JSON.stringify(value);
-        sessionStorage.setItem(key, serialized);
-        return true;
-      } catch (e) {
-        console.error('SessionStorage set error:', e);
-        return false;
-      }
-    },
-
-    get: function (key, defaultValue) {
-      try {
-        var item = sessionStorage.getItem(key);
-        if (item === null) return defaultValue;
-        return JSON.parse(item);
-      } catch (e) {
-        console.error('SessionStorage get error:', e);
-        return defaultValue;
-      }
-    },
-
-    remove: function (key) {
-      try {
-        sessionStorage.removeItem(key);
-        return true;
-      } catch (e) {
-        console.error('SessionStorage remove error:', e);
-        return false;
-      }
-    },
-
-    clear: function () {
-      try {
-        sessionStorage.clear();
-        return true;
-      } catch (e) {
-        console.error('SessionStorage clear error:', e);
-        return false;
-      }
-    },
-
-    has: function (key) {
-      return sessionStorage.getItem(key) !== null;
-    },
-
-    keys: function () {
-      return Object.keys(sessionStorage);
+  function setTokens(tokenResponse) {
+    if (!tokenResponse) {
+      console.error('TokenResponse is null or undefined');
+      return;
     }
-  };
 
-  /**
-   * Memory Storage (fallback)
-   */
-  var MemoryStorageAdapter = (function () {
-    var _storage = {};
-
-    return {
-      set: function (key, value) {
-        _storage[key] = value;
-        return true;
-      },
-
-      get: function (key, defaultValue) {
-        return _storage.hasOwnProperty(key) ? _storage[key] : defaultValue;
-      },
-
-      remove: function (key) {
-        delete _storage[key];
-        return true;
-      },
-
-      clear: function () {
-        _storage = {};
-        return true;
-      },
-
-      has: function (key) {
-        return _storage.hasOwnProperty(key);
-      },
-
-      keys: function () {
-        return Object.keys(_storage);
-      }
-    };
-  })();
-
-  /**
-   * Check if storage is available
-   */
-  function _isStorageAvailable(type) {
     try {
-      var storage = window[type];
-      var x = '__storage_test__';
-      storage.setItem(x, x);
-      storage.removeItem(x);
-      return true;
-    } catch (e) {
-      return false;
+      localStorage.setItem(_keys.accessToken, tokenResponse.AccessToken);
+      localStorage.setItem(_keys.refreshToken, tokenResponse.RefreshToken);
+      localStorage.setItem(_keys.accessTokenExpiry, tokenResponse.AccessTokenExpiry);
+      localStorage.setItem(_keys.refreshTokenExpiry, tokenResponse.RefreshTokenExpiry);
+
+      console.log('✅ Tokens stored successfully');
+    } catch (error) {
+      console.error('❌ Failed to store tokens:', error);
     }
   }
 
   /**
-   * Get appropriate adapter
+   * Get access token
+   * @returns {string|null}
    */
-  function _getAdapter(type) {
-    if (type === 'session') {
-      return _isStorageAvailable('sessionStorage')
-        ? SessionStorageAdapter
-        : MemoryStorageAdapter;
-    } else {
-      return _isStorageAvailable('localStorage')
-        ? LocalStorageAdapter
-        : MemoryStorageAdapter;
+  function getAccessToken() {
+    return localStorage.getItem(_keys.accessToken);
+  }
+
+  /**
+   * Get refresh token
+   * @returns {string|null}
+   */
+  function getRefreshToken() {
+    return localStorage.getItem(_keys.refreshToken);
+  }
+
+  /**
+   * Get access token expiry
+   * @returns {Date|null}
+   */
+  function getAccessTokenExpiry() {
+    var expiry = localStorage.getItem(_keys.accessTokenExpiry);
+    return expiry ? new Date(expiry) : null;
+  }
+
+  /**
+   * Get refresh token expiry
+   * @returns {Date|null}
+   */
+  function getRefreshTokenExpiry() {
+    var expiry = localStorage.getItem(_keys.refreshTokenExpiry);
+    return expiry ? new Date(expiry) : null;
+  }
+
+  /**
+   * Check if access token is expired
+   * @returns {boolean}
+   */
+  function isAccessTokenExpired() {
+    var expiry = getAccessTokenExpiry();
+    if (!expiry) return true;
+
+    // Consider token expired if less than 2 minutes remaining
+    var bufferMinutes = 2;
+    var expiryWithBuffer = new Date(expiry.getTime() - bufferMinutes * 60 * 1000);
+
+    return new Date() >= expiryWithBuffer;
+  }
+
+  /**
+   * Check if refresh token is expired
+   * @returns {boolean}
+   */
+  function isRefreshTokenExpired() {
+    var expiry = getRefreshTokenExpiry();
+    if (!expiry) return true;
+
+    return new Date() >= expiry;
+  }
+
+  /**
+   * Clear all tokens
+   */
+  function clearTokens() {
+    localStorage.removeItem(_keys.accessToken);
+    localStorage.removeItem(_keys.refreshToken);
+    localStorage.removeItem(_keys.accessTokenExpiry);
+    localStorage.removeItem(_keys.refreshTokenExpiry);
+
+    console.log('✅ Tokens cleared');
+  }
+
+  // ============================================
+  // PUBLIC - User Info Management
+  // ============================================
+
+  /**
+   * Store user info
+   * @param {object} userInfo
+   */
+  function setUserInfo(userInfo) {
+    try {
+      localStorage.setItem(_keys.userInfo, JSON.stringify(userInfo));
+      console.log('✅ User info stored');
+    } catch (error) {
+      console.error('❌ Failed to store user info:', error);
     }
   }
 
-  // Public API
-  return {
-    // Local Storage
-    local: LocalStorageAdapter,
-
-    // Session Storage
-    session: SessionStorageAdapter,
-
-    // Memory Storage
-    memory: MemoryStorageAdapter,
-
-    // Unified methods (uses localStorage by default)
-    set: function (key, value, useSession) {
-      var adapter = _getAdapter(useSession ? 'session' : 'local');
-      return adapter.set(key, value);
-    },
-
-    get: function (key, defaultValue, useSession) {
-      var adapter = _getAdapter(useSession ? 'session' : 'local');
-      return adapter.get(key, defaultValue);
-    },
-
-    remove: function (key, useSession) {
-      var adapter = _getAdapter(useSession ? 'session' : 'local');
-      return adapter.remove(key);
-    },
-
-    clear: function (useSession) {
-      var adapter = _getAdapter(useSession ? 'session' : 'local');
-      return adapter.clear();
-    },
-
-    has: function (key, useSession) {
-      var adapter = _getAdapter(useSession ? 'session' : 'local');
-      return adapter.has(key);
-    },
-
-    keys: function (useSession) {
-      var adapter = _getAdapter(useSession ? 'session' : 'local');
-      return adapter.keys();
+  /**
+   * Get user info
+   * @returns {object|null}
+   */
+  function getUserInfo() {
+    try {
+      var userInfo = localStorage.getItem(_keys.userInfo);
+      return userInfo ? JSON.parse(userInfo) : null;
+    } catch (error) {
+      console.error('❌ Failed to get user info:', error);
+      return null;
     }
+  }
+
+  /**
+   * Clear user info
+   */
+  function clearUserInfo() {
+    localStorage.removeItem(_keys.userInfo);
+    console.log('✅ User info cleared');
+  }
+
+  // ============================================
+  // PUBLIC - Menu Cache Management
+  // ============================================
+
+  /**
+   * Cache menu data
+   * @param {Array} menuData
+   */
+  function cacheMenu(menuData) {
+    try {
+      var userInfo = getUserInfo();
+      if (!userInfo) return;
+
+      var cacheKey = _keys.menuCache + '_' + userInfo.UserId;
+      var cacheData = {
+        data: menuData,
+        timestamp: new Date().toISOString()
+      };
+
+      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+      console.log('✅ Menu cached');
+    } catch (error) {
+      console.error('❌ Failed to cache menu:', error);
+    }
+  }
+
+  /**
+   * Get cached menu
+   * @returns {Array|null}
+   */
+  function getCachedMenu() {
+    try {
+      var userInfo = getUserInfo();
+      if (!userInfo) return null;
+
+      var cacheKey = _keys.menuCache + '_' + userInfo.UserId;
+      var cached = localStorage.getItem(cacheKey);
+
+      if (!cached) return null;
+
+      var cacheData = JSON.parse(cached);
+
+      // Check cache expiry (1 hour)
+      var cacheTime = new Date(cacheData.timestamp);
+      var hoursDiff = (new Date() - cacheTime) / (1000 * 60 * 60);
+
+      if (hoursDiff > 1) {
+        clearMenuCache();
+        return null;
+      }
+
+      return cacheData.data;
+    } catch (error) {
+      console.error('❌ Failed to get cached menu:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clear menu cache
+   */
+  function clearMenuCache() {
+    try {
+      var userInfo = getUserInfo();
+      if (!userInfo) return;
+
+      var cacheKey = _keys.menuCache + '_' + userInfo.UserId;
+      localStorage.removeItem(cacheKey);
+      console.log('✅ Menu cache cleared');
+    } catch (error) {
+      console.error('❌ Failed to clear menu cache:', error);
+    }
+  }
+
+  // ============================================
+  // PUBLIC - Generic Storage
+  // ============================================
+
+  /**
+   * Set item in localStorage
+   * @param {string} key
+   * @param {any} value
+   */
+  function setItem(key, value) {
+    try {
+      var stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+      localStorage.setItem(key, stringValue);
+    } catch (error) {
+      console.error('❌ Failed to set item:', error);
+    }
+  }
+
+  /**
+   * Get item from localStorage
+   * @param {string} key
+   * @returns {any}
+   */
+  function getItem(key) {
+    try {
+      var value = localStorage.getItem(key);
+      if (!value) return null;
+
+      // Try to parse JSON
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
+    } catch (error) {
+      console.error('❌ Failed to get item:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Remove item from localStorage
+   * @param {string} key
+   */
+  function removeItem(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error('❌ Failed to remove item:', error);
+    }
+  }
+
+  /**
+   * Clear all storage
+   */
+  function clearAll() {
+    try {
+      localStorage.clear();
+      console.log('✅ All storage cleared');
+    } catch (error) {
+      console.error('❌ Failed to clear storage:', error);
+    }
+  }
+
+  // ============================================
+  // PUBLIC API
+  // ============================================
+  return {
+    // Token management
+    setTokens: setTokens,
+    getAccessToken: getAccessToken,
+    getRefreshToken: getRefreshToken,
+    getAccessTokenExpiry: getAccessTokenExpiry,
+    getRefreshTokenExpiry: getRefreshTokenExpiry,
+    isAccessTokenExpired: isAccessTokenExpired,
+    isRefreshTokenExpired: isRefreshTokenExpired,
+    clearTokens: clearTokens,
+
+    // User info management
+    setUserInfo: setUserInfo,
+    getUserInfo: getUserInfo,
+    clearUserInfo: clearUserInfo,
+
+    // Menu cache management
+    cacheMenu: cacheMenu,
+    getCachedMenu: getCachedMenu,
+    clearMenuCache: clearMenuCache,
+
+    // Generic storage
+    setItem: setItem,
+    getItem: getItem,
+    removeItem: removeItem,
+    clearAll: clearAll
   };
 })();
+
+console.log('%c[StorageManager] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');

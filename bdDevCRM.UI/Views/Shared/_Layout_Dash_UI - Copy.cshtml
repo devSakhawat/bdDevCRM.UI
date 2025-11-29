@@ -285,10 +285,11 @@
   <!-- Theme JS -->
   <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
 
-  <!-- ========================================== -->
-  <!-- 1. LOAD CONFIG FIRST (No dependencies)    -->
-  <!-- ========================================== -->
-    <script src="~/assets/scripts/config/appconfig.js"></script>
+<!-- ========================================== -->
+<!-- 1. LOAD CONFIG FIRST (No dependencies)    -->
+<!-- ========================================== -->
+<script src="~/assets/Scripts/Config/AppConfig.js"></script>
+
 
 @*   <!-- ========================================== -->
   <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
@@ -306,10 +307,22 @@
   <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
  *@
 
+
   <!-- ========================================== -->
-  <!-- 4. LOAD MANAGERS & HELPERS                 -->
+  <!-- 2. LOAD HELPERS                            -->
   <!-- ========================================== -->
-  <!-- Managers -->
+  <script src="~/assets/Scripts/Core/Helpers/TypeConverter.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/DateHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/FormHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/GridHelper. js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/NumberHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/StringHelper. js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/ValidationHelper.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 3. LOAD CORE MANAGERS                     -->
+  <!-- ========================================== -->
   <script src="~/assets/scripts/core/managers/messagemanager.js"></script>
   <script src="~/assets/scripts/core/managers/apicallmanager.js"></script>
   <script src="~/assets/scripts/core/managers/sessionstorageadapter.js"></script>
@@ -318,34 +331,52 @@
   <script src="~/assets/scripts/core/managers/tokenmanager.js"></script>
   <script src="~/assets/scripts/core/managers/vanillaapicallmanager.js"></script>
 
-  <!-- Helpers -->
-  <script src="~/assets/scripts/core/helpers/datehelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/formhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/gridhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/numberhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/stringhelper.js"></script>
-  <script src="~/assets/scripts/core/helpers/validationhelper.js"></script>
-
   <!-- ========================================== -->
-  <!-- 5. Services Layer                          -->
+  <!-- 4. LOAD COMMON (Menu Helper)               -->
   <!-- ========================================== -->
-  <script src="~/assets/scripts/services/genericservice.js"></script>
-
-  <!-- Common js -->
-  <script src="~/assets/scripts/common/common.js"></script>
+  <script src="~/assets/Scripts/Common/common.js"></script>
   <script src="~/assets/scripts/common/commonmessage.js"></script>
   <script src="~/assets/scripts/common/cescommon.js"></script>
   <script src="~/assets/scripts/common/date.js"></script>
   <script src="~/assets/scripts/common/approverrecomendar.js"></script>
 
+  <!-- ========================================== -->
+<!-- 5. LOAD MODULE REGISTRY & APP INITIALIZER  -->
+<!-- ========================================== -->
+<script src="~/assets/Scripts/Core/ModuleRegistry.js"></script>
+<script src="~/assets/Scripts/Core/Managers/AppInitializer.js"></script>
+
+  <!-- ========================================== -->
+  <!-- 6. Services Layer                          -->
+  <!-- ========================================== -->
+  <script src="~/assets/scripts/services/genericservice.js"></script>
+
+
+
+
   <!-- Bootstrap App before any module -->
 @*   <script src="~/assets/scripts/app.bootstrap.js"></script> *@
 
+  <!-- ========================================== -->
+  <!-- 8. PAGE-SPECIFIC SCRIPTS                   -->
+  <!-- ========================================== -->
   @await RenderSectionAsync("Scripts", required: false)
 
+  <!-- ========================================== -->
+  <!-- 9. ✅ SINGLE INITIALIZATION POINT          -->
+  <!-- ========================================== -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      try {
+        // ✅ শুধু একটা call - সব কিছু AppInitializer handle করবে
+        AppInitializer.init();
+      } catch (error) {
+        console.error('❌ Failed to initialize application:', error);
+      }
+    });
+  </script>
 
-
-  <!-- ✅ Menu Initialization Script -->
+@*   <!-- ✅ Menu Initialization Script -->
   <script type="text/javascript">
     $(document).ready(function() {
       try {
@@ -363,9 +394,7 @@
         console.error('Error initializing menu:', error);
       }
     });
-  </script>
-
-
+  </script> *@
 
   <!-- Debug Helper (Development only) -->
   @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")

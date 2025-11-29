@@ -1435,7 +1435,9 @@ var MenuManager = {
   },
 
 };
-var MenuHelper = {
+
+
+var MenuHelperCommonFile = {
 
   GetMenuInformation: function () {
     var objMenuList = MenuManager.getMenu();

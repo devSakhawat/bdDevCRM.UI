@@ -1,4 +1,5 @@
-﻿/*=========================================================
+﻿/// <reference path="../core/managers/apicallmanager.js" />
+/*=========================================================
  * Menu Helper
  * File: common.js
  * Description: Sidebar menu management with caching
@@ -45,6 +46,7 @@ var MenuHelper = (function () {
    * 5.  Render menu
    */
   async function GetMenuInformation() {
+    debugger;
     if (_state.isLoading) {
       console.warn('⚠️ Menu already loading.. .');
       return;
@@ -104,14 +106,12 @@ var MenuHelper = (function () {
 
   /**
    * Fetch menu from API
-   * API থেকে menu fetch করা
    */
   async function _fetchMenuFromApi() {
     try {
-      var response = await ApiCallManager.get(
+      var response = await ApiCallManager.getWithRefreshToken(
         AppConfig.getApiUrl(),
         AppConfig.endpoints.menusByUserPermission || '/menus-by-user-permission',
-        null,
         {
           showLoadingIndicator: false,
           showErrorNotifications: false

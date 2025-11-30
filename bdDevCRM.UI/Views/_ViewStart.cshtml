@@ -1,3 +1,12 @@
 ﻿@{
-    Layout = "_Layout";
+  // Check if the request is an AJAX request from our NavigationManager
+  // The 'X-Requested-With' header is standard for this
+  if (Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+  {
+    Layout = null; // Only render the View content, no Layout
+  }
+  else
+  {
+    Layout = "_Layout_Dash_UI"; // Normal Full Page Load
+  }
 }

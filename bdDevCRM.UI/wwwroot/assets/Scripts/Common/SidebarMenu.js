@@ -1,13 +1,15 @@
 ﻿/// <reference path="../core/managers/apicallmanager.js" />
+/// <reference path="../core/managers/storagemanager.js" />
+
 /*=========================================================
  * Menu Helper
- * File: common.js
+ * File: SidebarMenu.js
  * Description: Sidebar menu management with caching
  * Author: devSakhawat
  * Date: 2025-11-26
 =========================================================*/
 
-var MenuHelper = (function () {
+var SidebarMenu = (function () {
   'use strict';
 
   // ============================================
@@ -61,9 +63,25 @@ var MenuHelper = (function () {
       _showSkeletonLoader();
 
       // Step 1: Check cache first
+      var cacheSource = (typeof StorageManager !== 'undefined') ? 'StorageManager' : 'localStorage';
       var cachedMenu = _getCachedMenu();
+      console.log('📦 Cached menu source:', cacheSource);
+      console.log('📦 Cached menu value:', cachedMenu);
 
-      if (cachedMenu) {
+      // Detect cached ParseError object (some code may have cached the full response/error accidentally)
+      if (cachedMenu && typeof cachedMenu === 'object' && cachedMenu.IsSuccess === false && cachedMenu.ErrorType === 'ParseError') {
+        console.warn('❌ Cached menu is a ParseError object — clearing cache and refetching');
+        _clearMenuCache();
+        cachedMenu = null;
+      }
+
+      // If cachedMenu is a wrapper object (unexpected), try to extract Data
+      if (cachedMenu && !Array.isArray(cachedMenu) && cachedMenu.Data && Array.isArray(cachedMenu.Data)) {
+        console.log('🔧 Cached menu was wrapped, extracting Data property');
+        cachedMenu = cachedMenu.Data;
+      }
+
+      if (cachedMenu && Array.isArray(cachedMenu) && cachedMenu.length > 0) {
         console.log('✅ Menu loaded from cache');
         _renderMenu(cachedMenu);
         _state.menuData = cachedMenu;
@@ -109,6 +127,7 @@ var MenuHelper = (function () {
    */
   async function _fetchMenuFromApi() {
     try {
+      // Correct signature: only endpoint and options
       var response = await ApiCallManager.getWithRefreshToken(
         AppConfig.getApiUrl(),
         AppConfig.endpoints.menusByUserPermission || '/menus-by-user-permission',
@@ -118,15 +137,33 @@ var MenuHelper = (function () {
         }
       );
 
-      // Handle ApiResponse wrapper
-      if (response && response.Data) {
+      // Debug logging
+      console.log('📥 Menu API Response:', response);
+      console.log('📋 Is Array?', Array.isArray(response));
+
+      // Validate response
+      if (!response) {
+        console.error('❌ Response is null or undefined');
+        return [];
+      }
+
+      // Response is already unwrapped (response.Data)
+      if (Array.isArray(response)) {
+        return response;
+      }
+
+      // Double-wrapped case (shouldn't happen but handle it)
+      if (response.Data && Array.isArray(response.Data)) {
         return response.Data;
       }
 
-      return response;
+      // Unexpected format
+      console.error('❌ Unexpected response format. Expected array, got:', typeof response);
+      console.error('Response:', response);
+      return [];
 
     } catch (error) {
-      console.error('API call failed:', error);
+      console.error('❌ API call failed:', error);
       throw error;
     }
   }
@@ -151,7 +188,7 @@ var MenuHelper = (function () {
 
       var cacheKey = _config.cacheKeyPrefix + userInfo.UserId;
       var cached = localStorage.getItem(cacheKey);
-
+      console.log(cached);
       if (!cached) return null;
 
       var cacheData = JSON.parse(cached);
@@ -412,18 +449,24 @@ var MenuHelper = (function () {
    * Menu এর URL নেওয়া
    */
   function _getMenuUrl(menu) {
-    var menuUrl = menu.MenuUrl || menu.Url || menu.Path || '#';
+    var menuUrl = menu.MenuPath || '#';
 
     if (menuUrl === '#') return '#';
 
-    // If URL doesn't start with /, add it
-    if (menuUrl.indexOf('/') !== 0) {
-      menuUrl = '/' + menuUrl;
+    // Check if AppConfig exists
+    if (typeof AppConfig !== 'undefined' && AppConfig.getUiUrl) {
+      try {
+        var fullUrl = new URL(menuUrl, AppConfig.getUiUrl());
+        return fullUrl.href;
+      } catch (e) {
+        console.error('Error constructing URL:', e);
+        // Fallback to string concatenation if URL fails
+      }
     }
 
-    // Add base URL if needed
-    if (typeof AppConfig !== 'undefined' && AppConfig.getUiUrl) {
-      return AppConfig.getUiUrl() + menuUrl;
+    // Fallback for when AppConfig is missing (local path only)
+    if (menuUrl.indexOf('/') !== 0) {
+      menuUrl = '/' + menuUrl;
     }
 
     return menuUrl;

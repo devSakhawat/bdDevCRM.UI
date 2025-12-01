@@ -414,18 +414,76 @@ button{
    Collapse Animation
 ============================================ */
 .collapse {
-  transition: height 0.3s ease;
+  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden; /* ✅ Important - prevents horizontal layout */
 }
 
 .collapsing {
-  transition: height 0.3s ease;
+  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden; /* ✅ Prevents content shifting */
 }
+
+/* Ensure submenu structure stays vertical */
+.nav .flex-column {
+  padding-left: 0;
+  margin-top: 0; /* ✅ Remove gap */
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column; /* ✅ Force vertical layout */
+}
+
+  /* Prevent Bootstrap's default display behavior */
+  .nav .flex-column.collapse:not(.show) {
+    display: none;
+  }
+
+  .nav .flex-column.collapsing {
+    display: block; /* ✅ Keep block during animation */
+    height: 0;
+  }
+
+  .nav .flex-column.collapse.show {
+    display: block;
+  }
+
+/* ============================================
+   Enhanced Arrow Rotation Animation
+============================================ */
+
+.submenu-arrow {
+  margin-left: auto;
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 12px;
+  font-weight: bold;
+  transform-origin: center;
+}
+
+/* Default state - arrow pointing right */
+.submenu-arrow {
+  transform: rotate(0deg);
+}
+
+  /* Expanded state - arrow pointing down */
+  .submenu-arrow.rotate-down {
+    transform: rotate(180deg);
+  }
+
+/* Add subtle scale effect on hover */
+.nav-link:hover .submenu-arrow {
+  transform: scale(1. 1);
+}
+
+  .nav-link:hover .submenu-arrow.rotate-down {
+    transform: rotate(180deg) scale(1.1);
+  }
+
 
 /* ============================================
    Responsive
 ============================================ */
 @media (max-width: 768px) {
-  . nav-link {
+  .nav-link {
     padding: 10px 12px;
     font-size: 13px;
   }
@@ -434,7 +492,7 @@ button{
       font-size: 16px;
     }
 
-  .nav . flex-column .nav-link {
+  .nav .flex-column .nav-link {
     padding: 8px 12px 8px 32px;
     font-size: 12px;
   }

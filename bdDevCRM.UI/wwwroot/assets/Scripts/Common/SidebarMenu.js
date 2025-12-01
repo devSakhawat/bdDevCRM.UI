@@ -364,7 +364,8 @@ var SidebarMenu = (function () {
       }
 
       linkHtml += '<span class="nav-link-text">' + (menu.MenuName || menu.Name) + '</span>';
-      linkHtml += '<i class="bi bi-chevron-down submenu-arrow' + (shouldExpand ? ' rotate-down' : '') + '"></i>';
+      //linkHtml += '<i class="bi bi-chevron-down submenu-arrow' + (shouldExpand ? ' rotate-down' : '') + '"></i>';
+      linkHtml += '<i class="bi bi-chevron-right submenu-arrow' + (shouldExpand ? ' rotate-down' : '') + '"></i>';
 
       $link.html(linkHtml);
       $li.append($link);
@@ -522,28 +523,83 @@ var SidebarMenu = (function () {
    * Bind menu events
    * Menu events bind করা
    */
+  //function _bindMenuEvents() {
+  //  var $sidebar = $('#' + _config.sidebarId);
+
+  //  // Submenu toggle animation
+  //  $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
+  //    var $this = $(this);
+  //    var $arrow = $this.find('.submenu-arrow');
+
+  //    // Rotate arrow animation
+  //    setTimeout(function () {
+  //      if ($this.attr('aria-expanded') === 'true') {
+  //        $arrow.addClass('rotate-down');
+  //      } else {
+  //        $arrow.removeClass('rotate-down');
+  //      }
+  //    }, 10);
+  //  });
+
+  //  // Close other submenus when opening one (accordion behavior)
+  //  $sidebar.find('.collapse').on('show.bs.collapse', function () {
+  //    var $this = $(this);
+  //    $sidebar.find('.collapse.show').each(function () {
+  //      if (this !== $this[0]) {
+  //        $(this).collapse('hide');
+  //      }
+  //    });
+  //  });
+  //}
+
+  /**
+ * Bind menu events (FIXED - Arrow Rotation)
+ */
   function _bindMenuEvents() {
     var $sidebar = $('#' + _config.sidebarId);
 
-    // Submenu toggle animation
+    // ✅ FIXED: Arrow rotation on toggle
     $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
+      e.preventDefault(); // Prevent default anchor behavior
+
       var $this = $(this);
       var $arrow = $this.find('.submenu-arrow');
+      var targetId = $this.attr('data-bs-target');
+      var $target = $(targetId);
 
-      // Rotate arrow animation
-      setTimeout(function () {
-        if ($this.attr('aria-expanded') === 'true') {
-          $arrow.addClass('rotate-down');
-        } else {
-          $arrow.removeClass('rotate-down');
-        }
-      }, 10);
+      // Toggle collapse
+      $target.collapse('toggle');
+
+      // Update arrow based on current state
+      if ($this.attr('aria-expanded') === 'true') {
+        $arrow.removeClass('rotate-down');
+      } else {
+        $arrow.addClass('rotate-down');
+      }
     });
 
-    // Close other submenus when opening one (accordion behavior)
+    // ✅ Update arrow after collapse animation completes
+    $sidebar.find('.collapse').on('shown.bs.collapse', function () {
+      var $parentLink = $(this).prev('[data-bs-toggle="collapse"]');
+      $parentLink.find('.submenu-arrow').addClass('rotate-down');
+      $parentLink.attr('aria-expanded', 'true');
+    });
+
+    $sidebar.find('.collapse').on('hidden.bs.collapse', function () {
+      var $parentLink = $(this).prev('[data-bs-toggle="collapse"]');
+      $parentLink.find('.submenu-arrow').removeClass('rotate-down');
+      $parentLink.attr('aria-expanded', 'false');
+    });
+
+    // ✅ Accordion behavior (optional - keeps one submenu open)
     $sidebar.find('.collapse').on('show.bs.collapse', function () {
       var $this = $(this);
-      $sidebar.find('. collapse.show').each(function () {
+
+      // Close other open submenus at the same level
+      var $parentLi = $this.closest('.nav-item');
+      var $siblings = $parentLi.siblings('.nav-item');
+
+      $siblings.find('.collapse.show').each(function () {
         if (this !== $this[0]) {
           $(this).collapse('hide');
         }

@@ -53,77 +53,99 @@ button{
 
 
 
-/*=========================================================
- * Sidebar Menu Styles
- * File: sidebar-menu.css
- * Description: Modern sidebar menu with animations
- * Author: devSakhawat
- * Date: 2025-11-26
-=========================================================*/
-
 /* ============================================
-   Sidebar Container
+   Enhanced Sidebar Menu with Better Spacing
 ============================================ */
-#sideNavbar {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  overflow-y: auto;
-  max-height: calc(100vh - 100px);
+/* Sidebar container with better spacing */
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  overflow: hidden;
 }
 
-  /* Custom scrollbar */
-  #sideNavbar::-webkit-scrollbar {
+.sidebar-header {
+  padding: 20px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+  /* Custom scrollbar for sidebar */
+  .sidebar-nav::-webkit-scrollbar {
     width: 6px;
   }
 
-  #sideNavbar::-webkit-scrollbar-track {
+  .sidebar-nav::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
   }
 
-  #sideNavbar::-webkit-scrollbar-thumb {
-    background: #888;
+  .sidebar-nav::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
     border-radius: 10px;
   }
 
-    #sideNavbar::-webkit-scrollbar-thumb:hover {
-      background: #555;
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+      background: #a0aec0;
     }
 
-/* ============================================
-   Menu Items
-============================================ */
+/* Menu items with better spacing */
 .nav-item {
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  color: #4a5568;
+  color: #475569;
   text-decoration: none;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 14px;
   font-weight: 500;
   position: relative;
+  border: 1px solid transparent;
 }
 
+  /* Hover effect - improved */
   .nav-link:hover {
-    background-color: #f7fafc;
-    color: #2d3748;
+    background-color: #f1f5f9;
+    color: #1e293b;
     transform: translateX(4px);
+    border-color: #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
-  .nav-link. active {
-    background-color: #4299e1;
-    color: #ffffff;
+  /* Active state - ENHANCED */
+  .nav-link.active {
+    background: linear-gradient(135deg, #624bff 0%, #4e3ccc 100%);
+    color: #ffffff !important;
     font-weight: 600;
+    box-shadow: 0 4px 12px rgba(98, 75, 255, 0.3);
+    border-color: #624bff;
   }
 
-    .nav-link. active::before {
+    .nav-link.active::before {
       content: '';
       position: absolute;
       left: 0;
@@ -131,15 +153,14 @@ button{
       transform: translateY(-50%);
       width: 4px;
       height: 70%;
-      background-color: #2b6cb0;
+      background-color: #ffffff;
       border-radius: 0 4px 4px 0;
     }
 
-  /* ============================================
-   Icons
-============================================ */
+  /* Icon styling (if you add icons later) */
   .nav-link i {
     font-size: 18px;
+    margin-right: 12px;
     transition: transform 0.3s ease;
   }
 
@@ -151,70 +172,176 @@ button{
     color: #ffffff;
   }
 
-/* ============================================
-   Submenu Arrow
-============================================ */
+/* Submenu arrow with smooth rotation */
 .submenu-arrow {
   margin-left: auto;
-  transition: transform 0.3s ease;
-  font-size: 14px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 12px;
+  font-weight: bold;
 }
 
   .submenu-arrow. rotate-down {
     transform: rotate(180deg);
   }
 
-/* ============================================
-   Submenu (Nested Menus)
-============================================ */
+/* Submenu (nested menus) with better indentation */
 .nav .flex-column {
   padding-left: 0;
   margin-top: 4px;
+  margin-bottom: 4px;
 }
 
   .nav .flex-column .nav-item {
-    margin-bottom: 0;
+    margin-bottom: 2px;
   }
 
+  /* Level 1 submenu - better indentation */
   .nav .flex-column .nav-link {
-    padding: 10px 16px 10px 40px;
+    padding: 10px 16px 10px 32px; /* Increased left padding */
     font-size: 13px;
     font-weight: 400;
+    position: relative;
   }
 
+    /* Visual indicator for submenu items */
     .nav .flex-column .nav-link::before {
       content: '';
       position: absolute;
-      left: 20px;
+      left: 16px;
       top: 50%;
       transform: translateY(-50%);
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       background-color: #cbd5e0;
       border-radius: 50%;
       transition: all 0.3s ease;
     }
 
     .nav .flex-column .nav-link:hover::before {
-      background-color: #4299e1;
+      background-color: #624bff;
       transform: translateY(-50%) scale(1.3);
     }
 
     .nav .flex-column .nav-link.active::before {
       background-color: #ffffff;
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
 
-  /* Third level nesting */
+  /* Level 2 submenu (third level) - even more indentation */
   .nav .flex-column .flex-column .nav-link {
-    padding-left: 56px;
+    padding-left: 48px;
     font-size: 12px;
   }
 
-    .nav .flex-column .flex-column .nav-link::before {
-      left: 36px;
+    .nav .flex-column . flex-column .nav-link::before {
+      left: 32px;
+      width: 6px;
+      height: 6px;
     }
+
+  /* Level 3 submenu (fourth level) */
+  .nav .flex-column . flex-column .flex-column . nav-link {
+    padding-left: 64px;
+    font-size: 11px;
+  }
+
+    .nav .flex-column .flex-column .flex-column .nav-link::before {
+      left: 48px;
+    }
+
+/* Collapse animation - smoother */
+.collapse {
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapsing {
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+  /* Footer buttons */
+  .sidebar-footer .btn {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+    .sidebar-footer .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+/* Skeleton loader - keep existing styles */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1. 5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-line {
+  height: 18px;
+  margin-bottom: 12px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-link {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+    .nav-link i {
+      font-size: 16px;
+    }
+
+  .nav .flex-column .nav-link {
+    padding: 8px 12px 8px 28px;
+    font-size: 12px;
+  }
+
+  .nav .flex-column .flex-column .nav-link {
+    padding-left: 44px;
+  }
+}
+
+/* Dark mode support (if needed later) */
+[data-theme="dark"] .nav-link {
+  color: #e2e8f0;
+}
+
+  [data-theme="dark"] .nav-link:hover {
+    background-color: #2d3748;
+    color: #f7fafc;
+  }
+
+  [data-theme="dark"] .nav-link.active {
+    background: linear-gradient(135deg, #7c66ff 0%, #624bff 100%);
+  }
+
+/* ============================================
+   Enhanced Sidebar Menu with Better Spacing End
+============================================ */
+
 
 /* ============================================
    Skeleton Loader
@@ -356,9 +483,11 @@ button{
 }
 
 .sidebar-header {
-  padding: 20px 16px;
+  padding: .625rem 1.5rem;
   border-bottom: 1px solid #e2e8f0;
+  height: 60px;
 }
+
 
 .sidebar-title {
   margin: 0;

@@ -329,14 +329,14 @@ var SidebarMenu = (function () {
   }
 
   /**
-   * Create menu item HTML
+   * Create menu item HTML (ENHANCED VERSION)
    * Menu item এর HTML তৈরি করা
    */
   function _createMenuItemHtml(menu, allMenus, currentPath) {
     var hasChildren = _hasChildMenus(menu.MenuId, allMenus);
     var isActive = _isMenuActive(menu, currentPath);
     var menuUrl = _getMenuUrl(menu);
-    var icon = menu.MenuIcon || menu.Icon || 'bi bi-circle';
+    var icon = menu.MenuIcon || menu.Icon || '';
 
     var $li = $('<li>').addClass('nav-item');
 
@@ -344,28 +344,36 @@ var SidebarMenu = (function () {
       // Parent menu with children
       var childMenus = _getChildMenus(menu.MenuId, allMenus);
       var hasActiveChild = _hasActiveChild(childMenus, currentPath);
+      var shouldExpand = isActive || hasActiveChild;
 
       var $link = $('<a>')
         .addClass('nav-link')
-        .addClass(isActive || hasActiveChild ? 'active' : '')
+        .addClass(shouldExpand ? 'active' : '')
         .attr('href', '#')
         .attr('data-bs-toggle', 'collapse')
         .attr('data-bs-target', '#submenu-' + menu.MenuId)
-        .attr('aria-expanded', isActive || hasActiveChild ? 'true' : 'false')
-        .attr('aria-controls', 'submenu-' + menu.MenuId)
-        .html(
-          '<i class="' + icon + ' me-2"></i>' +
-          '<span class="nav-link-text">' + (menu.MenuName || menu.Name) + '</span>' +
-          '<i class="bi bi-chevron-down ms-auto submenu-arrow"></i>'
-        );
+        .attr('aria-expanded', shouldExpand ? 'true' : 'false')
+        .attr('aria-controls', 'submenu-' + menu.MenuId);
 
+      // Build HTML content
+      var linkHtml = '';
+
+      // Add icon if exists
+      if (icon) {
+        linkHtml += '<i class="' + icon + '"></i>';
+      }
+
+      linkHtml += '<span class="nav-link-text">' + (menu.MenuName || menu.Name) + '</span>';
+      linkHtml += '<i class="bi bi-chevron-down submenu-arrow' + (shouldExpand ? ' rotate-down' : '') + '"></i>';
+
+      $link.html(linkHtml);
       $li.append($link);
 
       // Create submenu
       var $submenu = $('<ul>')
         .attr('id', 'submenu-' + menu.MenuId)
-        .addClass('collapse nav flex-column ms-3')
-        .addClass(isActive || hasActiveChild ? 'show' : '');
+        .addClass('collapse nav flex-column')
+        .addClass(shouldExpand ? 'show' : '');
 
       // Render child menus recursively
       childMenus.forEach(function (child) {
@@ -380,12 +388,17 @@ var SidebarMenu = (function () {
       var $link = $('<a>')
         .addClass('nav-link')
         .addClass(isActive ? 'active' : '')
-        .attr('href', menuUrl)
-        .html(
-          '<i class="' + icon + ' me-2"></i>' +
-          '<span class="nav-link-text">' + (menu.MenuName || menu.Name) + '</span>'
-        );
+        .attr('href', menuUrl);
 
+      var linkHtml = '';
+
+      if (icon) {
+        linkHtml += '<i class="' + icon + '"></i>';
+      }
+
+      linkHtml += '<span class="nav-link-text">' + (menu.MenuName || menu.Name) + '</span>';
+
+      $link.html(linkHtml);
       $li.append($link);
     }
 
@@ -419,28 +432,52 @@ var SidebarMenu = (function () {
   }
 
   /**
-   * Check if menu is active
-   * Menu active কিনা check করা
-   */
+ * Check if menu is active (IMPROVED VERSION)
+ * check Menu is active or not.
+ */
   function _isMenuActive(menu, currentPath) {
     if (!menu.MenuUrl && !menu.Url && !menu.Path) return false;
 
     var menuUrl = menu.MenuUrl || menu.Url || menu.Path;
 
-    // Normalize URLs
-    menuUrl = menuUrl.replace(/^\//, '');
-    currentPath = currentPath.replace(/^\//, '');
+    // Normalize URLs (remove leading slash and convert to lowercase)
+    menuUrl = menuUrl.replace(/^\//, '').toLowerCase();
+    currentPath = currentPath.replace(/^\//, '').toLowerCase();
 
-    return currentPath.toLowerCase().indexOf(menuUrl.toLowerCase()) === 0;
+    // Exact match check
+    if (currentPath === menuUrl) {
+      return true;
+    }
+
+    // Partial match check (for nested routes)
+    // Example: currentPath = "crm/application/details/123"
+    //          menuUrl = "crm/application"
+    // This should match
+    if (currentPath.indexOf(menuUrl) === 0) {
+      // Make sure it's a proper path segment match
+      // Prevent false positives like "user" matching "users"
+      var nextChar = currentPath.charAt(menuUrl.length);
+      return nextChar === '/' || nextChar === '';
+    }
+
+    return false;
   }
 
   /**
-   * Check if any child menu is active
-   * কোনো child menu active আছে কিনা
+   * Check if any child menu is active (IMPROVED VERSION)
+   * check child menu is active or not.
    */
   function _hasActiveChild(childMenus, currentPath) {
     return childMenus.some(function (child) {
-      return _isMenuActive(child, currentPath);
+      var isChildActive = _isMenuActive(child, currentPath);
+
+      // Recursively check nested children
+      if (!isChildActive && _hasChildMenus(child.MenuId, _getAllMenus())) {
+        var nestedChildren = _getChildMenus(child.MenuId, _getAllMenus());
+        isChildActive = _hasActiveChild(nestedChildren, currentPath);
+      }
+
+      return isChildActive;
     });
   }
 
@@ -470,6 +507,11 @@ var SidebarMenu = (function () {
     }
 
     return menuUrl;
+  }
+
+  // Helper function to get all menus (add this to your code)
+  function _getAllMenus() {
+    return _state.menuData || [];
   }
 
   // ============================================
@@ -697,7 +739,7 @@ var SidebarMenu = (function () {
   }
 
   /**
-   * Set active menu by URL
+   * Set active menu by URL (PUBLIC API)
    * URL দিয়ে active menu set করা
    */
   function setActiveMenuByUrl(url) {
@@ -706,19 +748,64 @@ var SidebarMenu = (function () {
     // Remove all active classes
     $sidebar.find('.nav-link').removeClass('active');
 
-    // Find and activate matching menu
-    $sidebar.find('. nav-link').each(function () {
+    // Normalize URL
+    url = url.replace(/^\//, '').toLowerCase();
+
+    // Find and activate matching menu (most specific match first)
+    var matches = [];
+
+    $sidebar.find('.nav-link').each(function () {
       var $link = $(this);
       var href = $link.attr('href');
 
-      if (href && href !== '#' && url.indexOf(href) === 0) {
-        $link.addClass('active');
+      if (href && href !== '#') {
+        var menuPath = href.replace(/^\//, '').toLowerCase();
 
-        // Expand parent menus
-        $link.parents('. collapse').addClass('show');
-        $link.parents('.collapse').prev('. nav-link').attr('aria-expanded', 'true');
+        if (url.indexOf(menuPath) === 0) {
+          var nextChar = url.charAt(menuPath.length);
+          if (nextChar === '/' || nextChar === '' || menuPath === url) {
+            matches.push({
+              element: $link,
+              length: menuPath.length
+            });
+          }
+        }
       }
     });
+
+    // Sort by length (longest match = most specific)
+    matches.sort(function (a, b) {
+      return b.length - a.length;
+    });
+
+    // Activate the most specific match
+    if (matches.length > 0) {
+      var $activeLink = matches[0].element;
+      $activeLink.addClass('active');
+
+      // Expand parent menus
+      $activeLink.parents('.collapse').each(function () {
+        $(this).addClass('show');
+        var $parentLink = $(this).prev('.nav-link');
+        $parentLink.attr('aria-expanded', 'true');
+        $parentLink.find('.submenu-arrow').addClass('rotate-down');
+      });
+
+      // Scroll into view
+      var navContainer = $sidebar.find('.sidebar-nav')[0];
+      if (navContainer && $activeLink[0]) {
+        var linkTop = $activeLink[0].offsetTop;
+        var linkHeight = $activeLink[0].offsetHeight;
+        var containerHeight = navContainer.offsetHeight;
+        var scrollTop = navContainer.scrollTop;
+
+        if (linkTop < scrollTop || linkTop + linkHeight > scrollTop + containerHeight) {
+          navContainer.scrollTop = linkTop - (containerHeight / 2) + (linkHeight / 2);
+        }
+      }
+
+      console.log('✅ Active menu set:', url);
+    }
   }
 
   /**

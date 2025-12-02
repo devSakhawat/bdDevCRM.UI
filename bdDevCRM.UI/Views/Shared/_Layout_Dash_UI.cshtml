@@ -264,8 +264,8 @@
       <!-- Search Box (NEW - Above Menu List) -->
       <div class="sidebar-search">
         <div class="search-wrapper">
-          <div class="input-group">
-            <input class="form-control rounded-3 bg-transparent ps-9" type="search" value="" id="searchInput" placeholder="Search" />
+          <div class="input-group d-flex align-items-start icon-wrapper">
+            <input class="flex-grow-1 border-right-strait form-control bg-transparent ps-9" type="search" value="" id="searchInput" placeholder="Search" />
             <span class="position-absolute start-0">
               <button class="btn position-absolute start-0" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -276,11 +276,14 @@
                 </svg>
               </button>
             </span>
+            <button type="button" class="btn btn-outline-dark  add-new-ddl-item-btn" onclick="InstituteDetailsHelper.openInstituteTypePopup();">
+              <span class="k-icon k-i-refresh"></span>
+            </button>
           </div>
-          <!-- Refresh Icon (NEW) -->
+        @*   <!-- Refresh Icon (NEW) -->
           <button id="btnRefreshMenu" class="btn-icon-refresh" title="Refresh Menu">
             <i class="bi bi-arrow-clockwise"></i>
-          </button>
+          </button> *@
         </div>
       </div>
 
@@ -421,13 +424,9 @@
 
   <script type="text/javascript">
       $(document).ready(function() {
-
         if (typeof SidebarMenu !== 'undefined') {
-      SidebarMenu.GetMenuInformation();
-    } else {
-      console.error('❌ SidebarMenu not found');
-    }
-
+          SidebarMenu.GetMenuInformation();
+        } else { console.error('❌ SidebarMenu not found'); }
 
         // Initialize Navigation Manager
       if (typeof NavigationManager !== 'undefined') {
@@ -458,7 +457,7 @@
                   await SidebarMenu. refreshMenu();
                   MessageManager.notify.success('Menu refreshed successfully');
               } catch (error) {
-                  MessageManager. notify.error('Failed to refresh menu');
+                  MessageManager.notify.error('Failed to refresh menu');
               } finally {
                   $btn.prop('disabled', false);
                   $btn.html(originalHtml);

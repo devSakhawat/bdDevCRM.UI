@@ -318,13 +318,11 @@ var SidebarMenu = (function () {
   function _buildMenuTree(menus) {
     if (!menus || menus.length === 0) return [];
 
-    // Find root menus (ParentMenuId = null or 0)
+    // Find root menus (ParentMenu = null or 0)
     return menus.filter(function (menu) {
-      return !menu.ParentMenuId ||
-        menu.ParentMenuId === 0 ||
-        menu.ParentMenuId === null ||
+      return !menu.ParentMenu ||
         menu.ParentMenu === 0 ||
-        menu.ParentMenu === null;
+        menu.ParentMenu === null
     }).sort(function (a, b) {
       // Sort by SortOrder or OrderNo
       var orderA = a.SortOrder || a.OrderNo || 0;

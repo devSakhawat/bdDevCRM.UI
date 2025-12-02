@@ -17,6 +17,9 @@ var SidebarMenu = (function () {
   // ============================================
   var _config = {
     sidebarId: 'sideNavbar',
+    searchInputId: 'menuSearch',
+    clearSearchBtnId: 'btnClearSearch',
+    noResultsId: 'noSearchResults',
     cacheKeyPrefix: 'menuCache_',
     cacheExpiryHours: 1,
     maxRetries: 3,
@@ -29,8 +32,10 @@ var SidebarMenu = (function () {
   var _state = {
     menuData: null,
     isLoading: false,
-    retryCount: 0
+    retryCount: 0,
+    searchTerm: ''
   };
+
 
   // ============================================
   // PUBLIC - Main Method
@@ -48,7 +53,6 @@ var SidebarMenu = (function () {
    * 5.  Render menu
    */
   async function GetMenuInformation() {
-    debugger;
     if (_state.isLoading) {
       console.warn('⚠️ Menu already loading.. .');
       return;
@@ -59,7 +63,6 @@ var SidebarMenu = (function () {
     try {
       console.log('🔄 Loading menu information...');
 
-      // Show skeleton loader
       _showSkeletonLoader();
 
       // Step 1: Check cache first
@@ -85,6 +88,7 @@ var SidebarMenu = (function () {
         console.log('✅ Menu loaded from cache');
         _renderMenu(cachedMenu);
         _state.menuData = cachedMenu;
+        _initSearchFunctionality();
         return;
       }
 
@@ -105,6 +109,7 @@ var SidebarMenu = (function () {
 
       // Step 5: Render menu
       _renderMenu(menus);
+      _initSearchFunctionality();
 
       console.log('✅ Menu loaded successfully');
 
@@ -339,6 +344,7 @@ var SidebarMenu = (function () {
     var icon = menu.MenuIcon || menu.Icon || '';
 
     var $li = $('<li>').addClass('nav-item');
+    $li.attr('data-menu-name', (menu.MenuName || menu.Name).toLowerCase());
 
     if (hasChildren) {
       // Parent menu with children
@@ -364,7 +370,6 @@ var SidebarMenu = (function () {
       }
 
       linkHtml += '<span class="nav-link-text">' + (menu.MenuName || menu.Name) + '</span>';
-      //linkHtml += '<i class="bi bi-chevron-down submenu-arrow' + (shouldExpand ? ' rotate-down' : '') + '"></i>';
       linkHtml += '<i class="bi bi-chevron-right submenu-arrow' + (shouldExpand ? ' rotate-down' : '') + '"></i>';
 
       $link.html(linkHtml);
@@ -439,7 +444,7 @@ var SidebarMenu = (function () {
   function _isMenuActive(menu, currentPath) {
     if (!menu.MenuUrl && !menu.Url && !menu.Path) return false;
 
-    var menuUrl = menu.MenuUrl || menu.Url || menu.Path;
+    var menuUrl = menu.MenuPath || menu.MenuUrl || menu.Url || menu.Path;
 
     // Normalize URLs (remove leading slash and convert to lowercase)
     menuUrl = menuUrl.replace(/^\//, '').toLowerCase();
@@ -523,54 +528,24 @@ var SidebarMenu = (function () {
    * Bind menu events
    * Menu events bind করা
    */
-  //function _bindMenuEvents() {
-  //  var $sidebar = $('#' + _config.sidebarId);
+  // ============================================
+  // PRIVATE - Event Handlers (NO ACCORDION)
+  // ============================================
 
-  //  // Submenu toggle animation
-  //  $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
-  //    var $this = $(this);
-  //    var $arrow = $this.find('.submenu-arrow');
-
-  //    // Rotate arrow animation
-  //    setTimeout(function () {
-  //      if ($this.attr('aria-expanded') === 'true') {
-  //        $arrow.addClass('rotate-down');
-  //      } else {
-  //        $arrow.removeClass('rotate-down');
-  //      }
-  //    }, 10);
-  //  });
-
-  //  // Close other submenus when opening one (accordion behavior)
-  //  $sidebar.find('.collapse').on('show.bs.collapse', function () {
-  //    var $this = $(this);
-  //    $sidebar.find('.collapse.show').each(function () {
-  //      if (this !== $this[0]) {
-  //        $(this).collapse('hide');
-  //      }
-  //    });
-  //  });
-  //}
-
-  /**
- * Bind menu events (FIXED - Arrow Rotation)
- */
   function _bindMenuEvents() {
     var $sidebar = $('#' + _config.sidebarId);
 
-    // ✅ FIXED: Arrow rotation on toggle
+    // ✅ Arrow rotation on toggle (NO AUTO-CLOSE)
     $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
-      e.preventDefault(); // Prevent default anchor behavior
+      e.preventDefault();
 
       var $this = $(this);
       var $arrow = $this.find('.submenu-arrow');
       var targetId = $this.attr('data-bs-target');
       var $target = $(targetId);
 
-      // Toggle collapse
       $target.collapse('toggle');
 
-      // Update arrow based on current state
       if ($this.attr('aria-expanded') === 'true') {
         $arrow.removeClass('rotate-down');
       } else {
@@ -591,20 +566,185 @@ var SidebarMenu = (function () {
       $parentLink.attr('aria-expanded', 'false');
     });
 
-    // ✅ Accordion behavior (optional - keeps one submenu open)
-    $sidebar.find('.collapse').on('show.bs.collapse', function () {
-      var $this = $(this);
+    // ❌ NO ACCORDION BEHAVIOR - REMOVED
+    // All menus can be open simultaneously
+  }
 
-      // Close other open submenus at the same level
-      var $parentLi = $this.closest('.nav-item');
-      var $siblings = $parentLi.siblings('.nav-item');
+  /**
+ * Bind menu events (FIXED - Arrow Rotation)
+ */
+  //function _bindMenuEvents() {
+  //  var $sidebar = $('#' + _config.sidebarId);
 
-      $siblings.find('.collapse.show').each(function () {
-        if (this !== $this[0]) {
-          $(this).collapse('hide');
-        }
-      });
+  //  // ✅ FIXED: Arrow rotation on toggle
+  //  $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
+  //    e.preventDefault(); // Prevent default anchor behavior
+
+  //    var $this = $(this);
+  //    var $arrow = $this.find('.submenu-arrow');
+  //    var targetId = $this.attr('data-bs-target');
+  //    var $target = $(targetId);
+
+  //    // Toggle collapse
+  //    $target.collapse('toggle');
+
+  //    // Update arrow based on current state
+  //    if ($this.attr('aria-expanded') === 'true') {
+  //      $arrow.removeClass('rotate-down');
+  //    } else {
+  //      $arrow.addClass('rotate-down');
+  //    }
+  //  });
+
+  //  // ✅ Update arrow after collapse animation completes
+  //  $sidebar.find('.collapse').on('shown.bs.collapse', function () {
+  //    var $parentLink = $(this).prev('[data-bs-toggle="collapse"]');
+  //    $parentLink.find('.submenu-arrow').addClass('rotate-down');
+  //    $parentLink.attr('aria-expanded', 'true');
+  //  });
+
+  //  $sidebar.find('.collapse').on('hidden.bs.collapse', function () {
+  //    var $parentLink = $(this).prev('[data-bs-toggle="collapse"]');
+  //    $parentLink.find('.submenu-arrow').removeClass('rotate-down');
+  //    $parentLink.attr('aria-expanded', 'false');
+  //  });
+
+  //  // ✅ Accordion behavior (optional - keeps one submenu open)
+  //  $sidebar.find('.collapse').on('show.bs.collapse', function () {
+  //    var $this = $(this);
+
+  //    // Close other open submenus at the same level
+  //    var $parentLi = $this.closest('.nav-item');
+  //    var $siblings = $parentLi.siblings('.nav-item');
+
+  //    $siblings.find('.collapse.show').each(function () {
+  //      if (this !== $this[0]) {
+  //        $(this).collapse('hide');
+  //      }
+  //    });
+  //  });
+  //}
+
+
+  // ============================================
+  // PRIVATE - Search Functionality (NEW)
+  // ============================================
+
+  function _initSearchFunctionality() {
+    var $searchInput = $('#' + _config.searchInputId);
+    var $clearBtn = $('#' + _config.clearSearchBtnId);
+    var $noResults = $('#' + _config.noResultsId);
+
+    if ($searchInput.length === 0) {
+      console.warn('Search input not found');
+      return;
+    }
+
+    // Live search on input
+    $searchInput.on('input', function () {
+      var searchTerm = $(this).val().trim();
+      _state.searchTerm = searchTerm;
+
+      if (searchTerm.length > 0) {
+        $clearBtn.show();
+        _filterMenus(searchTerm);
+      } else {
+        $clearBtn.hide();
+        _clearSearch();
+      }
     });
+
+    // Clear button
+    $clearBtn.on('click', function () {
+      $searchInput.val('');
+      $searchInput.focus();
+      _clearSearch();
+      $(this).hide();
+    });
+
+    // Enter key search
+    $searchInput.on('keypress', function (e) {
+      if (e.which === 13) {
+        e.preventDefault();
+      }
+    });
+
+    console.log('✅ Search functionality initialized');
+  }
+
+  function _filterMenus(searchTerm) {
+    var $sidebar = $('#' + _config.sidebarId);
+    var $noResults = $('#' + _config.noResultsId);
+
+    searchTerm = searchTerm.toLowerCase();
+    var hasResults = false;
+
+    $sidebar.find('. nav-item').each(function () {
+      var $item = $(this);
+      var menuName = $item.attr('data-menu-name') || '';
+      var $link = $item.children('. nav-link');
+      var $textSpan = $link.find('.nav-link-text');
+      var originalText = $textSpan.text();
+
+      if (menuName.indexOf(searchTerm) !== -1) {
+        // Match found
+        hasResults = true;
+        $item.removeClass('hidden');
+
+        // Highlight matched text
+        var highlightedText = _highlightText(originalText, searchTerm);
+        $textSpan.html(highlightedText);
+
+        // Expand all parent menus
+        $item.parents('.collapse').each(function () {
+          $(this).collapse('show');
+        });
+
+        // If this item has children, expand them too
+        var $childCollapse = $item.find('.collapse').first();
+        if ($childCollapse.length > 0) {
+          $childCollapse.collapse('show');
+        }
+
+      } else {
+        // No match
+        $item.addClass('hidden');
+        $textSpan.html(originalText); // Remove highlight
+      }
+    });
+
+    // Show/hide no results message
+    if (hasResults) {
+      $noResults.hide();
+      $sidebar.show();
+    } else {
+      $noResults.show();
+      $sidebar.hide();
+    }
+  }
+
+  function _highlightText(text, searchTerm) {
+    if (!searchTerm) return text;
+
+    var regex = new RegExp('(' + searchTerm + ')', 'gi');
+    return text.replace(regex, '<span class="search-highlight">$1</span>');
+  }
+
+  function _clearSearch() {
+    var $sidebar = $('#' + _config.sidebarId);
+    var $noResults = $('#' + _config.noResultsId);
+
+    $sidebar.find('.nav-item').removeClass('hidden');
+
+    // Remove highlights
+    $sidebar.find('.nav-link-text').each(function () {
+      var $span = $(this);
+      $span.html($span.text()); // Remove HTML, keep text only
+    });
+
+    $noResults.hide();
+    $sidebar.show();
+    _state.searchTerm = '';
   }
 
   // ============================================

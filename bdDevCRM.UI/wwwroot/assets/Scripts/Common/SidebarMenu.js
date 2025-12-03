@@ -17,13 +17,19 @@ var SidebarMenu = (function () {
   // ============================================
   var _config = {
     sidebarId: 'sideNavbar',
-    searchInputId: 'menuSearch',
+    searchInputId: 'sidebarSearchInput',
     clearSearchBtnId: 'btnClearSearch',
     noResultsId: 'noSearchResults',
     cacheKeyPrefix: 'menuCache_',
     cacheExpiryHours: 1,
     maxRetries: 3,
-    retryDelay: 1000
+    retryDelay: 1000,
+
+     // ✅ NEW: Search config
+    searchDebounceMs: 300,        // Wait 300ms after user stops typing
+    minSearchLength: 1,            // Minimum characters to trigger search
+    maxVisibleResults: 100,        // Limit visible results for performance
+    highlightClass: 'search-highlight'
   };
 
   // ============================================
@@ -623,9 +629,37 @@ var SidebarMenu = (function () {
   //  });
   //}
 
+  // ============================================
+  // PRIVATE - Debounce Utility
+  // ============================================
+
+  /**
+   * Debounce function - delays execution until user stops typing
+   * User typing বন্ধ করার পর function execute করা
+   * 
+   * @param {Function} func - Function to debounce
+   * @param {Number} wait - Wait time in milliseconds
+   * @returns {Function} Debounced function
+   */
+  function _debounce(func, wait) {
+    var timeout;
+    return function executedFunction() {
+      var context = this;
+      var args = arguments;
+
+      var later = function () {
+        timeout = null;
+        func.apply(context, args);
+      };
+
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
 
   // ============================================
-  // PRIVATE - Search Functionality (NEW)
+  // PRIVATE - Search Functionality (OPTIMIZED)
   // ============================================
 
   function _initSearchFunctionality() {
@@ -638,14 +672,28 @@ var SidebarMenu = (function () {
       return;
     }
 
-    // Live search on input
+    // ✅ Create debounced search function
+    var debouncedSearch = _debounce(function (searchTerm) {
+      if (searchTerm.length >= _config.minSearchLength) {
+        _filterMenus(searchTerm);
+      } else {
+        _clearSearch();
+      }
+    }, _config.searchDebounceMs);
+
+    // ✅ Live search on input (with debounce)
     $searchInput.on('input', function () {
       var searchTerm = $(this).val().trim();
       _state.searchTerm = searchTerm;
 
       if (searchTerm.length > 0) {
         $clearBtn.show();
-        _filterMenus(searchTerm);
+
+        // 🔥 Show loading indicator
+        _showSearchLoading();
+
+        // 🔥 Call debounced search
+        debouncedSearch(searchTerm);
       } else {
         $clearBtn.hide();
         _clearSearch();
@@ -660,73 +708,232 @@ var SidebarMenu = (function () {
       $(this).hide();
     });
 
-    // Enter key search
+    // Enter key search (immediate, no debounce)
     $searchInput.on('keypress', function (e) {
       if (e.which === 13) {
         e.preventDefault();
+        var searchTerm = $(this).val().trim();
+        if (searchTerm.length > 0) {
+          _filterMenus(searchTerm);
+        }
       }
     });
 
-    console.log('✅ Search functionality initialized');
+    console.log('✅ Search functionality initialized (Debounce: ' + _config.searchDebounceMs + 'ms)');
   }
 
+  /**
+ * Filter menus (OPTIMIZED for 500+ menus)
+ * কেন্দো ComboBox style search - alphabetic matching only
+ */
   function _filterMenus(searchTerm) {
+    var startTime = performance.now(); // Performance tracking
+
     var $sidebar = $('#' + _config.sidebarId);
     var $noResults = $('#' + _config.noResultsId);
 
-    searchTerm = searchTerm.toLowerCase();
-    var hasResults = false;
+    // ✅ Sanitize search term (only alphanumeric + spaces)
+    searchTerm = searchTerm.replace(/[^a-zA-Z0-9\s]/g, '').toLowerCase();
 
-    $sidebar.find('. nav-item').each(function () {
+    if (!searchTerm) {
+      _clearSearch();
+      return;
+    }
+
+    var hasResults = false;
+    var visibleCount = 0;
+    var matchedItems = [];
+
+    // ✅ First Pass: Collect all matches (without DOM manipulation)
+    $sidebar.find('.nav-item').each(function () {
       var $item = $(this);
       var menuName = $item.attr('data-menu-name') || '';
       var $link = $item.children('. nav-link');
-      var $textSpan = $link.find('.nav-link-text');
+      var $textSpan = $link.find('. nav-link-text');
       var originalText = $textSpan.text();
 
+      // ✅ Check if menu name contains search term (case-insensitive)
       if (menuName.indexOf(searchTerm) !== -1) {
-        // Match found
-        hasResults = true;
-        $item.removeClass('hidden');
-
-        // Highlight matched text
-        var highlightedText = _highlightText(originalText, searchTerm);
-        $textSpan.html(highlightedText);
-
-        // Expand all parent menus
-        $item.parents('.collapse').each(function () {
-          $(this).collapse('show');
+        matchedItems.push({
+          $item: $item,
+          $textSpan: $textSpan,
+          originalText: originalText,
+          searchTerm: searchTerm
         });
-
-        // If this item has children, expand them too
-        var $childCollapse = $item.find('.collapse').first();
-        if ($childCollapse.length > 0) {
-          $childCollapse.collapse('show');
-        }
-
-      } else {
-        // No match
-        $item.addClass('hidden');
-        $textSpan.html(originalText); // Remove highlight
       }
     });
 
-    // Show/hide no results message
+    // ✅ Second Pass: Update DOM in batch
+    $sidebar.find('.nav-item').addClass('hidden'); // Hide all first
+
+    matchedItems.forEach(function (match) {
+      if (visibleCount >= _config.maxVisibleResults) {
+        return; // Stop after max results
+      }
+
+      hasResults = true;
+      visibleCount++;
+
+      // Show matched item
+      match.$item.removeClass('hidden');
+
+      // Highlight matched text
+      var highlightedText = _highlightText(match.originalText, match.searchTerm);
+      match.$textSpan.html(highlightedText);
+
+      // Expand parent menus
+      match.$item.parents('.collapse').each(function () {
+        $(this).collapse('show');
+      });
+
+      // Expand child menus if any
+      var $childCollapse = match.$item.find('.collapse').first();
+      if ($childCollapse.length > 0) {
+        $childCollapse.collapse('show');
+      }
+    });
+
+    // ✅ Show/hide no results message
     if (hasResults) {
       $noResults.hide();
       $sidebar.show();
+
+      // Show count if limited
+      if (visibleCount >= _config.maxVisibleResults) {
+        _showResultsLimitMessage(visibleCount, matchedItems.length);
+      }
     } else {
       $noResults.show();
       $sidebar.hide();
     }
+
+    // ✅ Hide loading indicator
+    _hideSearchLoading();
+
+    // Performance logging
+    var endTime = performance.now();
+    console.log('🔍 Search completed in ' + (endTime - startTime).toFixed(2) + 'ms (' + visibleCount + ' results)');
   }
 
+  /**
+ * Highlight text (OPTIMIZED - Alphabetic only)
+ * শুধু alphabetic characters highlight করা
+ */
   function _highlightText(text, searchTerm) {
     if (!searchTerm) return text;
 
-    var regex = new RegExp('(' + searchTerm + ')', 'gi');
-    return text.replace(regex, '<span class="search-highlight">$1</span>');
+    // ✅ Escape special regex characters
+    var escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // ✅ Create regex for case-insensitive matching
+    var regex = new RegExp('(' + escapedTerm + ')', 'gi');
+
+    return text.replace(regex, '<span class="' + _config.highlightClass + '">$1</span>');
   }
+
+  /**
+   * Show search loading indicator
+   * Search loading indicator দেখানো
+   */
+  function _showSearchLoading() {
+    var $searchInput = $('#' + _config.searchInputId);
+    var $searchWrapper = $searchInput.closest('.search-wrapper');
+
+    // Add loading class
+    $searchWrapper.addClass('searching');
+
+    // Optional: Add spinner icon
+    var $spinner = $('<span class="search-spinner"><i class="bi bi-hourglass-split"></i></span>');
+    $searchWrapper.append($spinner);
+  }
+
+  /**
+   * Hide search loading indicator
+   * Search loading indicator লুকানো
+   */
+  function _hideSearchLoading() {
+    var $searchInput = $('#' + _config.searchInputId);
+    var $searchWrapper = $searchInput.closest('. search-wrapper');
+
+    $searchWrapper.removeClass('searching');
+    $searchWrapper.find('.search-spinner').remove();
+  }
+
+  /**
+   * Show results limit message
+   * Results limit message দেখানো
+   */
+  function _showResultsLimitMessage(visible, total) {
+    var $sidebar = $('#' + _config.sidebarId);
+
+    // Remove existing message
+    $sidebar.find('.search-limit-msg').remove();
+
+    // Add new message
+    var $msg = $('<div class="search-limit-msg text-muted text-center py-2">')
+      .html('<small>Showing ' + visible + ' of ' + total + ' results</small>');
+
+    $sidebar.prepend($msg);
+  }
+
+
+  //function _filterMenus(searchTerm) {
+  //  var $sidebar = $('#' + _config.sidebarId);
+  //  var $noResults = $('#' + _config.noResultsId);
+
+  //  searchTerm = searchTerm.toLowerCase();
+  //  var hasResults = false;
+
+  //  $sidebar.find('. nav-item').each(function () {
+  //    var $item = $(this);
+  //    var menuName = $item.attr('data-menu-name') || '';
+  //    var $link = $item.children('. nav-link');
+  //    var $textSpan = $link.find('.nav-link-text');
+  //    var originalText = $textSpan.text();
+
+  //    if (menuName.indexOf(searchTerm) !== -1) {
+  //      // Match found
+  //      hasResults = true;
+  //      $item.removeClass('hidden');
+
+  //      // Highlight matched text
+  //      var highlightedText = _highlightText(originalText, searchTerm);
+  //      $textSpan.html(highlightedText);
+
+  //      // Expand all parent menus
+  //      $item.parents('.collapse').each(function () {
+  //        $(this).collapse('show');
+  //      });
+
+  //      // If this item has children, expand them too
+  //      var $childCollapse = $item.find('.collapse').first();
+  //      if ($childCollapse.length > 0) {
+  //        $childCollapse.collapse('show');
+  //      }
+
+  //    } else {
+  //      // No match
+  //      $item.addClass('hidden');
+  //      $textSpan.html(originalText); // Remove highlight
+  //    }
+  //  });
+
+  //  // Show/hide no results message
+  //  if (hasResults) {
+  //    $noResults.hide();
+  //    $sidebar.show();
+  //  } else {
+  //    $noResults.show();
+  //    $sidebar.hide();
+  //  }
+  //}
+
+  //function _highlightText(text, searchTerm) {
+  //  if (!searchTerm) return text;
+
+  //  var regex = new RegExp('(' + searchTerm + ')', 'gi');
+  //  return text.replace(regex, '<span class="search-highlight">$1</span>');
+  //}
 
   function _clearSearch() {
     var $sidebar = $('#' + _config.sidebarId);

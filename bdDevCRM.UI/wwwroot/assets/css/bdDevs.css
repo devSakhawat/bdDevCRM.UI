@@ -971,7 +971,71 @@ legend.legendCommonModalBGImportant {
 /* Sync header with content scroll via JavaScript */
 
 
+/* ============================================
+   Search Loading State
+   ============================================ */
+.search-wrapper.searching {
+  position: relative;
+  opacity: 0.7;
+}
 
+.search-spinner {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+  .search-spinner i {
+    animation: spin 1s linear infinite;
+    color: #6c757d;
+  }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   Search Highlight (Kendo Style)
+   ============================================ */
+.search-highlight {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 1px 3px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* Dark mode support */
+[data-bs-theme="dark"] .search-highlight {
+  background-color: #664d03;
+  color: #ffecb5;
+}
+
+/* ============================================
+   Search Limit Message
+   ============================================ */
+.search-limit-msg {
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+[data-bs-theme="dark"] .search-limit-msg {
+  background-color: #343a40;
+}
+
+/* Hidden items (optimized) */
+.nav-item.hidden {
+  display: none !important;
+}
 
 
 

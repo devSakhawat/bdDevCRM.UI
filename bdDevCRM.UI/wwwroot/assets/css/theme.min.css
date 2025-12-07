@@ -28776,7 +28776,7 @@ textarea.form-control-lg {
 }
 
 .header .navbar {
-  left: 260px;
+  left: 0;
   padding: .624rem 1.5rem;
   position: fixed;
   right: 0;

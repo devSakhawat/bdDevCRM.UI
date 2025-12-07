@@ -18,6 +18,7 @@ var SidebarMenu = (function () {
   var _config = {
     sidebarId: 'sideNavbar',
     searchInputId: 'sidebarSearchInput',
+    searchButtonId: 'btnSearch', // ✅ NEW: Search button ID
     clearSearchBtnId: 'btnClearSearch',
     noResultsId: 'noSearchResults',
     cacheKeyPrefix: 'menuCache_',
@@ -25,8 +26,8 @@ var SidebarMenu = (function () {
     maxRetries: 3,
     retryDelay: 1000,
 
-     // ✅ NEW: Search config
-    searchDebounceMs: 300,        // Wait 300ms after user stops typing
+    // ✅ UPDATED: Search config
+    searchDebounceMs: 1000,        // ✅ Changed from 300ms to 1000ms (1 second)
     minSearchLength: 1,            // Minimum characters to trigger search
     maxVisibleResults: 100,        // Limit visible results for performance
     highlightClass: 'search-highlight'
@@ -60,7 +61,7 @@ var SidebarMenu = (function () {
    */
   async function GetMenuInformation() {
     if (_state.isLoading) {
-      console.warn('⚠️ Menu already loading.. .');
+      console.warn('⚠️ Menu already loading...');
       return;
     }
 
@@ -574,61 +575,6 @@ var SidebarMenu = (function () {
     // All menus can be open simultaneously
   }
 
-  /**
- * Bind menu events (FIXED - Arrow Rotation)
- */
-  //function _bindMenuEvents() {
-  //  var $sidebar = $('#' + _config.sidebarId);
-
-  //  // ✅ FIXED: Arrow rotation on toggle
-  //  $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
-  //    e.preventDefault(); // Prevent default anchor behavior
-
-  //    var $this = $(this);
-  //    var $arrow = $this.find('.submenu-arrow');
-  //    var targetId = $this.attr('data-bs-target');
-  //    var $target = $(targetId);
-
-  //    // Toggle collapse
-  //    $target.collapse('toggle');
-
-  //    // Update arrow based on current state
-  //    if ($this.attr('aria-expanded') === 'true') {
-  //      $arrow.removeClass('rotate-down');
-  //    } else {
-  //      $arrow.addClass('rotate-down');
-  //    }
-  //  });
-
-  //  // ✅ Update arrow after collapse animation completes
-  //  $sidebar.find('.collapse').on('shown.bs.collapse', function () {
-  //    var $parentLink = $(this).prev('[data-bs-toggle="collapse"]');
-  //    $parentLink.find('.submenu-arrow').addClass('rotate-down');
-  //    $parentLink.attr('aria-expanded', 'true');
-  //  });
-
-  //  $sidebar.find('.collapse').on('hidden.bs.collapse', function () {
-  //    var $parentLink = $(this).prev('[data-bs-toggle="collapse"]');
-  //    $parentLink.find('.submenu-arrow').removeClass('rotate-down');
-  //    $parentLink.attr('aria-expanded', 'false');
-  //  });
-
-  //  // ✅ Accordion behavior (optional - keeps one submenu open)
-  //  $sidebar.find('.collapse').on('show.bs.collapse', function () {
-  //    var $this = $(this);
-
-  //    // Close other open submenus at the same level
-  //    var $parentLi = $this.closest('.nav-item');
-  //    var $siblings = $parentLi.siblings('.nav-item');
-
-  //    $siblings.find('.collapse.show').each(function () {
-  //      if (this !== $this[0]) {
-  //        $(this).collapse('hide');
-  //      }
-  //    });
-  //  });
-  //}
-
   // ============================================
   // PRIVATE - Debounce Utility
   // ============================================
@@ -659,29 +605,37 @@ var SidebarMenu = (function () {
 
 
   // ============================================
-  // PRIVATE - Search Functionality (OPTIMIZED)
+  // PRIVATE - Search Functionality (3-WAY TRIGGER)
   // ============================================
 
+  /**
+   * Initialize search functionality with 3 trigger methods:
+   * 1. Auto search after user stops typing for 1 second (debounced)
+   * 2. Enter key press (instant)
+   * 3. Search icon click (instant)
+   */
   function _initSearchFunctionality() {
     var $searchInput = $('#' + _config.searchInputId);
+    var $searchButton = $('#' + _config.searchButtonId); // ✅ NEW: Search button
     var $clearBtn = $('#' + _config.clearSearchBtnId);
     var $noResults = $('#' + _config.noResultsId);
 
     if ($searchInput.length === 0) {
-      console.warn('Search input not found');
+      console.warn('⚠️ Search input not found');
       return;
     }
 
-    // ✅ Create debounced search function
+    // ✅ Create debounced search function (1 second delay)
     var debouncedSearch = _debounce(function (searchTerm) {
       if (searchTerm.length >= _config.minSearchLength) {
+        console.log('🔍 Auto search triggered (1 sec after typing stopped)');
         _filterMenus(searchTerm);
       } else {
         _clearSearch();
       }
-    }, _config.searchDebounceMs);
+    }, _config.searchDebounceMs); // 1000ms = 1 second
 
-    // ✅ Live search on input (with debounce)
+    // ✅ METHOD 1: Auto search on input (with 1 second debounce)
     $searchInput.on('input', function () {
       var searchTerm = $(this).val().trim();
       _state.searchTerm = searchTerm;
@@ -689,37 +643,59 @@ var SidebarMenu = (function () {
       if (searchTerm.length > 0) {
         $clearBtn.show();
 
-        // 🔥 Show loading indicator
+        // Show loading indicator
         _showSearchLoading();
 
-        // 🔥 Call debounced search
+        // Call debounced search (waits 1 second after typing stops)
         debouncedSearch(searchTerm);
       } else {
         $clearBtn.hide();
         _clearSearch();
+        _hideSearchLoading();
       }
     });
 
-    // Clear button
-    $clearBtn.on('click', function () {
-      $searchInput.val('');
-      $searchInput.focus();
-      _clearSearch();
-      $(this).hide();
-    });
-
-    // Enter key search (immediate, no debounce)
+    // ✅ METHOD 2: Enter key search (immediate, no debounce)
     $searchInput.on('keypress', function (e) {
-      if (e.which === 13) {
+      if (e.which === 13) { // Enter key
         e.preventDefault();
         var searchTerm = $(this).val().trim();
+
         if (searchTerm.length > 0) {
+          console.log('🔍 Enter key search triggered');
+          _showSearchLoading();
           _filterMenus(searchTerm);
         }
       }
     });
 
-    console.log('✅ Search functionality initialized (Debounce: ' + _config.searchDebounceMs + 'ms)');
+    // ✅ METHOD 3: Search button/icon click (immediate, no debounce)
+    if ($searchButton.length > 0) {
+      $searchButton.on('click', function (e) {
+        e.preventDefault();
+        var searchTerm = $searchInput.val().trim();
+
+        if (searchTerm.length > 0) {
+          console.log('🔍 Search icon clicked');
+          _showSearchLoading();
+          _filterMenus(searchTerm);
+        }
+      });
+    }
+
+    // ✅ Clear button
+    $clearBtn.on('click', function () {
+      $searchInput.val('');
+      $searchInput.focus();
+      _clearSearch();
+      _hideSearchLoading();
+      $(this).hide();
+    });
+
+    console.log('✅ Search functionality initialized');
+    console.log('   ↳ Auto search: 1 second after typing stops');
+    console.log('   ↳ Enter key: Instant search');
+    console.log('   ↳ Search icon: Instant search');
   }
 
   /**
@@ -748,8 +724,8 @@ var SidebarMenu = (function () {
     $sidebar.find('.nav-item').each(function () {
       var $item = $(this);
       var menuName = $item.attr('data-menu-name') || '';
-      var $link = $item.children('. nav-link');
-      var $textSpan = $link.find('. nav-link-text');
+      var $link = $item.children('.nav-link');
+      var $textSpan = $link.find('.nav-link-text');
       var originalText = $textSpan.text();
 
       // ✅ Check if menu name contains search term (case-insensitive)
@@ -839,10 +815,13 @@ var SidebarMenu = (function () {
     var $searchInput = $('#' + _config.searchInputId);
     var $searchWrapper = $searchInput.closest('.search-wrapper');
 
+    // Remove existing spinner first
+    $searchWrapper.find('.search-spinner').remove();
+
     // Add loading class
     $searchWrapper.addClass('searching');
 
-    // Optional: Add spinner icon
+    // Add spinner icon
     var $spinner = $('<span class="search-spinner"><i class="bi bi-hourglass-split"></i></span>');
     $searchWrapper.append($spinner);
   }
@@ -853,7 +832,7 @@ var SidebarMenu = (function () {
    */
   function _hideSearchLoading() {
     var $searchInput = $('#' + _config.searchInputId);
-    var $searchWrapper = $searchInput.closest('. search-wrapper');
+    var $searchWrapper = $searchInput.closest('.search-wrapper');
 
     $searchWrapper.removeClass('searching');
     $searchWrapper.find('.search-spinner').remove();
@@ -876,69 +855,15 @@ var SidebarMenu = (function () {
     $sidebar.prepend($msg);
   }
 
-
-  //function _filterMenus(searchTerm) {
-  //  var $sidebar = $('#' + _config.sidebarId);
-  //  var $noResults = $('#' + _config.noResultsId);
-
-  //  searchTerm = searchTerm.toLowerCase();
-  //  var hasResults = false;
-
-  //  $sidebar.find('. nav-item').each(function () {
-  //    var $item = $(this);
-  //    var menuName = $item.attr('data-menu-name') || '';
-  //    var $link = $item.children('. nav-link');
-  //    var $textSpan = $link.find('.nav-link-text');
-  //    var originalText = $textSpan.text();
-
-  //    if (menuName.indexOf(searchTerm) !== -1) {
-  //      // Match found
-  //      hasResults = true;
-  //      $item.removeClass('hidden');
-
-  //      // Highlight matched text
-  //      var highlightedText = _highlightText(originalText, searchTerm);
-  //      $textSpan.html(highlightedText);
-
-  //      // Expand all parent menus
-  //      $item.parents('.collapse').each(function () {
-  //        $(this).collapse('show');
-  //      });
-
-  //      // If this item has children, expand them too
-  //      var $childCollapse = $item.find('.collapse').first();
-  //      if ($childCollapse.length > 0) {
-  //        $childCollapse.collapse('show');
-  //      }
-
-  //    } else {
-  //      // No match
-  //      $item.addClass('hidden');
-  //      $textSpan.html(originalText); // Remove highlight
-  //    }
-  //  });
-
-  //  // Show/hide no results message
-  //  if (hasResults) {
-  //    $noResults.hide();
-  //    $sidebar.show();
-  //  } else {
-  //    $noResults.show();
-  //    $sidebar.hide();
-  //  }
-  //}
-
-  //function _highlightText(text, searchTerm) {
-  //  if (!searchTerm) return text;
-
-  //  var regex = new RegExp('(' + searchTerm + ')', 'gi');
-  //  return text.replace(regex, '<span class="search-highlight">$1</span>');
-  //}
-
+  /**
+   * Clear search and restore all menus
+   * Search clear করা এবং সব menus restore করা
+   */
   function _clearSearch() {
     var $sidebar = $('#' + _config.sidebarId);
     var $noResults = $('#' + _config.noResultsId);
 
+    // Show all menu items
     $sidebar.find('.nav-item').removeClass('hidden');
 
     // Remove highlights
@@ -947,9 +872,14 @@ var SidebarMenu = (function () {
       $span.html($span.text()); // Remove HTML, keep text only
     });
 
+    // Remove limit message
+    $sidebar.find('.search-limit-msg').remove();
+
     $noResults.hide();
     $sidebar.show();
     _state.searchTerm = '';
+
+    console.log('✅ Search cleared');
   }
 
   // ============================================
@@ -1068,15 +998,15 @@ var SidebarMenu = (function () {
       if (typeof MessageManager !== 'undefined') {
         MessageManager.alert.error(
           'Menu Load Failed',
-          'Failed to load menu after ' + _config.maxRetries + ' attempts.  Please refresh the page.'
+          'Failed to load menu after ' + _config.maxRetries + ' attempts. Please refresh the page.'
         );
       } else {
-        alert('Failed to load menu.  Please refresh the page.');
+        alert('Failed to load menu. Please refresh the page.');
       }
       return;
     }
 
-    console.log('🔄 Retrying menu load (attempt ' + _state.retryCount + ').. .');
+    console.log('🔄 Retrying menu load (attempt ' + _state.retryCount + ')...');
 
     // Clear cache before retry
     _clearMenuCache();

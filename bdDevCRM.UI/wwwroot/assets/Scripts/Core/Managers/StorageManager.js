@@ -195,7 +195,7 @@ var StorageManager = (function () {
 
       var cacheKey = _keys.menuCache + '_' + userInfo.UserId;
       var cached = localStorage.getItem(cacheKey);
-
+      console.log(cached);
       if (!cached) return null;
 
       var cacheData = JSON.parse(cached);

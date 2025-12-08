@@ -996,6 +996,13 @@ var ApiCallManager = (function () {
     delete: deleteRequest,
     patch: patch,
 
+    // Core HTTP Methods (with token refresh) 
+    getWithRefreshToken: getWithRefreshToken,
+    postWithRefreshToken: postWithRefreshToken,
+    putWithRefreshToken: putWithRefreshToken,
+    deleteWithRefreshToken: deleteWithRefreshToken,
+    patchWithRefreshToken: patchWithRefreshToken,
+
     // Grid Methods
     postForGrid: postForGrid,
     createGridDataSource: createGridDataSource,

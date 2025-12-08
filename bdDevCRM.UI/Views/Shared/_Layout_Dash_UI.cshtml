@@ -61,13 +61,11 @@
   <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="~/assets/kendo_2023_r1/js/jszip.min.js"></script>
-  @* <script src="~/lib/kendo-ui/js/kendo.all.min.js"></script> *@
   <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
 
-
   <!-- Config (No dependencies) -->
+  <script src="~/assets/Scripts/Core/App.js"></script>
   <script src="~/assets/Scripts/Config/AppConfig.js"></script>
-
 
   <!-- ========================================== -->
   <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
@@ -75,7 +73,6 @@
   <script src="~/assets/Scripts/Core/Logger.js"></script>
   <script src="~/assets/Scripts/Core/EventBus.js"></script>
   <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
-  <script src="~/assets/Scripts/Core/App.js"></script>
 
   @* 
   <!-- ========================================== -->
@@ -370,25 +367,23 @@
   <!-- ========================================== -->
   <!-- 4. LOAD COMMON (Menu Helper)               -->
   <!-- ========================================== -->
-  @* <script src="~/assets/Scripts/Common/common.js"></script>
-  <script src="~/assets/scripts/common/commonmessage.js"></script>
+  @* <script src="~/assets/Scripts/Common/common.js"></script> *@
+@*   <script src="~/assets/scripts/common/commonmessage.js"></script>
   <script src="~/assets/scripts/common/cescommon.js"></script>
   <script src="~/assets/scripts/common/date.js"></script>
-  <script src="~/assets/scripts/common/approverrecomendar.js"></script> *@
-
+  <script src="~/assets/scripts/common/approverrecomendar.js"></script>
+ *@
   <!-- Theme JS -->
   <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
 
-
-
   <!-- Core Managers -->
+  <script src="~/assets/scripts/core/managers/navigationmanager.js"></script>
   <script src="~/assets/Scripts/Core/Managers/StateManager.js"></script>
   <script src="~/assets/Scripts/Core/Managers/StorageManager.js"></script>
   <script src="~/assets/Scripts/Core/Managers/TokenManager.js"></script>
   <script src="~/assets/Scripts/Core/Managers/MessageManager.js"></script>
   <script src="~/assets/scripts/core/managers/sessionstorageadapter.js"></script>
   <script src="~/assets/scripts/core/managers/apicallmanager.js"></script>
-  <script src="~/assets/scripts/core/managers/navigationmanager.js"></script>
 
   <!-- Core Helpers -->
   <script src="~/assets/Scripts/Core/Helpers/ValidationHelper.js"></script>

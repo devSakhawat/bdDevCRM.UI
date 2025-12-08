@@ -29,6 +29,7 @@ var MenuModule = {
    * Initialize module
    */
   init: function () {
+    debugger;
     console.log('🔧 Initializing Menu Module.. .');
 
     // Check dependencies (now done by ModuleRegistry, but good to double-check)
@@ -64,6 +65,8 @@ var MenuModule = {
 
     return true;
   },
+
+
 
   /**
    * Initialize Kendo Grid
@@ -549,7 +552,7 @@ if (typeof ModuleRegistry !== 'undefined') {
     dependencies: ['MenuService', 'ApiCallManager', 'MessageManager', 'FormHelper', 'GridHelper'],
     priority: 5,
     autoInit: false,  // Will be initialized by route
-    route: '/Menu/.*'  // Only initialize when on Menu pages
+    route: AppConfig.getFrontendRoute("intMenu")  // Only initialize when on Menu pages
   });
 
   console.log('✅ MenuModule registered');

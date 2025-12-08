@@ -106,11 +106,11 @@ var AppConfig = (function () {
       // AccessControl ENDPOINTS (From Screenshot)
       // ========================================
       accessControllSummary: '/access-control-summary', // POST - Get access control summary grid
-      accessControls: '/access-controls',           // GET - Get all access controls
-      accessControlById: '/access-control/',        // GET - Get access control by ID
-      accessControlCreate: '/access-control',      // POST - Create access control
-      accessControlUpdate: '/access-control',      // PUT - Update access control /{key}
-      accessControlDelete: '/access-control',      // DELETE - Delete access control /{key}
+      accessControls: '/access-controls',               // GET - Get all access controls
+      accessControlById: '/access-control/',            // GET - Get access control by ID
+      accessControlCreate: '/access-control',           // POST - Create access control
+      accessControlUpdate: '/access-control',           // PUT - Update access control /{key}
+      accessControlDelete: '/access-control',           // DELETE - Delete access control /{key}
 
       // Access Control
       access: '/getaccess',
@@ -144,7 +144,19 @@ var AppConfig = (function () {
       district: '/districtddl',
       thana: '/thanaddl',
       branch: '/branchddl'
-    }
+    },
+
+    // Front-end endpoints
+    frontendRoutes: {
+      dashboard: '/dashboard',
+      settings: '/settings',
+      reportViewer: '/report-viewer',
+
+      // menu
+      intMenu: '/Core/MenuSettings',
+    },
+
+
   };
 
   // Public API
@@ -174,9 +186,7 @@ var AppConfig = (function () {
      * @returns {string}
      */
     getApiUrl: function () {
-      return this.isDevelopment()
-        ? _config.api.developmentUrl
-        : _config.api.productionUrl;
+      return this.isDevelopment() ? _config.api.developmentUrl : _config.api.productionUrl;
     },
 
     /**
@@ -191,6 +201,20 @@ var AppConfig = (function () {
         return '';
       }
       return this.getApiUrl() + endpoint;
+    },
+
+    /**
+   * Get front-end route URL
+   * @param {string} key
+   * @returns {string}
+   */
+    getFrontendRoute: function (key) {
+      var route = _config.frontendRoutes[key];
+      if (!route) {
+        console.warn(`AppConfig: Front-end route "${key}" not found`);
+        return '';
+      }
+      return route;
     },
 
     /**

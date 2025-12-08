@@ -6,7 +6,7 @@
  * Date: 2025-12-08
 =========================================================*/
 
-var StorageManager = (function () {
+var StorageManagerCopy = (function () {
   'use strict';
 
   // ============================================

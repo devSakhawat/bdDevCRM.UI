@@ -1,0 +1,103 @@
+﻿
+<script src="~/assets/scripts/modules/core/menu/menudetails.js"></script>
+
+@* <div id="divdetailsForDetails"> *@
+<div id="divdetailsForDetails" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+  <fieldset class="reset">
+    <legend class="reset">Menu Details</legend>
+
+    <form id="menuForm" class="main-form">
+      <input type="hidden" id="hdMenuId" value="0" />
+      <input type="hidden" id="hdSorOrder" value="0" />
+
+
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+        <label class="form-label" for="menu-name">Menu Name</label>
+        <input type="text" class="form-control" id="menu-name" placeholder="Enter Menu Name" required>
+      </div>
+
+      <!-- Module -->
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+        <label class="form-label widthSize100_per" for="module-name">Module Name<span class="redstart">*</span></label>
+        <div class="d-flex align-items-start icon-wrapper">
+          @* <input id="cmbInstituteCountryId" name="InstituteCountry" required validationMessage="Please Select Country" class="w-100" /> *@
+          <input id="cmd-module" name="InstituteCountry" required validationMessage="Please Select Module" class="flex-grow-1 border-right-strait" />
+          @* <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.ff();"> *@
+          <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn">
+            <span class="k-icon k-i-plus"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="menu-path">Menu Path</label>
+        <input type="text" class="form-control" id="menu-path" placeholder="Enter Menu Path">
+      </div>
+
+      <!-- Parent Menu Name -->
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2">
+        <label class="form-label widthSize100_per" for="module-name">Parent Menu Name<span class="redstart">*</span></label>
+        <div class="d-flex align-items-start icon-wrapper">
+          @* <input id="cmbInstituteCountryId" name="InstituteCountry" required validationMessage="Please Select Country" class="w-100" /> *@
+          <input id="cmb-parent-menu" name="InstituteCountry" required validationMessage="Please Select Parent Menu" class="flex-grow-1 border-right-strait" />
+          <button type="button" class="btn btn-outline-dark add-new-ddl-item-btn" onclick="CRMCourseInformationHelper.ff();">
+            <span class="k-icon k-i-plus"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-3 custom-checkbox">
+        <input type="checkbox" id="chkIsQuickLink" name="IsQuickLink" class="form-check-input" />
+        <label class="form-check-label">Is Quick Link</label>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-primary me-2" onclick="MenuDetailsHelper.SaveInformation()" id="btnSave">+ Add Menu</button>
+        <button type="button" class="btn btn-secondary me-2" onclick="MenuDetailsHelper.ClearInformation()" id="btnClear">Clear</button>
+        <button type="button" class="btn btn-light" onclick="MenuDetailsHelper.CloseInformation()" id="btnClose">Close</button>
+      </div>
+
+      <div class="status"></div>
+    </form>
+
+  </fieldset>
+</div>
+
+@* <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+  <fieldset class="reset">
+    <legend class="reset">>Menu Details</legend>
+
+    <div class="row mb-2">
+      <input id="currencyId" type="hidden" value="0" />
+
+      <div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2">
+        <label for="CurrencyName">Currency Name <span class="redstart">*</span></label>
+        <input type="text" class="form-control" id="currencyName" name="CurrencyName" placeholder="Currency name" required validationMessage="Currency anem is required" />
+      </div>
+
+      <!-- IsDefaultCurrency -->
+      <div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
+        <label for="IsDefaultCurrency" class="form-check-label">Is Default</label>
+        <input type="checkbox" id="chkIsDefaultCurrency" name="IsDefaultCurrency" class="form-check-input" />
+      </div>
+
+      <!-- IsActiveCurrency -->
+      <div class="col-xl-4 col-lg-4 col-md-4 col-12 mb-2 custom-checkbox">
+        <label for="IsActiveCurrency" class="form-check-label">Is Active</label>
+        <input type="checkbox" id="chkIsActiveCurrency" name="IsActiveCurrency" class="form-check-input" />
+      </div>
+    </div>
+
+    <div class="btnDiv mt-2">
+      <ul>
+        <li class="d-flex justify-content-end">
+          <button type="button" class="btn btn-primary me-2" id="btnCurrencySaveOrUpdate" onclick="CurrencyDetailsManager.saveOrUpdateCurrency();">+ Add Currency</button>
+          <button type="button" class="btn btn-secondary me-2" onclick="CurrencyDetailsHelper.clearForm();">Clear</button>
+          <button type="button" class="btn btn-light me-2" onclick='CommonManager.closeKendoWindow("#CurrencyPopUp_Course")'>Close</button>
+        </li>
+      </ul>
+    </div>
+  </fieldset>
+</div>
+ *@
+

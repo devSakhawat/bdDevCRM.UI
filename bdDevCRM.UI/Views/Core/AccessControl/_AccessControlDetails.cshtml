@@ -1,25 +1,35 @@
-﻿
-<script src="~/assets/scripts/core/accesscontrol/accesscontroldetails.js"></script>
-<div id="divdetailsForDetails">
-  <fieldset class="reset">
-    <legend class="reset">Access Control Details</legend>
+﻿@* <script src="~/assets/scripts/modules/core/accesscontrol/accesscontroldetails.js"></script> *@
 
-    <form id="accessControlForm" class="main-form">
-      <input type="hidden" id="hdnAccessControlId" value="0" />
 
-      <div class="mb-3">
-        <label class="form-label" for="accessControl-name">Access Name:<span class="redstart">*</span></label>
-        <input type="text" id="txtAccessControlName" name="accessControl-name" class="form-control" maxlength="50"
-               placeholder="Access Control name" required validationmessage="Please enter Access Control Name" />
-      </div>
+<fieldset class="border p-3 fieldsetCommon">
+  <legend class="legendCommon">Access Control Form</legend>
 
-      <div class="d-flex justify-content-end">
-        <button type="button" class="btn btn-primary me-2" onclick="AccessControlDetailsHelper.SaveInformation()" id="btnSave">+ Add New</button>
-        <button type="button" class="btn btn-secondary me-2" onclick="AccessControlDetailsHelper.ClearInformation()" id="btnClear">Clear</button>
-      </div>
+  <form id="accessControlForm" class="main-form mt-3">
 
-      <div class="status"></div>
-    </form>
+    <input type="hidden" name="AccessId" id="hdnAccessControlId" value="0" data-type="int" />
+    <div class="mb-3">
+      <label class="form-label" for="AccessName">Access Name:<span class="redstart">*</span></label>
+      <input type="text" id="txtAccessControlName" name="AccessName" class="form-control" maxlength="50"
+             placeholder="Access Control name" required validationmessage="Please enter Access Control Name" data-type="string" />
+    </div>
 
-  </fieldset>
-</div>
+    <!-- Buttons -->
+    <div class="btnDiv mt-2">
+      <ul>
+        <li class="d-flex justify-content-end">
+          <button type="button" class="btn btn-primary me-2"
+                  id="btnMenuSaveOrUpdate"
+                  onclick="AccessControl.saveOrUpdate();">
+            + Add Access Control
+          </button>
+
+          <button type="button" class="btn btn-secondary me-2"
+                  onclick="AccessControl.clearForm('menuForm');">
+            Clear
+          </button>
+        </li>
+      </ul>
+    </div>
+  </form>
+
+</fieldset>

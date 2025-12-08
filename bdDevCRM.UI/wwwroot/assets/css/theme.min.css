@@ -312,7 +312,7 @@ html {
   --dashui-font-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
   --dashui-gradient: linear-gradient(180deg,hsla(0,0%,100%,.15),hsla(0,0%,100%,0));
   --dashui-body-font-family: "Inter","sans-serif";
-  --dashui-body-font-size: 0.875rem;
+  --dashui-body-font-size: 1rem;
   --dashui-body-font-weight: 400;
   --dashui-body-line-height: 1.5;
   --dashui-body-color: #475569;
@@ -28776,8 +28776,8 @@ textarea.form-control-lg {
 }
 
 .header .navbar {
-  left: 0px;
-  padding: .625rem 1.5rem;
+  left: 0;
+  padding: .624rem 1.5rem;
   position: fixed;
   right: 0;
   top: 0px;
@@ -34905,7 +34905,8 @@ input[type="checkbox" i] {
   cursor: default !important;
   appearance: auto;
   box-sizing: border-box;
-  margin: 3px 3px 3px 4px;
+  /* margin: 3px 3px 3px 4px; */
   padding: initial;
   border: initial;
+  width: 1.6em;
 }

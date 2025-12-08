@@ -1,0 +1,61 @@
+﻿@{
+  ViewBag.Title = "Menu Info";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+<!-- row -->
+<div class="row gx-1 gy-2">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div id="divSummary">
+      <partial name="MenuSummary.cshtml" />
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div id="CoursePopUp" style="display: none">
+    <partial name="MenuDetails" />
+  </div>
+</div>
+<script src="~/assets/scripts/services/module/core/menuservice.js"></script>
+
+
+
+
+<script>
+  console.log('MenuService loaded:', typeof MenuService !== 'undefined');
+  console.log('MenuDetailsManager loaded:', typeof MenuDetailsManager !== 'undefined');
+  console.log('MenuSummaryManager loaded:', typeof MenuSummaryManager !== 'undefined');
+</script>
+
+
+
+
+
+
+@* @{
+	ViewData["Title"] = "Menu";
+	Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+
+<!-- row -->
+<div class="row">
+	<div class="col-12">
+		<!-- card -->
+		<h3>Menu Information</h3>
+		<div id="divSummary">
+			@Html.Partial("Menu/MenuSummary")
+		</div>
+
+		<div id="divDetails" style="display: none;">
+			@Html.Partial("Menu/MenuDetails")
+		</div>
+	</div>
+</div>
+
+<script src="~/assets/scripts/modules/core/menu/menu.js"></script>
+ *@
+
+
+

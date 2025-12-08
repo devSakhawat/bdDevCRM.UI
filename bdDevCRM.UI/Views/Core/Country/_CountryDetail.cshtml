@@ -1,10 +1,16 @@
 ﻿
-<script src="~/assets/scripts/core/country/countrydetail.js"></script>
+<script src="~/assets/scripts/modules/core/country/countrydetail.js"></script>
 
 
-<div class="col-xl-5 col-lg-5 col-md-6 col-sm-12 col-12" id="CountryFrom">
+
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
+  <fieldset class="border p-3 fieldsetCommon">
+		<legend class="legendCommon legendCommonModalBGImportant">Country Form</legend>
+		<form id="CountryFrom" enctype="multipart/form-data">
+
+@* <div class="col-xl-5 col-lg-5 col-md-6 col-sm-12 col-12" id="CountryFrom">
 	<fieldset class="reset">
-		<legend class="reset">Country Form</legend>
+		<legend class="reset">Country Form</legend> *@
 
 		<div class="row mb-2">
 			<input id="countryId" type="hidden" value="0" />
@@ -36,7 +42,8 @@
 					<button type="button" class="btn btn-danger btn-close-generic" onclick="window.location.href='/'">Close</button>
 				</li>
 			</ul>
-		</div>
+			</div>
+		</form>
 	</fieldset>
 </div>
 

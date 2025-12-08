@@ -1,12 +1,55 @@
-﻿
-<script src="~/assets/scripts/core/group/accesscontrolpermission.js"></script>
-
+﻿<script src="~/assets/scripts/modules/core/group/accesscontrolpermission.js"></script>
+@* <script src="~/assets/scripts/modules/core/group/accesscontrolpermission.js"></script> *@
+@* 
 <div id="divMenuPermission" class="menuPermission widthSize100_per">
   <div class="mb-2">
     <h4 for="Application" class="k-header mb-3 mb-2">Access Permission</h4>
     <div id="checkboxAccess" class="mb-1"> </div>
   </div>
+</div> *@
+
+<div id="divMenuPermission" class="menuPermission widthSize100_per">
+  <!-- Loader Container -->
+  <div id="accessSectionLoader"> </div>
+
+  <div class="mb-2">
+    <h4 for="Application" class="k-header mb-3 mb-2">Access Permission</h4>
+    <div id="checkboxAccess" class="mb-2"> </div>
+  </div>
 </div>
+
+
+<style>
+  #accessSectionLoader {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 20.5%;
+    margin-left: -40px !important;
+  }
+
+  .access-item .tree-label {
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+
+  .access-item:hover {
+    background-color: #8B8B8B;
+  }
+
+  .access-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+</style>
+
+@* 
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+ *@
+
 
 
 @* 

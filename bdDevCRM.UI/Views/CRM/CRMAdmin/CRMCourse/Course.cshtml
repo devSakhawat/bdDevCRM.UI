@@ -1,0 +1,32 @@
+﻿@{
+  ViewBag.Title = "Course Info";
+  Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
+}
+
+<!-- row -->
+<div class="row gx-1 gy-2">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div id="divSummary">
+      <partial name="~/Views/CRM/CRMAdmin/CRMCourse/_CourseSummary.cshtml" />
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div id="CoursePopUp" style="display: none">
+    <partial name="~/Views/CRM/CRMAdmin/CRMCourse/_CourseDetails.cshtml" />
+  </div>
+</div>
+
+<!-- ✅ STEP 1: LOAD SERVICE LAYER FIRST -->
+<script src="~/assets/scripts/services/module/courseservice.js"></script>
+
+<!-- ✅ STEP 2: THEN LOAD MODULE SCRIPTS -->
+<script src="~/assets/scripts/modules/crmadmin/crmcourse/course.js"></script>
+
+<!-- ✅ STEP 3: VERIFY LOAD -->
+<script>
+  console.log('CourseService loaded:', typeof CourseService !== 'undefined');
+  console.log('CourseDetailsManager loaded:', typeof CourseDetailsManager !== 'undefined');
+  console.log('CourseSummaryManager loaded:', typeof CourseSummaryManager !== 'undefined');
+</script>

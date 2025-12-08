@@ -65,6 +65,31 @@
   <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
 
 
+  <!-- Config (No dependencies) -->
+  <script src="~/assets/Scripts/Config/AppConfig.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Core/Logger.js"></script>
+  <script src="~/assets/Scripts/Core/EventBus.js"></script>
+  <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
+  <script src="~/assets/Scripts/Core/App.js"></script>
+
+  @* 
+  <!-- ========================================== -->
+  <!-- 3. LOAD BASE COMPONENT                     -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
+ *@
+  <!-- ========================================== -->
+  <!-- 5. LOAD MODULE REGISTRY & APP INITIALIZER  -->
+  <!-- ========================================== -->
+  <script src="~/assets/scripts/core/appinitializer.js"></script>
+  <script src="~/assets/scripts/core/moduleregistry.js"></script>
+
+
   <title>bdDevs CRM System</title>
 </head>
 
@@ -76,6 +101,15 @@
       <!-- header navbar -->
       <div class="navbar-custom navbar navbar-expand-lg">
         <div class="container-fluid px-0">
+          @*  <a class="navbar-brand d-block d-md-none" href="../index-2.html">
+            <img src="../assets/images/brand/logo/logo-2.svg" alt="Image" />
+          </a> *@
+
+          <!-- Brand logo -->
+          <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+            @* <img src="~/assets/images/logo/sountwels.png" alt="Brand Logo" class="bran-logo" /> *@
+            <img alt="Brand Logo" id="bran-logo" />
+          </a>
           <a id="nav-toggle" href="#!" class="ms-auto ms-md-0 me-0 me-lg-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
                  class="bi bi-text-indent-left text-muted" viewBox="0 0 16 16">
@@ -254,13 +288,6 @@
 
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <a class="navbar-brand" href="@Url.Action("Index", "Home")">
-          <img src="~/assets/images/logo/sountwels.png" alt="Brand Logo" class="bran-logo" />
-          @* <img alt="Brand Logo" id="bran-logo" /> *@
-        </a>
-      </div>
-
       <!-- Search Box (NEW - Above Menu List) -->
       <div class="sidebar-search">
         <div class="search-wrapper">
@@ -352,24 +379,6 @@
   <!-- Theme JS -->
   <script src="~/assets/Scripts/ThemeJS/theme.min.js"></script>
 
-  <!-- Config (No dependencies) -->
-  <script src="~/assets/Scripts/Config/AppConfig.js"></script>
-
-
-    <!-- ========================================== -->
-  <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
-  <!-- ========================================== -->
-  <script src="~/assets/Scripts/Core/Logger.js"></script>
-  <script src="~/assets/Scripts/Core/EventBus.js"></script>
-  <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
-  <script src="~/assets/Scripts/Core/App.js"></script>
-
-  @* 
-  <!-- ========================================== -->
-  <!-- 3. LOAD BASE COMPONENT                     -->
-  <!-- ========================================== -->
-  <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
- *@
 
 
   <!-- Core Managers -->
@@ -400,11 +409,7 @@
   <script src="~/assets/scripts/common/sidebarmenu.js"></script>
 
 
-  <!-- ========================================== -->
-  <!-- 5. LOAD MODULE REGISTRY & APP INITIALIZER  -->
-  <!-- ========================================== -->
-  <script src="~/assets/scripts/core/appinitializer.js"></script>
-  <script src="~/assets/scripts/core/moduleregistry.js"></script>
+
   <!-- ========================================== -->
   <!-- CONDITIONAL LOADING (LOGIN VS DASHBOARD)  -->
   <!-- ========================================== -->

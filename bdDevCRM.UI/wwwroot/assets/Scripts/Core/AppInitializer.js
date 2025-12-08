@@ -98,6 +98,7 @@ var AppInitializer = (function () {
   }
 
   async function _initRouteModules() {
+    debugger;
     console.log('🔧 Step 3: Initializing route-specific modules...');
 
     var currentPath = window.location.pathname;

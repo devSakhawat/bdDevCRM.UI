@@ -354,6 +354,32 @@ var ModuleRegistry = (function () {
     }
   }
 
+  /**
+   * Initialize all auto-init modules
+   * all the auto-init modules initialization
+   * 
+   * @returns {Promise<void>}
+   */
+  async function initAll() {
+    console.log('🔧 Initializing all auto-init modules...');
+
+    for (var name in _modules) {
+      if (_modules.hasOwnProperty(name)) {
+        var moduleEntry = _modules[name];
+
+        // Only init modules with autoInit: true
+        if (moduleEntry.config.autoInit &&
+          moduleEntry.state !== ModuleState.INITIALIZED) {
+          try {
+            await initModule(name);
+          } catch (error) {
+            console.error('Failed to auto-init module:', name, error);
+          }
+        }
+      }
+    }
+  }
+
   // ============================================
   // PUBLIC API
   // ============================================
@@ -375,7 +401,9 @@ var ModuleRegistry = (function () {
     getStatus: getStatus,
 
     // Cleanup
-    unloadModule: unloadModule
+    unloadModule: unloadModule,
+
+    initAll: initAll,// Initialize all auto-init modules
   };
 })();
 

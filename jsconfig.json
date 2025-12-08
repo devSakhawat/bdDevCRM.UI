@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "checkJs": false,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "target": "ES6",
+    "module": "none",
+    "lib": ["ES6", "DOM"]
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot/lib",
+    "**/node_modules/*"
+  ]
+}

@@ -7,9 +7,8 @@
   @* <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /> *@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Favicon icon-->
+<!-- Favicon icon-->
   <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico" />
-
 
   <!-- Libs CSS -->
   <link href="~/assets/libs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
@@ -22,8 +21,7 @@
   <link href="~/assets/kendo_2023_r1/styles/kendo.default.min.css" rel="stylesheet" />
   <link href="~/assets/kendo_2023_r1/styles/kendo.default.mobile.min.css" rel="stylesheet" />
 
-
-  <!-- common css -->
+  <!-- Common CSS -->
   <link href="~/assets/css/commonsize.css" rel="stylesheet" />
   <link href="~/assets/css/common.css" rel="stylesheet" />
   <link rel="stylesheet" href="~/assets/css/theme.min.css">
@@ -55,24 +53,60 @@
   </style>
 
   <!-- Scripts -->
-  <!-- ========================================== -->
-  <!-- CORE DEPENDENCIES (ALWAYS LOADED)         -->
+ <!-- ========================================== -->
+  <!-- 1️⃣ CORE DEPENDENCIES (ALWAYS LOADED)      -->
   <!-- ========================================== -->
   <script src="~/assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="~/assets/kendo_2023_r1/js/jszip.min.js"></script>
   <script src="~/assets/kendo_2023_r1/js/kendo.all.min.js"></script>
 
-  <!-- Config (No dependencies) -->
+
+ <!-- ========================================== -->
+  <!-- 2️⃣ GLOBAL CONFIGURATION (No dependencies) -->
+  <!-- ========================================== -->
   <script src="~/assets/Scripts/Core/App.js"></script>
   <script src="~/assets/Scripts/Config/AppConfig.js"></script>
+  @* ✅ AppConfig.js এখন baseApi এবং baseUI define করছে *@
 
   <!-- ========================================== -->
-  <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
+  <!-- 3️⃣ LOAD CORE FRAMEWORK                    -->
   <!-- ========================================== -->
   <script src="~/assets/Scripts/Core/Logger.js"></script>
   <script src="~/assets/Scripts/Core/EventBus.js"></script>
   <script src="~/assets/Scripts/Core/DependencyContainer.js"></script>
+
+
+  <!-- ========================================== -->
+  <!-- 4️⃣ LOAD MODULE SYSTEM                     -->
+  <!-- ========================================== -->
+  <script src="~/assets/scripts/core/appinitializer.js"></script>
+  <script src="~/assets/scripts/core/moduleregistry.js"></script>
+
+
+  <!-- 5. Core Managers -->
+  <script src="~/assets/Scripts/Core/Managers/StorageManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/TokenManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/MessageManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/StateManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/ApiCallManager.js"></script>
+  <script src="~/assets/Scripts/Core/Managers/NavigationManager.js"></script>
+
+  <!-- 6. Helpers -->
+  <script src="~/assets/Scripts/Core/Helpers/ValidationHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/FormHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/DateHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/StringHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/NumberHelper.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/TypeConverter.js"></script>
+  <script src="~/assets/Scripts/Core/Helpers/GridHelper.js"></script>
+
+@*   <!-- ========================================== -->
+  <!-- 2. LOAD CORE FRAMEWORK (Depends on Config) -->
+  <!-- ========================================== -->
+  <script src="~/assets/Scripts/Core/Logger.js"></script>
+  <script src="~/assets/Scripts/Core/EventBus.js"></script>
+  <script src="~/assets/Scripts/Core/DependencyContainer.js"></script> *@
 
   @* 
   <!-- ========================================== -->
@@ -80,12 +114,12 @@
   <!-- ========================================== -->
   <script src="~/assets/Scripts/Common/Components/BaseComponent.js"></script>
  *@
-  <!-- ========================================== -->
+@*   <!-- ========================================== -->
   <!-- 5. LOAD MODULE REGISTRY & APP INITIALIZER  -->
   <!-- ========================================== -->
   <script src="~/assets/scripts/core/appinitializer.js"></script>
   <script src="~/assets/scripts/core/moduleregistry.js"></script>
-
+ *@
 
   <title>bdDevs CRM System</title>
 </head>

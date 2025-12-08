@@ -1,4 +1,5 @@
-﻿/*=========================================================
+﻿/// <reference path="storagemanager.js" />
+/*=========================================================
  * Token Manager
  * File: TokenManager.js
  * Description: Manages JWT tokens with auto-refresh
@@ -204,15 +205,57 @@ var TokenManager = (function () {
     };
   }
 
-  // ============================================
-  // PUBLIC API
-  // ============================================
+  /**
+   * Check if token exists
+   * @returns {boolean}
+   */
+  function hasToken() {
+    return !!StorageManager.getAccessToken();
+  }
+
+  /**
+   * Clear session and tokens
+   */
+  function clearSession() {
+    stopAutoRefresh();
+    StorageManager.clearTokens();
+    StorageManager.clearUserInfo();
+  }
+
+  /**
+   * Redirect to login page
+   */
+  function redirectToLogin() {
+    var loginUrl = (typeof AppConfig !== 'undefined' && AppConfig.getUiUrl)
+      ? AppConfig.getUiUrl() + '/Home/Login'
+      : '/Home/Login';
+    window.location.href = loginUrl;
+  }
+
+  /**
+   * Check and refresh token if needed
+   * @returns {Promise<void>}
+   */
+  async function checkAndRefresh() {
+    await _checkAndRefreshToken();
+  }
+
+  // PUBLIC API 
   return {
     startAutoRefresh: startAutoRefresh,
     stopAutoRefresh: stopAutoRefresh,
     refreshToken: refreshToken,
-    getTokenStatus: getTokenStatus
+    getTokenStatus: getTokenStatus,
+    // New methods
+    hasToken: hasToken,
+    clearSession: clearSession,
+    redirectToLogin: redirectToLogin,
+    checkAndRefresh: checkAndRefresh
   };
 })();
 
 console.log('%c[TokenManager] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');
+// Token এখন AppConfig থেকে আসবে
+if (typeof AppConfig !== 'undefined' && AppConfig.getToken) {
+  return AppConfig.getToken(); // ✅ Working
+}

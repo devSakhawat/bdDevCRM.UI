@@ -78,6 +78,11 @@ var AppInitializer = (function () {
   async function _loadMenu() {
     console.log('🔧 Step 2: Loading menu...');
 
+    // ✅ Debug: Check authentication
+    console.log('🔐 Authentication check:');
+    console.log('  - isAuthenticated:', AppConfig.isAuthenticated());
+    console.log('  - Token exists:', !!AppConfig.getToken());
+
     if (!AppConfig.isAuthenticated()) {
       console.warn('⚠️ User not authenticated, skipping menu load');
       return;
@@ -86,11 +91,11 @@ var AppInitializer = (function () {
     _showMenuSkeleton();
 
     try {
-      if (typeof MenuHelper !== 'undefined' && MenuHelper.GetMenuInformation) {
-        await MenuHelper.GetMenuInformation();
+      if (typeof SidebarMenu !== 'undefined' && SidebarMenu.GetMenuInformation) {
+        await SidebarMenu.GetMenuInformation();
         console.log('✅ Menu loaded successfully');
       } else {
-        throw new Error('MenuHelper not found');
+        throw new Error('SidebarMenu not found');
       }
     } finally {
       _hideMenuSkeleton();

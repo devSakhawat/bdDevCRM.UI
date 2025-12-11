@@ -50,7 +50,7 @@ var SidebarMenu = (function () {
 
   /**
    * Get and render menu information
-   * Menu information fetch করে render করা
+   * Menu information fetch and then render
    * 
    * Flow:
    * 1. Check cache
@@ -1026,7 +1026,7 @@ var SidebarMenu = (function () {
 
   /**
    * Get current user info
-   * Current user এর info নেওয়া
+   * Current user info
    */
   function _getUserInfo() {
     if (typeof StorageManager !== 'undefined') {
@@ -1052,7 +1052,6 @@ var SidebarMenu = (function () {
 
   /**
    * Refresh menu (clear cache and reload)
-   * Menu refresh করা
    */
   async function refreshMenu() {
     console.log('🔄 Refreshing menu...');
@@ -1071,7 +1070,6 @@ var SidebarMenu = (function () {
 
   /**
    * Set active menu by URL (PUBLIC API)
-   * URL দিয়ে active menu set করা
    */
   function setActiveMenuByUrl(url) {
     var $sidebar = $('#' + _config.sidebarId);
@@ -1141,7 +1139,6 @@ var SidebarMenu = (function () {
 
   /**
    * Collapse all submenus
-   * সব submenus collapse করা
    */
   function collapseAllSubmenus() {
     var $sidebar = $('#' + _config.sidebarId);
@@ -1150,7 +1147,6 @@ var SidebarMenu = (function () {
 
   /**
    * Expand all submenus
-   * সব submenus expand করা
    */
   function expandAllSubmenus() {
     var $sidebar = $('#' + _config.sidebarId);
@@ -1161,12 +1157,44 @@ var SidebarMenu = (function () {
   // PUBLIC API
   // ============================================
   return {
-    GetMenuInformation: GetMenuInformation,
+    // Existing methods...
+    loadMenu: loadMenu,
     refreshMenu: refreshMenu,
-    getMenuData: getMenuData,
-    setActiveMenuByUrl: setActiveMenuByUrl,
-    collapseAllSubmenus: collapseAllSubmenus,
-    expandAllSubmenus: expandAllSubmenus
+
+    renderFromCache: function (menuData) {
+      if (!menuData || menuData.length === 0) {
+        console.warn('⚠️ No menu data to render');
+        return;
+      }
+
+      console.log('🎨 Rendering menu from cache:', menuData.length, 'items');
+      _renderMenu(menuData);
+      _bindMenuEvents();
+      _highlightActiveMenu();
+    },
+
+    // NEW: Check if cache exists
+    hasCache: function () {
+      var cached = _getCachedMenu();
+      return cached && cached.length > 0;
+    },
+
+    // NEW: Force refresh (clear cache + reload)
+    forceRefresh: function () {
+      console.log('Force refreshing menu...');
+      _clearMenuCache();
+      return loadMenu();
+    },
+
+    // Existing methods... 
+    clearCache: _clearMenuCache,
+    getCacheInfo: function () {
+      var cached = _getCachedMenu();
+      return {
+        exists: !!cached,
+        itemCount: cached ? cached.length : 0
+      };
+    }
   };
 })();
 

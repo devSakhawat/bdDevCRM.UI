@@ -22,29 +22,23 @@ var TokenManager = (function () {
   // PRIVATE - Configuration
   // ============================================
   var _config = {
-    checkIntervalMinutes: 1, // Check token expiry every 1 minute
-    refreshBufferMinutes: 2  // Refresh token if expires in < 2 minutes
+    checkIntervalMinutes: 1,
+    refreshBufferMinutes: 2
   };
 
   // ============================================
   // PUBLIC - Token Refresh
   // ============================================
 
-  /**
-   * Start automatic token refresh
-   */
   function startAutoRefresh() {
     if (_state.refreshInterval) {
       console.warn('⚠️ Auto-refresh already started');
       return;
     }
 
-    console.log('🔄 Starting automatic token refresh...');
-
-    // Check immediately
+    console.log('🔄 Starting automatic token refresh.. .');
     _checkAndRefreshToken();
 
-    // Then check periodically
     _state.refreshInterval = setInterval(function () {
       _checkAndRefreshToken();
     }, _config.checkIntervalMinutes * 60 * 1000);
@@ -52,9 +46,6 @@ var TokenManager = (function () {
     console.log('✅ Auto-refresh started (checking every ' + _config.checkIntervalMinutes + ' minute)');
   }
 
-  /**
-   * Stop automatic token refresh
-   */
   function stopAutoRefresh() {
     if (_state.refreshInterval) {
       clearInterval(_state.refreshInterval);
@@ -63,10 +54,6 @@ var TokenManager = (function () {
     }
   }
 
-  /**
-   * Manually refresh token
-   * @returns {Promise<boolean>} Success status
-   */
   async function refreshToken() {
     if (_state.isRefreshing) {
       console.warn('⚠️ Token refresh already in progress');
@@ -78,30 +65,28 @@ var TokenManager = (function () {
     try {
       console.log('🔄 Refreshing token...');
 
-      var refreshToken = StorageManager.getRefreshToken();
+      var refreshTokenValue = StorageManager.getRefreshToken();
 
-      if (!refreshToken) {
+      if (!refreshTokenValue) {
         console.error('❌ No refresh token found');
         _handleRefreshFailure();
         return false;
       }
 
-      // Check if refresh token is expired
       if (StorageManager.isRefreshTokenExpired()) {
         console.error('❌ Refresh token expired');
         _handleRefreshFailure();
         return false;
       }
 
-      // Call refresh token API
       var response = await ApiCallManager.post(
         AppConfig.getApiUrl(),
         '/refresh-token',
-        { RefreshToken: refreshToken },
+        { RefreshToken: refreshTokenValue },
         {
           retry: false,
           showErrorNotifications: false,
-          skipTokenRefresh: true // Important: Prevent infinite loop
+          skipTokenRefresh: true
         }
       );
 
@@ -109,12 +94,9 @@ var TokenManager = (function () {
         throw new Error('Invalid refresh token response');
       }
 
-      // Store new tokens
       StorageManager.setTokens(response.Data);
-
       console.log('✅ Token refreshed successfully');
 
-      // Trigger event
       if (typeof EventBus !== 'undefined') {
         EventBus.publish('token:refreshed', response.Data);
       }
@@ -135,41 +117,28 @@ var TokenManager = (function () {
   // PRIVATE - Helper Functions
   // ============================================
 
-  /**
-   * Check if token needs refresh and refresh if needed
-   */
   async function _checkAndRefreshToken() {
-    // Check if user is authenticated
     if (!AppConfig.isAuthenticated()) {
       return;
     }
 
-    // Check if access token is expired or about to expire
     if (StorageManager.isAccessTokenExpired()) {
       console.log('🔄 Access token expired, refreshing...');
       await refreshToken();
     }
   }
 
-  /**
-   * Handle refresh token failure
-   */
   function _handleRefreshFailure() {
-    console.error('❌ Refresh token failed, logging out...');
+    console.error('❌ Refresh token failed, logging out.. .');
 
-    // Stop auto-refresh
     stopAutoRefresh();
-
-    // Clear tokens
     StorageManager.clearTokens();
     StorageManager.clearUserInfo();
 
-    // Trigger event
     if (typeof EventBus !== 'undefined') {
       EventBus.publish('auth:logout', { reason: 'refresh_failed' });
     }
 
-    // Redirect to login
     setTimeout(function () {
       if (typeof MessageManager !== 'undefined') {
         MessageManager.alert.warning(
@@ -190,10 +159,6 @@ var TokenManager = (function () {
   // PUBLIC - Utility Functions
   // ============================================
 
-  /**
-   * Get current token status
-   * @returns {object}
-   */
   function getTokenStatus() {
     return {
       hasAccessToken: !!StorageManager.getAccessToken(),
@@ -205,26 +170,16 @@ var TokenManager = (function () {
     };
   }
 
-  /**
-   * Check if token exists
-   * @returns {boolean}
-   */
   function hasToken() {
     return !!StorageManager.getAccessToken();
   }
 
-  /**
-   * Clear session and tokens
-   */
   function clearSession() {
     stopAutoRefresh();
     StorageManager.clearTokens();
     StorageManager.clearUserInfo();
   }
 
-  /**
-   * Redirect to login page
-   */
   function redirectToLogin() {
     var loginUrl = (typeof AppConfig !== 'undefined' && AppConfig.getUiUrl)
       ? AppConfig.getUiUrl() + '/Home/Login'
@@ -232,21 +187,18 @@ var TokenManager = (function () {
     window.location.href = loginUrl;
   }
 
-  /**
-   * Check and refresh token if needed
-   * @returns {Promise<void>}
-   */
   async function checkAndRefresh() {
     await _checkAndRefreshToken();
   }
 
-  // PUBLIC API 
+  // ============================================
+  // PUBLIC API
+  // ============================================
   return {
     startAutoRefresh: startAutoRefresh,
     stopAutoRefresh: stopAutoRefresh,
     refreshToken: refreshToken,
     getTokenStatus: getTokenStatus,
-    // New methods
     hasToken: hasToken,
     clearSession: clearSession,
     redirectToLogin: redirectToLogin,
@@ -255,7 +207,8 @@ var TokenManager = (function () {
 })();
 
 console.log('%c[TokenManager] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');
-// Token এখন AppConfig থেকে আসবে
-if (typeof AppConfig !== 'undefined' && AppConfig.getToken) {
-  return AppConfig.getToken(); // ✅ Working
-}
+
+// ❌ নিচের এই লাইনগুলো মুছে ফেলুন - এগুলো ভুল ছিল:
+// if (typeof AppConfig !== 'undefined' && AppConfig.getToken) {
+//   return AppConfig.getToken(); // ❌ ILLEGAL - function এর বাইরে return
+// }

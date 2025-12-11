@@ -76,24 +76,98 @@ var AppInitializer = (function () {
   }
 
   async function _loadMenu() {
-    console.log('🔧 Step 2: Loading menu...');
+    console.log('🔧 Step 2: Loading menu.. .');
 
-    if (!AppConfig.isAuthenticated()) {
+    // Debug: Check authentication
+    console.log('🔐 Authentication check:');
+    console.log('  - isAuthenticated:', AppConfig.isAuthenticated());
+    console.log('  - Token exists:', !!AppConfig.getToken());
+
+    // Check authentication first
+    if (typeof AppConfig !== 'undefined' && !AppConfig.isAuthenticated()) {
       console.warn('⚠️ User not authenticated, skipping menu load');
       return;
     }
 
-    _showMenuSkeleton();
-
     try {
-      if (typeof MenuHelper !== 'undefined' && MenuHelper.GetMenuInformation) {
-        await MenuHelper.GetMenuInformation();
-        console.log('✅ Menu loaded successfully');
-      } else {
-        throw new Error('MenuHelper not found');
+      // Step 1: Try to get from cache FIRST (Fast Path)
+      var cachedMenu = null;
+
+      if (typeof StorageManager !== 'undefined' && StorageManager.getCachedMenu) {
+        cachedMenu = StorageManager.getCachedMenu();
+        console.log('📦 Cache check result:', cachedMenu ? cachedMenu.length + ' items found' : 'No cache');
       }
+
+      if (cachedMenu && cachedMenu.length > 0) {
+        // ⚡ FAST PATH: Use cached menu (no skeleton needed)
+        console.log('⚡ Using cached menu - instant load! ');
+
+        if (typeof SidebarMenu !== 'undefined' && SidebarMenu.renderFromCache) {
+          SidebarMenu.renderFromCache(cachedMenu);
+        } else if (typeof MenuHelper !== 'undefined' && MenuHelper.renderMenu) {
+          MenuHelper.renderMenu(cachedMenu);
+        } else {
+          // Fallback: Direct render
+          _renderSidebarMenu(cachedMenu);
+        }
+
+        console.log('✅ Menu loaded from cache');
+        return;
+      }
+
+      // Step 2: No cache - show skeleton and fetch from API
+      console.log('📡 No cache found - fetching from API.. .');
+      _showMenuSkeleton();
+
+      if (typeof SidebarMenu !== 'undefined' && SidebarMenu.loadMenu) {
+        await SidebarMenu.loadMenu();
+      } else if (typeof MenuHelper !== 'undefined' && MenuHelper.GetMenuInformation) {
+        await MenuHelper.GetMenuInformation();
+      } else {
+        throw new Error('No menu loader found (SidebarMenu or MenuHelper)');
+      }
+
+      console.log('✅ Menu loaded from API and cached');
+
+    } catch (error) {
+      console.error('❌ Menu load error:', error);
+      _showMenuError();
     } finally {
       _hideMenuSkeleton();
+    }
+  }
+
+  // Helper: Direct render (fallback)
+  function _renderSidebarMenu(menuData) {
+    var $sidebar = $('#sideNavbar');
+    if ($sidebar.length === 0) {
+      console.error('Sidebar element not found');
+      return;
+    }
+
+    // Simple render - adjust based on your HTML structure
+    var html = '';
+    menuData.forEach(function (item) {
+      html += '<li class="nav-item" data-menu-id="' + item.MenuId + '">';
+      html += '  <a class="nav-link" href="' + (item.MenuPath || '#') + '">';
+      html += '    <span class="nav-link-text">' + item.MenuName + '</span>';
+      html += '  </a>';
+      html += '</li>';
+    });
+
+    $sidebar.html(html);
+  }
+
+  // Helper: Show menu error
+  function _showMenuError() {
+    var $sidebar = $('#sideNavbar');
+    if ($sidebar.length > 0) {
+      $sidebar.html(
+        '<li class="nav-item text-danger p-3">' +
+        '<i class="fas fa-exclamation-triangle"></i> Failed to load menu ' +
+        '<a href="#" onclick="AppInitializer.reinit(); return false;">Retry</a>' +
+        '</li>'
+      );
     }
   }
 
@@ -178,10 +252,10 @@ var AppInitializer = (function () {
       }
 
       // Step 0: Check dependencies
-      var depCheck = _checkCoreDependencies();
+      var dependancyCheck = _checkCoreDependencies();
 
-      if (!depCheck.allLoaded) {
-        var errorMsg = 'Missing core dependencies: ' + depCheck.missing.join(', ');
+      if (!dependancyCheck.allLoaded) {
+        var errorMsg = 'Missing core dependencies: ' + dependancyCheck.missing.join(', ');
         console.error('❌', errorMsg);
 
         if (typeof MessageManager !== 'undefined') {
@@ -195,7 +269,7 @@ var AppInitializer = (function () {
       }
 
       console.log('✅ All core dependencies loaded');
-      console.table(depCheck.status);
+      console.table(dependancyCheck.status);
 
       // Step 1-5: Initialize in sequence
       await _initCoreSystems();

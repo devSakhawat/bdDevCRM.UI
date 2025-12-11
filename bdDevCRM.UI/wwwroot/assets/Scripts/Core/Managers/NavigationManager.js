@@ -30,6 +30,7 @@ var NavigationManager = (function () {
   // ============================================
 
   function init() {
+    debugger;
     console.log('🚀 NavigationManager initializing...');
 
     // 1. Bind Click Events (Event Delegation)

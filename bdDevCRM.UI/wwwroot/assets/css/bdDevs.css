@@ -1039,6 +1039,55 @@ legend.legendCommonModalBGImportant {
   display: none !important;
 }
 
+/*////////////////////////
+////////////////////////
+////////////////////////*/
+/* Grid Container Fix */
+.grid-container,
+.k-grid-wrapper,
+[id*="gridSummary"] {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Main Content Area */
+.main-content,
+.content-wrapper,
+.page-content {
+  padding: 15px !important;
+  margin-left: 0 !important;
+}
+
+/* When sidebar is collapsed */
+.sidebar-collapsed .main-content,
+.sidebar-mini .main-content {
+  margin-left: 60px !important;
+}
+
+/* When sidebar is expanded */
+.sidebar-expanded .main-content {
+  margin-left: 250px !important;
+}
+
+/* Grid specific */
+#gridSummaryMenu {
+  width: 100% !important;
+}
+
+.k-grid {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+  /* Remove extra spacing */
+  .k-grid .k-grid-header {
+    padding: 0 !important;
+  }
+
+  .k-grid .k-grid-content {
+    overflow-x: auto !important;
+  }
 
 
 

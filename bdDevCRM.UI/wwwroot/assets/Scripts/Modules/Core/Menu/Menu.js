@@ -15,6 +15,7 @@
 =========================================================*/
 
 var MenuModule = {
+  
   // Configuration
   config: {
     gridId: 'gridSummaryMenu',

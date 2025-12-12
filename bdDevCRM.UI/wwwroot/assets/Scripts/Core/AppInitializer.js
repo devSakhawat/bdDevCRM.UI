@@ -104,9 +104,8 @@ var AppInitializer = (function () {
 
         if (typeof SidebarMenu !== 'undefined' && SidebarMenu.renderFromCache) {
           SidebarMenu.renderFromCache(cachedMenu);
-        } else if (typeof MenuHelper !== 'undefined' && MenuHelper.renderMenu) {
-          MenuHelper.renderMenu(cachedMenu);
-        } else {
+        }
+        else {
           // Fallback: Direct render
           _renderSidebarMenu(cachedMenu);
         }
@@ -119,11 +118,10 @@ var AppInitializer = (function () {
       console.log('📡 No cache found - fetching from API.. .');
       _showMenuSkeleton();
 
-      if (typeof SidebarMenu !== 'undefined' && SidebarMenu.loadMenu) {
-        await SidebarMenu.loadMenu();
-      } else if (typeof MenuHelper !== 'undefined' && MenuHelper.GetMenuInformation) {
-        await MenuHelper.GetMenuInformation();
-      } else {
+      if (typeof SidebarMenu !== 'undefined' && SidebarMenu.GetMenuInformation) {
+        await SidebarMenu.GetMenuInformation();
+        console.log('✅ Menu loaded via SidebarMenu');
+      }  else {
         throw new Error('No menu loader found (SidebarMenu or MenuHelper)');
       }
 
@@ -165,7 +163,7 @@ var AppInitializer = (function () {
       $sidebar.html(
         '<li class="nav-item text-danger p-3">' +
         '<i class="fas fa-exclamation-triangle"></i> Failed to load menu ' +
-        '<a href="#" onclick="AppInitializer.reinit(); return false;">Retry</a>' +
+        '<a href="#" onclick="AppInitializer.reinit(); return false;"  class="text-primary">Retry</a>' +
         '</li>'
       );
     }

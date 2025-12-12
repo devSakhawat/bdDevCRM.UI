@@ -144,7 +144,7 @@ var SidebarMenu = (function () {
         AppConfig.getApiUrl(),
         AppConfig.endpoints.menusByUserPermission || '/menus-by-user-permission',
         {
-          showLoadingIndicator: false,
+          showLoadingIndicator: true,
           showErrorNotifications: false
         }
       );
@@ -700,7 +700,6 @@ var SidebarMenu = (function () {
 
   /**
  * Filter menus (OPTIMIZED for 500+ menus)
- * কেন্দো ComboBox style search - alphabetic matching only
  */
   function _filterMenus(searchTerm) {
     var startTime = performance.now(); // Performance tracking
@@ -793,7 +792,6 @@ var SidebarMenu = (function () {
 
   /**
  * Highlight text (OPTIMIZED - Alphabetic only)
- * শুধু alphabetic characters highlight করা
  */
   function _highlightText(text, searchTerm) {
     if (!searchTerm) return text;
@@ -1153,48 +1151,336 @@ var SidebarMenu = (function () {
     $sidebar.find('.collapse').collapse('show');
   }
 
+
+  // ============================================
+  // PRIVATE - Highlight Active Menu
+  // ============================================
+
+  /**
+   * Highlight active menu item based on current URL
+   * বর্তমান URL অনুযায়ী active menu item highlight করা
+   * 
+   * @param {string} currentPath - Current URL path (e.g., '/Core/MenuSettings')
+   */
+  function _highlightActiveMenu(currentPath) {
+    debugger;
+    // Default to current location if not provided
+    if (!currentPath) {
+      currentPath = window.location.pathname;
+    }
+
+    console.log('🎯 Highlighting active menu for path:', currentPath);
+
+    var $sidebar = $('#' + _config.sidebarId);
+
+    if ($sidebar.length === 0) {
+      console.warn('⚠️ Sidebar element not found');
+      return;
+    }
+
+    // Step 1: Remove all existing active states
+    $sidebar.find('.nav-link').removeClass('active');
+    $sidebar.find('.nav-item').removeClass('active');
+    $sidebar.find('.submenu').removeClass('show');
+    $sidebar.find('.nav-link[data-bs-toggle="collapse"]').addClass('collapsed');
+
+    // Step 2: Normalize current path (remove trailing slash, convert to lowercase)
+    var normalizedPath = _normalizePath(currentPath);
+
+    // Step 3: Find matching menu item
+    var $activeLink = null;
+    var bestMatchScore = 0;
+
+    $sidebar.find('.nav-link').each(function () {
+      var $link = $(this);
+      var href = $link.attr('href');
+
+      // Skip if no href or is a collapse toggle without real URL
+      if (!href || href === '#' || href.startsWith('#submenu-')) {
+        return;
+      }
+
+      // Normalize the href
+      var normalizedHref = _normalizePath(href);
+
+      // Calculate match score
+      var matchScore = _calculateMatchScore(normalizedPath, normalizedHref);
+
+      if (matchScore > bestMatchScore) {
+        bestMatchScore = matchScore;
+        $activeLink = $link;
+      }
+    });
+
+    // Step 4: Apply active state to best match
+    if ($activeLink && bestMatchScore > 0) {
+      _applyActiveState($activeLink);
+      console.log('✅ Active menu set:', $activeLink.text().trim());
+    } else {
+      console.log('⚠️ No matching menu item found for:', currentPath);
+    }
+  }
+
+  /**
+   * Normalize URL path for comparison
+   * URL path কে normalize করা comparison এর জন্য
+   * 
+   * @param {string} path - URL path
+   * @returns {string} Normalized path
+   */
+  function _normalizePath(path) {
+    if (!path) return '';
+
+    try {
+      // Extract pathname if full URL
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        var url = new URL(path);
+        path = url.pathname;
+      }
+
+      // Remove trailing slash
+      path = path.replace(/\/+$/, '');
+
+      // Convert to lowercase
+      path = path.toLowerCase();
+
+      // Remove leading slash for comparison
+      path = path.replace(/^\/+/, '');
+
+      return path;
+    } catch (error) {
+      console.error('Error normalizing path:', error);
+      return path.toLowerCase();
+    }
+  }
+
+  /**
+   * Calculate match score between current path and menu href
+   * Current path এবং menu href এর মধ্যে match score calculate করা
+   * 
+   * @param {string} currentPath - Current URL path (normalized)
+   * @param {string} menuHref - Menu item href (normalized)
+   * @returns {number} Match score (0 = no match, higher = better match)
+   */
+  function _calculateMatchScore(currentPath, menuHref) {
+    if (!currentPath || !menuHref) return 0;
+
+    // Exact match - highest score
+    if (currentPath === menuHref) {
+      return 100;
+    }
+
+    // Current path starts with menu href (e.g., /Core/MenuSettings/Edit matches /Core/MenuSettings)
+    if (currentPath.startsWith(menuHref + '/')) {
+      // Score based on how much of the path matches
+      return 50 + (menuHref.length / currentPath.length) * 40;
+    }
+
+    // Menu href starts with current path (less common but handle it)
+    if (menuHref.startsWith(currentPath + '/')) {
+      return 30;
+    }
+
+    // Partial match - check if paths share common segments
+    var currentSegments = currentPath.split('/').filter(Boolean);
+    var menuSegments = menuHref.split('/').filter(Boolean);
+
+    var matchingSegments = 0;
+    var minLength = Math.min(currentSegments.length, menuSegments.length);
+
+    for (var i = 0; i < minLength; i++) {
+      if (currentSegments[i] === menuSegments[i]) {
+        matchingSegments++;
+      } else {
+        break; // Stop at first non-matching segment
+      }
+    }
+
+    if (matchingSegments > 0) {
+      // Score based on matching segments
+      return (matchingSegments / Math.max(currentSegments.length, menuSegments.length)) * 25;
+    }
+
+    return 0;
+  }
+
+  /**
+   * Apply active state to menu link and expand parent submenus
+   * Menu link এ active state apply করা এবং parent submenu expand করা
+   * 
+   * @param {jQuery} $link - jQuery element of the active link
+   */
+  function _applyActiveState($link) {
+    if (!$link || $link.length === 0) return;
+
+    // Add active class to the link
+    $link.addClass('active');
+
+    // Add active class to parent nav-item
+    var $navItem = $link.closest('.nav-item');
+    $navItem.addClass('active');
+
+    // Expand all parent submenus
+    var $parentSubmenu = $link.closest('.submenu');
+
+    while ($parentSubmenu.length > 0) {
+      // Show the submenu
+      $parentSubmenu.addClass('show');
+
+      // Find the toggle link and remove collapsed class
+      var submenuId = $parentSubmenu.attr('id');
+      if (submenuId) {
+        var $toggleLink = $parentSubmenu
+          .closest('.nav-item')
+          .find('[data-bs-toggle="collapse"][href="#' + submenuId + '"], [data-bs-toggle="collapse"][data-bs-target="#' + submenuId + '"]');
+
+        if ($toggleLink.length > 0) {
+          $toggleLink.removeClass('collapsed');
+          $toggleLink.attr('aria-expanded', 'true');
+        }
+      }
+
+      // Add active class to parent nav-item
+      $parentSubmenu.closest('.nav-item').addClass('active');
+
+      // Move up to next parent submenu
+      $parentSubmenu = $parentSubmenu.parent().closest('.submenu');
+    }
+
+    // Scroll active item into view (optional)
+    _scrollActiveIntoView($link);
+  }
+
+  /**
+   * Scroll active menu item into view
+   * Active menu item কে visible area তে scroll করা
+   * 
+   * @param {jQuery} $link - jQuery element of the active link
+   */
+  function _scrollActiveIntoView($link) {
+    if (!$link || $link.length === 0) return;
+
+    var $sidebar = $('#' + _config.sidebarId);
+    var $scrollContainer = $sidebar.closest('.sidebar-scroll, .sidebar, .side-navbar');
+
+    if ($scrollContainer.length === 0) {
+      $scrollContainer = $sidebar;
+    }
+
+    // Check if element is in view
+    var linkOffset = $link.offset();
+    var containerOffset = $scrollContainer.offset();
+    var containerHeight = $scrollContainer.height();
+
+    if (linkOffset && containerOffset) {
+      var relativeTop = linkOffset.top - containerOffset.top;
+
+      // If element is outside visible area, scroll to it
+      if (relativeTop < 0 || relativeTop > containerHeight - 50) {
+        var scrollTop = $scrollContainer.scrollTop() + relativeTop - (containerHeight / 3);
+
+        $scrollContainer.animate({
+          scrollTop: Math.max(0, scrollTop)
+        }, 300);
+      }
+    }
+  }
+
+  /**
+   * Set active menu by URL (Public method)
+   * URL দিয়ে active menu set করা (Public method)
+   * 
+   * @param {string} url - URL to match
+   */
+  function setActiveMenuByUrl(url) {
+    if (!url) {
+      url = window.location.pathname;
+    }
+
+    _highlightActiveMenu(url);
+  }
+
+
+
+
+
+
+
   // ============================================
   // PUBLIC API
   // ============================================
   return {
-    // Existing methods...
-    loadMenu: loadMenu,
+    // Main methods
+    GetMenuInformation: GetMenuInformation,
+    loadMenu: GetMenuInformation,  // Alias
     refreshMenu: refreshMenu,
+    getMenuData: getMenuData,
 
+    // ✅ Active menu highlighting
+    setActiveMenuByUrl: setActiveMenuByUrl,
+    highlightActiveMenu: function (path) {
+      _highlightActiveMenu(path);
+    },
+
+    // Cache methods
     renderFromCache: function (menuData) {
       if (!menuData || menuData.length === 0) {
         console.warn('⚠️ No menu data to render');
         return;
       }
-
       console.log('🎨 Rendering menu from cache:', menuData.length, 'items');
+      // Store in state
+      _state.menuData = menuData;
+
+      // Render menu
       _renderMenu(menuData);
+
+      // Bind events
       _bindMenuEvents();
+
+      // Initialize search
+      if (typeof _initSearchFunctionality === 'function') {
+        _initSearchFunctionality();
+      }
+
+      // ✅ Highlight active menu
       _highlightActiveMenu();
+      console.log('✅ Menu rendered from cache');
+
+      //// Highlight active item
+      //var currentPath = window.location.pathname;
+      //_highlightActiveMenu(currentPath);
     },
 
-    // NEW: Check if cache exists
+    // Check if cache exists
     hasCache: function () {
       var cached = _getCachedMenu();
       return cached && cached.length > 0;
     },
 
-    // NEW: Force refresh (clear cache + reload)
+    // ✅ Force refresh (clear cache + reload)
     forceRefresh: function () {
-      console.log('Force refreshing menu...');
+      console.log('🔄 Force refreshing menu.. .');
       _clearMenuCache();
-      return loadMenu();
+      return GetMenuInformation();  // ✅ GetMenuInformation কল করবে
     },
 
-    // Existing methods... 
+    // ✅ Clear cache
     clearCache: _clearMenuCache,
+
+    // ✅ Get cache info
     getCacheInfo: function () {
       var cached = _getCachedMenu();
       return {
         exists: !!cached,
         itemCount: cached ? cached.length : 0
       };
-    }
+    },
+
+    // Submenu controls
+    collapseAllSubmenus: collapseAllSubmenus,
+    expandAllSubmenus: expandAllSubmenus
+
   };
 })();
 

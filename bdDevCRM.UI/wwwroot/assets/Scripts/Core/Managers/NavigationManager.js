@@ -56,6 +56,7 @@ var NavigationManager = (function () {
   function _bindNavigationEvents() {
     // Listen to clicks on the Sidebar and any specific internal links
     $(document).on('click', 'a', function (e) {
+      debugger;
       var $link = $(this);
       var url = $link.attr('href');
       var target = $link.attr('target');
@@ -108,66 +109,163 @@ var NavigationManager = (function () {
     if (_state.isNavigating && url === _state.currentUrl) return;
 
     _state.isNavigating = true;
+    _state.currentUrl = url;
 
-    // 1. Notify App (Start)
-    if (typeof EventBus !== 'undefined') {
-      EventBus.emit('navigation:start', { url: url });
-    }
+    console.log('🔄 SPA Navigation to:', url);
 
-    // 2. Show Loading
-    if (typeof MessageManager !== 'undefined') {
-      MessageManager.loading.show(_config.loadingMessage);
-    }
+    //// 1. Notify App (Start)
+    //if (typeof EventBus !== 'undefined') {
+    //  EventBus.emit('navigation:start', { url: url });
+    //}
+
+    //// 2. Show Loading
+    //if (typeof MessageManager !== 'undefined') {
+    //  MessageManager.loading.show(_config.loadingMessage);
+    //}
 
     try {
       console.log('🔄 Navigating to:', url);
 
-      // 3. Fetch Content (Using Fetch API with Special Header)
-      const response = await fetch(url, {
-        method: 'GET',
+      // Show loading
+      if (typeof MessageManager !== 'undefined') {
+        MessageManager.loading.show('Loading...');
+      }
+
+      // ✅ Step 1: Re-render sidebar menu from cache
+      await _ensureSidebarMenu();
+
+      // Step 2: Fetch new content
+      var response = await fetch(url, {
         headers: {
-          'X-Requested-With': 'XMLHttpRequest' // Critical for _ViewStart logic
+          'X-Requested-With': 'XMLHttpRequest'
         }
       });
 
       if (!response.ok) {
-        throw new Error(response.statusText);
+        throw new Error('Failed to load page:  ' + response.status);
       }
 
       const htmlContent = await response.text();
+      // Step 3: Extract and inject content
+      var $content = $('#' + _config.contentContainerId);
+      if ($content.length > 0) {
+        // Parse response and extract content
+        var $parsed = $('<div>').html(htmlContent);
+        var newContent = $parsed.find('#' + _config.contentContainerId).html();
 
-      // 4. Inject Content
-      var $container = $('#' + _config.contentContainerId);
-      $container.fadeOut(100, function () {
-        $container.html(htmlContent).fadeIn(200);
-
-        // 5. Update URL & State
-        if (pushState) {
-          history.pushState({ url: url }, '', url);
+        if (newContent) {
+          $content.html(newContent);
+        } else {
+          $content.html(htmlContent);
         }
-        _state.currentUrl = url;
-        document.title = "bdDevs CRM"; // Optionally parse title from response
+      }
 
-        // 6. Post-Load Initialization
-        _afterContentLoad(url);
-      });
+      // Step 4: Update browser history
+      if (pushState) {
+        history.pushState({ url: url }, '', url);
+      }
+
+      // Step 5: Initialize route-specific modules
+      if (typeof ModuleRegistry !== 'undefined') {
+        await ModuleRegistry.initByRoute(url);
+      }
+
+      // ✅ Step 6: Highlight active menu item
+      _highlightActiveMenuItem(url);
+
+      console.log('✅ SPA Navigation complete');
+
+      //// 4. Inject Content
+      //var $container = $('#' + _config.contentContainerId);
+      //$container.fadeOut(100, function () {
+      //  $container.html(htmlContent).fadeIn(200);
+
+      //  // 5. Update URL & State
+      //  if (pushState) {
+      //    history.pushState({ url: url }, '', url);
+      //  }
+      //  _state.currentUrl = url;
+      //  document.title = "bdDevs CRM"; // Optionally parse title from response
+
+      //  // 6. Post-Load Initialization
+      //  _afterContentLoad(url);
+      //});
 
     } catch (error) {
-      console.error('❌ Navigation failed:', error);
-      if (typeof MessageManager !== 'undefined') {
-        MessageManager.notify.error('Failed to load page content.');
-      }
+      console.error('❌ SPA Navigation failed:', error);
+      // Fallback:  Full page reload
+      window.location.href = url;
     } finally {
       _state.isNavigating = false;
       if (typeof MessageManager !== 'undefined') {
         MessageManager.loading.hide();
       }
+      //_state.isNavigating = false;
+      //if (typeof MessageManager !== 'undefined') {
+      //  MessageManager.loading.hide();
+      //}
 
-      // Notify App (End)
-      if (typeof EventBus !== 'undefined') {
-        EventBus.emit('navigation:end', { url: url });
+      //// Notify App (End)
+      //if (typeof EventBus !== 'undefined') {
+      //  EventBus.emit('navigation:end', { url: url });
+      //}
+    }
+  }
+
+  // ✅ NEW: Ensure sidebar menu is rendered
+  async function _ensureSidebarMenu() {
+    var $sidebar = $('#' + _config.sidebarId);
+
+    // Check if sidebar is empty or has only skeleton
+    var hasMenuItems = $sidebar.find('.nav-item[data-menu-id]').length > 0;
+
+    if (!hasMenuItems) {
+      console.log('📦 Sidebar empty, loading from cache.. .');
+
+      // Try cache first
+      if (typeof StorageManager !== 'undefined') {
+        var cachedMenu = StorageManager.getCachedMenu();
+
+        if (cachedMenu && cachedMenu.length > 0) {
+          console.log('⚡ Rendering menu from cache:', cachedMenu.length, 'items');
+
+          if (typeof SidebarMenu !== 'undefined' && SidebarMenu.renderFromCache) {
+            SidebarMenu.renderFromCache(cachedMenu);
+            return;
+          }
+        }
+      }
+
+      // No cache - fetch from API
+      console.log('📡 No cache, fetching menu from API...');
+      if (typeof SidebarMenu !== 'undefined' && SidebarMenu.GetMenuInformation) {
+        await SidebarMenu.GetMenuInformation();
       }
     }
+  }
+
+  // ✅ NEW: Highlight active menu item
+  function _highlightActiveMenuItem(url) {
+    var $sidebar = $('#' + _config.sidebarId);
+
+    // Remove all active classes
+    $sidebar.find('.nav-link').removeClass('active');
+    $sidebar.find('.nav-item').removeClass('active');
+
+    // Find and highlight current menu item
+    var pathname = new URL(url, window.location.origin).pathname;
+
+    $sidebar.find('.nav-link').each(function () {
+      var href = $(this).attr('href');
+      if (href && href.includes(pathname)) {
+        $(this).addClass('active');
+        $(this).closest('.nav-item').addClass('active');
+
+        // Expand parent submenu if exists
+        $(this).closest('.submenu').addClass('show');
+        $(this).closest('.has-submenu').find('> .nav-link').removeClass('collapsed');
+      }
+    });
   }
 
   /**

@@ -180,8 +180,8 @@ button{
   font-weight: bold;
 }
 
-  .submenu-arrow. rotate-down {
-    transform: rotate(180deg);
+  .submenu-arrow.rotate-down {
+    transform: rotate(90deg);
   }
 
 /* Submenu (nested menus) with better indentation */
@@ -235,14 +235,14 @@ button{
     font-size: 12px;
   }
 
-    .nav .flex-column . flex-column .nav-link::before {
+    .nav .flex-column .flex-column .nav-link::before {
       left: 32px;
       width: 6px;
       height: 6px;
     }
 
   /* Level 3 submenu (fourth level) */
-  .nav .flex-column . flex-column .flex-column . nav-link {
+  .nav .flex-column .flex-column .flex-column .nav-link {
     padding-left: 64px;
     font-size: 11px;
   }
@@ -284,7 +284,7 @@ button{
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
-  animation: skeleton-loading 1. 5s infinite;
+  animation: skeleton-loading 1.5s infinite;
   border-radius: 4px;
 }
 
@@ -406,7 +406,7 @@ button{
     font-weight: 500;
   }
 
-  .error-state . btn {
+  .error-state .btn {
     margin-top: 12px;
   }
 
@@ -466,16 +466,16 @@ button{
 
   /* Expanded state - arrow pointing down */
   .submenu-arrow.rotate-down {
-    transform: rotate(180deg);
+    transform: rotate(90deg);
   }
 
 /* Add subtle scale effect on hover */
 .nav-link:hover .submenu-arrow {
-  transform: scale(1. 1);
+  transform: scale(1.1);
 }
 
   .nav-link:hover .submenu-arrow.rotate-down {
-    transform: rotate(180deg) scale(1.1);
+    transform: rotate(90deg) scale(1.1);
   }
 
 
@@ -569,7 +569,7 @@ button{
 
 /* Responsive */
 @media (max-width: 768px) {
-  . sidebar {
+  .sidebar {
     width: 100%;
     transform: translateX(-100%);
     transition: transform 0.3s ease;

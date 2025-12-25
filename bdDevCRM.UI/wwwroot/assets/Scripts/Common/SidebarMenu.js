@@ -383,7 +383,7 @@ var SidebarMenu = (function () {
       // Create submenu
       var $submenu = $('<ul>')
         .attr('id', 'submenu-' + menu.MenuId)
-        .addClass('collapse nav flex-column')
+        .addClass('collapse submenu nav flex-column')
         .addClass(shouldExpand ? 'show' : '');
 
       // Render child menus recursively
@@ -1432,11 +1432,8 @@ var SidebarMenu = (function () {
       // Store in state
       _state.menuData = menuData;
 
-      // Render menu
+      // Render menu + _bindMenuEvents executed into _renderMenu
       _renderMenu(menuData);
-
-      // Bind events
-      _bindMenuEvents();
 
       // Initialize search
       if (typeof _initSearchFunctionality === 'function') {

@@ -71,7 +71,6 @@ var ModuleRegistry = (function () {
 
   /**
    * Load multiple scripts in sequence
-   * একাধিক scripts sequence এ load করা
    * 
    * @param {Array<string>} scriptUrls - Array of script URLs
    * @returns {Promise<void>}
@@ -204,7 +203,6 @@ var ModuleRegistry = (function () {
 
   /**
    * Initialize module by route pattern
-   * Route pattern অনুযায়ী module initialize করা
    * 
    * @param {string} currentPath - Current URL path
    * @returns {Promise<void>}

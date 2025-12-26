@@ -383,7 +383,7 @@ var SidebarMenu = (function () {
       // Create submenu
       var $submenu = $('<ul>')
         .attr('id', 'submenu-' + menu.MenuId)
-        .addClass('collapse nav flex-column')
+        .addClass('collapse submenu nav flex-column')
         .addClass(shouldExpand ? 'show' : '');
 
       // Render child menus recursively
@@ -1305,49 +1305,98 @@ var SidebarMenu = (function () {
   }
 
   /**
-   * Apply active state to menu link and expand parent submenus
-   * Menu link এ active state apply করা এবং parent submenu expand করা
-   * 
-   * @param {jQuery} $link - jQuery element of the active link
-   */
+ * Apply active state to menu link and expand parent submenus
+ * Menu link এ active state apply করা এবং parent submenu expand করা
+ * 
+ * @param {jQuery} $link - jQuery element of the active link
+ */
   function _applyActiveState($link) {
     if (!$link || $link.length === 0) return;
 
-    // Add active class to the link
-    $link.addClass('active');
+    console.log('🎯 Applying active state:', $link.text().trim());
 
-    // Add active class to parent nav-item
-    var $navItem = $link.closest('.nav-item');
-    $navItem.addClass('active');
+    // ═══════════════════════════════════════════════════════════
+    // STEP 1: Child (clicked item) কে active করা
+    // ═══════════════════════════════════════════════════════════
+    $link.addClass('active');  // Link এ active class
+    $link.closest('.nav-item').addClass('active');  // Nav-item এ active class
 
-    // Expand all parent submenus
-    var $parentSubmenu = $link.closest('.submenu');
+    // ═══════════════════════════════════════════════════════════
+    // STEP 2: While loop দিয়ে সব Parent traverse করা
+    // ═══════════════════════════════════════════════════════════
+    var $current = $link.closest('.nav-item');  // ✅ Start from nav-item
+    var iteration = 0;  // ✅ Safety counter
+    var maxIterations = 10;  // ✅ Prevent infinite loops
 
-    while ($parentSubmenu.length > 0) {
-      // Show the submenu
-      $parentSubmenu.addClass('show');
+    while (iteration < maxIterations) {
+      iteration++;
 
-      // Find the toggle link and remove collapsed class
+      // ─────────────────────────────────────────────────────────
+      // 2a: Current element এর parent submenu খুঁজি
+      // ─────────────────────────────────────────────────────────
+      var $parentSubmenu = $current.parent('.submenu, .collapse');
+
+      // যদি আর কোনো parent না থাকে, loop থেকে বের হই
+      if ($parentSubmenu.length === 0) {
+        console.log('🔝 Reached top level - no more parents');
+        break;
+      }
+
       var submenuId = $parentSubmenu.attr('id');
+      console.log('📂 Found parent submenu:', submenuId);
+
+      // ─────────────────────────────────────────────────────────
+      // 2b: Parent submenu কে expand করা (show class)
+      // ─────────────────────────────────────────────────────────
+      if (!$parentSubmenu.hasClass('show')) {
+        $parentSubmenu.addClass('show');
+        console.log('🔓 Expanded submenu:', submenuId);
+      }
+
+      // ─────────────────────────────────────────────────────────
+      // 2c: Parent এর toggle link খুঁজে update করা
+      // ─────────────────────────────────────────────────────────
       if (submenuId) {
-        var $toggleLink = $parentSubmenu
-          .closest('.nav-item')
-          .find('[data-bs-toggle="collapse"][href="#' + submenuId + '"], [data-bs-toggle="collapse"][data-bs-target="#' + submenuId + '"]');
+        var $toggleLink = $('[data-bs-target="#' + submenuId + '"], [href="#' + submenuId + '"]');
 
         if ($toggleLink.length > 0) {
           $toggleLink.removeClass('collapsed');
           $toggleLink.attr('aria-expanded', 'true');
+          $toggleLink.find('.submenu-arrow').addClass('rotate-down');
+          console.log('🔗 Updated toggle for:', submenuId);
         }
       }
 
-      // Add active class to parent nav-item
-      $parentSubmenu.closest('.nav-item').addClass('active');
+      // ─────────────────────────────────────────────────────────
+      // 2d: Parent nav-item কে active করা
+      // ─────────────────────────────────────────────────────────
+      var $parentNavItem = $parentSubmenu.closest('.nav-item');
+      var $parentNavLink = $parentNavItem.children('.nav-link');
+      //var $parentNavLink = $parentNavItem.find('> .nav-link');
+      if ($parentNavLink.length > 0 && !$parentNavLink.hasClass('active')) {
+        $parentNavLink.addClass('active');
+        console.log('✅ Parent nav-item activated:', $parentNavItem.find('> a').first().text().trim());
+      }
 
-      // Move up to next parent submenu
-      $parentSubmenu = $parentSubmenu.parent().closest('.submenu');
+      // ─────────────────────────────────────────────────────────
+      // 2e: ✅ CRITICAL: উপরে যাই (next parent খুঁজতে)
+      // ─────────────────────────────────────────────────────────
+      $current = $parentNavItem;  // ✅ Move to parent nav-item
+
+      // ✅ Safety check: যদি parent না পাওয়া যায়
+      if ($current.length === 0) {
+        console.log('⚠️ No parent nav-item found, stopping traversal');
+        break;
+      }
     }
 
-    // Scroll active item into view (optional)
+    if (iteration >= maxIterations) {
+      console.warn('⚠️ Max iterations reached, possible infinite loop prevented');
+    }
+
+    console.log('🎉 All parents activated and expanded!');
+
+    // Scroll active item into view
     _scrollActiveIntoView($link);
   }
 
@@ -1432,11 +1481,8 @@ var SidebarMenu = (function () {
       // Store in state
       _state.menuData = menuData;
 
-      // Render menu
+      // Render menu + _bindMenuEvents executed into _renderMenu
       _renderMenu(menuData);
-
-      // Bind events
-      _bindMenuEvents();
 
       // Initialize search
       if (typeof _initSearchFunctionality === 'function') {

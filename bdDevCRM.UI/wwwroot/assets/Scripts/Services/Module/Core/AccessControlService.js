@@ -104,7 +104,7 @@ var AccessControlService = {
    * Get grid data source
    */
   getGridDataSource: function (config) {
-    console.log('🔧 Creating grid DataSource with endpoint:', AppConfig.endpoints.accessControlSummary);
+    console.log('Creating grid DataSource with endpoint:', AppConfig.endpoints.accessControlSummary);
 
     const gridConfig = Object.assign({}, {
       endpoint: AppConfig.endpoints.accessControlSummary,

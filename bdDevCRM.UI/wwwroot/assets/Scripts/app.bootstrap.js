@@ -20,7 +20,7 @@
       if (typeof App !== 'undefined' && typeof App.init === 'function') {
         App.init();
       } else {
-        console.error('❌ App not found or init method missing');
+        console.error('App not found or init method missing');
         return;
       }
 
@@ -28,11 +28,11 @@
       _testCoreSystems();
 
       console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #4CAF50');
-      console.log('%c   ✅ Application Ready!', 'color: #4CAF50; font-size: 14px; font-weight: bold');
+      console.log('%c  Application Ready!', 'color: #4CAF50; font-size: 14px; font-weight: bold');
       console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #4CAF50');
 
     } catch (error) {
-      console.error('❌ Application initialization failed:', error);
+      console.error('Application initialization failed:', error);
     }
   });
 
@@ -44,30 +44,30 @@
 
     // Test Logger
     if (typeof App.Logger !== 'undefined') {
-      console.log('✅ Logger: OK');
+      console.log('Logger: OK');
       App.Logger.debug('Logger test message');
     } else {
-      console.warn('⚠️ Logger: Not available');
+      console.warn('Logger: Not available');
     }
 
     // Test EventBus
     if (typeof App.EventBus !== 'undefined') {
-      console.log('✅ EventBus: OK');
+      console.log('EventBus: OK');
 
       // Test event
       App.EventBus.on('test:event', function (data) {
-        console.log('📡 EventBus test event received:', data);
+        console.log('EventBus test event received:', data);
       });
       App.EventBus.emit('test:event', { message: 'Hello from EventBus!' });
       App.EventBus.off('test:event');
 
     } else {
-      console.warn('⚠️ EventBus: Not available');
+      console.warn('EventBus: Not available');
     }
 
     // Test StateManager
     if (typeof App.StateManager !== 'undefined') {
-      console.log('✅ StateManager: OK');
+      console.log('StateManager: OK');
 
       // Test state
       App.StateManager.setState('test', 'value', true); // silent mode
@@ -76,26 +76,26 @@
       App.StateManager.removeState('test', true);
 
     } else {
-      console.warn('⚠️ StateManager: Not available');
+      console.warn('StateManager: Not available');
     }
 
     // Test DI Container
     if (typeof App.DI !== 'undefined') {
-      console.log('✅ DI Container: OK');
+      console.log('DI Container: OK');
 
       // Show registered services
       var services = App.DI.getRegisteredServices();
-      console.log('📦 Registered services:', services.length, '→', services.join(', '));
+      console.log('Registered services:', services.length, '→', services.join(', '));
 
     } else {
-      console.warn('⚠️ DI Container: Not available');
+      console.warn('DI Container: Not available');
     }
 
     // Test BaseComponent
     if (typeof BaseComponent !== 'undefined') {
-      console.log('✅ BaseComponent: OK');
+      console.log('BaseComponent: OK');
     } else {
-      console.warn('⚠️ BaseComponent: Not available');
+      console.warn('BaseComponent: Not available');
     }
 
     console.log('%c🧪 Core Systems Test Complete!', 'color: #FF9800; font-size: 12px');

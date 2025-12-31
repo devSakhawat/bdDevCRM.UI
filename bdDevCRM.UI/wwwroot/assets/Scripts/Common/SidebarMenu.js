@@ -18,7 +18,7 @@ var SidebarMenu = (function () {
   var _config = {
     sidebarId: 'sideNavbar',
     searchInputId: 'sidebarSearchInput',
-    searchButtonId: 'btnSearch', // ✅ NEW: Search button ID
+    searchButtonId: 'btnSearch', //NEW: Search button ID
     clearSearchBtnId: 'btnClearSearch',
     noResultsId: 'noSearchResults',
     cacheKeyPrefix: 'menuCache_',
@@ -26,8 +26,8 @@ var SidebarMenu = (function () {
     maxRetries: 3,
     retryDelay: 1000,
 
-    // ✅ UPDATED: Search config
-    searchDebounceMs: 1000,        // ✅ Changed from 300ms to 1000ms (1 second)
+    //UPDATED: Search config
+    searchDebounceMs: 1000,        //Changed from 300ms to 1000ms (1 second)
     minSearchLength: 1,            // Minimum characters to trigger search
     maxVisibleResults: 100,        // Limit visible results for performance
     highlightClass: 'search-highlight'
@@ -61,7 +61,7 @@ var SidebarMenu = (function () {
    */
   async function GetMenuInformation() {
     if (_state.isLoading) {
-      console.warn('⚠️ Menu already loading...');
+      console.warn('Menu already loading...');
       return;
     }
 
@@ -75,24 +75,24 @@ var SidebarMenu = (function () {
       // Step 1: Check cache first
       var cacheSource = (typeof StorageManager !== 'undefined') ? 'StorageManager' : 'localStorage';
       var cachedMenu = _getCachedMenu();
-      console.log('📦 Cached menu source:', cacheSource);
-      console.log('📦 Cached menu value:', cachedMenu);
+      console.log('Cached menu source:', cacheSource);
+      console.log('Cached menu value:', cachedMenu);
 
       // Detect cached ParseError object (some code may have cached the full response/error accidentally)
       if (cachedMenu && typeof cachedMenu === 'object' && cachedMenu.IsSuccess === false && cachedMenu.ErrorType === 'ParseError') {
-        console.warn('❌ Cached menu is a ParseError object — clearing cache and refetching');
+        console.warn('Cached menu is a ParseError object — clearing cache and refetching');
         _clearMenuCache();
         cachedMenu = null;
       }
 
       // If cachedMenu is a wrapper object (unexpected), try to extract Data
       if (cachedMenu && !Array.isArray(cachedMenu) && cachedMenu.Data && Array.isArray(cachedMenu.Data)) {
-        console.log('🔧 Cached menu was wrapped, extracting Data property');
+        console.log('Cached menu was wrapped, extracting Data property');
         cachedMenu = cachedMenu.Data;
       }
 
       if (cachedMenu && Array.isArray(cachedMenu) && cachedMenu.length > 0) {
-        console.log('✅ Menu loaded from cache');
+        console.log('Menu loaded from cache');
         _renderMenu(cachedMenu);
         _state.menuData = cachedMenu;
         _initSearchFunctionality();
@@ -103,7 +103,7 @@ var SidebarMenu = (function () {
       var menus = await _fetchMenuFromApi();
 
       if (!menus || menus.length === 0) {
-        console.warn('⚠️ No menus found for current user');
+        console.warn('No menus found for current user');
         _showEmptyState();
         return;
       }
@@ -118,10 +118,10 @@ var SidebarMenu = (function () {
       _renderMenu(menus);
       _initSearchFunctionality();
 
-      console.log('✅ Menu loaded successfully');
+      console.log('Menu loaded successfully');
 
     } catch (error) {
-      console.error('❌ Failed to load menu:', error);
+      console.error('Failed to load menu:', error);
       _handleMenuLoadError(error);
 
     } finally {
@@ -155,7 +155,7 @@ var SidebarMenu = (function () {
 
       // Validate response
       if (!response) {
-        console.error('❌ Response is null or undefined');
+        console.error('Response is null or undefined');
         return [];
       }
 
@@ -170,12 +170,12 @@ var SidebarMenu = (function () {
       }
 
       // Unexpected format
-      console.error('❌ Unexpected response format. Expected array, got:', typeof response);
+      console.error('Unexpected response format. Expected array, got:', typeof response);
       console.error('Response:', response);
       return [];
 
     } catch (error) {
-      console.error('❌ API call failed:', error);
+      console.error('API call failed:', error);
       throw error;
     }
   }
@@ -244,7 +244,7 @@ var SidebarMenu = (function () {
       };
 
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-      console.log('✅ Menu cached successfully');
+      console.log('Menu cached successfully');
 
     } catch (error) {
       console.error('Error caching menu:', error);
@@ -268,7 +268,7 @@ var SidebarMenu = (function () {
 
       var cacheKey = _config.cacheKeyPrefix + userInfo.UserId;
       localStorage.removeItem(cacheKey);
-      console.log('✅ Menu cache cleared');
+      console.log('Menu cache cleared');
 
     } catch (error) {
       console.error('Error clearing menu cache:', error);
@@ -315,7 +315,7 @@ var SidebarMenu = (function () {
     // Bind events
     _bindMenuEvents();
 
-    console.log('✅ Menu rendered successfully');
+    console.log('Menu rendered successfully');
   }
 
   /**
@@ -540,7 +540,7 @@ var SidebarMenu = (function () {
   function _bindMenuEvents() {
     var $sidebar = $('#' + _config.sidebarId);
 
-    // ✅ Arrow rotation on toggle (NO AUTO-CLOSE)
+    //Arrow rotation on toggle (NO AUTO-CLOSE)
     $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
       e.preventDefault();
 
@@ -558,7 +558,7 @@ var SidebarMenu = (function () {
       }
     });
 
-    // ✅ Update arrow after collapse animation completes
+    //Update arrow after collapse animation completes
     $sidebar.find('.collapse').on('shown.bs.collapse', function () {
       var $parentLink = $(this).prev('[data-bs-toggle="collapse"]');
       $parentLink.find('.submenu-arrow').addClass('rotate-down');
@@ -571,7 +571,7 @@ var SidebarMenu = (function () {
       $parentLink.attr('aria-expanded', 'false');
     });
 
-    // ❌ NO ACCORDION BEHAVIOR - REMOVED
+    // NO ACCORDION BEHAVIOR - REMOVED
     // All menus can be open simultaneously
   }
 
@@ -616,16 +616,16 @@ var SidebarMenu = (function () {
    */
   function _initSearchFunctionality() {
     var $searchInput = $('#' + _config.searchInputId);
-    var $searchButton = $('#' + _config.searchButtonId); // ✅ NEW: Search button
+    var $searchButton = $('#' + _config.searchButtonId); //NEW: Search button
     var $clearBtn = $('#' + _config.clearSearchBtnId);
     var $noResults = $('#' + _config.noResultsId);
 
     if ($searchInput.length === 0) {
-      console.warn('⚠️ Search input not found');
+      console.warn('Search input not found');
       return;
     }
 
-    // ✅ Create debounced search function (1 second delay)
+    //Create debounced search function (1 second delay)
     var debouncedSearch = _debounce(function (searchTerm) {
       if (searchTerm.length >= _config.minSearchLength) {
         console.log('🔍 Auto search triggered (1 sec after typing stopped)');
@@ -635,7 +635,7 @@ var SidebarMenu = (function () {
       }
     }, _config.searchDebounceMs); // 1000ms = 1 second
 
-    // ✅ METHOD 1: Auto search on input (with 1 second debounce)
+    //METHOD 1: Auto search on input (with 1 second debounce)
     $searchInput.on('input', function () {
       var searchTerm = $(this).val().trim();
       _state.searchTerm = searchTerm;
@@ -655,7 +655,7 @@ var SidebarMenu = (function () {
       }
     });
 
-    // ✅ METHOD 2: Enter key search (immediate, no debounce)
+    //METHOD 2: Enter key search (immediate, no debounce)
     $searchInput.on('keypress', function (e) {
       if (e.which === 13) { // Enter key
         e.preventDefault();
@@ -669,7 +669,7 @@ var SidebarMenu = (function () {
       }
     });
 
-    // ✅ METHOD 3: Search button/icon click (immediate, no debounce)
+    //METHOD 3: Search button/icon click (immediate, no debounce)
     if ($searchButton.length > 0) {
       $searchButton.on('click', function (e) {
         e.preventDefault();
@@ -683,7 +683,7 @@ var SidebarMenu = (function () {
       });
     }
 
-    // ✅ Clear button
+    //Clear button
     $clearBtn.on('click', function () {
       $searchInput.val('');
       $searchInput.focus();
@@ -692,7 +692,7 @@ var SidebarMenu = (function () {
       $(this).hide();
     });
 
-    console.log('✅ Search functionality initialized');
+    console.log('Search functionality initialized');
     console.log('   ↳ Auto search: 1 second after typing stops');
     console.log('   ↳ Enter key: Instant search');
     console.log('   ↳ Search icon: Instant search');
@@ -707,7 +707,7 @@ var SidebarMenu = (function () {
     var $sidebar = $('#' + _config.sidebarId);
     var $noResults = $('#' + _config.noResultsId);
 
-    // ✅ Sanitize search term (only alphanumeric + spaces)
+    //Sanitize search term (only alphanumeric + spaces)
     searchTerm = searchTerm.replace(/[^a-zA-Z0-9\s]/g, '').toLowerCase();
 
     if (!searchTerm) {
@@ -719,7 +719,7 @@ var SidebarMenu = (function () {
     var visibleCount = 0;
     var matchedItems = [];
 
-    // ✅ First Pass: Collect all matches (without DOM manipulation)
+    //First Pass: Collect all matches (without DOM manipulation)
     $sidebar.find('.nav-item').each(function () {
       var $item = $(this);
       var menuName = $item.attr('data-menu-name') || '';
@@ -727,7 +727,7 @@ var SidebarMenu = (function () {
       var $textSpan = $link.find('.nav-link-text');
       var originalText = $textSpan.text();
 
-      // ✅ Check if menu name contains search term (case-insensitive)
+      //Check if menu name contains search term (case-insensitive)
       if (menuName.indexOf(searchTerm) !== -1) {
         matchedItems.push({
           $item: $item,
@@ -738,7 +738,7 @@ var SidebarMenu = (function () {
       }
     });
 
-    // ✅ Second Pass: Update DOM in batch
+    //Second Pass: Update DOM in batch
     $sidebar.find('.nav-item').addClass('hidden'); // Hide all first
 
     matchedItems.forEach(function (match) {
@@ -768,7 +768,7 @@ var SidebarMenu = (function () {
       }
     });
 
-    // ✅ Show/hide no results message
+    //Show/hide no results message
     if (hasResults) {
       $noResults.hide();
       $sidebar.show();
@@ -782,7 +782,7 @@ var SidebarMenu = (function () {
       $sidebar.hide();
     }
 
-    // ✅ Hide loading indicator
+    //Hide loading indicator
     _hideSearchLoading();
 
     // Performance logging
@@ -796,10 +796,10 @@ var SidebarMenu = (function () {
   function _highlightText(text, searchTerm) {
     if (!searchTerm) return text;
 
-    // ✅ Escape special regex characters
+    //Escape special regex characters
     var escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    // ✅ Create regex for case-insensitive matching
+    //Create regex for case-insensitive matching
     var regex = new RegExp('(' + escapedTerm + ')', 'gi');
 
     return text.replace(regex, '<span class="' + _config.highlightClass + '">$1</span>');
@@ -877,7 +877,7 @@ var SidebarMenu = (function () {
     $sidebar.show();
     _state.searchTerm = '';
 
-    console.log('✅ Search cleared');
+    console.log('Search cleared');
   }
 
   // ============================================
@@ -1131,7 +1131,7 @@ var SidebarMenu = (function () {
         }
       }
 
-      console.log('✅ Active menu set:', url);
+      console.log('Active menu set:', url);
     }
   }
 
@@ -1174,7 +1174,7 @@ var SidebarMenu = (function () {
     var $sidebar = $('#' + _config.sidebarId);
 
     if ($sidebar.length === 0) {
-      console.warn('⚠️ Sidebar element not found');
+      console.warn('Sidebar element not found');
       return;
     }
 
@@ -1215,9 +1215,9 @@ var SidebarMenu = (function () {
     // Step 4: Apply active state to best match
     if ($activeLink && bestMatchScore > 0) {
       _applyActiveState($activeLink);
-      console.log('✅ Active menu set:', $activeLink.text().trim());
+      console.log('Active menu set:', $activeLink.text().trim());
     } else {
-      console.log('⚠️ No matching menu item found for:', currentPath);
+      console.log('No matching menu item found for:', currentPath);
     }
   }
 
@@ -1324,9 +1324,9 @@ var SidebarMenu = (function () {
     // ═══════════════════════════════════════════════════════════
     // STEP 2: While loop দিয়ে সব Parent traverse করা
     // ═══════════════════════════════════════════════════════════
-    var $current = $link.closest('.nav-item');  // ✅ Start from nav-item
-    var iteration = 0;  // ✅ Safety counter
-    var maxIterations = 10;  // ✅ Prevent infinite loops
+    var $current = $link.closest('.nav-item');  //Start from nav-item
+    var iteration = 0;  //Safety counter
+    var maxIterations = 10;  //Prevent infinite loops
 
     while (iteration < maxIterations) {
       iteration++;
@@ -1375,23 +1375,23 @@ var SidebarMenu = (function () {
       //var $parentNavLink = $parentNavItem.find('> .nav-link');
       if ($parentNavLink.length > 0 && !$parentNavLink.hasClass('active')) {
         $parentNavLink.addClass('active');
-        console.log('✅ Parent nav-item activated:', $parentNavItem.find('> a').first().text().trim());
+        console.log('Parent nav-item activated:', $parentNavItem.find('> a').first().text().trim());
       }
 
       // ─────────────────────────────────────────────────────────
-      // 2e: ✅ CRITICAL: উপরে যাই (next parent খুঁজতে)
+      // 2e:CRITICAL: উপরে যাই (next parent খুঁজতে)
       // ─────────────────────────────────────────────────────────
-      $current = $parentNavItem;  // ✅ Move to parent nav-item
+      $current = $parentNavItem;  //Move to parent nav-item
 
-      // ✅ Safety check: যদি parent না পাওয়া যায়
+      //Safety check: যদি parent না পাওয়া যায়
       if ($current.length === 0) {
-        console.log('⚠️ No parent nav-item found, stopping traversal');
+        console.log('No parent nav-item found, stopping traversal');
         break;
       }
     }
 
     if (iteration >= maxIterations) {
-      console.warn('⚠️ Max iterations reached, possible infinite loop prevented');
+      console.warn('Max iterations reached, possible infinite loop prevented');
     }
 
     console.log('🎉 All parents activated and expanded!');
@@ -1465,7 +1465,7 @@ var SidebarMenu = (function () {
     refreshMenu: refreshMenu,
     getMenuData: getMenuData,
 
-    // ✅ Active menu highlighting
+    //Active menu highlighting
     setActiveMenuByUrl: setActiveMenuByUrl,
     highlightActiveMenu: function (path) {
       _highlightActiveMenu(path);
@@ -1474,7 +1474,7 @@ var SidebarMenu = (function () {
     // Cache methods
     renderFromCache: function (menuData) {
       if (!menuData || menuData.length === 0) {
-        console.warn('⚠️ No menu data to render');
+        console.warn('No menu data to render');
         return;
       }
       console.log('🎨 Rendering menu from cache:', menuData.length, 'items');
@@ -1489,9 +1489,9 @@ var SidebarMenu = (function () {
         _initSearchFunctionality();
       }
 
-      // ✅ Highlight active menu
+      //Highlight active menu
       _highlightActiveMenu();
-      console.log('✅ Menu rendered from cache');
+      console.log('Menu rendered from cache');
 
       //// Highlight active item
       //var currentPath = window.location.pathname;
@@ -1504,17 +1504,17 @@ var SidebarMenu = (function () {
       return cached && cached.length > 0;
     },
 
-    // ✅ Force refresh (clear cache + reload)
+    //Force refresh (clear cache + reload)
     forceRefresh: function () {
       console.log('🔄 Force refreshing menu.. .');
       _clearMenuCache();
-      return GetMenuInformation();  // ✅ GetMenuInformation কল করবে
+      return GetMenuInformation();  //GetMenuInformation কল করবে
     },
 
-    // ✅ Clear cache
+    //Clear cache
     clearCache: _clearMenuCache,
 
-    // ✅ Get cache info
+    //Get cache info
     getCacheInfo: function () {
       var cached = _getCachedMenu();
       return {

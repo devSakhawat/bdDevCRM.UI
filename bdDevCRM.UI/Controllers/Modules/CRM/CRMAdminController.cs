@@ -11,14 +11,14 @@ namespace bdDevCRM.UI.Controllers.Modules.CRM
     {
     }
 
-    // ✅ Optional helper method to check user login session
+    //Optional helper method to check user login session
     private bool IsUserLoggedIn()
     {
       var user = HttpContext.Session.GetString("CurrentUser");
       return !string.IsNullOrEmpty(user);
     }
 
-    // ✅ Common login redirect method
+    //Common login redirect method
     private IActionResult RedirectToLogin()
     {
       return RedirectToAction("Logoff", "Home");

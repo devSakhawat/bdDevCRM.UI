@@ -415,21 +415,21 @@ button{
 ============================================ */
 .collapse {
   transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden; /* ✅ Important - prevents horizontal layout */
+  overflow: hidden; /*Important - prevents horizontal layout */
 }
 
 .collapsing {
   transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden; /* ✅ Prevents content shifting */
+  overflow: hidden; /*Prevents content shifting */
 }
 
 /* Ensure submenu structure stays vertical */
 .nav .flex-column {
   padding-left: 0;
-  margin-top: 0; /* ✅ Remove gap */
+  margin-top: 0; /*Remove gap */
   margin-bottom: 0;
   display: flex;
-  flex-direction: column; /* ✅ Force vertical layout */
+  flex-direction: column; /*Force vertical layout */
 }
 
   /* Prevent Bootstrap's default display behavior */
@@ -438,7 +438,7 @@ button{
   }
 
   .nav .flex-column.collapsing {
-    display: block; /* ✅ Keep block during animation */
+    display: block; /*Keep block during animation */
     height: 0;
   }
 

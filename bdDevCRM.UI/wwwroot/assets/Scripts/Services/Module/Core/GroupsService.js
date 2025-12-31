@@ -43,12 +43,12 @@ var MenuService = {
    */
   getModules: async function () {
     try {
-      console.log('📡 Loading modules from:', AppConfig.endpoints.modules);
+      console.log('Loading modules from:', AppConfig.endpoints.modules);
       const data = await ApiCallManager.get(AppConfig.endpoints.modules);
-      console.log('✅ Modules loaded:', data);
+      console.log('Modules loaded:', data);
       return data;
     } catch (error) {
-      console.error('❌ Error loading modules:', error);
+      console.error('Error loading modules:', error);
       return [];
     }
   },
@@ -64,12 +64,12 @@ var MenuService = {
 
     try {
       const endpoint = `${AppConfig.endpoints.menusByModuleId}/${moduleId}`;
-      console.log('📡 Loading menus from:', endpoint);
+      console.log('Loading menus from:', endpoint);
       const data = await ApiCallManager.get(endpoint);
-      console.log('✅ Menus loaded:', data);
+      console.log('Menus loaded:', data);
       return data;
     } catch (error) {
-      console.error('❌ Error loading menus by module:', error);
+      console.error('Error loading menus by module:', error);
       return [];
     }
   },
@@ -153,7 +153,7 @@ var MenuService = {
    * Get grid data source
    */
   getGridDataSource: function (config) {
-    console.log('🔧 Creating grid DataSource with endpoint:', AppConfig.endpoints.menuSummary);
+    console.log('Creating grid DataSource with endpoint:', AppConfig.endpoints.menuSummary);
 
     const gridConfig = Object.assign({}, {
       endpoint: AppConfig.endpoints.menuSummary,

@@ -365,7 +365,7 @@
       <!-- Container fluid -->
       <div class="app-content-area">
         <div class="container-fluid">
-          <!-- ✅ ADDED ID HERE -->
+          <!--ADDED ID HERE -->
           <div id="spa-content-container">
             @RenderBody()
           </div>
@@ -452,7 +452,7 @@
   @await RenderSectionAsync("Scripts", required: false)
 
   <!-- ========================================== -->
-  <!-- 9. ✅ SINGLE INITIALIZATION POINT          -->
+  <!-- 9.SINGLE INITIALIZATION POINT          -->
   <!-- ========================================== -->
 
 
@@ -460,7 +460,7 @@
       $(document).ready(function() {
         if (typeof SidebarMenu !== 'undefined') {
           SidebarMenu.GetMenuInformation();
-        } else { console.error('❌ SidebarMenu not found'); }
+        } else { console.error('SidebarMenu not found'); }
 
         // Initialize Navigation Manager
       if (typeof NavigationManager !== 'undefined') {

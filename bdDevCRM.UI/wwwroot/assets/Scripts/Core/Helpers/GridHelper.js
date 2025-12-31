@@ -7,7 +7,7 @@
 =========================================================*/
 
 if (typeof GridHelper !== 'undefined') {
-  console.log('⚠️ GridHelper already loaded, skipping...');
+  console.log('GridHelper already loaded, skipping...');
 } else {
 
   var GridHelper = {
@@ -128,14 +128,14 @@ if (typeof GridHelper !== 'undefined') {
         return;
       }
 
-      // ✅ FIX: Calculate width based on actual container
+      //FIX: Calculate width based on actual container
       const $container = $grid.parent();
       const containerWidth = $container.width() || $(window).width() - 250; // 250 = sidebar width
 
-      // ✅ FIX: Use 100% width instead of calculated pixels
+      //FIX: Use 100% width instead of calculated pixels
       const gridWidth = '100%';
 
-      // ✅ FIX: Better height calculation
+      //FIX: Better height calculation
       const initialHeight = this.calculateGridHeight({
         headerHeight: options.heightConfig?.headerHeight || 60,
         footerHeight: options.heightConfig?.footerHeight || 40,
@@ -188,14 +188,14 @@ if (typeof GridHelper !== 'undefined') {
       delete finalOptions.heightConfig;
       delete finalOptions.fileName;
 
-      // ✅ Initialize grid
+      //Initialize grid
       $grid.kendoGrid(finalOptions);
 
-      // ✅ Get grid instance
+      //Get grid instance
       const grid = $grid.data('kendoGrid');
 
       if (grid) {
-        // ✅ Bind dataBound event to adjust height AFTER data loads
+        //Bind dataBound event to adjust height AFTER data loads
         grid.bind('dataBound', function (e) {
           const rowCount = e.sender.dataSource.total();
           const heightConfig = options.heightConfig || {};
@@ -203,7 +203,7 @@ if (typeof GridHelper !== 'undefined') {
           // Calculate optimal height
           const optimalHeight = GridHelper.getOptimalGridHeight(rowCount, heightConfig);
 
-          // ✅ Use wrapper element to set height
+          //Use wrapper element to set height
           const wrapper = e.sender.wrapper;
           if (wrapper) {
             wrapper.height(optimalHeight);
@@ -220,7 +220,7 @@ if (typeof GridHelper !== 'undefined') {
               content.height(contentHeight);
             }
 
-            console.log('✅ Grid height adjusted:', optimalHeight + 'px', 'for', rowCount, 'rows');
+            console.log('Grid height adjusted:', optimalHeight + 'px', 'for', rowCount, 'rows');
           }
         });
       }

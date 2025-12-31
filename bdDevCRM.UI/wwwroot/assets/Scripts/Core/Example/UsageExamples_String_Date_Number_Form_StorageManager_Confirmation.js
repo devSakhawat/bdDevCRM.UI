@@ -93,16 +93,16 @@ ConfirmationManager.confirm({
 //wwwroot / assets / Scripts /
 //├── Core /
 //│   ├── Helpers /
-//│   │   ├── StringHelper.js      ✅ String utilities
-//│   │   ├── DateHelper.js        ✅ Date utilities
-//│   │   ├── NumberHelper.js      ✅ Number / currency formatting
-//│   │   ├── FormHelper.js        ✅ Form manipulation
-//│   │   ├── GridHelper.js        ✅ Grid utilities(already exists)
-//│   │   └── ValidationHelper.js  ✅ Validation(already exists)
+//│   │   ├── StringHelper.js     String utilities
+//│   │   ├── DateHelper.js       Date utilities
+//│   │   ├── NumberHelper.js     Number / currency formatting
+//│   │   ├── FormHelper.js       Form manipulation
+//│   │   ├── GridHelper.js       Grid utilities(already exists)
+//│   │   └── ValidationHelper.js Validation(already exists)
 //│   │
 //│   └── Managers /
-//│       ├── StorageManager.js        ✅ localStorage / sessionStorage
-//│       ├── ConfirmationManager.js   ✅ Confirmation dialogs
-//│       ├── ApiCallManager.js        ✅ Centralized API calls
-//│       ├── GridManager.js           ✅ Grid setup
-//│       └── NotificationManager.js   ✅ Messages / notifications
+//│       ├── StorageManager.js       localStorage / sessionStorage
+//│       ├── ConfirmationManager.js  Confirmation dialogs
+//│       ├── ApiCallManager.js       Centralized API calls
+//│       ├── GridManager.js          Grid setup
+//│       └── NotificationManager.js  Messages / notifications

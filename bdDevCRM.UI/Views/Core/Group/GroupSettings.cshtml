@@ -50,7 +50,7 @@
           console.log(App);
             // Check if App is initialized
             if (typeof App === 'undefined' || !App.isInitialized()) {
-                console.error('❌ App not initialized. Cannot start Group module.');
+                console.error('App not initialized. Cannot start Group module.');
                 return;
             }
 
@@ -58,13 +58,13 @@
             App.startModule('Group');
 
             console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #4CAF50; font-weight: bold');
-            console.log('%c   ✅ Group Module Started!', 'color: #4CAF50; font-size: 14px; font-weight: bold');
+            console.log('%c  Group Module Started!', 'color: #4CAF50; font-size: 14px; font-weight: bold');
             console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #4CAF50; font-weight: bold');
 
             // Log module info
             var groupModule = App.getModule('Group');
             if (groupModule) {
-                console.log('📦 Group Module Info:', {
+                console.log('Group Module Info:', {
                     name: groupModule.config.name,
                     version: groupModule.config.version,
                     initialized: groupModule.isInitialized()
@@ -72,7 +72,7 @@
             }
 
         } catch (error) {
-            console.error('❌ Failed to start Group module:', error);
+            console.error('Failed to start Group module:', error);
             if (typeof App !== 'undefined' && App.Logger) {
                 App.Logger.error('Group module start failed:', error);
             }

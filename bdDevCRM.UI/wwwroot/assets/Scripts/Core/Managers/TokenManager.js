@@ -32,7 +32,7 @@ var TokenManager = (function () {
 
   function startAutoRefresh() {
     if (_state.refreshInterval) {
-      console.warn('⚠️ Auto-refresh already started');
+      console.warn('Auto-refresh already started');
       return;
     }
 
@@ -43,20 +43,20 @@ var TokenManager = (function () {
       _checkAndRefreshToken();
     }, _config.checkIntervalMinutes * 60 * 1000);
 
-    console.log('✅ Auto-refresh started (checking every ' + _config.checkIntervalMinutes + ' minute)');
+    console.log('Auto-refresh started (checking every ' + _config.checkIntervalMinutes + ' minute)');
   }
 
   function stopAutoRefresh() {
     if (_state.refreshInterval) {
       clearInterval(_state.refreshInterval);
       _state.refreshInterval = null;
-      console.log('✅ Auto-refresh stopped');
+      console.log('Auto-refresh stopped');
     }
   }
 
   async function refreshToken() {
     if (_state.isRefreshing) {
-      console.warn('⚠️ Token refresh already in progress');
+      console.warn('Token refresh already in progress');
       return false;
     }
 
@@ -68,13 +68,13 @@ var TokenManager = (function () {
       var refreshTokenValue = StorageManager.getRefreshToken();
 
       if (!refreshTokenValue) {
-        console.error('❌ No refresh token found');
+        console.error('No refresh token found');
         _handleRefreshFailure();
         return false;
       }
 
       if (StorageManager.isRefreshTokenExpired()) {
-        console.error('❌ Refresh token expired');
+        console.error('Refresh token expired');
         _handleRefreshFailure();
         return false;
       }
@@ -95,7 +95,7 @@ var TokenManager = (function () {
       }
 
       StorageManager.setTokens(response.Data);
-      console.log('✅ Token refreshed successfully');
+      console.log('Token refreshed successfully');
 
       if (typeof EventBus !== 'undefined') {
         EventBus.publish('token:refreshed', response.Data);
@@ -104,7 +104,7 @@ var TokenManager = (function () {
       return true;
 
     } catch (error) {
-      console.error('❌ Token refresh failed:', error);
+      console.error('Token refresh failed:', error);
       _handleRefreshFailure();
       return false;
 
@@ -129,7 +129,7 @@ var TokenManager = (function () {
   }
 
   function _handleRefreshFailure() {
-    console.error('❌ Refresh token failed, logging out.. .');
+    console.error('Refresh token failed, logging out.. .');
 
     stopAutoRefresh();
     StorageManager.clearTokens();
@@ -208,7 +208,7 @@ var TokenManager = (function () {
 
 console.log('%c[TokenManager] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');
 
-// ❌ নিচের এই লাইনগুলো মুছে ফেলুন - এগুলো ভুল ছিল:
+// নিচের এই লাইনগুলো মুছে ফেলুন - এগুলো ভুল ছিল:
 // if (typeof AppConfig !== 'undefined' && AppConfig.getToken) {
-//   return AppConfig.getToken(); // ❌ ILLEGAL - function এর বাইরে return
+//   return AppConfig.getToken(); // ILLEGAL - function এর বাইরে return
 // }

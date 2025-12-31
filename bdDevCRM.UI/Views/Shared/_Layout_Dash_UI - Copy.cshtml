@@ -363,20 +363,20 @@
   @await RenderSectionAsync("Scripts", required: false)
 
   <!-- ========================================== -->
-  <!-- 9. ✅ SINGLE INITIALIZATION POINT          -->
+  <!-- 9.SINGLE INITIALIZATION POINT          -->
   <!-- ========================================== -->
   <script type="text/javascript">
     $(document).ready(function() {
       try {
-        // ✅ শুধু একটা call - সব কিছু AppInitializer handle করবে
+        //শুধু একটা call - সব কিছু AppInitializer handle করবে
         AppInitializer.init();
       } catch (error) {
-        console.error('❌ Failed to initialize application:', error);
+        console.error('Failed to initialize application:', error);
       }
     });
   </script>
 
-@*   <!-- ✅ Menu Initialization Script -->
+@*   <!--Menu Initialization Script -->
   <script type="text/javascript">
     $(document).ready(function() {
       try {

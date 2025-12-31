@@ -138,11 +138,11 @@ var CourseSummaryHelper = {
 
 //bdDevCRM.UI / wwwroot / assets / Scripts /
 //├── Config /
-//│   └── config.js ✅ (Already Created)
+//│   └── config.js(Already Created)
 //│
 //├── Core /
 //│   ├── Managers /
-//│   │   ├── VanillaApiCallManager.js ✅ (Already Created)
+//│   │   ├── VanillaApiCallManager.js(Already Created)
 //│   │   ├── BaseManager.js
 //│   │   ├── TokenManager.js
 //│   │   ├── LoadingManager.js

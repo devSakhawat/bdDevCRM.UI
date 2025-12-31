@@ -33,9 +33,9 @@ $(document).ready(function () {
     CourseSummaryHelper.initCourseSummary();
     CourseDetailsHelper.intCourseDetails();
 
-    console.log('✅ Course module initialized successfully');
+    console.log('Course module initialized successfully');
   } catch (error) {
-    console.error('❌ Error initializing Course module:', error);
+    console.error('Error initializing Course module:', error);
     if (typeof MessageManager !== 'undefined') {
       MessageManager.notify.error('Failed to initialize Course module');
     }

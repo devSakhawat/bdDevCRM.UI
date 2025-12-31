@@ -106,7 +106,7 @@ var LoginModule = (function () {
 
       // Store tokens using StorageManager
       StorageManager.setTokens(tokenResponse);
-      console.log('✅ Tokens stored');
+      console.log('Tokens stored');
 
       // Get user info
       var userInfoResponse = await ApiCallManager.get(AppConfig.getApiUrl(), '/user-info');
@@ -117,7 +117,7 @@ var LoginModule = (function () {
 
       // Store user info
       StorageManager.setUserInfo(userInfoResponse);
-      console.log('✅ User info stored:', userInfoResponse);
+      console.log('User info stored:', userInfoResponse);
 
       // Save remember me
       _saveRememberMe(validation.credentials.LoginId);
@@ -138,7 +138,7 @@ var LoginModule = (function () {
       }, 500);
 
     } catch (error) {
-      console.error('❌ Login failed:', error);
+      console.error('Login failed:', error);
 
       if (typeof MessageManager !== 'undefined') {
         MessageManager.loading.hide();
@@ -191,22 +191,22 @@ var LoginModule = (function () {
 
   // Initialization
   function init() {
-    console.log('🔧 Initializing Login Module...');
+    console.log('Initializing Login Module...');
 
     if (typeof StorageManager === 'undefined') {
-      console.error('❌ StorageManager not loaded! ');
+      console.error('StorageManager not loaded! ');
       return;
     }
 
     if (typeof ApiCallManager === 'undefined') {
-      console.error('❌ ApiCallManager not loaded!');
+      console.error('ApiCallManager not loaded!');
       return;
     }
 
     _loadRememberMe();
     _bindEvents();
 
-    console.log('✅ Login Module initialized');
+    console.log('Login Module initialized');
   }
 
   return { init: init };

@@ -23,7 +23,7 @@ var AppConfig = (function () {
       timeout: 30000,
 
       // Retry attempts for failed requests
-      retryAttempts: 3
+      retryAttempts: 2
     },
 
     // UI Configuration
@@ -154,6 +154,9 @@ var AppConfig = (function () {
 
       // menu
       intMenu: '/Core/MenuSettings',
+
+      // Module
+      intMenu: '/Core/ModuleSettings',
     },
 
 
@@ -288,8 +291,6 @@ var AppConfig = (function () {
     isAuthenticated: function () {
       return !!this.getToken();
     },
-
-    // User Info Management
 
     /**
      * Get user info from storage

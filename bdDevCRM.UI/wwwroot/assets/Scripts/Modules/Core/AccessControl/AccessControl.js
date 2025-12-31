@@ -25,7 +25,7 @@ var AccessControll = {
    * Initialize module
    */
   init: function () {
-    console.log('🔧 Initializing Menu Module...');
+    console.log('Initializing Menu Module...');
     this.initGrid();
     //this.initModal();
     //this.initForm();
@@ -192,7 +192,7 @@ var AccessControll = {
       return;
     }
 
-    // ✅ (Type-safe)
+    //(Type-safe)
     const menuData = this.getFormData();
     console.log(menuData);
     //const menuData = this.getFormData();
@@ -329,20 +329,20 @@ var AccessControll = {
    * Get form data
    */
   getFormData: function () {
-    // ✅ Type-safe form data
+    //Type-safe form data
     let formData = FormHelper.getFormDataTyped('menuForm');
 
-    // ✅ Manual conversion for ComboBoxes
+    //Manual conversion for ComboBoxes
     const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
     const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
 
     formData.ModuleId = moduleCbo ? parseInt(moduleCbo.value()) || 0 : 0;
     formData.ParentMenu = parentCbo ? parseInt(parentCbo.value()) || 0 : 0;
 
-    // ✅ Ensure IsQuickLink is int (0 or 1)
+    //Ensure IsQuickLink is int (0 or 1)
     formData.IsQuickLink = formData.IsQuickLink ? 1 : 0;
 
-    // ✅ Ensure IsActive is int
+    //Ensure IsActive is int
     formData.IsActive = parseInt(formData.IsActive) || 0;
 
     return formData;
@@ -378,36 +378,36 @@ var AccessControll = {
 $(document).ready(function () {
   // Check dependencies
   if (typeof AccessControlService === 'undefined') {
-    console.error('❌ MenuService not loaded!');
+    console.error('MenuService not loaded!');
     return;
   }
 
   if (typeof ApiCallManager === 'undefined') {
-    console.error('❌ ApiCallManager not loaded!');
+    console.error('ApiCallManager not loaded!');
     return;
   }
 
   if (typeof MessageManager === 'undefined') {
-    console.error('❌ MessageManager not loaded!');
+    console.error('MessageManager not loaded!');
     return;
   }
 
   if (typeof FormHelper === 'undefined') {
-    console.warn('⚠️ FormHelper not loaded!');
+    console.warn('FormHelper not loaded!');
     return;
   }
 
   if (typeof GridHelper === 'undefined') {
-    console.error('❌ GridHelper not loaded!');
+    console.error('GridHelper not loaded!');
     return;
   }
 
   // Initialize module
   try {
     AccessControll.init();
-    console.log('✅ Menu Module initialized successfully');
+    console.log('Menu Module initialized successfully');
   } catch (error) {
-    console.error('❌ Failed to initialize Menu module:', error);
+    console.error('Failed to initialize Menu module:', error);
   }
 });
 

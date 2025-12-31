@@ -1,0 +1,153 @@
+﻿/*=========================================================
+ * Module Service
+ * File: ModuleService.js
+ * Description: Centralized API service for Module Menu
+ * Author: devSakhawat
+ * Date: 2025-01-18
+=========================================================*/
+
+var ModuleService = {
+
+  /**
+   * Get all modules
+   */
+  getAllModules: async function () {
+    try {
+      const data = await ApiCallManager.get(AppConfig.endpoints.modules);
+      return data;
+    } catch (error) {
+      console.error('Error loading modules:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get module by ID
+   */
+  getById: async function (id) {
+    if (!id || id <= 0) {
+      throw new Error('Invalid module ID');
+    }
+
+    try {
+      const data = await ApiCallManager.get(`${AppConfig.endpoints.moduleUpdate}/${id}`);
+      return data;
+    } catch (error) {
+      console.error('Error loading module:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get modules for dropdown
+   */
+  getModules: async function () {
+    try {
+      console.log('Loading modules from:', AppConfig.endpoints.modules);
+      const data = await ApiCallManager.get(AppConfig.endpoints.modules);
+      console.log('Modules loaded:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading modules:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Create module
+   */
+  create: async function (menuData) {
+    console.log(menuData);
+    if (!this.validateModule(menuData)) {
+      throw new Error('Invalid menu data');
+    }
+
+    try {
+      const result = await ApiCallManager.post(AppConfig.endpoints.menuCreate, menuData);
+      return result;
+    } catch (error) {
+      console.error('Error creating menu:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update module
+   */
+  update: async function (id, menuData) {
+    if (!id || id <= 0) {
+      throw new Error('Invalid module ID');
+    }
+
+    if (!this.validateModule(menuData)) {
+      throw new Error('Invalid module data');
+    }
+
+    try {
+      const result = await ApiCallManager.put(`${AppConfig.endpoints.menuUpdate}/${id}`, menuData);
+      return result;
+    } catch (error) {
+      console.error('Error updating menu:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete module
+   */
+  delete: async function (id) {
+    if (!id || id <= 0) {
+      throw new Error('Invalid module ID');
+    }
+
+    try {
+      const result = await ApiCallManager.delete(`${AppConfig.endpoints.moduleDelete}/${id}`);
+      return result;
+    } catch (error) {
+      console.error('Error deleting Module:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Validate module data
+   */
+  validateModule: function (menuData) {
+    if (!menuData.ModuleName || menuData.ModuleName.trim() === '') {
+      if (typeof MessageManager !== 'undefined') {
+        MessageManager.notify.error('Module name is required');
+      }
+      return false;
+    }
+    if (!menuData.ModuleId || menuData.ModuleId === 0) {
+      if (typeof MessageManager !== 'undefined') {
+        MessageManager.notify.error('Module is required');
+      }
+      return false;
+    }
+    return true;
+  },
+
+  /**
+   * Get grid data source
+   */
+  getGridDataSource: function (config) {
+    const gridConfig = Object.assign({}, {
+      endpoint: AppConfig.endpoints.moduleSummary,
+      pageSize: 20,
+      serverPaging: true,
+      serverSorting: true,
+      serverFiltering: true,
+      modelFields: {
+        ModuleId: { type: 'number' },
+        ModuleName: { type: 'string' }
+      },
+      primaryKey: 'ModuleId' 
+    }, config || {});
+
+    return ApiCallManager.createGridDataSource(gridConfig);
+  }
+};
+
+
+

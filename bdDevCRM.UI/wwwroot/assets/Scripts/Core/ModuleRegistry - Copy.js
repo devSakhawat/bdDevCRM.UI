@@ -43,7 +43,7 @@ var ModuleRegistryCopy = (function () {
     return new Promise(function (resolve, reject) {
       // Check if already loaded
       if (_loadedScripts[scriptUrl]) {
-        console.log('✅ Script already loaded:', scriptUrl);
+        console.log('Script already loaded:', scriptUrl);
         resolve();
         return;
       }
@@ -56,12 +56,12 @@ var ModuleRegistryCopy = (function () {
 
       script.onload = function () {
         _loadedScripts[scriptUrl] = true;
-        console.log('✅ Script loaded:', scriptUrl);
+        console.log('Script loaded:', scriptUrl);
         resolve();
       };
 
       script.onerror = function () {
-        console.error('❌ Failed to load script:', scriptUrl);
+        console.error('Failed to load script:', scriptUrl);
         reject(new Error('Failed to load script: ' + scriptUrl));
       };
 
@@ -133,7 +133,7 @@ var ModuleRegistryCopy = (function () {
       state: ModuleState.REGISTERED
     };
 
-    console.log('📦 Module registered:', name);
+    console.log('Module registered:', name);
   }
 
   /**
@@ -151,18 +151,18 @@ var ModuleRegistryCopy = (function () {
     }
 
     if (moduleEntry.state === ModuleState.INITIALIZED) {
-      console.log('✅ Module already initialized:', name);
+      console.log('Module already initialized:', name);
       return;
     }
 
     if (moduleEntry.state === ModuleState.INITIALIZING ||
       moduleEntry.state === ModuleState.LOADING) {
-      console.warn('⚠️ Module already initializing:', name);
+      console.warn('Module already initializing:', name);
       return;
     }
 
     try {
-      console.log('🔧 Initializing module:', name);
+      console.log('Initializing module:', name);
 
       // 🆕 Step 1: Load required scripts (if any)
       if (moduleEntry.config.scripts && moduleEntry.config.scripts.length > 0) {
@@ -171,7 +171,7 @@ var ModuleRegistryCopy = (function () {
 
         await loadScripts(moduleEntry.config.scripts);
 
-        console.log('✅ Scripts loaded for module:', name);
+        console.log('Scripts loaded for module:', name);
       }
 
       // Step 2: Mark as initializing
@@ -191,13 +191,13 @@ var ModuleRegistryCopy = (function () {
       moduleEntry.state = ModuleState.INITIALIZED;
       _initialized.push(name);
 
-      console.log('✅ Module initialized:', name);
+      console.log('Module initialized:', name);
 
     } catch (error) {
       moduleEntry.state = ModuleState.FAILED;
       _failed.push({ name: name, error: error.message });
 
-      console.error('❌ Module initialization failed:', name, error);
+      console.error('Module initialization failed:', name, error);
       throw error;
     }
   }
@@ -220,7 +220,7 @@ var ModuleRegistryCopy = (function () {
           var routePattern = new RegExp(moduleEntry.config.route);
 
           if (routePattern.test(currentPath)) {
-            console.log('✅ Route matched for module:', name);
+            console.log('Route matched for module:', name);
 
             try {
               await initModule(name);

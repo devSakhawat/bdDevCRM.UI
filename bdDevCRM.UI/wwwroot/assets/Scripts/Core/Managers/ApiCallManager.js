@@ -16,7 +16,7 @@ var ApiCallManager = (function () {
 
   var _config = {
     defaultTimeout: 30000,
-    maxRetries: 3,
+    maxRetries: 2,
     retryDelay: 1000,
     showErrorNotifications: true,
     showLoadingForRequests: false
@@ -69,31 +69,31 @@ var ApiCallManager = (function () {
         data: function (response) {
           console.log('📥 Grid DataSource Response:', response);
 
-          // ✅ NULL check
+          //NULL check
           if (!response) {
-            console.error('❌ Response is NULL or undefined');
+            console.error('Response is NULL or undefined');
             return [];
           }
 
-          // ✅ Check if response is successful
+          //Check if response is successful
           if (response.IsSuccess === false) {
-            console.error('❌ API returned error:', response.Message);
+            console.error('API returned error:', response.Message);
             _handleError(response);
             return [];
           }
 
-          // ✅ Extract data
+          //Extract data
           if (response && response.IsSuccess && response.Data) {
             const items = response.Data.Items || [];
-            console.log('✅ Grid data loaded:', items.length, 'items');
+            console.log('Grid data loaded:', items.length, 'items');
             return items;
           }
 
-          console.warn('⚠️ Unexpected response format:', response);
+          console.warn('Unexpected response format:', response);
           return [];
         },
         total: function (response) {
-          // ✅ NULL check
+          //NULL check
           if (!response) {
             return 0;
           }
@@ -119,9 +119,9 @@ var ApiCallManager = (function () {
       serverSorting: config.serverSorting !== false,
       serverFiltering: config.serverFiltering !== false,
       error: function (e) {
-        console.error('❌ DataSource Error:', e);
+        console.error('DataSource Error:', e);
 
-        // ✅ Handle XHR errors
+        //Handle XHR errors
         if (e.xhr) {
           console.error('XHR Status:', e.xhr.status);
           console.error('XHR Response:', e.xhr.responseText);

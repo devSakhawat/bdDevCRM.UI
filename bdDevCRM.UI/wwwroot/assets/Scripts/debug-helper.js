@@ -38,7 +38,7 @@
     console.log('Author:', module.config.author);
     console.log('Initialized:', module.isInitialized());
 
-    console.log('\n📦 Components:');
+    console.log('\nComponents:');
     console.log('  - Summary:', module.getComponent('summary'));
     console.log('  - Details:', module.getComponent('details'));
     console.log('  - Info:', module.getComponent('info'));
@@ -59,41 +59,41 @@
 
     var module = App.getModule('Group');
     if (!module) {
-      console.error('❌ Group module not found');
+      console.error('Group module not found');
       return;
     }
 
-    console.log('✅ Module found');
-    console.log('✅ Initialized:', module.isInitialized());
+    console.log('Module found');
+    console.log('Initialized:', module.isInitialized());
 
     // Test components
     var summary = module.getComponent('summary');
     var details = module.getComponent('details');
     var info = module.getComponent('info');
 
-    console.log('✅ Summary component:', summary ? 'OK' : 'MISSING');
-    console.log('✅ Details component:', details ? 'OK' : 'MISSING');
-    console.log('✅ Info component:', info ? 'OK' : 'MISSING');
+    console.log('Summary component:', summary ? 'OK' : 'MISSING');
+    console.log('Details component:', details ? 'OK' : 'MISSING');
+    console.log('Info component:', info ? 'OK' : 'MISSING');
 
     // Test controller
     var controller = module.getController();
-    console.log('✅ Controller:', controller ? 'OK' : 'MISSING');
+    console.log('Controller:', controller ? 'OK' : 'MISSING');
 
     // Test events
-    console.log('\n📡 Testing EventBus...');
+    console.log('\nTesting EventBus...');
     var testEventReceived = false;
 
     App.EventBus.on('test:group', function (data) {
       testEventReceived = true;
-      console.log('✅ Event received:', data);
+      console.log('Event received:', data);
     });
 
     App.EventBus.emit('test:group', { message: 'Test from Group Module' });
 
     if (testEventReceived) {
-      console.log('✅ EventBus working');
+      console.log('EventBus working');
     } else {
-      console.error('❌ EventBus not working');
+      console.error('EventBus not working');
     }
 
     App.EventBus.off('test:group');
@@ -135,7 +135,7 @@
     var controller = module.getController();
     if (controller) {
       controller.clearGroup();
-      console.log('✅ Group form cleared');
+      console.log('Group form cleared');
     }
   };
 
@@ -161,9 +161,9 @@
     var controller = module.getController();
     if (controller) {
       controller.saveGroup(formData).then(function (result) {
-        console.log('✅ Save test complete:', result);
+        console.log('Save test complete:', result);
       }).catch(function (error) {
-        console.error('❌ Save test failed:', error);
+        console.error('Save test failed:', error);
       });
     }
   };

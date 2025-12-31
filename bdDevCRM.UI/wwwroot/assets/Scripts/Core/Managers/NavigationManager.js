@@ -46,7 +46,7 @@ var NavigationManager = (function () {
       ModuleRegistry.initByRoute(window.location.pathname);
     }
 
-    console.log('✅ NavigationManager initialized');
+    console.log('NavigationManager initialized');
   }
 
   // ============================================
@@ -131,7 +131,7 @@ var NavigationManager = (function () {
       //  MessageManager.loading.show('Loading...');
       //}
 
-      //// ✅ Step 1: Re-render sidebar menu from cache
+      ////Step 1: Re-render sidebar menu from cache
       //await _ensureSidebarMenu();
 
       // Step 2: Fetch new content
@@ -165,7 +165,7 @@ var NavigationManager = (function () {
         history.pushState({ url: url }, '', url);
       }
 
-      ////// ✅ Step 1: Re-render sidebar menu from cache
+      //////Step 1: Re-render sidebar menu from cache
       //await _ensureSidebarMenu();
 
       //_state.currentUrl = url;
@@ -176,16 +176,16 @@ var NavigationManager = (function () {
         await ModuleRegistry.initByRoute(url);
       }
 
-      //// ✅ Step 1: Re-render sidebar menu from cache
+      ////Step 1: Re-render sidebar menu from cache
       await _ensureSidebarMenu();
 
       _state.currentUrl = url;
       document.title = "bdDevs CRM";
 
-      //// ✅ Step 6: Highlight active menu item
+      ////Step 6: Highlight active menu item
       //_highlightActiveMenuItem(url);
 
-      console.log('✅ SPA Navigation complete');
+      console.log('SPA Navigation complete');
 
       //// 4. Inject Content
       //var $container = $('#' + _config.contentContainerId);
@@ -204,7 +204,7 @@ var NavigationManager = (function () {
       //});
 
     } catch (error) {
-      console.error('❌ SPA Navigation failed:', error);
+      console.error('SPA Navigation failed:', error);
       // Fallback:  Full page reload
       window.location.href = url;
     } finally {
@@ -225,7 +225,7 @@ var NavigationManager = (function () {
     }
   }
 
-  // ✅ NEW: Ensure sidebar menu is rendered
+  //NEW: Ensure sidebar menu is rendered
   async function _ensureSidebarMenu() {
     var $sidebar = $('#' + _config.sidebarId);
 
@@ -233,14 +233,14 @@ var NavigationManager = (function () {
     var hasMenuItems = $sidebar.find('.nav-item[data-menu-id]').length > 0;
 
     if (!hasMenuItems) {
-      console.log('📦 Sidebar empty, loading from cache.. .');
+      console.log('Sidebar empty, loading from cache.. .');
 
       // Try cache first
       if (typeof StorageManager !== 'undefined') {
         var cachedMenu = StorageManager.getCachedMenu();
 
         if (cachedMenu && cachedMenu.length > 0) {
-          console.log('⚡ Rendering menu from cache:', cachedMenu.length, 'items');
+          console.log('Rendering menu from cache:', cachedMenu.length, 'items');
 
           if (typeof SidebarMenu !== 'undefined' && SidebarMenu.renderFromCache) {
             SidebarMenu.renderFromCache(cachedMenu);
@@ -250,14 +250,14 @@ var NavigationManager = (function () {
       }
 
       // No cache - fetch from API
-      console.log('📡 No cache, fetching menu from API...');
+      console.log('No cache, fetching menu from API...');
       if (typeof SidebarMenu !== 'undefined' && SidebarMenu.GetMenuInformation) {
         await SidebarMenu.GetMenuInformation();
       }
     }
   }
 
-  // ✅ NEW: Highlight active menu item
+  //NEW: Highlight active menu item
   function _highlightActiveMenuItem(url) {
     var $sidebar = $('#' + _config.sidebarId);
 

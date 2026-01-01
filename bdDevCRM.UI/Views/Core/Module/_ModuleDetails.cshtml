@@ -1,0 +1,73 @@
+﻿@* <script src="~/assets/scripts/modules/core/module/moduledetails.js"></script> *@
+
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
+  <fieldset class="border p-3 fieldsetCommon">
+    <legend class="legendCommon legendCommonModalBGImportant">Module Form</legend>
+    <form id="moduleForm" enctype="multipart/form-data">
+      <div class="row mb-2">
+        <!-- ModuleId (int?) -->
+        <input type="hidden" id="hdModuleId" value="0" data-type="int" name="ModuleId" />
+
+        <!-- Module Name (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="ModuleName">Module Name <span class="redstart">*</span></label>
+          <input type="text"
+                 class="form-control"
+                 id="module-name"
+                 name="ModuleName"
+                 placeholder="Enter Module Name"
+                 data-type="string"
+                 required />
+        </div>
+      </div>
+
+    @*   <!-- Buttons -->
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="ModuleFormActions.closeForm()">
+          <i class="fas fa-times"></i> Close
+        </button>
+        <button type="button"
+                class="btn btn-warning"
+                onclick="ModuleFormActions.clearForm()">
+          <i class="fas fa-eraser"></i> Clear
+        </button>
+        <button type="button"
+                class="btn btn-primary"
+                id="btnSaveModule"
+                onclick="ModuleFormActions.saveOrUpdate()">
+          <i class="fas fa-save"></i> Save
+        </button>
+      </div> *@
+
+    </form>
+
+  </fieldset>
+</div>
+
+
+@* 
+<div id="divdetailsForDetails">
+  <fieldset class="reset">
+    <legend class="reset">Module Details</legend>
+
+    <form id="moduleForm">
+      <input type="hidden" id="hdModuleId" value="0" />
+
+      <div class="mb-3">
+        <label class="form-label" for="Module-name">Module Name</label>
+        <input type="text" class="form-control" id="Module-name" name="Module-name" placeholder="Enter Module Name" required>
+      </div>
+
+      <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary me-2" onclick="ModuleDetailsHelper.SaveInformation()" id="btnSave">+ Add Module</button>
+            <button type="button" class="btn btn-secondary me-2" onclick="ModuleDetailsHelper.ClearInformation()" id="btnClear">Clear</button>
+            <button type="button" class="btn btn-light me-2" onclick="ModuleDetailsHelper.CloseInformation()" id="btnClose">Close</button>
+      </div>
+
+      <div class="status"></div>
+    </form>
+  </fieldset>
+</div> *@
+

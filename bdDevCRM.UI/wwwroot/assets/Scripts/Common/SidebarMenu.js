@@ -186,7 +186,6 @@ var SidebarMenu = (function () {
 
   /**
    * Get cached menu from localStorage
-   * localStorage থেকে cached menu নেওয়া
    */
   function _getCachedMenu() {
     try {
@@ -224,7 +223,6 @@ var SidebarMenu = (function () {
 
   /**
    * Cache menu to localStorage
-   * Menu কে localStorage এ cache করা
    */
   function _cacheMenu(menuData) {
     try {
@@ -253,7 +251,6 @@ var SidebarMenu = (function () {
 
   /**
    * Clear menu cache
-   * Menu cache clear করা
    */
   function _clearMenuCache() {
     try {
@@ -320,7 +317,6 @@ var SidebarMenu = (function () {
 
   /**
    * Build menu tree structure
-   * Menu tree structure তৈরি করা (parent-child relationship)
    */
   function _buildMenuTree(menus) {
     if (!menus || menus.length === 0) return [];
@@ -340,7 +336,6 @@ var SidebarMenu = (function () {
 
   /**
    * Create menu item HTML (ENHANCED VERSION)
-   * Menu item এর HTML তৈরি করা
    */
   function _createMenuItemHtml(menu, allMenus, currentPath) {
     var hasChildren = _hasChildMenus(menu.MenuId, allMenus);
@@ -418,7 +413,6 @@ var SidebarMenu = (function () {
 
   /**
    * Check if menu has child menus
-   * Menu এর child আছে কিনা check করা
    */
   function _hasChildMenus(menuId, allMenus) {
     return allMenus.some(function (menu) {
@@ -428,7 +422,6 @@ var SidebarMenu = (function () {
 
   /**
    * Get child menus
-   * Child menus গুলো নেওয়া
    */
   function _getChildMenus(menuId, allMenus) {
     return allMenus
@@ -494,7 +487,6 @@ var SidebarMenu = (function () {
 
   /**
    * Get menu URL
-   * Menu এর URL নেওয়া
    */
   function _getMenuUrl(menu) {
     var menuUrl = menu.MenuPath || '#';
@@ -531,7 +523,6 @@ var SidebarMenu = (function () {
 
   /**
    * Bind menu events
-   * Menu events bind করা
    */
   // ============================================
   // PRIVATE - Event Handlers (NO ACCORDION)
@@ -581,7 +572,6 @@ var SidebarMenu = (function () {
 
   /**
    * Debounce function - delays execution until user stops typing
-   * User typing বন্ধ করার পর function execute করা
    * 
    * @param {Function} func - Function to debounce
    * @param {Number} wait - Wait time in milliseconds
@@ -838,7 +828,6 @@ var SidebarMenu = (function () {
 
   /**
    * Show results limit message
-   * Results limit message দেখানো
    */
   function _showResultsLimitMessage(visible, total) {
     var $sidebar = $('#' + _config.sidebarId);
@@ -855,7 +844,6 @@ var SidebarMenu = (function () {
 
   /**
    * Clear search and restore all menus
-   * Search clear করা এবং সব menus restore করা
    */
   function _clearSearch() {
     var $sidebar = $('#' + _config.sidebarId);
@@ -886,7 +874,6 @@ var SidebarMenu = (function () {
 
   /**
    * Show skeleton loader
-   * Skeleton loader দেখানো
    */
   function _showSkeletonLoader() {
     var $sidebar = $('#' + _config.sidebarId);
@@ -910,7 +897,6 @@ var SidebarMenu = (function () {
 
   /**
    * Hide skeleton loader
-   * Skeleton loader লুকানো
    */
   function _hideSkeletonLoader() {
     var $sidebar = $('#' + _config.sidebarId);
@@ -919,7 +905,6 @@ var SidebarMenu = (function () {
 
   /**
    * Show empty state
-   * Empty state দেখানো
    */
   function _showEmptyState() {
     var $sidebar = $('#' + _config.sidebarId);
@@ -940,7 +925,6 @@ var SidebarMenu = (function () {
 
   /**
    * Show error state with retry button
-   * Error state retry button সহ দেখানো
    */
   function _showErrorState() {
     var $sidebar = $('#' + _config.sidebarId);
@@ -974,7 +958,6 @@ var SidebarMenu = (function () {
 
   /**
    * Handle menu load error
-   * Menu load error handle করা
    */
   function _handleMenuLoadError(error) {
     _showErrorState();
@@ -987,7 +970,6 @@ var SidebarMenu = (function () {
 
   /**
    * Retry menu loading
-   * Menu loading retry করা
    */
   async function _retryMenuLoad() {
     _state.retryCount++;
@@ -1060,7 +1042,6 @@ var SidebarMenu = (function () {
 
   /**
    * Get current menu data
-   * Current menu data নেওয়া
    */
   function getMenuData() {
     return _state.menuData;
@@ -1158,7 +1139,6 @@ var SidebarMenu = (function () {
 
   /**
    * Highlight active menu item based on current URL
-   * বর্তমান URL অনুযায়ী active menu item highlight করা
    * 
    * @param {string} currentPath - Current URL path (e.g., '/Core/MenuSettings')
    */
@@ -1169,7 +1149,7 @@ var SidebarMenu = (function () {
       currentPath = window.location.pathname;
     }
 
-    console.log('🎯 Highlighting active menu for path:', currentPath);
+    console.log('Highlighting active menu for path:', currentPath);
 
     var $sidebar = $('#' + _config.sidebarId);
 
@@ -1223,7 +1203,6 @@ var SidebarMenu = (function () {
 
   /**
    * Normalize URL path for comparison
-   * URL path কে normalize করা comparison এর জন্য
    * 
    * @param {string} path - URL path
    * @returns {string} Normalized path
@@ -1256,7 +1235,6 @@ var SidebarMenu = (function () {
 
   /**
    * Calculate match score between current path and menu href
-   * Current path এবং menu href এর মধ্যে match score calculate করা
    * 
    * @param {string} currentPath - Current URL path (normalized)
    * @param {string} menuHref - Menu item href (normalized)
@@ -1306,7 +1284,6 @@ var SidebarMenu = (function () {
 
   /**
  * Apply active state to menu link and expand parent submenus
- * Menu link এ active state apply করা এবং parent submenu expand করা
  * 
  * @param {jQuery} $link - jQuery element of the active link
  */
@@ -1316,13 +1293,13 @@ var SidebarMenu = (function () {
     console.log('🎯 Applying active state:', $link.text().trim());
 
     // ═══════════════════════════════════════════════════════════
-    // STEP 1: Child (clicked item) কে active করা
+    // STEP 1: Child (clicked item) 
     // ═══════════════════════════════════════════════════════════
     $link.addClass('active');  // Link এ active class
     $link.closest('.nav-item').addClass('active');  // Nav-item এ active class
 
     // ═══════════════════════════════════════════════════════════
-    // STEP 2: While loop দিয়ে সব Parent traverse করা
+    // STEP 2: Parent traverse by While loop
     // ═══════════════════════════════════════════════════════════
     var $current = $link.closest('.nav-item');  //Start from nav-item
     var iteration = 0;  //Safety counter
@@ -1332,11 +1309,10 @@ var SidebarMenu = (function () {
       iteration++;
 
       // ─────────────────────────────────────────────────────────
-      // 2a: Current element এর parent submenu খুঁজি
+      // 2a: Current element 
       // ─────────────────────────────────────────────────────────
       var $parentSubmenu = $current.parent('.submenu, .collapse');
 
-      // যদি আর কোনো parent না থাকে, loop থেকে বের হই
       if ($parentSubmenu.length === 0) {
         console.log('🔝 Reached top level - no more parents');
         break;
@@ -1346,7 +1322,7 @@ var SidebarMenu = (function () {
       console.log('📂 Found parent submenu:', submenuId);
 
       // ─────────────────────────────────────────────────────────
-      // 2b: Parent submenu কে expand করা (show class)
+      // 2b: expand Parent submenu
       // ─────────────────────────────────────────────────────────
       if (!$parentSubmenu.hasClass('show')) {
         $parentSubmenu.addClass('show');
@@ -1354,7 +1330,7 @@ var SidebarMenu = (function () {
       }
 
       // ─────────────────────────────────────────────────────────
-      // 2c: Parent এর toggle link খুঁজে update করা
+      // 2c: Update Parent toggle link
       // ─────────────────────────────────────────────────────────
       if (submenuId) {
         var $toggleLink = $('[data-bs-target="#' + submenuId + '"], [href="#' + submenuId + '"]');
@@ -1368,7 +1344,7 @@ var SidebarMenu = (function () {
       }
 
       // ─────────────────────────────────────────────────────────
-      // 2d: Parent nav-item কে active করা
+      // 2d: active Parent nav-item
       // ─────────────────────────────────────────────────────────
       var $parentNavItem = $parentSubmenu.closest('.nav-item');
       var $parentNavLink = $parentNavItem.children('.nav-link');
@@ -1379,11 +1355,10 @@ var SidebarMenu = (function () {
       }
 
       // ─────────────────────────────────────────────────────────
-      // 2e:CRITICAL: উপরে যাই (next parent খুঁজতে)
+      // 2e:CRITICAL: Go to above to find next parent
       // ─────────────────────────────────────────────────────────
       $current = $parentNavItem;  //Move to parent nav-item
 
-      //Safety check: যদি parent না পাওয়া যায়
       if ($current.length === 0) {
         console.log('No parent nav-item found, stopping traversal');
         break;
@@ -1402,7 +1377,6 @@ var SidebarMenu = (function () {
 
   /**
    * Scroll active menu item into view
-   * Active menu item কে visible area তে scroll করা
    * 
    * @param {jQuery} $link - jQuery element of the active link
    */
@@ -1437,7 +1411,6 @@ var SidebarMenu = (function () {
 
   /**
    * Set active menu by URL (Public method)
-   * URL দিয়ে active menu set করা (Public method)
    * 
    * @param {string} url - URL to match
    */

@@ -38,32 +38,33 @@ var ModuleService = {
     }
   },
 
-  /**
-   * Get modules for dropdown
-   */
-  getModules: async function () {
-    try {
-      console.log('Loading modules from:', AppConfig.endpoints.modules);
-      const data = await ApiCallManager.get(AppConfig.endpoints.modules);
-      console.log('Modules loaded:', data);
-      return data;
-    } catch (error) {
-      console.error('Error loading modules:', error);
-      return [];
-    }
-  },
+  ///**
+  // * Get modules for dropdown
+  // */
+  //getModules: async function () {
+  //  try {
+  //    console.log('Loading modules from:', AppConfig.endpoints.modules);
+  //    const data = await ApiCallManager.get(AppConfig.endpoints.modules);
+  //    console.log('Modules loaded:', data);
+  //    return data;
+  //  } catch (error) {
+  //    console.error('Error loading modules:', error);
+  //    return [];
+  //  }
+  //},
 
   /**
    * Create module
    */
-  create: async function (menuData) {
-    console.log(menuData);
-    if (!this.validateModule(menuData)) {
+  create: async function (moduleData) {
+    console.log(moduleData);
+    debugger;
+    if (!this.validateModule(moduleData ,true)) {
       throw new Error('Invalid menu data');
     }
 
     try {
-      const result = await ApiCallManager.post(AppConfig.endpoints.menuCreate, menuData);
+      const result = await ApiCallManager.post(AppConfig.endpoints.moduleCreate, moduleData);
       return result;
     } catch (error) {
       console.error('Error creating menu:', error);
@@ -74,17 +75,17 @@ var ModuleService = {
   /**
    * Update module
    */
-  update: async function (id, menuData) {
+  update: async function (id, moduleData) {
     if (!id || id <= 0) {
       throw new Error('Invalid module ID');
     }
 
-    if (!this.validateModule(menuData)) {
+    if (!this.validateModule(moduleData ,true)) {
       throw new Error('Invalid module data');
     }
 
     try {
-      const result = await ApiCallManager.put(`${AppConfig.endpoints.menuUpdate}/${id}`, menuData);
+      const result = await ApiCallManager.put(`${AppConfig.endpoints.moduleUpdate}/${id}`, moduleData);
       return result;
     } catch (error) {
       console.error('Error updating menu:', error);
@@ -112,16 +113,16 @@ var ModuleService = {
   /**
    * Validate module data
    */
-  validateModule: function (menuData) {
-    if (!menuData.ModuleName || menuData.ModuleName.trim() === '') {
+  validateModule: function (moduleData, isCreate) {
+    if (!moduleData.ModuleName || moduleData.ModuleName.trim() === '') {
       if (typeof MessageManager !== 'undefined') {
         MessageManager.notify.error('Module name is required');
       }
       return false;
     }
-    if (!menuData.ModuleId || menuData.ModuleId === 0) {
+    if ((!moduleData.ModuleId || moduleData.ModuleId === 0) && !isCreate) {
       if (typeof MessageManager !== 'undefined') {
-        MessageManager.notify.error('Module is required');
+        MessageManager.notify.error('ModuleId is required');
       }
       return false;
     }

@@ -67,7 +67,7 @@ var ApiCallManager = (function () {
       },
       schema: {
         data: function (response) {
-          console.log('📥 Grid DataSource Response:', response);
+          console.log('Grid DataSource Response:', response);
 
           //NULL check
           if (!response) {

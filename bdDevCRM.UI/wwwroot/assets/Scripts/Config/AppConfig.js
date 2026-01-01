@@ -156,7 +156,7 @@ var AppConfig = (function () {
       intMenu: '/Core/MenuSettings',
 
       // Module
-      intMenu: '/Core/ModuleSettings',
+      intModule: '/Core/ModuleSettings',
     },
 
 

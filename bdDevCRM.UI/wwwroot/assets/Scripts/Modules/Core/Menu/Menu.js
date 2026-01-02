@@ -31,12 +31,12 @@ var MenuModule = {
    */
   init: function () {
     debugger;
-    console.log('Initializing Menu Module.. .');
+    /*console.log('Initializing Menu Module.. .');*/
 
-    // Check dependencies (now done by ModuleRegistry, but good to double-check)
-    if (!this._checkDependencies()) {
-      throw new Error('Menu Module dependencies not satisfied');
-    }
+    //// Check dependencies (now done by ModuleRegistry, but good to double-check)
+    //if (!this._checkDependencies()) {
+    //  throw new Error('Menu Module dependencies not satisfied');
+    //}
 
     this.initGrid();
     this.initModal();
@@ -45,27 +45,27 @@ var MenuModule = {
     console.log('Menu Module initialized successfully');
   },
 
-  /**
-   * Check module dependencies
-   */
-  _checkDependencies: function () {
-    var deps = {
-      MenuService: typeof MenuService !== 'undefined',
-      ApiCallManager: typeof ApiCallManager !== 'undefined',
-      MessageManager: typeof MessageManager !== 'undefined',
-      FormHelper: typeof FormHelper !== 'undefined',
-      GridHelper: typeof GridHelper !== 'undefined'
-    };
+  ///**
+  // * Check module dependencies
+  // */
+  //_checkDependencies: function () {
+  //  var deps = {
+  //    MenuService: typeof MenuService !== 'undefined',
+  //    ApiCallManager: typeof ApiCallManager !== 'undefined',
+  //    MessageManager: typeof MessageManager !== 'undefined',
+  //    FormHelper: typeof FormHelper !== 'undefined',
+  //    GridHelper: typeof GridHelper !== 'undefined'
+  //  };
 
-    for (var dep in deps) {
-      if (!deps[dep]) {
-        console.error('Missing dependency:', dep);
-        return false;
-      }
-    }
+  //  for (var dep in deps) {
+  //    if (!deps[dep]) {
+  //      console.error('Missing dependency:', dep);
+  //      return false;
+  //    }
+  //  }
 
-    return true;
-  },
+  //  return true;
+  //},
 
 
 
@@ -232,8 +232,10 @@ var MenuModule = {
    * Open modal for creating new menu
    */
   openCreateModal: function () {
+    debugger;
     this.clearForm();
-    this.openModal('Create New Menu');
+    //this.openModal('Create New Menu');
+    FormHelper.openKendoWindow(this.config.modalId, 'Create New Module', '80%');
     this.setFormMode('create');
   },
 
@@ -307,13 +309,10 @@ var MenuModule = {
    * Save or update menu
    */
   saveOrUpdate: async function () {
-    if (!this.validateForm()) {
-      return;
-    }
-
     //(Type-safe)
     const menuData = this.getFormData();
     console.log(menuData);
+
     //const menuData = this.getFormData();
     const isCreate = !menuData.MenuId || menuData.MenuId === 0;
 
@@ -449,7 +448,7 @@ var MenuModule = {
    */
   getFormData: function () {
     //Type-safe form data
-    let formData = FormHelper.getFormDataTyped('menuForm');
+    let formData = FormHelper.getFormDataTyped(this.config.formId);
 
     //Manual conversion for ComboBoxes
     const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
@@ -470,20 +469,18 @@ var MenuModule = {
   /**
    * Validate form
    */
-  validateForm: function () {
+  validateForm: function (formData) {
     if (!FormHelper.validate('#' + this.config.formId)) {
       return false;
     }
 
-    const data = this.getFormData();
-
-    if (!data.MenuName || data.MenuName.trim() === '') {
+    if (!formData.MenuName || formData.MenuName.trim() === '') {
       MessageManager.notify.error('Menu name is required');
       $('#menu-name').focus();
       return false;
     }
 
-    if (!data.ModuleId || data.ModuleId === 0) {
+    if (!formData.ModuleId || formData.ModuleId === 0) {
       MessageManager.notify.error('Please select a module');
       $('#' + this.config.moduleComboId).focus();
       return false;
@@ -508,44 +505,6 @@ var MenuDetailsHelper = {
     MenuModule.closeModal();
   }
 };
-
-//// Initialize on document ready
-//$(document).ready(function () {
-//  // Check dependencies
-//  if (typeof MenuService === 'undefined') {
-//    console.error('MenuService not loaded!');
-//    return;
-//  }
-
-//  if (typeof ApiCallManager === 'undefined') {
-//    console.error('ApiCallManager not loaded!');
-//    return;
-//  }
-
-//  if (typeof MessageManager === 'undefined') {
-//    console.error('MessageManager not loaded!');
-//    return;
-//  }
-
-//  if (typeof FormHelper === 'undefined') {
-//    console.warn('FormHelper not loaded!');
-//    return;
-//  }
-
-//  if (typeof GridHelper === 'undefined') {
-//    console.error('GridHelper not loaded!');
-//    return;
-//  }
-
-//  // Initialize module
-//  try {
-//    MenuModule.init();
-//    console.log('Menu Module initialized successfully');
-//  } catch (error) {
-//    console.error('Failed to initialize Menu module:', error);
-//  }
-//});
-
 
 //NEW WAY - Register with ModuleRegistry
 if (typeof ModuleRegistry !== 'undefined') {

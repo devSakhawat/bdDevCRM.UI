@@ -97,12 +97,199 @@ var FormHelper = {
   },
 
   /**
+   * Set Form Mode (View/Create/Edit)
+   */
+  setFormMode: function (config) {
+    const {
+      formMode = null,           // 'view', 'create', 'edit'
+      formId = null,                    // Form ID (required)
+      saveOrUpdateButtonId = null,       // Save button ID
+      clearButtonId = 'btnClear', 
+      createButtonText = 'Save',      // Create mode button text
+      editButtonText = 'Update',      // Edit mode button text
+      createButtonIcon = 'fas fa-save', // Create mode icon
+      editButtonIcon = 'fas fa-check'   // Edit mode icon
+    } = config;
+
+    // Validate formId
+    if (!formId) {
+      console.error('Form ID is required for setFormMode!');
+      return;
+    }
+
+    if (!saveOrUpdateButtonId) {
+      console.error('Button ID is required!');
+      return;
+    }
+
+    // Get buttons with proper jQuery selector
+    const saveBtn = $(saveOrUpdateButtonId.startsWith('#') ? saveOrUpdateButtonId : '#' + saveOrUpdateButtonId);
+    const clearBtn = $(clearButtonId.startsWith('#') ? clearButtonId : '#' + clearButtonId);
+
+    if (!saveBtn.length) {
+      console.error(`Save button with ID "${saveOrUpdateButtonId}" not found!`);
+      return;
+    }
+
+    if (formMode === 'view') {
+      FormHelper.makeFormReadOnly('#' + formId);
+      saveBtn.hide();
+      clearBtn.hide();
+
+    } else {
+      FormHelper.makeFormEditable('#' + formId);
+      saveBtn.show();
+      clearBtn.show();
+
+      if (formMode === 'create') {
+        // Create Mode
+        saveBtn.html(`<i class="${createButtonIcon}"></i> ${createButtonText}`);
+      } else if (formMode === 'edit') {
+        // Edit Mode
+        saveBtn.html(`<i class="${editButtonIcon}"></i> ${editButtonText}`);
+      }
+    }
+  },
+
+  //setFormMode: function (formMode ,btnSaveOrUpdate  ,formId, ) {
+
+  //  const {
+  //    btnSaveOrUpdate = null,
+  //    formMode = null,
+  //    editCallback = null,
+  //    deleteCallback = null,
+  //    idField = 'Id'
+  //  } = config;
+
+  //  const saveBtn = $('#btnMenuSaveOrUpdate');
+
+  //  if (formMode === 'view') {
+  //    FormHelper.makeFormReadOnly('#' + this.config.formId);
+  //    saveBtn.hide();
+  //  } else {
+  //    FormHelper.makeFormEditable('#' + this.config.formId);
+  //    saveBtn.show();
+
+  //    if (formMode === 'create') {
+  //      saveBtn.html('<span class="k-icon k-i-plus"></span> Add Menu');
+  //    } else if (formMode === 'edit') {
+  //      saveBtn.html('<span class="k-icon k-i-check"></span> Update Menu');
+  //    }
+  //  }
+  //},
+
+  // Common Form Action Buttons Generator with example
+  /**
+   * Product Form with additional button
+   * CommonHelper.createFormActionButtons({
+   * formId: 'productForm',
+   * closeCallback: 'ProductFormActions.closeForm()',
+   * clearCallback: 'ProductFormActions.clearForm()',
+   * saveCallback: 'ProductFormActions.saveOrUpdate()',
+   * saveButtonId: 'btnSaveProduct',
+   * additionalButtons: [
+   *   {
+   *     text: 'Preview',
+   *     icon: 'fas fa-eye',
+   *     className: 'btn-info',
+   *      callback: 'ProductFormActions.preview()'
+   *     }
+   *   ]
+   * });
+   */
+  createFormActionButtons: function (config) {
+    const {
+      showClose = true,
+      showClear = true,
+      showSave = true,
+      closeCallback = null,
+      clearCallback = null,
+      saveCallback = null,
+      saveButtonId = null,
+      saveButtonText = 'Save',
+      formId = null,
+      additionalButtons = []
+    } = config;
+
+    // Check if formId is provided
+    if (!formId) {
+      console.error('Form ID is required!');
+      return;
+    }
+
+    // Get form element
+    const formElement = document.getElementById(formId);
+    if (!formElement) {
+      console.error(`Form with ID "${formId}" not found!`);
+      return;
+    }
+
+    let html = '<div class="d-flex justify-content-end gap-2 mt-4">';
+
+    // Close Button
+    if (showClose) {
+      const closeFunc = closeCallback || 'closeModal()';
+      html += `
+      <button type="button" class="btn btn-secondary" onclick="${closeFunc}">
+        <i class="fas fa-times"></i> Close
+      </button>`;
+    }
+
+    // Clear Button
+    if (showClear) {
+      const clearFunc = clearCallback || 'clearForm()';
+      html += `
+      <button type="button" class="btn btn-warning" id="btnClear" onclick="${clearFunc}">
+        <i class="fas fa-eraser"></i> Clear
+      </button>`;
+    }
+
+    // Additional Custom Buttons
+    if (additionalButtons.length > 0) {
+      additionalButtons.forEach(btn => {
+        html += `
+        <button type="button" 
+                class="btn ${btn.className || 'btn-info'}" 
+                onclick="${btn.callback}">
+          <i class="${btn.icon || 'fas fa-cog'}"></i> ${btn.text}
+        </button>`;
+      });
+    }
+
+    // Save Button
+    if (showSave) {
+      if (!saveButtonId) {
+        console.error('Save button ID is required!');
+        return;
+      }
+
+      const saveFunc = saveCallback || 'saveOrUpdate()';
+      html += `
+      <button type="button" 
+              class="btn btn-primary" 
+              id="${saveButtonId}" 
+              onclick="${saveFunc}">
+        <i class="fas fa-save"></i> ${saveButtonText}
+      </button>`;
+    }
+
+    html += '</div>';
+
+    // Insert buttons into form
+    formElement.insertAdjacentHTML('beforeend', html);
+  },
+
+  /**
  * Get form data with type conversion (Type-safe version)
- * @param {string} formId - Form ID
+ * @param {string} formSelector - Form ID
  * @returns {object} Type-converted form data
  */
-  getFormDataTyped: function (formId) {
-    const $form = $('#' + formId);
+  getFormDataTyped: function (formSelector) {    
+    const selector = formSelector.startsWith('#') ? formSelector : '#' + formSelector; // selector string    
+    const $form = $(selector); // create jquery object
+
+    //const $form = $(formSelector.startsWith('#') ? formSelector : '#' + formSelector);
+    //const $form = $('#' + formSelector);
     const data = {};
 
     $form.find('[name]').each(function () {

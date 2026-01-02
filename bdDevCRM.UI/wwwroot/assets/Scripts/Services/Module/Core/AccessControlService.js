@@ -3,7 +3,8 @@
  * File: AccessControlService.js
  * Description: Centralized API service for Access Control
  * Author: devSakhawat
- * Date: 2025-01-18
+ * Date: 2025-01-18 ,2026-01-02
+ * Last Update: 2026-01-02
 =========================================================*/
 
 var AccessControlService = {
@@ -17,7 +18,7 @@ var AccessControlService = {
     }
 
     try {
-      const data = await ApiCallManager.get(`${AppConfig.endpoints.accessControlUpdate}/${id}`);
+      const data = await ApiCallManager.get(`${AppConfig.endpoints.accessControlById}/${id}`);
       return data;
     } catch (error) {
       console.error('Error loading accessControl:', error);
@@ -28,14 +29,14 @@ var AccessControlService = {
   /**
    * Create AccessControl
    */
-  create: async function (accessControlData) {
-    console.log(accessControlData);
-    if (!this.validateAccessControl(accessControlData)) {
-      throw new Error('Invalid accessControl data');
+  create: async function (formData) {
+    console.log(formData);
+    if (!this.validateFormData(formData)) {
+      throw new Error('Invalid access control data');
     }
 
     try {
-      const result = await ApiCallManager.post(AppConfig.endpoints.accessControlCreate, accessControlData);
+      const result = await ApiCallManager.post(AppConfig.endpoints.accessControlCreate, formData);
       return result;
     } catch (error) {
       console.error('Error creating accessControl:', error);
@@ -46,17 +47,17 @@ var AccessControlService = {
   /**
    * Update AccessControl
    */
-  update: async function (id, accessControlData) {
+  update: async function (id, formData) {
     if (!id || id <= 0) {
       throw new Error('Invalid accessControl ID');
     }
 
-    if (!this.validateAccessControl(accessControlData)) {
-      throw new Error('Invalid accessControl data');
+    if (!this.validateFormData(formData)) {
+      throw new Error('Invalid access control data');
     }
 
     try {
-      const result = await ApiCallManager.put(`${AppConfig.endpoints.accessControlUpdate}/${id}`, accessControlData);
+      const result = await ApiCallManager.put(`${AppConfig.endpoints.accessControlUpdate}/${id}`, formData);
       return result;
     } catch (error) {
       console.error('Error updating accessControl:', error);
@@ -84,19 +85,14 @@ var AccessControlService = {
   /**
    * Validate accessControl data
    */
-  validateAccessControl: function (accessControlData) {
-    if (!accessControlData.AccessControlName || accessControlData.AccessControlName.trim() === '') {
+  validateFormData: function (formData) {
+    if (!formData.AccessName || formData.AccessName.trim() === '') {
       if (typeof MessageManager !== 'undefined') {
-        MessageManager.notify.error('AccessControl name is required');
+        MessageManager.notify.error('Access Control name is required');
       }
       return false;
     }
-    if (!accessControlData.ModuleId || accessControlData.ModuleId === 0) {
-      if (typeof MessageManager !== 'undefined') {
-        MessageManager.notify.error('Module is required');
-      }
-      return false;
-    }
+
     return true;
   },
 
@@ -112,11 +108,9 @@ var AccessControlService = {
       serverPaging: true,
       serverSorting: true,
       serverFiltering: true,
-      //idField: "AccessControlId",
       modelFields: {
         AccessId: { type: 'number' },
         AccessName: { type: 'string' },
-        //IsActive: { type: 'number' }
       },
       primaryKey: 'AccessId'
     }, config || {});

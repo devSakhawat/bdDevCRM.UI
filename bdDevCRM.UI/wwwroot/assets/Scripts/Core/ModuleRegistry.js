@@ -135,6 +135,50 @@ var ModuleRegistry = (function () {
     console.log('Module registered:', name);
   }
 
+  // ============================================
+  // PUBLIC - Enhanced Module Dependencies Check
+  // ============================================
+ /**
+ * Advanced:  Check dependencies with detailed error messages
+ * @param {string} moduleName - Name of the module being checked
+ * @param {Array<string>} depNames - Required dependency names
+ * @param {boolean} throwError - Whether to throw error or just return false
+ * @returns {boolean}
+ */
+  function checkFileDependencies(moduleName, pageName, throwError) {
+    var depNames = ['ApiCallManager', 'MessageManager', 'FormHelper', 'GridHelper'];
+    depNames.push(pageName);
+
+    if (!Array.isArray(depNames)) {
+      console.error('Dependency names must be an array');
+      return false;
+    }
+
+    var missing = [];
+
+    depNames.forEach(function (name) {
+      if (typeof window[name] === 'undefined') {
+        missing.push(name);
+      }
+    });
+
+    if (missing.length > 0) {
+      var errorMsg = moduleName + ' is missing dependencies: ' + missing.join(', ');
+
+      console.error(errorMsg);
+      console.warn('💡 Make sure these scripts are loaded before ' + moduleName);
+
+      if (throwError) {
+        throw new Error(errorMsg);
+      }
+
+      return false;
+    }
+
+    console.log('All dependencies loaded for ' + moduleName);
+    return true;
+  }
+
   /**
    * Initialize a specific module (with dynamic script loading)
    * Module initialize করা (dynamic script loading সহ)
@@ -208,6 +252,7 @@ var ModuleRegistry = (function () {
    * @returns {Promise<void>}
    */
   async function initByRoute(currentPath) {
+    debugger;
     console.log('🛣️ Initializing modules for route:', currentPath);
 
     for (var name in _modules) {
@@ -233,7 +278,6 @@ var ModuleRegistry = (function () {
 
   /**
    * Manually load and initialize a module
-   * Manually একটা module load এবং initialize করা
    * 
    * @param {string} name - Module name
    * @param {Array<string>} scriptUrls - Scripts to load
@@ -263,7 +307,6 @@ var ModuleRegistry = (function () {
 
   /**
    * Wait for a module to register itself
-   * Module register হওয়ার জন্য wait করা
    */
   function _waitForModuleRegistration(name, timeout) {
     return new Promise(function (resolve, reject) {
@@ -284,7 +327,6 @@ var ModuleRegistry = (function () {
   // ============================================
   // PRIVATE - Dependency Checking (existing)
   // ============================================
-
   async function _checkDependencies(moduleName, dependencies) {
     for (var i = 0; i < dependencies.length; i++) {
       var depName = dependencies[i];
@@ -337,7 +379,6 @@ var ModuleRegistry = (function () {
 
   /**
    * Unload a module (for SPA-like behavior)
-   * Module unload করা
    */
   function unloadModule(name) {
     if (_modules[name]) {
@@ -387,7 +428,7 @@ var ModuleRegistry = (function () {
     initModule: initModule,
     initByRoute: initByRoute,
 
-    // Dynamic loading (🆕)
+    // Dynamic loading
     loadScript: loadScript,
     loadScripts: loadScripts,
     loadAndInitModule: loadAndInitModule,
@@ -397,6 +438,9 @@ var ModuleRegistry = (function () {
     isInitialized: isInitialized,
     getRegisteredModules: getRegisteredModules,
     getStatus: getStatus,
+
+    // Check dependencies
+    checkFileDependencies: checkFileDependencies,
 
     // Cleanup
     unloadModule: unloadModule,

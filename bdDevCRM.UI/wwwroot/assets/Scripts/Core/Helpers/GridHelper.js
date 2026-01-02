@@ -128,12 +128,17 @@ if (typeof GridHelper !== 'undefined') {
         return;
       }
 
-      //FIX: Calculate width based on actual container
       const $container = $grid.parent();
       const containerWidth = $container.width() || $(window).width() - 250; // 250 = sidebar width
 
-      //FIX: Use 100% width instead of calculated pixels
-      const gridWidth = '100%';
+      //FIX: Calculate total columns width dynamically
+      const totalColumnsWidth = columns.reduce((sum, col) => {
+        const width = col.width ? parseInt(col.width.toString().replace(/px|%/g, '')) : 100;
+        return sum + width;
+      }, 0);
+
+      //FIX: Use calculated width if columns fit, otherwise use 100%
+      const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
 
       //FIX: Better height calculation
       const initialHeight = this.calculateGridHeight({
@@ -144,9 +149,7 @@ if (typeof GridHelper !== 'undefined') {
         pagerHeight: 50
       });
 
-      //const containerWidth = $grid.parent().width() || (window.innerWidth - 323);
-      const totalColumnsWidth = columns.reduce((sum, col) => sum + (parseInt(col.width) || 100), 0);
-      //const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
+      
 
       //const initialHeight = this.calculateGridHeight(options.heightConfig || {});
 
@@ -195,6 +198,13 @@ if (typeof GridHelper !== 'undefined') {
       const grid = $grid.data('kendoGrid');
 
       if (grid) {
+        // NEW: Apply !important width using CSS after grid initialization
+        if (totalColumnsWidth <= containerWidth) {
+          /*grid.wrapper.css('width', totalColumnsWidth + 'px !important');*/
+          // or this
+          grid.wrapper[0].style.setProperty('width', totalColumnsWidth + 'px', 'important');
+        }
+
         //Bind dataBound event to adjust height AFTER data loads
         grid.bind('dataBound', function (e) {
           const rowCount = e.sender.dataSource.total();

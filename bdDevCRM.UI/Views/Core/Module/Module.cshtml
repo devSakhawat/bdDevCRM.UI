@@ -4,9 +4,7 @@
   Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
 }
 
-<script src="~/assets/scripts/modules/core/module/module.js"></script>
-
-<!-- row -->
+@* <!-- row -->
 <div class="row">
   <div class="col-12">
     <!-- card -->
@@ -19,7 +17,26 @@
       @Html.Partial("Module/ModuleDetails")
     </div>
   </div>
+</div> *@
+
+<!-- row -->
+<div class="row gx-1 gy-2">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div id="divSummary">
+      <partial name="~/Views/Core/Module/_ModuleSummary.cshtml" />
+    </div>
+  </div>
 </div>
 
+<div class="row">
+  <div id="ModulePopUp" style="display: none">
+    <partial name="~/Views/Core/Module/_ModuleDetails.cshtml" />
+  </div>
+</div>
+
+<!-- Module Service -->
+<script src="~/assets/scripts/services/module/core/moduleservice.js"></script>
+<!-- Module -->
+<script src="~/assets/scripts/modules/core/module/module.js"></script>
 
 

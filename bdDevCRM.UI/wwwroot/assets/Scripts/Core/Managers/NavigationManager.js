@@ -30,7 +30,7 @@ var NavigationManager = (function () {
   // ============================================
 
   function init() {
-    debugger;
+    
     console.log('🚀 NavigationManager initializing...');
 
     // 1. Bind Click Events (Event Delegation)
@@ -56,7 +56,7 @@ var NavigationManager = (function () {
   function _bindNavigationEvents() {
     // Listen to clicks on the Sidebar and any specific internal links
     $(document).on('click', 'a', function (e) {
-      debugger;
+      
       var $link = $(this);
       var url = $link.attr('href');
       var target = $link.attr('target');

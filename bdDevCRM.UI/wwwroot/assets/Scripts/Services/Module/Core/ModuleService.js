@@ -38,21 +38,6 @@ var ModuleService = {
     }
   },
 
-  ///**
-  // * Get modules for dropdown
-  // */
-  //getModules: async function () {
-  //  try {
-  //    console.log('Loading modules from:', AppConfig.endpoints.modules);
-  //    const data = await ApiCallManager.get(AppConfig.endpoints.modules);
-  //    console.log('Modules loaded:', data);
-  //    return data;
-  //  } catch (error) {
-  //    console.error('Error loading modules:', error);
-  //    return [];
-  //  }
-  //},
-
   /**
    * Create module
    */

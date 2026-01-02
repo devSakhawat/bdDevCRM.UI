@@ -105,38 +105,38 @@ var Module = {
     FormHelper.initForm(this.config.formId);
   },
 
-  /**
-   * Load modules for dropdown
-   */
-  loadModules: async function () {
-    try {
-      const modules = await MenuService.getModules();
-      const combo = $('#' + this.config.moduleComboId).data('kendoComboBox');
-      if (combo) {
-        combo.setDataSource(modules || []);
-      }
-    } catch (error) {
-      console.error('Error loading modules:', error);
-    }
-  },
+  ///**
+  // * Load modules for dropdown
+  // */
+  //loadModules: async function () {
+  //  try {
+  //    const modules = await MenuService.getModules();
+  //    const combo = $('#' + this.config.moduleComboId).data('kendoComboBox');
+  //    if (combo) {
+  //      combo.setDataSource(modules || []);
+  //    }
+  //  } catch (error) {
+  //    console.error('Error loading modules:', error);
+  //  }
+  //},
 
-  /**
-   * On module change - load parent menus
-   */
-  onModuleChange: async function (e) {
-    const moduleId = e.sender.value();
-    if (!moduleId) return;
+  ///**
+  // * On module change - load parent menus
+  // */
+  //onModuleChange: async function (e) {
+  //  const moduleId = e.sender.value();
+  //  if (!moduleId) return;
 
-    try {
-      const menus = await MenuService.getMenusByModuleId(moduleId);
-      const combo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
-      if (combo) {
-        combo.setDataSource(menus || []);
-      }
-    } catch (error) {
-      console.error('Error loading parent menus:', error);
-    }
-  },
+  //  try {
+  //    const menus = await MenuService.getMenusByModuleId(moduleId);
+  //    const combo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
+  //    if (combo) {
+  //      combo.setDataSource(menus || []);
+  //    }
+  //  } catch (error) {
+  //    console.error('Error loading parent menus:', error);
+  //  }
+  //},
 
   /**
    * Open modal for creating new module
@@ -144,7 +144,8 @@ var Module = {
   openCreateModal: function () {
     debugger;
     this.clearForm();
-    this.openModal('Create New Module');
+    //this.openModal('Create New Module');
+    FormHelper.openKendoWindow(this.config.modalId, 'Create New Module', '50%');
     FormHelper.setFormMode({
       formMode: 'create', 
       formId: 'moduleForm',
@@ -265,7 +266,7 @@ var Module = {
    * Open modal
    */
   openModal: function (title) {
-    FormHelper.openKendoWindow(this.config.modalId, title || 'Module Details', '50%', '90%');
+    FormHelper.openKendoWindow(this.config.modalId, title || 'Module Details', '50%');
   },
 
   /**

@@ -105,7 +105,7 @@ var AppConfig = (function () {
       // ========================================
       // AccessControl ENDPOINTS (From Screenshot)
       // ========================================
-      accessControllSummary: '/access-control-summary', // POST - Get access control summary grid
+      accessControlSummary: '/access-control-summary', // POST - Get access control summary grid
       accessControls: '/access-controls',               // GET - Get all access controls
       accessControlById: '/access-control/',            // GET - Get access control by ID
       accessControlCreate: '/access-control',           // POST - Create access control
@@ -146,7 +146,7 @@ var AppConfig = (function () {
       branch: '/branchddl'
     },
 
-    // Front-end endpoints
+    // Front-end page init endpoints
     frontendRoutes: {
       dashboard: '/dashboard',
       settings: '/settings',
@@ -157,6 +157,9 @@ var AppConfig = (function () {
 
       // Module
       intModule: '/Core/ModuleSettings',
+
+      // Access Controll Screen
+      intAccessControll: '/Core/AccessSettings',
     },
 
 

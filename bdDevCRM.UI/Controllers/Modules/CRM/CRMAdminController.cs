@@ -37,14 +37,14 @@ namespace bdDevCRM.UI.Controllers.Modules.CRM
       return View("~/Views/CRM/CRMAdmin/CRMCourse/Course.cshtml");
     }
 
-    //[HttpGet("CRMInstitute")]
-    //public IActionResult CRMInstitute()
-    //{
-    //  //if (!IsUserLoggedIn())
-    //  //  return RedirectToLogin();
+    [HttpGet("CRMInstitute")]
+    public IActionResult CRMInstitute()
+    {
+      //if (!IsUserLoggedIn())
+      //  return RedirectToLogin();
 
-    //  return View("~/Views/CRM/CRMAdmin/CRMInstitute/Institute.cshtml");
-    //}
+      return View("~/Views/CRM/CRMAdmin/CRMInstitute/Institute.cshtml");
+    }
 
     //[HttpGet("CRMInstituteType")]
     //public IActionResult CRMInstituteType()

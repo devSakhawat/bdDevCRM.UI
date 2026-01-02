@@ -8,27 +8,28 @@
 
 /*=========================================================
  * Access Controll Form (Complete CRUD with)
- * File: AccessControll.js
+ * File: AccessControl.js
  * Author: devSakhawat
  * Date: 2025-01-18
+ * Update Date: 2026-01-01
 =========================================================*/
-var AccessControll = {
+var AccessControl = {
   // Configuration
   config: {
     gridId: 'gridSummaryAccessControl',
     formId: 'accessControlForm',
     isActive: 'is-active',
-    reportName: 'AccessControlList'
+    reportName: 'AccessControlList',
+    initPageRoute: 'intAccessControll'
   },
 
   /**
    * Initialize module
    */
   init: function () {
-    console.log('Initializing Menu Module...');
+    console.log('Initializing Access Control Screen...');
     this.initGrid();
-    //this.initModal();
-    //this.initForm();
+    this.initForm();
   },
 
   /**
@@ -53,7 +54,7 @@ var AccessControll = {
   getColumns: function () {
     return [
       { field: "AccessId", title: "Access Id", width: 0, hidden: true },
-      { field: "AccessName", title: "Access Name", width: 120 },
+      { field: "AccessName", title: "Access Name", width: 250 },
       //{ field: "IsActive", title: "Status", width: 80, template: "#= data.IsActive == 1 ? 'Active' : 'Inactive' #" },
       {
         field: "Actions",
@@ -76,108 +77,76 @@ var AccessControll = {
     FormHelper.initForm(this.config.formId);
   },
 
-  /**
-   * Load modules for dropdown
-   */
-  loadModules: async function () {
-    try {
-      const modules = await MenuService.getModules();
-      const combo = $('#' + this.config.moduleComboId).data('kendoComboBox');
-      if (combo) {
-        combo.setDataSource(modules || []);
-      }
-    } catch (error) {
-      console.error('Error loading modules:', error);
-    }
-  },
-
-  /**
-   * On module change - load parent menus
-   */
-  onModuleChange: async function (e) {
-    const moduleId = e.sender.value();
-    if (!moduleId) return;
-
-    try {
-      const menus = await MenuService.getMenusByModuleId(moduleId);
-      const combo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
-      if (combo) {
-        combo.setDataSource(menus || []);
-      }
-    } catch (error) {
-      console.error('Error loading parent menus:', error);
-    }
-  },
-
-  /**
-   * Open modal for creating new menu
-   */
-  openCreateModal: function () {
-    this.clearForm();
-    this.openModal('Create New Menu');
-    this.setFormMode('create');
-  },
-
-  view: async function (menuId) {
-    if (!menuId || menuId <= 0) {
-      MessageManager.notify.warning('Invalid menu ID');
+  view: async function (accessId) {
+    debugger;
+    if (!accessId || accessId <= 0) {
+      MessageManager.notify.warning('Invalid accessId');
       return;
     }
 
     try {
-      // Data From Grid
-      this.clearForm();
-      const grid = $('#gridSummaryMenu').data('kendoGrid');
-      const dataItem = grid.dataSource.get(menuId);
+      FormHelper.clearFormFields('#' + this.config.formId);
+      const grid = $('#' + this.config.gridId).data('kendoGrid');
+      const dataItem = grid.dataSource.get(accessId);
       if (dataItem) {
-        MenuModule.populateForm(dataItem);
-        MenuModule.openModal('View Menu Details');
-        MenuModule.setFormMode('view');
+        FormHelper.setFormData('#' + this.config.formId, dataItem);
+        FormHelper.setFormMode({
+          formId: this.config.formId,
+          formMode: 'view',
+          saveOrUpdateButtonId: 'btnAccessControlSaveOrUpdate'
+        });
       }
     } catch (error) {
-      console.error('Error loading menu:', error);
+      console.error('Error loading module:', error);
     }
   },
 
   /**
-   * Edit menu
+   * Edit access control
    */
-  edit: async function (menuId) {
-    if (!menuId || menuId <= 0) {
-      MessageManager.notify.warning('Invalid menu ID');
+  edit: async function (accessId) {
+    debugger;
+    if (!accessId || accessId <= 0) {
+      MessageManager.notify.warning('Invalid access control ID');
       return;
     }
 
     try {
-      const grid = $('#gridSummaryMenu').data('kendoGrid');
-      const dataItem = grid.dataSource.get(menuId);
+      FormHelper.clearFormFields('#' + this.config.formId);
+      const grid = $('#' + this.config.gridId).data('kendoGrid');
+      const dataItem = grid.dataSource.get(accessId);
       if (dataItem) {
-        MenuModule.populateForm(dataItem);
-        MenuModule.openModal('Edit Menu');
-        MenuModule.setFormMode('edit');
+        //this.populateForm(dataItem); // for medium and large form
+        FormHelper.setFormData('#' + this.config.formId, dataItem);
+        FormHelper.setFormMode({
+          formId: this.config.formId,
+          formMode: 'edit',
+          saveOrUpdateButtonId: 'btnAccessControlSaveOrUpdate'
+        });
       }
     } catch (error) {
-      console.error('Error loading menu:', error);
+      console.error('Error loading access control:', error);
     }
   },
 
   /**
    * Delete menu with confirmation
    */
-  delete: async function (menuId) {
-    if (!menuId || menuId <= 0) {
-      MessageManager.notify.warning('Invalid menu ID');
+  delete: async function (accessId) {
+    debugger;
+    if (!accessId || accessId <= 0) {
+      MessageManager.notify.warning('Invalid access ID');
       return;
     }
 
-    MessageManager.confirm.delete('this menu', async () => {
+    MessageManager.confirm.delete('this access control', async () => {
       try {
         await MessageManager.loading.wrap(
-          MenuService.delete(menuId),
-          'Deleting menu...'
+          AccessControlService.delete(accessId),
+          'Deleting access control...'
         );
-        MessageManager.notify.success('Menu deleted successfully!');
-        GridHelper.refreshGrid(MenuModule.config.gridId);
+        MessageManager.notify.success('Access control deleted successfully!');
+        GridHelper.refreshGrid(AccessControl.config.gridId);
       } catch (error) {
         console.error('Delete error:', error);
       }
@@ -188,77 +157,28 @@ var AccessControll = {
    * Save or update menu
    */
   saveOrUpdate: async function () {
-    if (!this.validateForm()) {
-      return;
-    }
-
-    //(Type-safe)
-    const menuData = this.getFormData();
-    console.log(menuData);
-    //const menuData = this.getFormData();
-    const isCreate = !menuData.MenuId || menuData.MenuId === 0;
+    debugger;
+    const formData = FormHelper.getFormDataTyped(this.config.formId);
+    const isCreate = !formData.AccessId || formData.AccessId === 0;
 
     try {
       if (isCreate) {
         await MessageManager.loading.wrap(
-          MenuService.create(menuData),
-          'Creating menu...'
+          AccessControlService.create(formData),
+          'Creating Access Control...'
         );
-        MessageManager.notify.success('Menu created successfully!');
+        MessageManager.notify.success('Access control created successfully!');
       } else {
         await MessageManager.loading.wrap(
-          MenuService.update(menuData.MenuId, menuData),
-          'Updating menu...'
+          AccessControlService.update(formData.AccessId, formData),
+          'Updating Access control...'
         );
-        MessageManager.notify.success('Menu updated successfully!');
+        MessageManager.notify.success('Access control updated successfully!');
       }
-
-      this.closeModal();
+      this.clearForm();
       GridHelper.refreshGrid(this.config.gridId);
     } catch (error) {
       console.error('Save/Update error:', error);
-    }
-  },
-
-  /**
-   * Open modal
-   */
-  openModal: function (title) {
-    FormHelper.openKendoWindow(this.config.modalId, title || 'Menu Details', '80%', '90%');
-  },
-
-  /**
-   * Close modal
-   */
-  closeModal: function () {
-    FormHelper.closeKendoWindow(this.config.modalId);
-  },
-
-  /**
-   * On modal close
-   */
-  onModalClose: function () {
-    this.clearForm();
-  },
-
-  /**
-   * Set form mode (create/edit/view)
-   */
-  setFormMode: function (mode) {
-    const saveBtn = $('#btnMenuSaveOrUpdate');
-
-    if (mode === 'view') {
-      FormHelper.makeFormReadOnly('#' + this.config.formId);
-      saveBtn.hide();
-    } else {
-      FormHelper.makeFormEditable('#' + this.config.formId);
-      saveBtn.show();
-
-      if (mode === 'create') {
-        saveBtn.html('<span class="k-icon k-i-plus"></span> Add Menu');
-      } else if (mode === 'edit') {
-        saveBtn.html('<span class="k-icon k-i-check"></span> Update Menu');
-      }
     }
   },
 
@@ -267,30 +187,6 @@ var AccessControll = {
    */
   clearForm: function () {
     FormHelper.clearFormFields('#' + this.config.formId);
-    $('#hdMenuId').val(0);
-    $('#hdSortOrder').val(0);
-
-    const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
-    const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
-    const isActiveCbo = $('#' + this.config.isActive).data('kendoDropDownList');
-
-    if (moduleCbo) {
-      moduleCbo.value('');
-      moduleCbo.text('');
-    }
-
-    if (parentCbo) {
-      parentCbo.value('');
-      parentCbo.text('');
-      parentCbo.setDataSource([]);
-    }
-
-    if (isActiveCbo) {
-      isActiveCbo.value('');
-      isActiveCbo.text('');
-    }
-
-    $('#chkIsQuickLink').prop('checked', false);
   },
 
   /**
@@ -301,28 +197,6 @@ var AccessControll = {
     this.clearForm();
 
     FormHelper.setFormData('#' + this.config.formId, data);
-
-    const isActiveCbo = $('#' + this.config.isActive).data('kendoDropDownList');
-    if (isActiveCbo && data.IsActive) {
-      isActiveCbo.value(data.IsActive);
-    }
-
-    const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
-    if (moduleCbo && data.ModuleId) {
-      moduleCbo.value(data.ModuleId);
-    }
-
-    if (data.ModuleId) {
-      MenuService.getMenusByModuleId(data.ModuleId).then(menus => {
-        const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
-        if (parentCbo) {
-          parentCbo.setDataSource(menus || []);
-          if (data.ParentMenu) {
-            setTimeout(() => parentCbo.value(data.ParentMenu), 100);
-          }
-        }
-      });
-    }
   },
 
   /**
@@ -330,95 +204,21 @@ var AccessControll = {
    */
   getFormData: function () {
     //Type-safe form data
-    let formData = FormHelper.getFormDataTyped('menuForm');
-
-    //Manual conversion for ComboBoxes
-    const moduleCbo = $('#' + this.config.moduleComboId).data('kendoComboBox');
-    const parentCbo = $('#' + this.config.parentMenuComboId).data('kendoComboBox');
-
-    formData.ModuleId = moduleCbo ? parseInt(moduleCbo.value()) || 0 : 0;
-    formData.ParentMenu = parentCbo ? parseInt(parentCbo.value()) || 0 : 0;
-
-    //Ensure IsQuickLink is int (0 or 1)
-    formData.IsQuickLink = formData.IsQuickLink ? 1 : 0;
-
-    //Ensure IsActive is int
-    formData.IsActive = parseInt(formData.IsActive) || 0;
-
+    let formData = FormHelper.getFormDataTyped(this.config.formId);
     return formData;
   },
-
-  /**
-   * Validate form
-   */
-  validateForm: function () {
-    if (!FormHelper.validate('#' + this.config.formId)) {
-      return false;
-    }
-
-    const data = this.getFormData();
-
-    if (!data.MenuName || data.MenuName.trim() === '') {
-      MessageManager.notify.error('Menu name is required');
-      $('#menu-name').focus();
-      return false;
-    }
-
-    if (!data.ModuleId || data.ModuleId === 0) {
-      MessageManager.notify.error('Please select a module');
-      $('#' + this.config.moduleComboId).focus();
-      return false;
-    }
-
-    return true;
-  }
 };
 
-// Initialize on document ready
-$(document).ready(function () {
-  // Check dependencies
-  if (typeof AccessControlService === 'undefined') {
-    console.error('MenuService not loaded!');
-    return;
-  }
-
-  if (typeof ApiCallManager === 'undefined') {
-    console.error('ApiCallManager not loaded!');
-    return;
-  }
-
-  if (typeof MessageManager === 'undefined') {
-    console.error('MessageManager not loaded!');
-    return;
-  }
-
-  if (typeof FormHelper === 'undefined') {
-    console.warn('FormHelper not loaded!');
-    return;
-  }
-
-  if (typeof GridHelper === 'undefined') {
-    console.error('GridHelper not loaded!');
-    return;
-  }
-
-  // Initialize module
-  try {
-    AccessControll.init();
-    console.log('Menu Module initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize Menu module:', error);
-  }
-});
-
-
-
-
-//$(document).ready(function () {
-//    //AccessControlSummaryManager.GenerateAccessControlGrid();
-//  //AccessControlSummaryHelper.GeRowDataOfAccessControlGrid();
-
-//  AccessControlSummaryHelper.initAccessControlSummary();
-
-//    $("#txtAccessControlName").focus();
-//});
+// ============================================
+// MODULE REGISTRY REGISTRATION
+// ============================================
+if (typeof ModuleRegistry !== 'undefined') {
+  ModuleRegistry.register('AccessControl', AccessControl, {
+    dependencies: ['AccessControlService', 'ApiCallManager', 'MessageManager', 'FormHelper', 'GridHelper'],
+    priority: 5,
+    autoInit: false,  // Will be initialized by route
+    route: AppConfig.getFrontendRoute(AccessControl.config.initPageRoute)  // Only initialize when on Access Controll Page pages
+  });
+} else {
+  console.error('ModuleRegistry not loaded!  Cannot register Access Control Screen');
+}

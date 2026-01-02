@@ -55,7 +55,6 @@ var AccessControl = {
     return [
       { field: "AccessId", title: "Access Id", width: 0, hidden: true },
       { field: "AccessName", title: "Access Name", width: 250 },
-      //{ field: "IsActive", title: "Status", width: 80, template: "#= data.IsActive == 1 ? 'Active' : 'Inactive' #" },
       {
         field: "Actions",
         title: "Actions",

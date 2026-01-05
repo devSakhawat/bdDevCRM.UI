@@ -299,9 +299,7 @@ var UserInfoHelper = {
         console.error("Error loading country data:", error);
         comboBox.setDataSource([]);
       });
-    }
-    
-    
+    }    
   },
 
   populateUserInformationDetails: async function (selectedItem) {

@@ -255,9 +255,9 @@ var ApiCallManager = (function () {
 
     if (!_config.showErrorNotifications) return;
 
-    const statusCode = error.StatusCode || 500;
-    const errorType = error.ErrorType || 'Error';
-    const message = error.Message || 'An error occurred';
+    const statusCode = error.StatusCode || error.statusCode || error?.response?.status || 500;
+    const errorType = error.ErrorType || error.errorType || 'Error';
+    const message = error.Message || error.message || 'An error occurred';
 
     // Check if MessageManager is available
     if (typeof MessageManager === 'undefined') {
@@ -311,10 +311,13 @@ var ApiCallManager = (function () {
 
     // Client errors (400, 404, 409)
     if (statusCode >= 400 && statusCode < 500) {
-      if (errorType === 'NotFound') {
-        MessageManager.notify.info(message);
+      if (errorType === 'BadRequestException') {
+        MessageManager.notify.error(message, 'Bad Request Exception');
+      }
+      else if (errorType === 'NotFound') {
+        MessageManager.notify.info(message, 'Not Found');
       } else if (errorType === 'Conflict') {
-        MessageManager.notify.warning(message);
+        MessageManager.notify.warning(message, errorType);
       } else {
         MessageManager.notify.error(message);
       }

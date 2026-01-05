@@ -1,8 +1,10 @@
-﻿<script src="~/assets/scripts/modules/core/users/userinfo.js"></script>
+﻿@* <script src="~/assets/scripts/modules/core/users/userinfo.js"></script> *@
+
 
 
 <div id="divUserInfo">
-  <div class="divDetails">
+  @* <div class="divDetails"> *@
+  <form id="userForm" enctype="multipart/form-data">
     <ul>
       <li class="mb-2">
         <label for="CompanyNameDetails" class="lbl widthSize100_per">SBU:</label>
@@ -12,7 +14,7 @@
 
       <li class="mb-2">
         <label for="BranchNameDetails" class="lbl widthSize100_per">Branch Name:<span class="redstart">*</span></label>
-        <input class="width_100_Per_Important" id="cmbBranchDetails" name="BranchNameDetails" validationmessage="Please Select Branch Name"  />
+        <input class="width_100_Per_Important" id="cmbBranchDetails" name="BranchNameDetails" validationmessage="Please Select Branch Name" />
       </li>
 
       <li class="mb-2">
@@ -22,12 +24,12 @@
 
       <li class="mb-2">
         <label for="LoginId" class="lbl widthSize100_per">Login ID:<span class="redstart">*</span></label>
-        <input type="text" class="width_100_Per_Important k-textbox" id="txtLoginId" name="LoginId"  placeholder="Login ID" validationmessage="Please enter valid Login ID" />
+        <input type="text" class="width_100_Per_Important k-textbox" id="txtLoginId" name="LoginId" placeholder="Login ID" validationmessage="Please enter valid Login ID" />
       </li>
 
       <li class="mb-2">
         <label for="NewPassword" class="lbl widthSize100_per">New Password:</label>
-        <input type="password" class="width_100_Per_Important k-textbox" id="txtNewPassword" name="NewPassword"  />
+        <input type="password" class="width_100_Per_Important k-textbox" id="txtNewPassword" name="NewPassword" />
       </li>
 
       <li class="mb-2">
@@ -37,7 +39,7 @@
 
       <li class="mb-2">
         <label for="UserName" class="lbl widthSize100_per">User Name:<span class="redstart">*</span></label>
-        <input type="text" class="width_100_Per_Important k-textbox" id="txtUserName" name="UserName" maxlength="50"  placeholder="User Name" required validationmessage="Please enter valid User Name" />
+        <input type="text" class="width_100_Per_Important k-textbox" id="txtUserName" name="UserName" maxlength="50" placeholder="User Name" required validationmessage="Please enter valid User Name" />
       </li>
 
       <li class="mb-2">
@@ -65,5 +67,6 @@
         <input type="checkbox" id="chkIsActive" name="IsActive" class="form-check-input" />
       </li>
     </ul>
-  </div>
+    @* </div> *@
+  </form>
 </div>

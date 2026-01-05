@@ -32,13 +32,6 @@ var UserDetailsManager = {
             var objUser = UserInfoHelper.createUserInformationForSaveData();
             objUser = GroupMembershipHelper.createGroupMemberForSaveData(objUser);
 
-            //var objUserinfo = JSON.stringify(objUser).replace(/&/g, "^");
-            //var jsonParam = 'strobjUserInfo=' + objUserinfo;
-            //AjaxManager.SendJson(serviceUrl, jsonParam, onSuccess, onFailed);
-
-            // when you use replease you must your use replace on .net
-            //var jsonObject = 'strGroupInfo=' + JSON.stringify(obj).replace(/&/g, "^");
-
             var jsonObject = JSON.stringify(objUser);
             var responseData = AjaxManager.PostDataForDotnetCoreWithHttp(baseApi, serviceUrl, jsonObject, httpType, onSuccess, onFailed);
             function onSuccess(responseData) {

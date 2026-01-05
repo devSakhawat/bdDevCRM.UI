@@ -45,30 +45,6 @@ var MenuModule = {
     console.log('Menu Module initialized successfully');
   },
 
-  ///**
-  // * Check module dependencies
-  // */
-  //_checkDependencies: function () {
-  //  var deps = {
-  //    MenuService: typeof MenuService !== 'undefined',
-  //    ApiCallManager: typeof ApiCallManager !== 'undefined',
-  //    MessageManager: typeof MessageManager !== 'undefined',
-  //    FormHelper: typeof FormHelper !== 'undefined',
-  //    GridHelper: typeof GridHelper !== 'undefined'
-  //  };
-
-  //  for (var dep in deps) {
-  //    if (!deps[dep]) {
-  //      console.error('Missing dependency:', dep);
-  //      return false;
-  //    }
-  //  }
-
-  //  return true;
-  //},
-
-
-
   /**
    * Initialize Kendo Grid
    */

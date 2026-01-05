@@ -102,20 +102,49 @@ var AppConfig = (function () {
       menuDelete: '/menu',                          // DELETE - Delete menu /{key}
       menuDDL: '/menus-4-ddl',
 
-      // ========================================
+      // =======================================================================================
       // AccessControl ENDPOINTS (From Screenshot)
-      // ========================================
+      // =======================================================================================
       accessControlSummary: '/access-control-summary', // POST - Get access control summary grid
-      accessControls: '/access-controls',               // GET - Get all access controls
-      accessControlById: '/access-control/',            // GET - Get access control by ID
-      accessControlCreate: '/access-control',           // POST - Create access control
-      accessControlUpdate: '/access-control',           // PUT - Update access control /{key}
-      accessControlDelete: '/access-control',           // DELETE - Delete access control /{key}
+      accessControls: '/access-controls',              // GET - Get all access controls
+      accessControlById: '/access-control/',           // GET - Get access control by ID
+      accessControlCreate: '/access-control',          // POST - Create access control
+      accessControlUpdate: '/access-control',          // PUT - Update access control /{key}
+      accessControlDelete: '/access-control',          // DELETE - Delete access control /{key}
 
+      // --- User Management ---
+      userSummary: "/user-summary",                    // For the main grid data
+      resetPassword: "/Users/ResetPassword/",          // For resetting a user's password
+      motherCompanies: "/mother-companies",            // To get the list of companies
+      employeeTypes: "/employeetypes",                 // To get employee types for dropdown
+      userCreate: "/user",                             // POST (create) and PUT (update)
+      userUpdate: "/user",                             // PUT (update)
+      userDelete: "/user",                             // DELETE (delete)
+
+      // --- User Details (Cascading Combos) ---
+      branchesByCompanyId: "/branches-by-compnayId/companyId",       // Get branches for a company
+      departmentsByCompanyId: "/departments-by-compnayId/companyId", // Get departments for a company
+      employeesByFilters: "/employees-by-indentities",               // Get employees based on company, branch, department
+      employeeTypes: "/employeetypes",
+
+      // --- Group Membership ---
+      groups: "/groups",                                             // To get all groups
+      groupMembersByUserId: "/groups/group-members-by-userId",       // To get groups a user belongs to
+
+      // --- User Upload (Excel) ---
+      userUpload: "/user/upload",                                    // Endpoint for Kendo Upload to save the file
+      userUploadRemove: "/user/upload/remove",                       // Endpoint for Kendo Upload to remove the file
+      userImport: "/user/import",                                    // Endpoint to trigger the import process after upload
+
+      // =======================================================================================
+      // AccessControl ENDPOINTS (From Screenshot)
+      // =======================================================================================
       // Access Control
       access: '/getaccess',
 
+      // =======================================================================================
       // Workflow
+      // =======================================================================================
       status: '/status/key/',
       actions: '/actions-4-group/status/',
 
@@ -160,6 +189,9 @@ var AppConfig = (function () {
 
       // Access Controll Screen
       intAccessControll: '/Core/AccessSettings',
+
+      // User Screen
+      intUser: '/Core/UserSettings',
     },
 
 

@@ -198,7 +198,6 @@ var UserSummaryHelper = {
     }
   },
 
-
   setGridDataSource: function () {
     let companyId = 0;
     let comboBox = $("#cmbCompanyNameForSummary").data("kendoComboBox");
@@ -229,7 +228,6 @@ var UserSummaryHelper = {
     }
   },
 
-
   clickEventForEditButton: async function (e) {
     debugger;
 
@@ -249,58 +247,5 @@ var UserSummaryHelper = {
 
   },
 
-//  GenerateMotherCompanyCombo: function () {
-//    var objCompany = new Object();
-//    objCompany = UserSummaryHelper.GetMotherCompany();
-
-//    $("#cmbCompanyNameForSummary").kendoComboBox({
-//      placeholder: "Select Company...",
-//      dataTextField: "CompanyName",
-//      dataValueField: "CompanyId",
-//      dataSource: objCompany
-//    });
-//    if (CurrentUser != null) {
-//      var cmbComp = $("#cmbCompanyNameForSummary").data("kendoComboBox");
-//      //cmbComp.value(CurrentUser.CompanyId);
-//    }
-//  },
-
-//  clickEventForResetPassword: function () {
-//    $('#btnResetPassword').live('click', function () {
-//      var entityGrid = $("#gridUser").data("kendoGrid");
-
-//      var selectedItem = entityGrid.dataItem(entityGrid.select());
-
-//      userSummaryHelper.resetPassword(selectedItem);
-
-//    });
-//  },
-
-
-//  resetPassword: function (items) {
-//    userSummaryManager.ResetPasswordByCompanyIdAndUserId(items.CompanyId, items.UserId);
-//  },
-
-//  clickEventForEditUser: function () {
-//    $('#gridUser table tr').live('dblclick', function () {
-//      var entityGrid = $("#gridUser").data("kendoGrid");
-
-//      var selectedItem = entityGrid.dataItem(entityGrid.select());
-
-//      userInfoHelper.populateUserInformationDetails(selectedItem);
-
-//      groupMembershipHelper.populateGroupMember(selectedItem);
-
-//    });
-//  },
-
-//  CompanyIndexChangeEvent: function (e) {
-//    var companyData = $("#cmbCompanyNameForSummary").data("kendoComboBox");
-//    var companyId = companyData.value();
-//    $("#gridUser").empty();
-//    $("#gridUser").kendoGrid();
-//    userSummaryHelper.GenerateUserSummaryGrid(companyId);
-
-//  },
 
 };

@@ -131,16 +131,16 @@ if (typeof GridHelper !== 'undefined') {
       const $container = $grid.parent();
       const containerWidth = $container.width() || $(window).width() - 250; // 250 = sidebar width
 
-      //FIX: Calculate total columns width dynamically
+      //Calculate total columns width dynamically
       const totalColumnsWidth = columns.reduce((sum, col) => {
         const width = col.width ? parseInt(col.width.toString().replace(/px|%/g, '')) : 100;
         return sum + width;
       }, 0);
 
-      //FIX: Use calculated width if columns fit, otherwise use 100%
+      //Use calculated width if columns fit, otherwise use 100%
       const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
 
-      //FIX: Better height calculation
+      //Better height calculation
       const initialHeight = this.calculateGridHeight({
         headerHeight: options.heightConfig?.headerHeight || 60,
         footerHeight: options.heightConfig?.footerHeight || 40,
@@ -148,10 +148,6 @@ if (typeof GridHelper !== 'undefined') {
         toolbarHeight: 50,
         pagerHeight: 50
       });
-
-      
-
-      //const initialHeight = this.calculateGridHeight(options.heightConfig || {});
 
       const defaultExports = ["excel", "pdf"];
       const finalToolbar = Array.isArray(options.toolbar) ? options.toolbar.concat(defaultExports) : defaultExports;

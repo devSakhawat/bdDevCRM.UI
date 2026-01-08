@@ -72,12 +72,12 @@ var User = {
     // The dataSource will be set later when a company is selected
     GridHelper.loadGrid(this.config.gridId, this.getColumns(), [], {
       toolbar: [
-        {
-          template: `<button type="button" onclick="User.openCreateModal()" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary">
-                      <span class="k-icon k-i-plus"></span>
-                      <span class="k-button-text">Create New User</span>
-                    </button>`
-        }
+        //{
+        //  template: `<button type="button" onclick="User.openCreateModal()" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary">
+        //              <span class="k-icon k-i-plus"></span>
+        //              <span class="k-button-text">Create New User</span>
+        //            </button>`
+        //}
       ],
       fileName: this.config.reportName,
       heightConfig: {
@@ -115,10 +115,10 @@ var User = {
         field: "ResetPassword", title: "Reset Password", filterable: false, width: "500",
         template: '<input type="button" class="k-button btn btn-outline-warning" value="Reset Password" id="btnResetPassword" />', sortable: false, exportable: false
       },
-      {
-        field: "Edit", title: "Edit", filterable: false, width: "300",
-        template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="UserSummaryHelper.clickEventForEditButton(event)"  />', sortable: false, exportable: false
-      },
+      //{
+      //  field: "Edit", title: "Edit", filterable: false, width: "300",
+      //  template: '<input type="button" class="k-button btn btn-outline-dark" value="Edit" id="btnEdit" onClick="UserSummaryHelper.clickEventForEditButton(event)"  />', sortable: false, exportable: false
+      //},
       {
         field: "Actions",
         title: "Actions",

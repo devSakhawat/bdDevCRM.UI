@@ -1,34 +1,46 @@
 ﻿@* <script src="~/assets/scripts/modules/core/users/userdetails.js"></script> *@
 
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-sm-12">
+  <fieldset class="border p-3 fieldsetCommon">
+    <legend class="legendCommon">User Form</legend>
+    <div id="tabstrip">
+      <ul>
+        <li>
+          User Info
+        </li>
+        <li>
+          Group Membership
+        </li>
+      </ul>
+      <div>
+        <partial name="Users/_UserInfo" />
+      </div>
+      <div>
+        <partial name="Users/_GroupMembership" />
+      </div>
 
-<fieldset class="border p-3 fieldsetCommon">
-  <legend class="legendCommon">User Form</legend>
-  <div id="tabstrip">
-    <ul>
-      <li>
-        User Info
-      </li>
-      <li>
-        Group Membership
-      </li>
-    </ul>
-    <div>
-      <partial name="Users/_UserInfo" />
     </div>
-    <div>
-      <partial name="Users/_GroupMembership" />
+
+    @*<div class="btnDiv mt-2">
+      <ul>
+        <li class="d-flex justify-content-end">
+          <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="UserDetailsManager.saveOrUpdateItem()">+ Add New Item</button>
+          <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="UserDetailsHelper.clearUserForm()">Clear</button>
+        </li>
+      </ul>
+    </div>*@
+
+    <!-- Buttons -->
+    <div class="btnDiv mt-2">
+      <ul>
+        <li class="d-flex justify-content-end">
+          <button type="button" class="btn btn-primary me-2" id="btnUserSaveOrUpdate" onclick="User.saveOrUpdate();">+ Add Menu</button>
+          <button type="button" class="btn btn-secondary me-2" onclick="User.clearForm();">Clear</button>
+          <button type="button" class="btn btn-light" onclick="User.closeModal();"> Close </button>
+        </li>
+      </ul>
     </div>
 
-  </div>
-
-  <div class="btnDiv mt-2">
-    <ul>
-      <li class="d-flex justify-content-end">
-        <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="UserDetailsManager.saveOrUpdateItem()">+ Add New Item</button>
-        <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="UserDetailsHelper.clearUserForm()">Clear</button>
-      </li>
-    </ul>
-  </div>
-
-</fieldset>
+  </fieldset>
+</div>
 

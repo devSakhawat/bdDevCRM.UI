@@ -319,7 +319,7 @@ var ApiCallManager = (function () {
       } else if (errorType === 'Conflict') {
         MessageManager.notify.warning(message, errorType);
       } else {
-        MessageManager.notify.error(message);
+        MessageManager.notify.error(message, errorType);
       }
       return;
     }

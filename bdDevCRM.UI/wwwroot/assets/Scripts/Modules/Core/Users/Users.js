@@ -12,7 +12,7 @@ var User = {
   config: {
     gridId: 'gridUserSummary',
     formId: 'userForm', // Assuming the main form container has this ID
-    modalId: 'userDetailsModal', // Assuming there is a modal for user details
+    modalId: 'userPopUp', // Assuming there is a modal for user details
     // Summary Page ComboBoxes
     companyComboForSummaryId: 'cmbCompanyNameForSummary',
     // Details Page ComboBoxes and Fields
@@ -37,7 +37,7 @@ var User = {
     this.initTab();
     this.initGrid();
     this.initSummaryComboBoxes();
-    ////this.initModal();
+    this.initModal();
     this.initForm();
 
     //// Initial population of company dropdowns
@@ -72,12 +72,12 @@ var User = {
     // The dataSource will be set later when a company is selected
     GridHelper.loadGrid(this.config.gridId, this.getColumns(), [], {
       toolbar: [
-        //{
-        //  template: `<button type="button" onclick="User.openCreateModal()" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary">
-        //              <span class="k-icon k-i-plus"></span>
-        //              <span class="k-button-text">Create New User</span>
-        //            </button>`
-        //}
+        {
+          template: `<button type="button" onclick="User.openCreateModal()" class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary">
+                      <span class="k-icon k-i-plus"></span>
+                      <span class="k-button-text">Create New User</span>
+                    </button>`
+        }
       ],
       fileName: this.config.reportName,
       heightConfig: {
@@ -105,14 +105,14 @@ var User = {
       { field: "CreatedDate", hidden: true},
       { field: "BranchId", hidden: true},
       { field: "DepartmentId", hidden: true},
-      { field: "Employee_Id", title: "Employee Id", width: "250" },//EmployeeId in Employement
-      { field: "LoginId", title: "Login ID", width: "200" },
-      { field: "DepartmentName", title: "Department", width: "350" },
-      { field: "DESIGNATIONNAME", title: "Designation", width: "350" },
-      { field: "ShortName", title: "Short Name", width: "300" },//EmployeeId in Employement
-      { field: "IsActive", title: "Is Active", width: "80", template: "#= IsActive ? 'Active' : 'Inactive' #" },
+      { field: "Employee_Id", title: "Employee Id", width: "110px" },//EmployeeId in Employement
+      { field: "LoginId", title: "Login ID", width: "100px" },
+      { field: "DepartmentName", title: "Department", width: "200px" },
+      { field: "DESIGNATIONNAME", title: "Designation", width: "150px" },
+      { field: "ShortName", title: "Short Name", width: "120px" },//EmployeeId in Employement
+      { field: "IsActive", title: "Is Active", width: "90px", template: "#= IsActive ? 'Active' : 'Inactive' #" },
       {
-        field: "ResetPassword", title: "Reset Password", filterable: false, width: "500",
+        field: "ResetPassword", title: "Reset Password", filterable: false, width: "150px",
         template: '<input type="button" class="k-button btn btn-outline-warning" value="Reset Password" id="btnResetPassword" />', sortable: false, exportable: false
       },
       //{
@@ -122,7 +122,7 @@ var User = {
       {
         field: "Actions",
         title: "Actions",
-        width: 200,
+        width: 210,
         template: GridHelper.createActionColumn({
           idField: 'UserId',
           editCallback: 'User.edit',
@@ -363,6 +363,27 @@ var User = {
     this.clearForm();
     FormHelper.openKendoWindow(this.config.modalId, 'Create New User', '80%', '90%');
     this.setFormMode('create');
+  },
+
+  view: async function (userId) {
+    if (!userId || userId <= 0) {
+      MessageManager.notify.warning('Invalid user ID');
+      return;
+    }
+
+    try {
+      // Data From Grid
+      this.clearForm();
+      const grid = $('#' + this.config.gridId).data('kendoGrid');
+      const dataItem = grid.dataSource.get(userId);
+      if (dataItem) {
+        await this.populateForm(dataItem);
+        FormHelper.openKendoWindow(this.config.modalId, 'View User Details', '80%', '90%');
+        this.setFormMode('view');
+      }
+    } catch (error) {
+      console.error('Error loading menu:', error);
+    }
   },
 
   /**

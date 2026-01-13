@@ -1,72 +1,177 @@
 ﻿@* <script src="~/assets/scripts/modules/core/users/userinfo.js"></script> *@
 
-
-
 <div id="divUserInfo">
-  @* <div class="divDetails"> *@
   <form id="userForm" enctype="multipart/form-data">
-    <ul>
-      <li class="mb-2">
-        <label for="CompanyNameDetails" class="lbl widthSize100_per">SBU:</label>
-        <input type="hidden" id="hdnUserId" value="0" />
-        <input class="width_100_Per_Important " id="cmbCompanyNameDetails" name="CompanyNameDetails" validationmessage="Please Select Company" />
-      </li>
+    <div class="row mb-2">
 
-      <li class="mb-2">
+      <!-- UserId (int?) -->
+      <input type="hidden" id="hdnUserId" value="0" />
+
+      <!-- Company Name (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+        <label for="CompanyNameDetails" class="lbl widthSize100_per">SBU:</label>
+        <input class="width_100_Per_Important " id="cmbCompanyNameDetails" name="CompanyNameDetails" validationmessage="Please Select Company" />
+      </div>
+
+      <!-- Branch Name (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label for="BranchNameDetails" class="lbl widthSize100_per">Branch Name:<span class="redstart">*</span></label>
         <input class="width_100_Per_Important" id="cmbBranchDetails" name="BranchNameDetails" validationmessage="Please Select Branch Name" />
-      </li>
+      </div>
 
-      <li class="mb-2">
+      <!-- Department Name (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label for="DepartmentNameDetails" class="lbl widthSize100_per">Department Name:</label>
         <input class="width_100_Per_Important " id="cmbDepartmentNameDetails" name="DepartmentNameDetails" validationmessage="Please Select Department Name" />
-      </li>
+      </div>
 
-      <li class="mb-2">
+      <!-- Login ID -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label for="LoginId" class="lbl widthSize100_per">Login ID:<span class="redstart">*</span></label>
         <input type="text" class="width_100_Per_Important k-textbox" id="txtLoginId" name="LoginId" placeholder="Login ID" validationmessage="Please enter valid Login ID" />
-      </li>
+      </div>
 
-      <li class="mb-2">
+      <!-- New Password (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label for="NewPassword" class="lbl widthSize100_per">New Password:</label>
         <input type="password" class="width_100_Per_Important k-textbox" id="txtNewPassword" name="NewPassword" />
-      </li>
+      </div>
 
-      <li class="mb-2">
+      <!-- Confirm Password (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label for="ConfirmPassword" class="lbl widthSize100_per">Confirm Password:</label>
         <input type="password" class="width_100_Per_Important k-textbox" id="txtConfirmPassword" name="ConfirmPassword" />
-      </li>
+      </div>
 
-      <li class="mb-2">
+      <!-- User Name (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label for="UserName" class="lbl widthSize100_per">User Name:<span class="redstart">*</span></label>
         <input type="text" class="width_100_Per_Important k-textbox" id="txtUserName" name="UserName" maxlength="50" placeholder="User Name" required validationmessage="Please enter valid User Name" />
-      </li>
+      </div>
 
-      <li class="mb-2">
+      <!-- Employee Name (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label class="lbl widthSize100_per">Employee:<span class="redstart">*</span></label>
         <input class="width_100_Per_Important" id="cmbEmployee" name="EmployeeName" validationmessage="Please Select an Employee Name" required="required" />
-      </li>
+      </div>
 
-      <li class="mb-2">
+      <!-- IMEI (string?) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
         <label class="lbl widthSize100_per">IMEI:</label>
         <input class="width_100_Per_Important k-textbox" id="txtIMEI" name="IMEI" />
-      </li>
+      </div>
 
-      <li class="mb-2 custom-checkbox">
+      <!-- Has Root Privilege (int but bool-like UI) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2 custom-checkbox">
         <label for="AccessAllSbu" class="form-check-label">Has Root Privilege:</label>
-        <input type="checkbox" id="chkAccessAllSbu" name="AccessAllSbu" class="form-check-input" />
-      </li>
+        <input type="checkbox"
+               id="chkAccessAllSbu"
+               name="AccessAllSbu"
+               class="form-check-input"
+               data-type="boolasint" />
+      </div>
 
-      <li class="mb-2">
-        <label class="lbl widthSize100_per">Default Dashboard:</label>
-        <input class="width_100_Per_Important" id="ddlCommonDashboard" />
-      </li>
-
-      <li class="mb-2 custom-checkbox">
+      <!-- Is Active (int but bool-like UI) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2 custom-checkbox">
         <label for="IsActive" class="form-check-label">Is Active:</label>
         <input type="checkbox" id="chkIsActive" name="IsActive" class="form-check-input" />
-      </li>
-    </ul>
-    @* </div> *@
+      </div>
+
+      <!-- Default Dashboard (dropdown) -->
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+        <label class="lbl widthSize100_per">Default Dashboard:</label>
+        <input class="width_100_Per_Important" id="ddlCommonDashboard" />
+      </div>
+
+    </div>
   </form>
 </div>
+
+@* <div id="divUserInfo">
+  <div class="tab-scroll-container" data-simplebar>
+    <form id="userForm" enctype="multipart/form-data">
+      <div class="row mb-2">
+
+        <!-- UserId (int?) -->
+        <input type="hidden" id="hdnUserId" value="0" />
+
+        <!-- Company Name (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="CompanyNameDetails" class="lbl widthSize100_per">SBU:</label>
+          <input class="width_100_Per_Important " id="cmbCompanyNameDetails" name="CompanyNameDetails" validationmessage="Please Select Company" />
+        </div>
+
+        <!-- Branch Name (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="BranchNameDetails" class="lbl widthSize100_per">Branch Name:<span class="redstart">*</span></label>
+          <input class="width_100_Per_Important" id="cmbBranchDetails" name="BranchNameDetails" validationmessage="Please Select Branch Name" />
+        </div>
+
+        <!-- Department Name (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="DepartmentNameDetails" class="lbl widthSize100_per">Department Name:</label>
+          <input class="width_100_Per_Important " id="cmbDepartmentNameDetails" name="DepartmentNameDetails" validationmessage="Please Select Department Name" />
+        </div>
+
+        <!-- Login ID -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="LoginId" class="lbl widthSize100_per">Login ID:<span class="redstart">*</span></label>
+          <input type="text" class="width_100_Per_Important k-textbox" id="txtLoginId" name="LoginId" placeholder="Login ID" validationmessage="Please enter valid Login ID" />
+        </div>
+
+        <!-- New Password (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="NewPassword" class="lbl widthSize100_per">New Password:</label>
+          <input type="password" class="width_100_Per_Important k-textbox" id="txtNewPassword" name="NewPassword" />
+        </div>
+
+        <!-- Confirm Password (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="ConfirmPassword" class="lbl widthSize100_per">Confirm Password:</label>
+          <input type="password" class="width_100_Per_Important k-textbox" id="txtConfirmPassword" name="ConfirmPassword" />
+        </div>
+
+        <!-- User Name (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label for="UserName" class="lbl widthSize100_per">User Name:<span class="redstart">*</span></label>
+          <input type="text" class="width_100_Per_Important k-textbox" id="txtUserName" name="UserName" maxlength="50" placeholder="User Name" required validationmessage="Please enter valid User Name" />
+        </div>
+
+        <!-- Employee Name (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label class="lbl widthSize100_per">Employee:<span class="redstart">*</span></label>
+          <input class="width_100_Per_Important" id="cmbEmployee" name="EmployeeName" validationmessage="Please Select an Employee Name" required="required" />
+        </div>
+
+        <!-- IMEI (string?) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label class="lbl widthSize100_per">IMEI:</label>
+          <input class="width_100_Per_Important k-textbox" id="txtIMEI" name="IMEI" />
+        </div>
+
+        <!-- Has Root Privilege (int but bool-like UI) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2 custom-checkbox">
+          <label for="AccessAllSbu" class="form-check-label">Has Root Privilege:</label>
+          <input type="checkbox"
+                 id="chkAccessAllSbu"
+                 name="AccessAllSbu"
+                 class="form-check-input"
+                 data-type="boolasint" />
+        </div>
+
+        <!-- Is Active (int but bool-like UI) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2 custom-checkbox">
+          <label for="IsActive" class="form-check-label">Is Active:</label>
+          <input type="checkbox" id="chkIsActive" name="IsActive" class="form-check-input" />
+        </div>
+
+        <!-- Default Dashboard (dropdown) -->
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mb-2">
+          <label class="lbl widthSize100_per">Default Dashboard:</label>
+          <input class="width_100_Per_Important" id="ddlCommonDashboard" />
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div> *@

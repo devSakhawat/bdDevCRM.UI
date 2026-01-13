@@ -194,12 +194,22 @@ if (typeof GridHelper !== 'undefined') {
       const grid = $grid.data('kendoGrid');
 
       if (grid) {
-        // NEW: Apply !important width using CSS after grid initialization
+
+        //if (totalColumnsWidth <= containerWidth) {
+        //  /*grid.wrapper.css('width', totalColumnsWidth + 'px !important');*/
+        //  // or this
+        //  grid.wrapper[0].style.setProperty('width', totalColumnsWidth + 'px', 'important');
+        //}
+
         if (totalColumnsWidth <= containerWidth) {
-          /*grid.wrapper.css('width', totalColumnsWidth + 'px !important');*/
-          // or this
-          grid.wrapper[0].style.setProperty('width', totalColumnsWidth + 'px', 'important');
+          grid.wrapper[0].style.minWidth = totalColumnsWidth + 'px';
         }
+
+        //if (totalColumnsWidth <= containerWidth) {
+        //  /*grid.wrapper.css('width', totalColumnsWidth + 'px !important');*/
+        //  // or this
+        //  grid.wrapper[0].style.setProperty('width', totalColumnsWidth + 'px', 'important');
+        //}
 
         //Bind dataBound event to adjust height AFTER data loads
         grid.bind('dataBound', function (e) {

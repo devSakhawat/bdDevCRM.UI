@@ -550,32 +550,512 @@ var FormHelper = {
     $gridSel.removeClass("d-none");
   },
 
-  initializeKendoWindow: function (windowSelector, kendowWindowTitle = "", kendowWindowWidth = "50%") {
+  initializeKendoWindow: function (windowSelector, kendowWindowTitle = "", kendowWindowWidth = "50%" , top = "auto") {
     const selector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
     $(selector).kendoWindow({
       title: kendowWindowTitle,
-      resizeable: false,
+      resizable: true,
       width: kendowWindowWidth,
       actions: ["Pin", "Refresh", "Maximize", "Close"],
+      position: {
+        top: top
+      },
       modal: true,
       visible: false,
     });
   },
 
-  openKendoWindow: function (windowSelector, kendowWindowTitle, kendowWindowWidth = "50%") {
+  //openKendoWindow: function (windowSelector, kendowWindowTitle, kendowWindowWidth = "50%", top = "auto") {
+  //  const selector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+  //  var popUp = $(selector).data("kendoWindow");
+  //  if (!popUp) {
+  //    //this.initializeKendoWindow(windowSelector, kendowWindowTitle, kendowWindowWidth ,top);
+  //    $(selector).kendoWindow({
+  //      title: kendowWindowTitle,
+  //      resizable: true,
+  //      width: kendowWindowWidth,
+  //      actions: ["Pin", "Refresh", "Maximize", "Close"],
+  //      position: {
+  //        top: top,
+  //        left: "auto" // Keeps horizontal centering
+  //      },
+  //      modal: true,
+  //      visible: false,
+  //    });
+
+  //    // end
+  //    popUp = $(selector).data("kendoWindow");
+  //  }
+  //  if (kendowWindowTitle && kendowWindowTitle != "") {
+  //    popUp.title(kendowWindowTitle);
+  //  }
+
+  //  popUp.open();
+  //  if (typeof popUp.toFront === "function") {
+  //    popUp.toFront();
+  //  }
+
+  //  //// 1. Open the window
+  //  //popUp.open();
+
+  //  //// 2. Bring to front
+  //  //if (typeof popUp.toFront === "function") {
+  //  //  popUp.toFront();
+  //  //}
+
+  //  //// This overrides the default center behavior for the vertical axis.
+  //  //// We use 'undefined' for left so it stays horizontally centered (or use 'auto')
+  //  //popUp.setOptions({
+  //  //  position: {
+  //  //    top: top,
+  //  //    left: "auto"
+  //  //  }
+  //  //});
+
+  //},
+
+  //openKendoWindow: function (
+  //  windowSelector,
+  //  kendowWindowTitle,
+  //  kendowWindowWidth = "50%",
+  //  top = "auto",
+  //  animationType = "default", // "default" | "toggle" | "expand"
+  //  animateOpacity = true // true | false
+  //) {
+  //  const selector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+  //  var popUp = $(selector).data("kendoWindow");
+  //  var isTopValuePercentage = top.includes('%');
+  //  var topValue = parseFloat(top);
+
+  //  // Build animation config based on type
+  //  var effects = "";
+  //  var animationConfig = null;
+
+  //  if (animationType === "default") {
+  //    // Default: Zoom + Fade animation
+  //    animationConfig = {
+  //      open: {
+  //        effects: "zoom:in fadeIn",
+  //        duration: 300
+  //      },
+  //      close: {
+  //        effects: "zoom:out fadeOut",
+  //        duration: 200
+  //      }
+  //    };
+  //  }
+  //  else if (animationType === "expand") {
+  //    // Expand + Fade animation
+  //    effects = "expand:vertical";
+  //    if (animateOpacity) {
+  //      effects += " fadeIn";
+  //    }
+  //    animationConfig = {
+  //      open: {
+  //        effects: effects,
+  //        duration: 300
+  //      },
+  //      close: {
+  //        effects: effects,
+  //        reverse: true,
+  //        duration: 200
+  //      }
+  //    };
+  //  }
+  //  // else animationType === "none" → animationConfig stays null
+
+  //  // Calculate horizontal center position
+  //  var leftPosition = "auto";
+  //  if (kendowWindowWidth) {
+  //    var widthValue = parseFloat(kendowWindowWidth);
+  //    var isPercentage = kendowWindowWidth.includes('%');
+
+  //    if (isPercentage) {
+  //      leftPosition = ((100 - widthValue) / 2) + "%";
+  //    } else {
+  //      leftPosition = "calc((100% - " + kendowWindowWidth + ") / 2)";
+  //    }
+  //  }
+
+  //  // Handle top position
+  //  if (!isTopValuePercentage) {
+  //    if (topValue >= 200) {
+  //      top = "120px";
+  //    }
+  //  } else {
+  //    top = "200px";
+  //  }
+  //  // Create or update Kendo Window
+  //  if (!popUp) {
+  //    $(selector).kendoWindow({
+  //      title: kendowWindowTitle,
+  //      resizable: true,
+  //      width: kendowWindowWidth,
+  //      actions: ["Pin", "Refresh", "Maximize", "Close"],
+  //      position: {
+  //        top: top,
+  //        left: leftPosition
+  //      },
+  //      modal: true,
+  //      visible: false,
+  //      animation: animationConfig
+  //    });
+  //    popUp = $(selector).data("kendoWindow");
+  //  } else {
+  //    popUp.setOptions({
+  //      width: kendowWindowWidth,
+  //      position: {
+  //        top: top,
+  //        left: leftPosition
+  //      },
+  //      animation: animationConfig
+  //    });
+  //  }
+
+  //  if (kendowWindowTitle) {
+  //    popUp.title(kendowWindowTitle);
+  //  }
+
+  //  if (isTopValuePercentage) {
+  //    popUp.center().open();
+  //  } else {
+  //    popUp.open();
+  //  }
+
+  //  if (typeof popUp.toFront === "function") {
+  //    popUp.toFront();
+  //  }
+  //},
+
+  //adjustScrollableAreas: function (topPx) {
+  //  var browserHeight = $(window).height();
+  //  var maxAllowedHeight = browserHeight - topPx - 100;
+
+  //  var tabHeaderHeight = $(".k-tabstrip-items:visible").outerHeight() || 0;
+
+  //  var footerHeight = 0;
+  //  $("[data-fixed-footer]:visible").each(function () {
+  //    footerHeight += $(this).outerHeight(true);
+  //  });
+
+  //  var availableHeight = maxAllowedHeight - tabHeaderHeight - footerHeight;
+
+  //  $("[data-scroll-area]").each(function () {
+  //    $(this).css({
+  //      height: availableHeight + "px",
+  //      overflow: "auto"
+  //    });
+
+  //    // Simplebar  refresh
+  //    if (this.SimpleBar) {
+  //      this.SimpleBar.recalculate();
+  //    }
+  //  });
+  //},
+
+  //openKendoWindow: function (
+  //  windowSelector,
+  //  kendowWindowTitle,
+  //  kendowWindowWidth = "50%",
+  //  top = "auto",
+  //  animationType = "default",
+  //  animateOpacity = true
+  //) {
+  //  const selector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
+  //  var popUp = $(selector).data("kendoWindow");
+  //  var isTopValuePercentage = top.includes('%');
+  //  var topValue = parseFloat(top);
+
+  //  // Build animation config based on type
+  //  var effects = "";
+  //  var animationConfig = null;
+
+  //  if (animationType === "default") {
+  //    animationConfig = {
+  //      open: {
+  //        effects: "zoom:in fadeIn",
+  //        duration: 300
+  //      },
+  //      close: {
+  //        effects: "zoom:out fadeOut",
+  //        duration: 200
+  //      }
+  //    };
+  //  }
+  //  else if (animationType === "expand") {
+  //    effects = "expand:vertical";
+  //    if (animateOpacity) {
+  //      effects += " fadeIn";
+  //    }
+  //    animationConfig = {
+  //      open: {
+  //        effects: effects,
+  //        duration: 300
+  //      },
+  //      close: {
+  //        effects: effects,
+  //        reverse: true,
+  //        duration: 200
+  //      }
+  //    };
+  //  }
+
+  //  // Calculate horizontal center position
+  //  var leftPosition = "auto";
+  //  if (kendowWindowWidth) {
+  //    var widthValue = parseFloat(kendowWindowWidth);
+  //    var isPercentage = kendowWindowWidth.includes('%');
+
+  //    if (isPercentage) {
+  //      leftPosition = ((100 - widthValue) / 2) + "%";
+  //    } else {
+  //      leftPosition = "calc((100% - " + kendowWindowWidth + ") / 2)";
+  //    }
+  //  }
+
+  //  // Calculate maximum height
+  //  var browserHeight = $(window).height();
+  //  var topPositionPx = 0;
+
+  //  if (isTopValuePercentage) {
+  //    topPositionPx = (topValue / 100) * browserHeight;
+  //  } else {
+  //    topPositionPx = topValue;
+  //  }
+
+  //  // Maximum height = Browser height - top position - 100px footer space
+  //  var maxHeight = browserHeight - topPositionPx - 100;
+
+  //  // Handle top position
+  //  if (!isTopValuePercentage) {
+  //    if (topValue >= 200) {
+  //      top = "120px";
+  //    }
+  //  } else {
+  //    top = "200px";
+  //  }
+
+  //  // Create or update Kendo Window
+  //  if (!popUp) {
+  //    $(selector).kendoWindow({
+  //      title: kendowWindowTitle,
+  //      resizable: true,
+  //      width: kendowWindowWidth,
+  //      maxHeight: maxHeight,  //Set maximum height
+  //      actions: ["Pin", "Refresh", "Maximize", "Close"],
+  //      position: {
+  //        top: top,
+  //        left: leftPosition
+  //      },
+  //      modal: true,
+  //      visible: false,
+  //      animation: animationConfig,
+  //      open: function () {
+  //        FormHelper.adjustScrollableAreas(topPositionPx);
+  //      },
+  //      resize: function () {
+  //        FormHelper.adjustScrollableAreas(topPositionPx);
+  //      }
+  //    });
+  //    popUp = $(selector).data("kendoWindow");
+  //  } else {
+  //    popUp.setOptions({
+  //      width: kendowWindowWidth,
+  //      maxHeight: maxHeight,  // Update maximum height
+  //      position: {
+  //        top: top,
+  //        left: leftPosition
+  //      },
+  //      animation: animationConfig,
+  //      open: function () {
+  //        FormHelper.adjustScrollableAreas(topPositionPx);
+  //      },
+  //      resize: function () {
+  //        FormHelper.adjustScrollableAreas(topPositionPx);
+  //      }
+  //    });
+  //  }
+
+  //  if (kendowWindowTitle) {
+  //    popUp.title(kendowWindowTitle);
+  //  }
+
+  //  if (isTopValuePercentage) {
+  //    popUp.center().open();
+  //  } else {
+  //    popUp.open();
+  //  }
+
+  //  if (typeof popUp.toFront === "function") {
+  //    popUp.toFront();
+  //  }
+
+  //  // Handle window resize to adjust maxHeight dynamically
+  //  $(window).off('resize.kendoWindow' + selector).on('resize.kendoWindow' + selector, function () {
+  //    var newBrowserHeight = $(window).height();
+  //    var newTopPositionPx = isTopValuePercentage ? (topValue / 100) * newBrowserHeight : topValue;
+
+  //    FormHelper.adjustScrollableAreas(newTopPositionPx);
+  //  });
+
+  //},
+
+  openKendoWindow: function (
+    windowSelector,
+    kendowWindowTitle,
+    kendowWindowWidth = "50%",
+    kendowWindowheight = "50%",
+    animationType = "default",
+    animateOpacity = true,
+    onOpenCallback = null  // Generic callback parameter
+  ) {
     const selector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
     var popUp = $(selector).data("kendoWindow");
-    if (!popUp) {
-      this.initializeKendoWindow(windowSelector, kendowWindowTitle, kendowWindowWidth);
-      popUp = $(selector).data("kendoWindow");
+    var iskendowWindowheightValuePercentage = kendowWindowheight.includes('%');
+    var kendowWindowheightValue = parseFloat(kendowWindowheight);
+
+    // Build animation config
+    var effects = "";
+    var animationConfig = null;
+
+    if (animationType === "default") {
+      animationConfig = {
+        open: {
+          effects: "zoom:in fadeIn",
+          duration: 300
+        },
+        close: {
+          effects: "zoom:out fadeOut",
+          duration: 200
+        }
+      };
     }
-    if (kendowWindowTitle && kendowWindowTitle != "") {
+    else if (animationType === "expand") {
+      effects = "expand:vertical";
+      if (animateOpacity) {
+        effects += " fadeIn";
+      }
+      animationConfig = {
+        open: {
+          effects: effects,
+          duration: 300
+        },
+        close: {
+          effects: effects,
+          reverse: true,
+          duration: 200
+        }
+      };
+    }
+
+    // Calculate horizontal center position
+    var leftPosition = "auto";
+    if (kendowWindowWidth) {
+      var widthValue = parseFloat(kendowWindowWidth);
+      var isPercentage = kendowWindowWidth.includes('%');
+
+      if (isPercentage) {
+        leftPosition = ((100 - widthValue) / 2) + "%";
+      } else {
+        leftPosition = "calc((100% - " + kendowWindowWidth + ") / 2)";
+      }
+    }
+
+    // Calculate maximum height
+    var browserHeight = $(window).height();
+    var kendowWindowHeight = 0;
+
+    // no need to calculate content height. Caller will pass kendow window height value. then (-) top and bottom value.
+    if (iskendowWindowheightValuePercentage) {
+      kendowWindowHeight = ((kendowWindowheightValue / 100) * (browserHeight - 50 - 50));
+    } else {
+      kendowWindowHeight = kendowWindowheightValue;
+    }
+
+    //var maxHeight = browserHeight - 50;
+
+    //// Handle top position
+    //if (!isTopValuePercentage) {
+    //  if (topValue >= 200) {
+    //    top = "120px";
+    //  }
+    //} else {
+    //  top = "200px";
+    //}
+
+    // Create or update Kendo Window
+    if (!popUp) {
+      $(selector).kendoWindow({
+        title: kendowWindowTitle,
+        resizable: true,
+        width: kendowWindowWidth,
+        height: kendowWindowHeight,
+        actions: ["Pin", "Refresh", "Maximize", "Close"],
+        position: {
+          top: '50px',
+          left: leftPosition
+        },
+        modal: true,
+        visible: false,
+        animation: animationConfig,
+        // Generic callback execution
+        open: function () {
+          setTimeout(function () {
+            if (typeof onOpenCallback === 'function') {
+              onOpenCallback(selector, kendowWindowHeight);
+            }
+          }, 100);
+        }
+      });
+      popUp = $(selector).data("kendoWindow");
+    } else {
+      popUp.setOptions({
+        width: kendowWindowWidth,
+        height: kendowWindowHeight,
+        position: {
+          top: top,
+          left: leftPosition
+        },
+        animation: animationConfig
+      });
+    }
+
+    if (kendowWindowTitle) {
       popUp.title(kendowWindowTitle);
     }
+
     popUp.center().open();
+
+    //if (isTopValuePercentage) {
+    //  popUp.center().open();
+    //} else {
+    //  popUp.open();
+    //}
+
     if (typeof popUp.toFront === "function") {
       popUp.toFront();
     }
+
+    // Generic window resize handler
+    $(window).off('resize.kendoWindow' + selector).on('resize.kendoWindow' + selector, function () {
+      var newBrowserHeight = $(window).height();
+/*      var newTopPositionPx = isTopValuePercentage ? (topValue / 100) * newBrowserHeight : topValue;*/
+      var newMaxHeight = newBrowserHeight - 50;
+
+      //var newTopPositionPx = isTopValuePercentage ? (topValue / 100) * newBrowserHeight : topValue;
+      //var newMaxHeight = newBrowserHeight - newTopPositionPx - 50;
+
+      if (popUp) {
+        popUp.setOptions({
+          height: newMaxHeight
+        });
+
+        // ✅ Call callback on resize too
+        if (typeof onOpenCallback === 'function') {
+          onOpenCallback(selector, newMaxHeight);
+        }
+      }
+    });
   },
 
   closeKendoWindow: function (windowSelector) {

@@ -26,23 +26,29 @@ var User = {
     hiddenUserIdId: 'hdnUserId',
     groupMembershipContainerId: 'checkboxGroup',
     // grid report 
-    reportName: 'UserList'
+    reportName: 'UserList',
+
+    tabStripId: 'tabstrip',
+    userInfoTabId: 'divUserInfo',
+    groupMembershipTabId: 'divInfo',
+    buttonPanelClass: 'btnDiv'
   },
 
   /**
    * Initialize module
    */
-  init: function () {
+  init: async function () {
     debugger;
     this.initTab();
     this.initGrid();
-    this.initSummaryComboBoxes();
+    await this.initComboBoxes();
+    //this.initSummaryComboBoxes();
     this.initModal();
     this.initForm();
 
     //// Initial population of company dropdowns
     this.populateCompanyComboForSummary();
-    //this.populateCompanyComboForDetails();
+    this.populateCompanyComboForDetails();
 
     this.setGridDataSource();
     console.log('User Module initialized successfully');
@@ -50,20 +56,41 @@ var User = {
 
   initTab: function () {
     $("#tabstrip").kendoTabStrip({
-      select: function (e) {
-        // Ensure only one tab has the 'k-state-active' class
+      select: (e) => {
         $("#tabstrip ul li").removeClass("k-state-active");
         $(e.item).addClass("k-state-active");
+
+        // ✅ tab switch এর পর content scrollbar re-init
+        setTimeout(() => {
+          this.initTabContentScrollbars();
+        }, 0);
       }
     });
 
     var tabStrip = $("#tabstrip").data("kendoTabStrip");
     if (tabStrip) {
-      tabStrip.select(0); // Ensure the first tab is selected by default
+      tabStrip.select(0);
     } else {
       console.error("Kendo TabStrip is not initialized.");
     }
   },
+
+  //initTab: function () {
+  //  $("#tabstrip").kendoTabStrip({
+  //    select: function (e) {
+  //      // Ensure only one tab has the 'k-state-active' class
+  //      $("#tabstrip ul li").removeClass("k-state-active");
+  //      $(e.item).addClass("k-state-active");
+  //    }
+  //  });
+
+  //  var tabStrip = $("#tabstrip").data("kendoTabStrip");
+  //  if (tabStrip) {
+  //    tabStrip.select(0); // Ensure the first tab is selected by default
+  //  } else {
+  //    console.error("Kendo TabStrip is not initialized.");
+  //  }
+  //},
 
   /**
    * Initialize Kendo Grid
@@ -150,30 +177,29 @@ var User = {
    */
   initForm: function () {
     FormHelper.initForm(this.config.formId);
-    this.initComboBoxes();
     this.initGroupMembership();
   },
 
   /**
    * Initialize ComboBoxes
    */
-  initSummaryComboBoxes: function () {
-    // User Summary Company ComboBox
-    $('#' + this.config.companyComboForSummaryId).kendoComboBox({
-      placeholder: "Select Company...",
-      dataTextField: "CompanyName",
-      dataValueField: "CompanyId",
-      filter: "contains",
-      suggest: true,
-      dataSource: [],
-      //change: this.onCompanyChange.bind(this)
-    });
-  },
-
-  /**
+  initComboBoxes: async function () {
+    /**
    * Initialize ComboBoxes
    */
-  initComboBoxes: function () {
+    //initSummaryComboBoxes: function () {
+      // User Summary Company ComboBox
+      $('#' + this.config.companyComboForSummaryId).kendoComboBox({
+        placeholder: "Select Company...",
+        dataTextField: "CompanyName",
+        dataValueField: "CompanyId",
+        filter: "contains",
+        suggest: true,
+        dataSource: [],
+        //change: this.onCompanyChange.bind(this)
+      });
+    //},
+
     // Company ComboBox
     $('#' + this.config.companyComboId).kendoComboBox({
       placeholder: "Select Company...",
@@ -241,27 +267,27 @@ var User = {
    */
   populateCompanyComboForSummary: async function () {
     try {
-      const companies = await UserService.getMotherCompanies();
       const combo = $('#' + this.config.companyComboForSummaryId).data('kendoComboBox');
       if (combo) {
+        const companies = await UserService.getMotherCompanies();
         combo.setDataSource(companies);
         // Set default company if available, e.g., from CurrentUser object
         // combo.value(CurrentUser.CompanyId);
       }
     } catch (error) {
-      console.error('Error loading companies for summary:', error);
+      console.log('Error loading companies for summary:', error);
     }
   },
 
   populateCompanyComboForDetails: async function () {
     try {
-      const companies = await UserService.getMotherCompanies();
       const combo = $('#' + this.config.companyComboId).data('kendoComboBox');
       if (combo) {
+        const companies = await UserService.getMotherCompanies();
         combo.setDataSource(companies);
       }
     } catch (error) {
-      console.error('Error loading companies for details:', error);
+      console.log('Error loading companies for details:', error);
     }
   },
 
@@ -331,39 +357,161 @@ var User = {
   /**
    * Load groups for group membership
    */
+  // Existing loadGroups - no changes needed
   loadGroups: async function () {
     try {
       const groups = await UserService.getGroups();
       const container = $('#' + this.config.groupMembershipContainerId);
+
       let html = "<div class='row'>";
       groups.forEach(group => {
         html += `
           <div class="col-12 mb-2">
-            <div class="d-flex justify-content-between align-items-center border-bottom pb-1">
-              <span>${group.GroupName}</span>
-              <input type="checkbox" class="form-check-input"
-                     id="chkGroup${group.GroupId}"
-                     data-group-id="${group.GroupId}"
-                     data-group-name="${group.GroupName}" />
-            </div>
+              <div class="d-flex justify-content-between align-items-center border-bottom pb-0">
+                  <span>${group.GroupName}</span>
+                  <input type="checkbox" class="form-check-input"
+                         id="chkGroup${group.GroupId}"
+                         data-group-id="${group.GroupId}"
+                         data-group-name="${group.GroupName}" />
+              </div>
           </div>
-        `;
+      `;
       });
       html += "</div>";
       container.html(html);
+
+      // click on item
+      container.off('click.group-toggle').on('click.group-toggle', '.d-flex.justify-content-between', function (e) {
+        if (e.target.type !== 'checkbox') {
+          const $checkbox = $(this).find('input[type="checkbox"]');
+          $checkbox.prop('checked', !$checkbox.prop('checked'));
+        }
+      });
+      // click on item END
+
     } catch (error) {
       console.error('Error loading groups:', error);
     }
   },
 
+
+  initTabContentScrollbars: function () {
+    const $windowElement = $("#" + this.config.modalId);
+    if ($windowElement.length === 0) return;
+
+    const tabStrip = $("#" + this.config.tabStripId).data("kendoTabStrip");
+    if (!tabStrip) return;
+
+    const $selected = tabStrip.select();
+    if (!$selected || $selected.length === 0) return;
+
+    const selectedIndex = $selected.index();
+    if (selectedIndex < 0) return;
+
+    const contentElement = tabStrip.contentElement(selectedIndex);
+    if (!contentElement) return;
+
+    const $content = $(contentElement);
+    if ($content.length === 0) return;
+
+    const windowHeight = $windowElement.height() || 0;
+    const legendHeight = $windowElement.find(".legendCommon").outerHeight(true) || 40;
+    const tabHeaderHeight = $("#" + this.config.tabStripId + " > ul").outerHeight(true) || 50;
+    const buttonPanelHeight = $("." + this.config.buttonPanelClass).outerHeight(true) || 60;
+    const padding = 20;
+
+    const contentHeight = Math.max(150, windowHeight - legendHeight - tabHeaderHeight - buttonPanelHeight - padding);
+
+    // 1) content area height fixed
+    $content.css({
+      height: contentHeight + "px",
+      maxHeight: contentHeight + "px",
+      overflow: "hidden"
+    });
+
+    // 2) Create/Reuse wrapper INSIDE k-content
+    let $scrollHost = $content.children(".tabContentScroll");
+    if ($scrollHost.length === 0) {
+      $scrollHost = $('<div class="tabContentScroll"></div>');
+
+      // move existing children into wrapper
+      $scrollHost.append($content.children());
+      $content.append($scrollHost);
+    }
+
+    $scrollHost.css({
+      height: contentHeight + "px",
+      maxHeight: contentHeight + "px"
+    });
+
+    // 3) Destroy previous SimpleBar instance (if any)
+    if ($scrollHost[0].SimpleBar) {
+      $scrollHost[0].SimpleBar.unMount();
+    }
+
+    // 4) Init SimpleBar on wrapper (NOT on k-content)
+    if (typeof SimpleBar !== "undefined") {
+      new SimpleBar($scrollHost[0], {
+        autoHide: false,
+        scrollbarMaxSize: 50
+      });
+    }
+  },
+
+  //initSimpleBarForTab: function (tabId, contentHeight) {
+  //  const tabElement = $("#" + tabId);
+  //  if (tabElement.length === 0) return;
+
+  //  // Wrap content if not already wrapped
+  //  if (!tabElement.find('.tab-scroll-container').length) {
+  //    tabElement.wrapInner('<div class="tab-scroll-container" data-simplebar></div>');
+  //  }
+
+  //  const scrollContainer = tabElement.find('.tab-scroll-container');
+  //  scrollContainer.css({
+  //    'max-height': contentHeight + 'px',
+  //    'height': contentHeight + 'px'
+  //  });
+
+  //  // Initialize SimpleBar
+  //  const scrollElement = scrollContainer[0];
+  //  if (scrollElement && typeof SimpleBar !== 'undefined') {
+  //    // Destroy existing instance if any
+  //    if (scrollElement.SimpleBar) {
+  //      scrollElement.SimpleBar.unMount();
+  //    }
+  //    new SimpleBar(scrollElement, {
+  //      autoHide: true,
+  //      scrollbarMaxSize: 50
+  //    });
+  //  }
+  //},
+
+
   /**
    * Open modal for creating new user
    */
+  // Updated openCreateModal with callback
   openCreateModal: function () {
     this.clearForm();
-    FormHelper.openKendoWindow(this.config.modalId, 'Create New User', '80%', '90%');
+    debugger;
+    // Pass callback function to FormHelper
+    FormHelper.openKendoWindow( this.config.modalId, 'Create New User', '80%', '100%', 'default', true,
+      // Callback function
+      () => {
+        this.initTabContentScrollbars();
+      }
+    );
+
     this.setFormMode('create');
   },
+
+  //openCreateModal: function () {
+  //  debugger;
+  //  this.clearForm();
+  //  FormHelper.openKendoWindow(this.config.modalId, 'Create New User', '80%', '100px', "default", true);
+  //  this.setFormMode('create');
+  //},
 
   view: async function (userId) {
     if (!userId || userId <= 0) {
@@ -385,6 +533,8 @@ var User = {
       console.error('Error loading menu:', error);
     }
   },
+
+
 
   /**
    * Edit user
@@ -543,7 +693,7 @@ var User = {
     FormHelper.clearFormFields('#' + this.config.formId);
     $('#' + this.config.hiddenUserIdId).val(0);
 
-    this.clearComboBox(this.config.companyComboId);
+    //this.clearComboBox(this.config.companyComboId);
     this.clearComboBox(this.config.branchComboId);
     this.clearComboBox(this.config.departmentComboId);
     this.clearComboBox(this.config.employeeComboId);

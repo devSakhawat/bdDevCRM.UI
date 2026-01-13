@@ -21,17 +21,8 @@
 
     </div>
 
-    @*<div class="btnDiv mt-2">
-      <ul>
-        <li class="d-flex justify-content-end">
-          <button type="button" id="btnSave" class="btn btn-primary me-2" onclick="UserDetailsManager.saveOrUpdateItem()">+ Add New Item</button>
-          <button type="button" id="btnClear" class="btn btn-secondary me-2" onclick="UserDetailsHelper.clearUserForm()">Clear</button>
-        </li>
-      </ul>
-    </div>*@
-
     <!-- Buttons -->
-    <div class="btnDiv mt-2">
+    <div class="btnDiv mt-2" data-fixed-footer>
       <ul>
         <li class="d-flex justify-content-end">
           <button type="button" class="btn btn-primary me-2" id="btnUserSaveOrUpdate" onclick="User.saveOrUpdate();">+ Add Menu</button>
@@ -44,3 +35,51 @@
   </fieldset>
 </div>
 
+
+<style>
+  /* TabStrip layout */
+  #tabstrip {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+    /* Tab headers fixed */
+    #tabstrip > ul {
+      flex: 0 0 auto;
+    }
+
+    /* Content area: this will get SimpleBar */
+    #tabstrip > .k-content {
+      flex: 1 1 auto;
+      overflow: hidden; /* native scrollbar off */
+      padding: 0 !important;
+    }
+
+      /* SimpleBar styling for tab content */
+      #tabstrip > .k-content .simplebar-content {
+        padding-right: 15px !important;
+      }
+
+      #tabstrip > .k-content .simplebar-scrollbar::before {
+        background-color: #888;
+        border-radius: 4px;
+      }
+
+      #tabstrip > .k-content .simplebar-track.simplebar-vertical {
+        width: 8px;
+        background-color: #f1f1f1;
+        border-radius: 4px;
+        right: 2px;
+      }
+
+  /* Buttons fixed (no scroll) */
+  .btnDiv {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 10;
+    background: white;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+  }
+</style>

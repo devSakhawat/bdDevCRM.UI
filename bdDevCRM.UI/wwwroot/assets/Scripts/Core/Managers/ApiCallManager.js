@@ -1023,7 +1023,10 @@ var ApiCallManager = (function () {
     // Utilities
     getBaseUrl: getBaseUrl,
     isReady: isReady,
-    getInfo: getInfo
+    getInfo: getInfo,
+
+    // prevent this because of when apimanager call get, post, put, delete, put then it cover error autometically.
+    //handleError: _handleError
   };
 })();
 

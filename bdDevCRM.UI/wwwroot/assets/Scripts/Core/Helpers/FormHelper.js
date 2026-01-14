@@ -1013,7 +1013,7 @@ var FormHelper = {
         width: kendowWindowWidth,
         height: kendowWindowHeight,
         position: {
-          top: top,
+          top: '50px',
           left: leftPosition
         },
         animation: animationConfig

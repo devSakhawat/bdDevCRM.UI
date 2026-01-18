@@ -184,14 +184,6 @@ var GroupPermissionHelper = {
       ReportPermissionHelper.populateExistingReportInArray(objGroupPermission);
     } catch (error) {
       VanillaApiCallManager.handleApiError(error);
-      //console.log(error);
-      //ToastrMessage.showToastrNotification({
-      //  preventDuplicates: true,
-      //  closeButton: true,
-      //  timeOut: 0,
-      //  message: error,
-      //  type: 'error',
-      //});
       return false;
     }
     

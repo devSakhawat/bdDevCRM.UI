@@ -122,14 +122,14 @@ var AppConfig = (function () {
       userDelete: "/user",                             // DELETE (delete)
 
       // --- User Details (Cascading Combos) ---
-      branchesByCompanyId: "/branches-by-compnayId/companyId",       // Get branches for a company
-      departmentsByCompanyId: "/departments-by-compnayId/companyId", // Get departments for a company
+      branchesByCompanyId: "/branches-by-compnayId-for-combo/companyId?companyId=",       // Get branches for a company
+      departmentsByCompanyId: "/departments-by-compnayId-for-combo/companyId?companyId=", // Get departments for a company
       employeesByFilters: "/employees-by-indentities",               // Get employees based on company, branch, department
       employeeTypes: "/employeetypes",
 
       // --- Group Membership ---
-      groups: "/groups",                                             // To get all groups
-      groupMembersByUserId: "/groups/group-members-by-userId",       // To get groups a user belongs to
+      groups: "/groups",                                                     // To get all groups
+      groupMembersByUserId: "/groups/group-members-by-userId?userId=",       // To get groups a user belongs to
 
       // --- User Upload (Excel) ---
       userUpload: "/user/upload",                                    // Endpoint for Kendo Upload to save the file
@@ -192,6 +192,12 @@ var AppConfig = (function () {
 
       // User Screen
       intUser: '/Core/UserSettings',
+
+      // Groups Screen
+      intUser: '/Core/UserSettings',
+
+      // Group Screen
+      intGroup: '/Core/GroupSettings',
     },
 
 
@@ -496,9 +502,9 @@ var baseUI = AppConfig.getUiUrl();
 
 // Log configuration on load (only in development)
 if (AppConfig.isDevelopment()) {
-  console.log('%c[AppConfig] Loaded', 'color: #2196F3; font-weight: bold');
-  console.log('Environment:', AppConfig.isDevelopment() ? 'Development' : 'Production');
-  console.log('API URL:', AppConfig.getApiUrl());
-  console.log('UI URL:', AppConfig.getUiUrl());
-  console.log("Pass AppConfig.js file");
+  //console.log('%c[AppConfig] Loaded', 'color: #2196F3; font-weight: bold');
+  //console.log('Environment:', AppConfig.isDevelopment() ? 'Development' : 'Production');
+  //console.log('API URL:', AppConfig.getApiUrl());
+  //console.log('UI URL:', AppConfig.getUiUrl());
+  //console.log("Pass AppConfig.js file");
 }

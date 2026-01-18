@@ -36,21 +36,18 @@ var TokenManager = (function () {
       return;
     }
 
-    console.log('🔄 Starting automatic token refresh.. .');
     _checkAndRefreshToken();
 
     _state.refreshInterval = setInterval(function () {
       _checkAndRefreshToken();
     }, _config.checkIntervalMinutes * 60 * 1000);
 
-    console.log('Auto-refresh started (checking every ' + _config.checkIntervalMinutes + ' minute)');
   }
 
   function stopAutoRefresh() {
     if (_state.refreshInterval) {
       clearInterval(_state.refreshInterval);
       _state.refreshInterval = null;
-      console.log('Auto-refresh stopped');
     }
   }
 
@@ -63,7 +60,6 @@ var TokenManager = (function () {
     _state.isRefreshing = true;
 
     try {
-      console.log('🔄 Refreshing token...');
 
       var refreshTokenValue = StorageManager.getRefreshToken();
 
@@ -123,7 +119,6 @@ var TokenManager = (function () {
     }
 
     if (StorageManager.isAccessTokenExpired()) {
-      console.log('🔄 Access token expired, refreshing...');
       await refreshToken();
     }
   }
@@ -206,9 +201,4 @@ var TokenManager = (function () {
   };
 })();
 
-console.log('%c[TokenManager] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');
-
-// নিচের এই লাইনগুলো মুছে ফেলুন - এগুলো ভুল ছিল:
-// if (typeof AppConfig !== 'undefined' && AppConfig.getToken) {
-//   return AppConfig.getToken(); // ILLEGAL - function এর বাইরে return
-// }
+//console.log('%c[TokenManager] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');

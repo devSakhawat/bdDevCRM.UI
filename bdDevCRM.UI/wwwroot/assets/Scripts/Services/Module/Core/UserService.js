@@ -18,7 +18,7 @@ var UserService = {
       const data = await ApiCallManager.get(AppConfig.endpoints.groups);
       return data;
     } catch (error) {
-      console.error('Error loading groups:', error);
+      // console.log('Error loading groups:', error);
       throw error;
     }
   },
@@ -31,7 +31,7 @@ var UserService = {
       const data = await ApiCallManager.get(AppConfig.endpoints.modules);
       return data;
     } catch (error) {
-      console.error('Error loading modules:', error);
+      // console.log('Error loading modules:', error);
       throw error;
     }
   },
@@ -45,10 +45,10 @@ var UserService = {
       return [];
     }
     try {
-      const data = await ApiCallManager.get(`${AppConfig.endpoints.groupMembersByUserId}/${userId}`);
+      const data = await ApiCallManager.get(`${AppConfig.endpoints.groupMembersByUserId}${userId}`);
       return data;
     } catch (error) {
-      console.error('Error loading group members for user:', error);
+      // console.log('Error loading group members for user:', error);
       throw error;
     }
   },
@@ -61,7 +61,7 @@ var UserService = {
       const data = await ApiCallManager.get(AppConfig.endpoints.motherCompanies);
       return data;
     } catch (error) {
-      console.error('Error loading mother companies:', error);
+      // console.log('Error loading mother companies:', error);
       throw error;
     }
   },
@@ -74,7 +74,7 @@ var UserService = {
       const data = await ApiCallManager.get(AppConfig.endpoints.employeeTypes);
       return data;
     } catch (error) {
-      console.error('Error loading employee types:', error);
+      // console.log('Error loading employee types:', error);
       throw error;
     }
   },
@@ -88,10 +88,10 @@ var UserService = {
       return [];
     }
     try {
-      const data = await ApiCallManager.get(`${AppConfig.endpoints.branchesByCompanyId}/${companyId}`);
+      const data = await ApiCallManager.get(`${AppConfig.endpoints.branchesByCompanyId}${companyId}`);
       return data;
     } catch (error) {
-      console.error('Error loading branches:', error);
+      // console.log('Error loading branches:', error);
       throw error;
     }
   },
@@ -105,10 +105,10 @@ var UserService = {
       return [];
     }
     try {
-      const data = await ApiCallManager.get(`${AppConfig.endpoints.departmentsByCompanyId}/${companyId}`);
+      const data = await ApiCallManager.get(`${AppConfig.endpoints.departmentsByCompanyId}${companyId}`);
       return data;
     } catch (error) {
-      console.error('Error loading departments:', error);
+      // console.log('Error loading departments:', error);
       throw error;
     }
   },
@@ -122,7 +122,7 @@ var UserService = {
       const data = await ApiCallManager.get(endpoint);
       return data;
     } catch (error) {
-      console.error('Error loading employees:', error);
+      // console.log('Error loading employees:', error);
       throw error;
     }
   },
@@ -135,10 +135,10 @@ var UserService = {
       throw new Error('Invalid user data');
     }
     try {
-      const result = await ApiCallManager.post(AppConfig.endpoints.user, userData);
+      const result = await ApiCallManager.post(AppConfig.endpoints.userCreate, userData);
       return result;
     } catch (error) {
-      console.error('Error creating user:', error);
+      // console.log('Error creating user:', error);
       throw error;
     }
   },
@@ -154,10 +154,10 @@ var UserService = {
       throw new Error('Invalid user data');
     }
     try {
-      const result = await ApiCallManager.put(`${AppConfig.endpoints.user}/${id}`, userData);
+      const result = await ApiCallManager.put(`${AppConfig.endpoints.userUpdate}/${id}`, userData);
       return result;
     } catch (error) {
-      console.error('Error updating user:', error);
+      // console.log('Error updating user:', error);
       throw error;
     }
   },
@@ -174,7 +174,7 @@ var UserService = {
       const result = await ApiCallManager.post(AppConfig.endpoints.resetPassword, { companyId, userId });
       return result;
     } catch (error) {
-      console.error('Error resetting password:', error);
+      // console.log('Error resetting password:', error);
       throw error;
     }
   },
@@ -230,7 +230,7 @@ var UserService = {
       const result = await ApiCallManager.get(AppConfig.endpoints.userImport); // e.g., "/user/import"
       return result;
     } catch (error) {
-      console.error('Error importing uploaded data:', error);
+      // console.log('Error importing uploaded data:', error);
       throw error;
     }
   },
@@ -263,4 +263,4 @@ var UserService = {
 };
 
 // Log initialization
-console.log('%c[UserService] ✓ Loaded', 'color: #2196F3; font-weight: bold;');
+// console.log('%c[UserService] ✓ Loaded', 'color: #2196F3; font-weight: bold;');

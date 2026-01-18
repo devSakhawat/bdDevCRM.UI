@@ -19,7 +19,6 @@ var App = App || {};
    * Initialize core systems
    */
   function _initializeCoreSystems() {
-    console.log('Initializing core systems...');
 
     // Initialize Logger first
     if (App.Logger) {
@@ -114,7 +113,7 @@ var App = App || {};
       return;
     }
 
-    console.log('%c🚀 Initializing bdDevCRM Application...', 'color: #4CAF50; font-size: 16px; font-weight: bold;');
+    // console.log('%c🚀 Initializing bdDevCRM Application...', 'color: #4CAF50; font-size: 16px; font-weight: bold;');
 
     try {
       // 1. Initialize core systems
@@ -131,7 +130,7 @@ var App = App || {};
 
       _initialized = true;
 
-      console.log('%cApplication initialized successfully!', 'color: #4CAF50; font-size: 14px; font-weight: bold;');
+      // console.log('%cApplication initialized successfully!', 'color: #4CAF50; font-size: 14px; font-weight: bold;');
       App.Logger.info('Application ready');
 
       // Emit app initialized event
@@ -140,7 +139,7 @@ var App = App || {};
       }
 
     } catch (error) {
-      console.error('Failed to initialize application:', error);
+      // console.log('Failed to initialize application:', error);
       if (App.Logger) {
         App.Logger.error('Initialization failed:', error);
       }
@@ -152,7 +151,7 @@ var App = App || {};
    */
   App.registerModule = function (name, module) {
     if (!name) {
-      console.error('Module name is required');
+      // console.log('Module name is required');
       return;
     }
 

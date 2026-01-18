@@ -7,7 +7,6 @@
 =========================================================*/
 
 if (typeof GridHelper !== 'undefined') {
-  console.log('GridHelper already loaded, skipping...');
 } else {
 
   var GridHelper = {
@@ -235,8 +234,6 @@ if (typeof GridHelper !== 'undefined') {
               const contentHeight = optimalHeight - headerHeight - pagerHeight - toolbarHeight;
               content.height(contentHeight);
             }
-
-            console.log('Grid height adjusted:', optimalHeight + 'px', 'for', rowCount, 'rows');
           }
         });
       }

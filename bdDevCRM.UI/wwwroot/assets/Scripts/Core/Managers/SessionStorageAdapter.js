@@ -65,7 +65,7 @@ var SessionStorageAdapter = (function () {
    */
   function get(key, defaultValue) {
     if (!key) {
-      console.error('SessionStorageAdapter.get: Key is required');
+      //console.error('SessionStorageAdapter.get: Key is required');
       return defaultValue;
     }
 
@@ -96,7 +96,7 @@ var SessionStorageAdapter = (function () {
    */
   function remove(key) {
     if (!key) {
-      console.error('SessionStorageAdapter.remove: Key is required');
+      //console.error('SessionStorageAdapter.remove: Key is required');
       return false;
     }
 
@@ -109,7 +109,7 @@ var SessionStorageAdapter = (function () {
 
       return true;
     } catch (e) {
-      console.error('SessionStorageAdapter.remove error:', e);
+      //console.error('SessionStorageAdapter.remove error:', e);
       return false;
     }
   }
@@ -297,7 +297,7 @@ var SessionStorageAdapter = (function () {
   };
 })();
 
-// Auto log on load (only in development)
-if (typeof AppConfig !== 'undefined' && AppConfig.isDevelopment()) {
-  console.log('SessionStorageAdapter loaded:', SessionStorageAdapter.getInfo());
-}
+//// Auto log on load (only in development)
+//if (typeof AppConfig !== 'undefined' && AppConfig.isDevelopment()) {
+//  console.log('SessionStorageAdapter loaded:', SessionStorageAdapter.getInfo());
+//}

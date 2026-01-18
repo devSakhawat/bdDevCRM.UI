@@ -41,7 +41,7 @@ var StorageManager = (function () {
       localStorage.setItem(_keys.accessTokenExpiry, tokenResponse.AccessTokenExpiry);
       localStorage.setItem(_keys.refreshTokenExpiry, tokenResponse.RefreshTokenExpiry);
 
-      console.log('Tokens stored successfully');
+      // console.log('Tokens stored successfully');
     } catch (error) {
       console.error('Failed to store tokens:', error);
     }
@@ -116,7 +116,7 @@ var StorageManager = (function () {
     localStorage.removeItem(_keys.accessTokenExpiry);
     localStorage.removeItem(_keys.refreshTokenExpiry);
 
-    console.log('Tokens cleared');
+    // console.log('Tokens cleared');
   }
 
   // ============================================
@@ -130,7 +130,6 @@ var StorageManager = (function () {
   function setUserInfo(userInfo) {
     try {
       localStorage.setItem(_keys.userInfo, JSON.stringify(userInfo));
-      console.log('User info stored');
     } catch (error) {
       console.error('Failed to store user info:', error);
     }
@@ -155,7 +154,7 @@ var StorageManager = (function () {
    */
   function clearUserInfo() {
     localStorage.removeItem(_keys.userInfo);
-    console.log('User info cleared');
+    // console.log('User info cleared');
   }
 
   // ============================================
@@ -178,7 +177,6 @@ var StorageManager = (function () {
       };
 
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-      console.log('Menu cached');
     } catch (error) {
       console.error('Failed to cache menu:', error);
     }
@@ -195,7 +193,6 @@ var StorageManager = (function () {
 
       var cacheKey = _keys.menuCache + '_' + userInfo.UserId;
       var cached = localStorage.getItem(cacheKey);
-      console.log(cached);
       if (!cached) return null;
 
       var cacheData = JSON.parse(cached);
@@ -226,7 +223,6 @@ var StorageManager = (function () {
 
       var cacheKey = _keys.menuCache + '_' + userInfo.UserId;
       localStorage.removeItem(cacheKey);
-      console.log('Menu cache cleared');
     } catch (error) {
       console.error('Failed to clear menu cache:', error);
     }
@@ -290,7 +286,6 @@ var StorageManager = (function () {
   function clearAll() {
     try {
       localStorage.clear();
-      console.log('All storage cleared');
     } catch (error) {
       console.error('Failed to clear storage:', error);
     }
@@ -327,5 +322,3 @@ var StorageManager = (function () {
     clearAll: clearAll
   };
 })();
-
-console.log('%c[StorageManager] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');

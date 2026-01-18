@@ -371,6 +371,11 @@ var FormHelper = {
     }
   },
 
+  makeValidSelector: function (formSelector) {
+    const selector = $(formSelector.startsWith('#') ? formSelector : '#' + formSelector);
+    return selector;
+  },
+
   makeFormReadOnly: function (formSelector) {
     const selector = formSelector.startsWith('#') ? formSelector : '#' + formSelector;
     $(selector).find("input, select, textarea").prop("disabled", true);
@@ -522,7 +527,7 @@ var FormHelper = {
     }
 
     if ($gridSel.length === 0) {
-      console.log(gridSel + " not found.");
+      // console.log(gridSel + " not found.");
       return;
     }
 
@@ -537,12 +542,12 @@ var FormHelper = {
     const $gridSel = $(gridSel);
 
     if ($formSel.length === 0) {
-      console.log(formSel + " not found.");
+      // console.log(formSel + " not found.");
       return;
     }
 
     if ($gridSel.length === 0) {
-      console.log(gridSel + " not found.");
+      // console.log(gridSel + " not found.");
       return;
     }
 
@@ -965,14 +970,15 @@ var FormHelper = {
     var browserHeight = $(window).height();
     var kendowWindowHeight = 0;
 
-    // no need to calculate content height. Caller will pass kendow window height value. then (-) top and bottom value.
-    if (iskendowWindowheightValuePercentage) {
-      kendowWindowHeight = ((kendowWindowheightValue / 100) * (browserHeight - 50 - 50));
-    } else {
-      kendowWindowHeight = kendowWindowheightValue;
-    }
+    //// no need to calculate content height. Caller will pass kendow window height value. then (-) top and bottom value.
+    //if (iskendowWindowheightValuePercentage) {
+    //  kendowWindowHeight = ((kendowWindowheightValue / 100) * (browserHeight - 20));
+    //} else {
+    //  kendowWindowHeight = kendowWindowheightValue;
+    //}
 
-    //var maxHeight = browserHeight - 50;
+    var maxHeight = browserHeight - 50;
+    kendowWindowHeight = browserHeight - 50;
 
     //// Handle top position
     //if (!isTopValuePercentage) {
@@ -992,7 +998,7 @@ var FormHelper = {
         height: kendowWindowHeight,
         actions: ["Pin", "Refresh", "Maximize", "Close"],
         position: {
-          top: '50px',
+          top: '20px',
           left: leftPosition
         },
         modal: true,
@@ -1013,7 +1019,7 @@ var FormHelper = {
         width: kendowWindowWidth,
         height: kendowWindowHeight,
         position: {
-          top: '50px',
+          top: '20px',
           left: leftPosition
         },
         animation: animationConfig
@@ -1040,7 +1046,7 @@ var FormHelper = {
     $(window).off('resize.kendoWindow' + selector).on('resize.kendoWindow' + selector, function () {
       var newBrowserHeight = $(window).height();
 /*      var newTopPositionPx = isTopValuePercentage ? (topValue / 100) * newBrowserHeight : topValue;*/
-      var newMaxHeight = newBrowserHeight - 50;
+      var newMaxHeight = newBrowserHeight - 20;
 
       //var newTopPositionPx = isTopValuePercentage ? (topValue / 100) * newBrowserHeight : topValue;
       //var newMaxHeight = newBrowserHeight - newTopPositionPx - 50;
@@ -1049,8 +1055,6 @@ var FormHelper = {
         popUp.setOptions({
           height: newMaxHeight
         });
-
-        // ✅ Call callback on resize too
         if (typeof onOpenCallback === 'function') {
           onOpenCallback(selector, newMaxHeight);
         }
@@ -1086,12 +1090,12 @@ var FormHelper = {
     var fileName = CommonManager.getFileNameWithDateTime(willBeGeneratedfileName);
 
     if (!grid) {
-      console.error("Grid not initialized");
+      // console.log("Grid not initialized");
       return;
     }
 
     if (!grid.dataSource) {
-      console.error("DataSource not found");
+      // console.log("DataSource not found");
       return;
     }
 

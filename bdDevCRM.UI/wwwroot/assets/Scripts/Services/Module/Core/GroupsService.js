@@ -1,45 +1,48 @@
 ﻿/*=========================================================
- * Menu Service
- * File: MenuService.js
- * Description: Centralized API service for Menu module
+ * Group Service
+ * File: GroupService.js
+ * Description: Centralized API service for Group Settings module
  * Author: devSakhawat
- * Date: 2025-01-18
+ * Date: 2026-01-18
 =========================================================*/
 
-var MenuService = {
+var GroupService = {
 
   /**
-   * Get all menus
+   * Get all groups
+   * সব group এর list পাওয়া
    */
-  getAllMenus: async function () {
+  getAllGroups: async function () {
     try {
-      const data = await ApiCallManager.get(AppConfig.endpoints.menus);
+      const data = await ApiCallManager.get(AppConfig.endpoints.groups);
       return data;
     } catch (error) {
-      console.error('Error loading menus:', error);
+      console.error('Error loading groups:', error);
       throw error;
     }
   },
 
   /**
-   * Get menu by ID
+   * Get group by ID
+   * নির্দিষ্ট group এর details পাওয়া
    */
   getById: async function (id) {
     if (!id || id <= 0) {
-      throw new Error('Invalid menu ID');
+      throw new Error('Invalid group ID');
     }
 
     try {
-      const data = await ApiCallManager.get(`${AppConfig.endpoints.menuUpdate}/${id}`);
+      const data = await ApiCallManager.get(`${AppConfig.endpoints.groupUpdate}/${id}`);
       return data;
     } catch (error) {
-      console.error('Error loading menu:', error);
+      console.error('Error loading group:', error);
       throw error;
     }
   },
 
   /**
    * Get modules for dropdown
+   * Module list পাওয়া (dropdown এ দেখানোর জন্য)
    */
   getModules: async function () {
     try {
@@ -54,7 +57,30 @@ var MenuService = {
   },
 
   /**
+   * Get groups by module ID
+   * নির্দিষ্ট module এর সব group পাওয়া
+   */
+  getGroupsByModuleId: async function (moduleId) {
+    if (!moduleId || moduleId <= 0) {
+      console.warn('Invalid module ID');
+      return [];
+    }
+
+    try {
+      const endpoint = `${AppConfig.endpoints.groupsByModuleId}/${moduleId}`;
+      console.log('Loading groups from:', endpoint);
+      const data = await ApiCallManager.get(endpoint);
+      console.log('Groups loaded:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading groups by module:', error);
+      return [];
+    }
+  },
+
+  /**
    * Get menus by module ID
+   * নির্দিষ্ট module এর সব menu পাওয়া (menu permission এর জন্য)
    */
   getMenusByModuleId: async function (moduleId) {
     if (!moduleId || moduleId <= 0) {
@@ -75,115 +101,178 @@ var MenuService = {
   },
 
   /**
-   * Create menu
+   * Get group permissions by group ID
+   * নির্দিষ্ট group এর সব permission পাওয়া
    */
-  create: async function (menuData) {
-    console.log(menuData);
-    if (!this.validateMenu(menuData)) {
-      throw new Error('Invalid menu data');
+  getGroupPermissions: async function (groupId) {
+    if (!groupId || groupId <= 0) {
+      console.warn('Invalid group ID');
+      return [];
     }
 
     try {
-      const result = await ApiCallManager.post(AppConfig.endpoints.menuCreate, menuData);
+      const endpoint = `${AppConfig.endpoints.groupPermission}/${groupId}`;
+      console.log('Loading group permissions from:', endpoint);
+      const data = await ApiCallManager.get(endpoint);
+      console.log('Group permissions loaded:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading group permissions:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Get all access controls
+   * সব access control পাওয়া
+   */
+  getAccessControls: async function () {
+    try {
+      const endpoint = AppConfig.endpoints.accessControls || '/getaccess';
+      console.log('Loading access controls from:', endpoint);
+      const data = await ApiCallManager.get(endpoint);
+      console.log('Access controls loaded:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading access controls:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Get status/states by menu ID
+   * নির্দিষ্ট menu এর সব status/state পাওয়া
+   */
+  getStatusByMenuId: async function (menuId) {
+    if (!menuId || menuId <= 0) {
+      console.warn('Invalid menu ID');
+      return [];
+    }
+
+    try {
+      const endpoint = `${AppConfig.endpoints.statusByMenu || '/status/key'}/${menuId}`;
+      console.log('Loading status from:', endpoint);
+      const data = await ApiCallManager.get(endpoint);
+      console.log('Status loaded:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading status by menu:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Get actions by status ID
+   * নির্দিষ্ট status এর সব action পাওয়া
+   */
+  getActionsByStatusId: async function (statusId) {
+    if (!statusId || statusId <= 0) {
+      console.warn('Invalid status ID');
+      return [];
+    }
+
+    try {
+      const endpoint = `${AppConfig.endpoints.actionsByStatus || '/actions-4-group/status'}?statusId=${statusId}`;
+      console.log('Loading actions from:', endpoint);
+      const data = await ApiCallManager.get(endpoint);
+      console.log('Actions loaded:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading actions by status:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Get customized reports
+   * সব customized report পাওয়া
+   */
+  getReports: async function () {
+    try {
+      const endpoint = AppConfig.endpoints.customizedReports || '/customized-report';
+      console.log('Loading reports from:', endpoint);
+      const data = await ApiCallManager.get(endpoint);
+      console.log('Reports loaded:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading reports:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Create group
+   * নতুন group তৈরি করা
+   */
+  create: async function (groupData) {
+    console.log('Creating group:', groupData);
+
+    if (!this.validateGroup(groupData)) {
+      throw new Error('Invalid group data');
+    }
+
+    try {
+      const result = await ApiCallManager.post(AppConfig.endpoints.groupCreate || '/group', groupData);
       return result;
     } catch (error) {
-      console.error('Error creating menu:', error);
+      console.error('Error creating group:', error);
       throw error;
     }
   },
 
   /**
-   * Update menu
+   * Update group
+   * Group update করা
    */
-  update: async function (id, menuData) {
+  update: async function (id, groupData) {
     if (!id || id <= 0) {
-      throw new Error('Invalid menu ID');
+      throw new Error('Invalid group ID');
     }
 
-    if (!this.validateMenu(menuData)) {
-      throw new Error('Invalid menu data');
+    console.log('Updating group:', id, groupData);
+
+    if (!this.validateGroup(groupData)) {
+      throw new Error('Invalid group data');
     }
 
     try {
-      const result = await ApiCallManager.put(`${AppConfig.endpoints.menuUpdate}/${id}`, menuData);
+      const result = await ApiCallManager.put(`${AppConfig.endpoints.groupUpdate || '/group'}/${id}`, groupData);
       return result;
     } catch (error) {
-      console.error('Error updating menu:', error);
+      console.error('Error updating group:', error);
       throw error;
     }
   },
 
   /**
-   * Delete menu
+   * Delete group
+   * Group delete করা
    */
   delete: async function (id) {
     if (!id || id <= 0) {
-      throw new Error('Invalid menu ID');
+      throw new Error('Invalid group ID');
     }
 
     try {
-      const result = await ApiCallManager.delete(`${AppConfig.endpoints.menuDelete}/${id}`);
+      const result = await ApiCallManager.delete(`${AppConfig.endpoints.groupDelete || '/Group'}/${id}`);
       return result;
     } catch (error) {
-      console.error('Error deleting menu:', error);
+      console.error('Error deleting group:', error);
       throw error;
     }
   },
 
   /**
-   * Validate menu data
+   * Validate group data
+   * Group data validation করা
    */
-  validateMenu: function (menuData) {
-    if (!menuData.MenuName || menuData.MenuName.trim() === '') {
+  validateGroup: function (groupData) {
+    if (!groupData.GroupName || groupData.GroupName.trim() === '') {
       if (typeof MessageManager !== 'undefined') {
-        MessageManager.notify.error('Menu name is required');
+        MessageManager.notify.error('Group name is required');
       }
       return false;
     }
-    if (!menuData.ModuleId || menuData.ModuleId === 0) {
-      if (typeof MessageManager !== 'undefined') {
-        MessageManager.notify.error('Module is required');
-      }
-      return false;
-    }
-    return true;
-  },
 
-  /**
-   * Get grid data source
-   */
-  getGridDataSource: function (config) {
-    console.log('Creating grid DataSource with endpoint:', AppConfig.endpoints.menuSummary);
-
-    const gridConfig = Object.assign({}, {
-      endpoint: AppConfig.endpoints.menuSummary,
-      pageSize: 20,
-      serverPaging: true,
-      serverSorting: true,
-      serverFiltering: true,
-      //idField: "MenuId",
-      modelFields: {
-        MenuId: { type: 'number' },
-        ModuleId: { type: 'number' },
-        ParentMenu: { type: 'number' },
-        MenuName: { type: 'string' },
-        MenuPath: { type: 'string' },
-        ParentMenuName: { type: 'string' },
-        ModuleName: { type: 'string' },
-        MenuCode: { type: 'string' },
-        MenuType: { type: 'number' },
-        SortOrder: { type: 'number' },
-        IsQuickLink: { type: 'boolean' },
-        IsActive: { type: 'number' }
-      },
-      primaryKey: 'MenuId'
-    }, config || {});
-
-    return ApiCallManager.createGridDataSource(gridConfig);
-  }
-};
-
-// Log initialization
-console.log('%c[MenuService] ✓ Loaded', 'color: #2196F3; font-weight: bold;');
-
-
+    // At least one module should be selected
+    if (!groupData.ModuleList || groupData.ModuleList.len

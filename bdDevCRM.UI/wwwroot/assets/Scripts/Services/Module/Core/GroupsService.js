@@ -10,7 +10,6 @@ var GroupService = {
 
   /**
    * Get all groups
-   * সব group এর list পাওয়া
    */
   getAllGroups: async function () {
     try {
@@ -24,7 +23,6 @@ var GroupService = {
 
   /**
    * Get group by ID
-   * নির্দিষ্ট group এর details পাওয়া
    */
   getById: async function (id) {
     if (!id || id <= 0) {
@@ -42,7 +40,6 @@ var GroupService = {
 
   /**
    * Get modules for dropdown
-   * Module list পাওয়া (dropdown এ দেখানোর জন্য)
    */
   getModules: async function () {
     try {
@@ -58,7 +55,6 @@ var GroupService = {
 
   /**
    * Get groups by module ID
-   * নির্দিষ্ট module এর সব group পাওয়া
    */
   getGroupsByModuleId: async function (moduleId) {
     if (!moduleId || moduleId <= 0) {
@@ -80,7 +76,6 @@ var GroupService = {
 
   /**
    * Get menus by module ID
-   * নির্দিষ্ট module এর সব menu পাওয়া (menu permission এর জন্য)
    */
   getMenusByModuleId: async function (moduleId) {
     if (!moduleId || moduleId <= 0) {
@@ -102,7 +97,7 @@ var GroupService = {
 
   /**
    * Get group permissions by group ID
-   * নির্দিষ্ট group এর সব permission পাওয়া
+   * Permission for group.
    */
   getGroupPermissions: async function (groupId) {
     if (!groupId || groupId <= 0) {
@@ -124,7 +119,7 @@ var GroupService = {
 
   /**
    * Get all access controls
-   * সব access control পাওয়া
+   * all access control
    */
   getAccessControls: async function () {
     try {
@@ -141,7 +136,6 @@ var GroupService = {
 
   /**
    * Get status/states by menu ID
-   * নির্দিষ্ট menu এর সব status/state পাওয়া
    */
   getStatusByMenuId: async function (menuId) {
     if (!menuId || menuId <= 0) {
@@ -163,7 +157,6 @@ var GroupService = {
 
   /**
    * Get actions by status ID
-   * নির্দিষ্ট status এর সব action পাওয়া
    */
   getActionsByStatusId: async function (statusId) {
     if (!statusId || statusId <= 0) {
@@ -185,7 +178,6 @@ var GroupService = {
 
   /**
    * Get customized reports
-   * সব customized report পাওয়া
    */
   getReports: async function () {
     try {
@@ -202,7 +194,6 @@ var GroupService = {
 
   /**
    * Create group
-   * নতুন group তৈরি করা
    */
   create: async function (groupData) {
     console.log('Creating group:', groupData);
@@ -222,7 +213,7 @@ var GroupService = {
 
   /**
    * Update group
-   * Group update করা
+   * Group update
    */
   update: async function (id, groupData) {
     if (!id || id <= 0) {
@@ -246,7 +237,7 @@ var GroupService = {
 
   /**
    * Delete group
-   * Group delete করা
+   * Group delete
    */
   delete: async function (id) {
     if (!id || id <= 0) {
@@ -263,9 +254,9 @@ var GroupService = {
   },
 
   /**
-   * Validate group data
-   * Group data validation করা
-   */
+     * Validate group data
+     * Group data validation করা
+     */
   validateGroup: function (groupData) {
     if (!groupData.GroupName || groupData.GroupName.trim() === '') {
       if (typeof MessageManager !== 'undefined') {
@@ -275,4 +266,38 @@ var GroupService = {
     }
 
     // At least one module should be selected
-    if (!groupData.ModuleList || groupData.ModuleList.len
+    if (!groupData.ModuleList || groupData.ModuleList.length === 0) {
+      if (typeof MessageManager !== 'undefined') {
+        MessageManager.notify.error('Please select at least one module');
+      }
+      return false;
+    }
+
+    return true;
+  },
+
+  /**
+   * Get grid data source
+   * Grid এর জন্য data source তৈরি করা
+   */
+  getGridDataSource: function (config) {
+    console.log('Creating grid DataSource with endpoint:', AppConfig.endpoints.groupSummary || '/group-summary');
+
+    const gridConfig = Object.assign({}, {
+      endpoint: AppConfig.endpoints.groupSummary || '/group-summary',
+      pageSize: 13,
+      serverPaging: true,
+      serverSorting: true,
+      serverFiltering: true,
+      modelFields: {
+        GroupId: { type: 'number' },
+        GroupName: { type: 'string' },
+        IsDefault: { type: 'number' },
+        CreatedDate: { type: 'date' }
+      },
+      primaryKey: 'GroupId'
+    }, config || {});
+
+    return ApiCallManager.createGridDataSource(gridConfig);
+  }
+};

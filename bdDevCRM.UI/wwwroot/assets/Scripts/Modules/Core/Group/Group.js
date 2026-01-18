@@ -46,7 +46,7 @@ var Groups = {
   // Configuration - All ID and setting are here.
   config: {
     // Grid
-    gridId: 'gridGroupSummary',
+    groupGridId: 'gridGroupSummary',
 
     // Form and Modal
     formId: 'groupForm',
@@ -147,18 +147,17 @@ var Groups = {
 
   /**
    * Initialize Kendo Grid
-   * Summary grid তৈরি করা যেখানে সব group দেখাবে
    */
   initGrid: function () {
-    GridHelper.loadGrid(this.config.gridId, this.getColumns(), [], {
+    GridHelper.loadGrid(this.config.groupGridId, this.getColumns(), [], {
       toolbar: [
-        {
-          template: `<button type="button" onclick="GroupSettings.openCreateModal()" 
-                    class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary">
-                    <span class="k-icon k-i-plus"></span>
-                    <span class="k-button-text">Create New Group</span>
-                  </button>`
-        }
+        //{
+        //  template: `<button type="button" onclick="GroupSettings.openCreateModal()" 
+        //            class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary">
+        //            <span class="k-icon k-i-plus"></span>
+        //            <span class="k-button-text">Create New Group</span>
+        //          </button>`
+        //}
       ],
       fileName: this.config.reportName,
       heightConfig: {
@@ -168,49 +167,58 @@ var Groups = {
       }
     });
 
-    // Grid এর data source set করা
     this.setGridDataSource();
   },
 
   /**
  * Get Grid Columns
- * Grid এর column definition
  */
   getColumns: function () {
-    return [
+    return columns = [
+      { field: "GroupId", title: "Group Id", width: 0, hidden: true },
+      { field: "GroupName", title: "Group Name", width: "70%" },
       {
-        field: "GroupId",
-        title: "Group Id",
-        hidden: true
-      },
-      {
-        field: "GroupName",
-        title: "Group Name",
-        width: "70%"
-      },
-      {
-        field: "Actions",
-        title: "Actions",
-        width: "28%",
-        filterable: false,
-        sortable: false,
-        exportable: false,
-        template: GridHelper.createActionColumn({
-          idField: 'GroupId',
-          editCallback: 'GroupSettings.edit',
-          deleteCallback: 'GroupSettings.delete',
-          viewCallback: 'GroupSettings.view'
-        })
+        field: "Edit", title: "Actions", filterable: false, width: "28%",
+        template: `
+        <input type="button" class="btn btn-outline-dark " style="cursor: pointer; margin-right: 5px;" value="Edit" id="btnEdit" onClick="GroupSummaryHelper.clickEventForEditButton(event)"/>`
+        , sortable: false, exportable: false
       }
     ];
   },
+  //getColumns: function () {
+  //  return [
+  //    {
+  //      field: "GroupId",
+  //      title: "Group Id",
+  //      hidden: true
+  //    },
+  //    {
+  //      field: "GroupName",
+  //      title: "Group Name",
+  //      width: "70%"
+  //    },
+  //    {
+  //      field: "Actions",
+  //      title: "Actions",
+  //      width: "28%",
+  //      filterable: false,
+  //      sortable: false,
+  //      exportable: false,
+  //      template: GridHelper.createActionColumn({
+  //        idField: 'GroupId',
+  //        editCallback: 'GroupSettings.edit',
+  //        deleteCallback: 'GroupSettings.delete',
+  //        viewCallback: 'GroupSettings.view'
+  //      })
+  //    }
+  //  ];
+  //},
 
   /**
  * Set Grid DataSource
- * Grid এ data load করার জন্য datasource configure করা
  */
   setGridDataSource: function () {
-    const grid = $("#" + this.config.gridId).data("kendoGrid");
+    const grid = $("#" + this.config.groupGridId).data("kendoGrid");
     if (grid) {
       const ds = this.getSummaryGridDataSource();
 
@@ -232,52 +240,17 @@ var Groups = {
 
   /**
  * Get Summary Grid DataSource
- * Grid এর জন্য Kendo DataSource তৈরি করা
  */
   getSummaryGridDataSource: function () {
-    return new kendo.data.DataSource({
-      transport: {
-        read: {
-          url: baseApi + "/group-summary",
-          type: "POST",
-          dataType: "json",
-          contentType: "application/json"
-        },
-        parameterMap: function (data, type) {
-          if (type === "read") {
-            return JSON.stringify(data);
-          }
-          return data;
-        }
-      },
-      schema: {
-        data: "Items",
-        total: "TotalCount",
-        model: {
-          id: "GroupId",
-          fields: {
-            GroupId: { type: "number" },
-            GroupName: { type: "string" },
-            CreatedDate: { type: "date" }
-          }
-        }
-      },
-      pageSize: 13,
-      serverPaging: true,
-      serverSorting: true,
-      serverFiltering: true
-    });
+    return GroupService.getGridDataSource();
   },
 
   /**
  * Initialize Form
- * Form এবং এর সব components initialize করা
  */
   initForm: async function () {
-    // FormHelper দিয়ে basic form initialize
     FormHelper.initForm(this.config.formId);
 
-    // সব components initialize করা
     await this.initModuleCheckboxes();    // Module permission checkboxes
     this.initModuleCombo();               // Module selection combo
     this.initTreeView();                  // Menu tree view
@@ -288,7 +261,6 @@ var Groups = {
 
   /**
  * Initialize Module Checkboxes
- * Module permission এর জন্য dynamic checkboxes তৈরি করা
  */
   initModuleCheckboxes: async function () {
     try {
@@ -313,7 +285,6 @@ var Groups = {
 
       $("#" + this.config.moduleCheckboxContainerId).html(html);
 
-      // Event listener attach করা
       $("#" + this.config.moduleCheckboxContainerId).find('.module-checkbox')
         .on('change', (e) => {
           const moduleId = $(e.target).data('module-id');
@@ -330,7 +301,6 @@ var Groups = {
 
   /**
  * Initialize Module ComboBox
- * Module selection এর জন্য ComboBox
  */
   initModuleCombo: function () {
     $("#" + this.config.moduleComboId).kendoComboBox({
@@ -346,10 +316,8 @@ var Groups = {
 
   /**
    * Initialize TreeView for Menu Permission
-   * Menu permission এর জন্য TreeView initialize করা
    */
   initTreeView: function () {
-    // প্রথমে empty TreeView তৈরি করা
     if ($("#" + this.config.menuTreeViewId).length === 0) {
       $("#" + this.config.menuContentId).html('<div id="' + this.config.menuTreeViewId + '"></div>');
     }
@@ -364,7 +332,6 @@ var Groups = {
 
   /**
  * Initialize Report Permissions
- * Report permission checkboxes load করা
  */
   initReportPermissions: async function () {
     try {
@@ -407,7 +374,6 @@ var Groups = {
 
   /**
  * Initialize Tab Content Scrollbars
- * Tab content এর জন্য custom scrollbar setup করা
  */
   initTabContentScrollbars: function () {
     const tabStrip = $("#" + this.config.tabStripId).data("kendoTabStrip");
@@ -474,7 +440,7 @@ var Groups = {
 // Register with ModuleRegistry
 if (typeof ModuleRegistry !== 'undefined') {
   ModuleRegistry.register('Groups', Groups, {
-    dependencies: ['GroupsService', 'ApiCallManager', 'MessageManager', 'FormHelper', 'GridHelper'],
+    dependencies: ['GroupService', 'ApiCallManager', 'MessageManager', 'FormHelper', 'GridHelper'],
     priority: 5,
     autoInit: false,
     route: AppConfig.getFrontendRoute("intGroup") // Assuming a route for user pages

@@ -45,6 +45,9 @@ var Groups = {
 
   // Configuration - All ID and setting are here.
   config: {
+    // Details
+    detailsDivId: 'divdetailsForDetails',
+
     // Grid
     groupGridId: 'gridGroupSummary',
 
@@ -101,23 +104,24 @@ var Groups = {
    * Module Initialize - Main initialization function
    */
   init: async function () {
-    debugger;
-    console.log('Initializing Group Settings Module...');
+    //console.log('Initializing Group Settings Module...');
 
     try {
+      debugger;
       // The order of initialization is important
       this.initTab();           // 1. First, create the Tab
       this.initGrid();          // 2. Then the Grid
       await this.initForm();    // 3. Form and all its components
+      FormHelper.generateHeightWithoutHeaderAndFooter(this.config.detailsDivId, 80, 50)
 
-      console.log('Group Settings Module initialized successfully');
+      //console.log('Group Settings Module initialized successfully');
     } catch (error) {
-      console.error('Error initializing Group Settings:', error);
+      //console.error('Error initializing Group Settings:', error);
       MessageManager.notify.error('Failed to initialize Group Settings module');
     }
   },
 
-  /**
+ /**
  * Initialize Kendo TabStrip
  * Tabs are created and configured
  */
@@ -129,9 +133,9 @@ var Groups = {
         $(e.item).addClass("k-state-active");
 
         // scrollbar setup for Tab content
-        setTimeout(() => {
-          this.initTabContentScrollbars();
-        }, 0);
+        //setTimeout(() => {
+        //  this.initTabContentScrollbars();
+        //}, 0);
       }
     });
 
@@ -143,7 +147,6 @@ var Groups = {
       console.error("Kendo TabStrip is not initialized.");
     }
   },
-
 
   /**
    * Initialize Kendo Grid
@@ -164,7 +167,8 @@ var Groups = {
         headerHeight: 65,
         footerHeight: 50,
         paddingBuffer: 30
-      }
+      },
+      width: '100%'
     });
 
     this.setGridDataSource();
@@ -178,42 +182,19 @@ var Groups = {
       { field: "GroupId", title: "Group Id", width: 0, hidden: true },
       { field: "GroupName", title: "Group Name", width: "70%" },
       {
-        field: "Edit", title: "Actions", filterable: false, width: "28%",
-        template: `
-        <input type="button" class="btn btn-outline-dark " style="cursor: pointer; margin-right: 5px;" value="Edit" id="btnEdit" onClick="GroupSummaryHelper.clickEventForEditButton(event)"/>`
-        , sortable: false, exportable: false
+        field: "Actions",
+        title: "Actions",
+        width: '30%',
+        template: GridHelper.createActionColumn({
+          idField: 'GroupId',
+          editCallback: 'Groups.edit',
+          //deleteCallback: 'Groups.delete',
+          //viewCallback: 'Groups.view'
+        })
       }
     ];
   },
-  //getColumns: function () {
-  //  return [
-  //    {
-  //      field: "GroupId",
-  //      title: "Group Id",
-  //      hidden: true
-  //    },
-  //    {
-  //      field: "GroupName",
-  //      title: "Group Name",
-  //      width: "70%"
-  //    },
-  //    {
-  //      field: "Actions",
-  //      title: "Actions",
-  //      width: "28%",
-  //      filterable: false,
-  //      sortable: false,
-  //      exportable: false,
-  //      template: GridHelper.createActionColumn({
-  //        idField: 'GroupId',
-  //        editCallback: 'GroupSettings.edit',
-  //        deleteCallback: 'GroupSettings.delete',
-  //        viewCallback: 'GroupSettings.view'
-  //      })
-  //    }
-  //  ];
-  //},
-
+  
   /**
  * Set Grid DataSource
  */
@@ -253,9 +234,10 @@ var Groups = {
 
     await this.initModuleCheckboxes();    // Module permission checkboxes
     this.initModuleCombo();               // Module selection combo
-    this.initTreeView();                  // Menu tree view
-    await this.initReportPermissions();   // Report permissions
+    //this.initTreeView();                  // Menu tree view
+    //await this.initReportPermissions();   // Report permissions
 
+    //await this.populateModuleCombo();
     console.log('Form initialized successfully');
   },
 
@@ -264,8 +246,8 @@ var Groups = {
  */
   initModuleCheckboxes: async function () {
     try {
-      const modules = await this.getModules();
-
+      const modules = await GroupService.getModules();
+      debugger;
       let html = "<div class='row'>";
       modules.forEach(module => {
         html += `
@@ -310,8 +292,23 @@ var Groups = {
       dataSource: [],
       filter: "contains",
       suggest: true,
-      change: this.onModuleComboChange.bind(this)
+      //change: this.onModuleComboChange.bind(this)
     });
+  },
+
+  /**
+   * Load companies for dropdowns
+   */
+  populateModuleCombo: async function () {
+    try {
+      const combo = $('#' + this.config.moduleComboId).data('kendoComboBox');
+      if (combo) {
+        const modules = await GroupService.getModules();
+        combo.setDataSource(modules);
+      }
+    } catch (error) {
+      console.log('Error loading modules :', error);
+    }
   },
 
   /**
@@ -335,7 +332,7 @@ var Groups = {
  */
   initReportPermissions: async function () {
     try {
-      const reports = await this.getReports();
+      //const reports = await this.getReports();
 
       let html = "<div class='row'>";
       reports.forEach(report => {
@@ -434,6 +431,350 @@ var Groups = {
     }
   },
 
+  /////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////
+  /**
+ * Module Arrays - For permission track 
+ */
+  moduleArray: [],
+  allModuleArray: [],
+
+  /**
+   * On Module Checkbox Change
+   * Module checkbox এ click করলে এই function call হবে
+   */
+  onModuleCheckboxChange: function (moduleId, moduleName, controlId) {
+    debugger;
+    const isChecked = $("#" + controlId).is(':checked');
+
+    if (isChecked) {
+      // Module select করা হলে array তে add করব
+      this.addModuleToArray(moduleId, moduleName);
+    } else {
+      // Module unselect করা হলে array থেকে remove করব
+      this.removeModuleFromArray(moduleId);
+    }
+
+    // Module ComboBox update করব
+    this.updateModuleComboBox();
+  },
+
+  /**
+   * Add Module to Array
+   * Module কে array তে যোগ করা
+   */
+  addModuleToArray: function (moduleId, moduleName) {
+    // Check করব module already আছে কিনা
+    const exists = this.moduleArray.some(item => item.ModuleId === moduleId);
+
+    if (!exists) {
+      const moduleObj = {
+        ModuleId: moduleId,
+        ModuleName: moduleName,
+        ReferenceID: moduleId,
+        PermissionTableName: "Module"
+      };
+
+      this.moduleArray.push(moduleObj);
+      console.log('Module added:', moduleObj);
+    }
+  },
+
+  /**
+   * Remove Module from Array
+   * Module কে array থেকে সরানো
+   */
+  removeModuleFromArray: function (moduleId) {
+    // Module remove করার আগে এর সব dependent data remove করব
+    this.removeMenusByModuleId(moduleId);
+    this.removeAccessByModuleId(moduleId);
+
+    // Module array থেকে remove করব
+    this.moduleArray = this.moduleArray.filter(item => item.ModuleId !== moduleId);
+
+    console.log('Module removed:', moduleId);
+  },
+
+  /**
+   * Update Module ComboBox
+   * Module ComboBox এ selected modules দেখানো
+   */
+  updateModuleComboBox: function () {
+    const combo = $("#" + this.config.moduleComboId).data("kendoComboBox");
+
+    if (combo) {
+      // DataSource update করব
+      combo.setDataSource(this.moduleArray);
+
+      // Event unbind করে আবার bind করব (duplicate event এড়ানোর জন্য)
+      combo.unbind("select");
+      combo.bind("select", this.onModuleComboSelect.bind(this));
+    }
+  },
+
+  /**
+   * On Module Combo Select
+   * ComboBox থেকে module select করলে menu এবং access load করব
+   */
+  onModuleComboSelect: async function (e) {
+    debugger;
+    try {
+      const dataItem = this.dataItem(e.item.index());
+      const moduleId = dataItem.ModuleId;
+
+      console.log('Module selected from combo:', moduleId);
+
+      // Parallel এ menu এবং access load করব
+      await Promise.all([
+        this.loadMenuTreeByModuleId(moduleId),
+        this.loadAccessControlByModuleId(moduleId)
+      ]);
+
+      // ComboBox value set করব
+      const combo = $("#" + this.config.moduleComboId).data("kendoComboBox");
+      if (combo) {
+        combo.value(moduleId);
+      }
+
+    } catch (error) {
+      console.error('Error in module combo select:', error);
+      MessageManager.notify.error('Failed to load module data');
+    }
+  },
+
+  /**
+   * On Module Combo Change
+   * ComboBox change event handler
+   */
+  onModuleComboChange: async function (e) {
+    const moduleId = e.sender.value();
+
+    if (!moduleId) {
+      return;
+    }
+
+    console.log('Module combo changed:', moduleId);
+
+    try {
+      // Menu এবং Access Control load করব
+      await Promise.all([
+        this.loadMenuTreeByModuleId(moduleId),
+        this.loadAccessControlByModuleId(moduleId)
+      ]);
+    } catch (error) {
+      console.error('Error loading module data:', error);
+    }
+  },
+
+  /**
+   * Load Menu Tree by Module ID
+   * নির্দিষ্ট module এর menu tree load করা
+   */
+  loadMenuTreeByModuleId: async function (moduleId) {
+    const loaderContainer = $('#' + this.config.menuLoaderContainerId);
+    const loader = loaderContainer.kendoLoader({
+      size: 'large',
+      type: 'infinite-spinner',
+      themeColor: 'primary'
+    }).data("kendoLoader");
+
+    try {
+      // Loader show করব
+      $("#" + this.config.menuContentId).css("min-height", "50px");
+      loaderContainer.show();
+      loader.show();
+
+      // Previous tree remove করব
+      $("#" + this.config.menuTreeViewId).remove();
+      $("#" + this.config.menuContentId).html('<div id="' + this.config.menuTreeViewId + '"></div>');
+
+      // API থেকে menus load করব
+      const menus = await GroupService.getMenusByModuleId(moduleId);
+
+      if (!menus || menus.length === 0) {
+        console.warn('No menus found for module:', moduleId);
+        return;
+      }
+
+      // Hierarchical data structure তৈরি করব
+      const treeData = this.buildMenuHierarchy(menus);
+
+      // TreeView initialize করব
+      const treeView = $("#" + this.config.menuTreeViewId).kendoTreeView({
+        checkboxes: {
+          checkChildren: true,
+          template: "<input type='checkbox' id='chkMenu#= item.id #' />"
+        },
+        dataSource: treeData,
+        check: this.onMenuCheck.bind(this),
+        dataBound: function (e) {
+          // Auto expand করব
+          if (this.expandRoot) {
+            this.expand(e.node.find(".k-item"));
+          }
+        }
+      }).data("kendoTreeView");
+
+      // Existing menu selection restore করব
+      this.restoreMenuSelection();
+
+      console.log('Menu tree loaded successfully');
+
+    } catch (error) {
+      console.error('Error loading menu tree:', error);
+      MessageManager.notify.error('Failed to load menus');
+    } finally {
+      loader.hide();
+      $("#" + this.config.menuContentId).css("min-height", "auto");
+      loaderContainer.hide();
+    }
+  },
+
+  /**
+   * Build Menu Hierarchy
+   * Flat menu list থেকে hierarchical structure তৈরি করা
+   */
+  buildMenuHierarchy: function (menus) {
+    const hierarchy = [];
+
+    // Parent menus filter করব (যাদের ParentMenu null বা 0)
+    const parentMenus = menus.filter(m => !m.ParentMenu || m.ParentMenu === 0);
+
+    parentMenus.forEach(parent => {
+      const menuItem = {
+        id: parent.MenuId,
+        text: parent.MenuName,
+        value: parent.MenuId,
+        expanded: true,
+        items: this.getChildMenus(parent.MenuId, menus)
+      };
+
+      hierarchy.push(menuItem);
+    });
+
+    return hierarchy;
+  },
+
+  /**
+   * Get Child Menus
+   * Recursive function - parent এর সব child menu পাওয়া
+   */
+  getChildMenus: function (parentId, allMenus) {
+    const children = allMenus.filter(m => m.ParentMenu === parentId);
+
+    return children.map(child => {
+      return {
+        id: child.MenuId,
+        text: child.MenuName,
+        value: child.MenuId,
+        expanded: true,
+        items: this.getChildMenus(child.MenuId, allMenus)
+      };
+    });
+  },
+
+  /**
+   * Load Access Control by Module ID
+   * নির্দিষ্ট module এর access control load করা
+   */
+  loadAccessControlByModuleId: async function (moduleId) {
+    const loaderContainer = $('#' + this.config.accessLoaderContainerId);
+    const loader = loaderContainer.kendoLoader({
+      size: 'large',
+      type: 'infinite-spinner',
+      themeColor: 'primary'
+    }).data("kendoLoader");
+
+    try {
+      // Loader show করব
+      loaderContainer.show();
+      loader.show();
+
+      // Previous content clear করব
+      $("#" + this.config.accessCheckboxContainerId).empty();
+
+      // API থেকে access controls load করব
+      const accessList = await GroupService.getAccessControls();
+
+      if (!accessList || accessList.length === 0) {
+        $("#" + this.config.accessCheckboxContainerId).html(
+          '<div class="col-12"><p class="text-muted">No access controls available</p></div>'
+        );
+        return;
+      }
+
+      // HTML তৈরি করব
+      let html = '<div class="row">';
+      accessList.forEach(access => {
+        html += `
+        <div class="col-12 mb-1">
+          <div class="d-flex justify-content-start align-items-center access-item">
+            <input type="checkbox" 
+                   class="form-check-input" 
+                   id="chkAccess${access.AccessId}" 
+                   data-access-id="${access.AccessId}"
+                   data-access-name="${access.AccessName}"
+                   data-module-id="${moduleId}" />
+            <label for="chkAccess${access.AccessId}" class="tree-label ms-2">
+              ${access.AccessName}
+            </label>
+          </div>
+        </div>
+      `;
+      });
+      html += '</div>';
+
+      $("#" + this.config.accessCheckboxContainerId).html(html);
+
+      // Event listeners attach করব
+      $("#" + this.config.accessCheckboxContainerId).find('input[type="checkbox"]')
+        .on('change', (e) => {
+          const accessId = $(e.target).data('access-id');
+          const accessName = $(e.target).data('access-name');
+          const modId = $(e.target).data('module-id');
+          this.onAccessCheckboxChange(accessId, accessName, modId);
+        });
+
+      // Existing selection restore করব
+      this.restoreAccessSelection(moduleId);
+
+      console.log('Access controls loaded successfully');
+
+    } catch (error) {
+      console.error('Error loading access controls:', error);
+      $("#" + this.config.accessCheckboxContainerId).html(
+        '<div class="col-12"><p class="text-danger">Failed to load access controls</p></div>'
+      );
+    } finally {
+      loader.hide();
+      loaderContainer.hide();
+    }
+  },
+
+  /**
+   * Remove Menus by Module ID
+   * Module remove করার সময় এর সব menu ও remove করব
+   */
+  removeMenusByModuleId: function (moduleId) {
+    // এটা পরে implement করব যখন menu array তৈরি করব
+    console.log('Removing menus for module:', moduleId);
+
+    // TreeView clear করব
+    $("#" + this.config.menuTreeViewId).remove();
+    $("#" + this.config.menuContentId).html('<div id="' + this.config.menuTreeViewId + '"></div>');
+  },
+
+  /**
+   * Remove Access by Module ID
+   * Module remove করার সময় এর সব access ও remove করব
+   */
+  removeAccessByModuleId: function (moduleId) {
+    // এটা পরে implement করব যখন access array তৈরি করব
+    console.log('Removing access for module:', moduleId);
+
+    // Access checkboxes clear করব
+    $("#" + this.config.accessCheckboxContainerId).empty();
+  },
 };
 
 

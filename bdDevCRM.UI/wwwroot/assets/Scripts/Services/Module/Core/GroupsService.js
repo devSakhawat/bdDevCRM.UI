@@ -39,10 +39,11 @@ var GroupService = {
   },
 
   /**
-   * Get modules for dropdown
-   */
+  * Get modules for dropdown
+  */
   getModules: async function () {
     try {
+      debugger;
       console.log('Loading modules from:', AppConfig.endpoints.modules);
       const data = await ApiCallManager.get(AppConfig.endpoints.modules);
       console.log('Modules loaded:', data);
@@ -54,8 +55,8 @@ var GroupService = {
   },
 
   /**
-   * Get groups by module ID
-   */
+  * Get groups by module ID
+  */
   getGroupsByModuleId: async function (moduleId) {
     if (!moduleId || moduleId <= 0) {
       console.warn('Invalid module ID');

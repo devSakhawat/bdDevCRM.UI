@@ -2,9 +2,8 @@
   ViewData["Title"] = "Group Settings";
   Layout = "~/Views/Shared/_Layout_Dash_UI.cshtml";
 }
-<script src="~/assets/scripts/modules/core/group/group.js"></script>
 
-<!-- row -->
+@* <!-- row -->
 <div class="row">
   <h3 class="k-header text-center">Group Settings</h3>
 
@@ -20,13 +19,32 @@
     </div>
   </div>
 </div>
+ *@
+
+<!-- row -->
+<div class="row gx-2 gy-2">
+  <div class="col-xl-3 col-lg-3 col-md-3 col-3">
+    <div id="gridGroupSummary">
+      @* <partial name="~/Views/Core/Users/_UserSummary.cshtml" /> *@
+      @* <partial name="Group/_GroupSummary" /> *@
+    </div>
+  </div>
+  <div class="col-xl-9 col-lg-9 col-md-9 col-9">
+    <div id="divDetails">
+      <partial name="Group/_GroupDetails" />
+    </div>
+  </div>
+</div>
+
+<script src="~/assets/scripts/services/module/core/groupsservice.js"></script>
+<script src="~/assets/scripts/modules/core/group/group.js"></script>
 
 @* @section Scripts {
   <!-- ========================================== -->
   <!-- GROUP MODULE SCRIPTS                       -->
   <!-- ========================================== -->
   <!-- Models -->
-  <script src="~/assets/Scripts/Modules/Core/Group/Models/GroupModel.js"></script>
+
 
   <!-- Controllers -->
   <script src="~/assets/Scripts/Modules/Core/Group/Controllers/GroupController.js"></script>

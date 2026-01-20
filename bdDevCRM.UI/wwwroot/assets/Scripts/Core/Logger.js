@@ -79,13 +79,13 @@ App.Logger = (function () {
 
     group: function (label) {
       if (_enabled) {
-        console.group(label);
+        //console.group(label);
       }
     },
 
     groupEnd: function () {
       if (_enabled) {
-        console.groupEnd();
+        //console.groupEnd();
       }
     }
   };

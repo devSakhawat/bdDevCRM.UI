@@ -19,7 +19,7 @@ var ModuleRegistry = (function () {
 
   var ModuleState = {
     REGISTERED: 'registered',
-    LOADING: 'loading',      // 🆕 New state
+    LOADING: 'loading',      // New state
     INITIALIZING: 'initializing',
     INITIALIZED: 'initialized',
     FAILED: 'failed'
@@ -31,7 +31,6 @@ var ModuleRegistry = (function () {
 
   /**
    * Dynamically load a JavaScript file
-   * JavaScript file dynamically load করা
    * 
    * @param {string} scriptUrl - Script URL (e.g., '/assets/Scripts/Modules/Course/Course.js')
    * @returns {Promise<void>}
@@ -43,12 +42,9 @@ var ModuleRegistry = (function () {
     return new Promise(function (resolve, reject) {
       // Check if already loaded
       if (_loadedScripts[scriptUrl]) {
-        console.log('Script already loaded:', scriptUrl);
         resolve();
         return;
       }
-
-      console.log('⏳ Loading script:', scriptUrl);
 
       var script = document.createElement('script');
       script.src = scriptUrl;
@@ -56,7 +52,6 @@ var ModuleRegistry = (function () {
 
       script.onload = function () {
         _loadedScripts[scriptUrl] = true;
-        console.log('Script loaded:', scriptUrl);
         resolve();
       };
 
@@ -97,7 +92,6 @@ var ModuleRegistry = (function () {
 
   /**
    * Register a module with optional lazy loading
-   * Module register করা (lazy loading support সহ)
    * 
    * @param {string} name - Module name
    * @param {object} module - Module object with init() method
@@ -122,7 +116,7 @@ var ModuleRegistry = (function () {
       priority: 5,
       autoInit: false,
       route: null,
-      scripts: [] // 🆕 Scripts to load dynamically
+      scripts: [] // Scripts to load dynamically
     };
 
     _modules[name] = {
@@ -131,8 +125,6 @@ var ModuleRegistry = (function () {
       config: Object.assign({}, defaultConfig, config || {}),
       state: ModuleState.REGISTERED
     };
-
-    console.log('Module registered:', name);
   }
 
   // ============================================
@@ -175,14 +167,11 @@ var ModuleRegistry = (function () {
       return false;
     }
 
-    console.log('All dependencies loaded for ' + moduleName);
     return true;
   }
 
   /**
-   * Initialize a specific module (with dynamic script loading)
-   * Module initialize করা (dynamic script loading সহ)
-   * 
+   * Initialize a specific module
    * @param {string} name - Module name
    * @returns {Promise<void>}
    */
@@ -194,27 +183,19 @@ var ModuleRegistry = (function () {
     }
 
     if (moduleEntry.state === ModuleState.INITIALIZED) {
-      console.log('Module already initialized:', name);
       return;
     }
 
     if (moduleEntry.state === ModuleState.INITIALIZING ||
       moduleEntry.state === ModuleState.LOADING) {
-      console.warn('Module already initializing:', name);
       return;
     }
 
     try {
-      console.log('Initializing module:', name);
-
-      // 🆕 Step 1: Load required scripts (if any)
       if (moduleEntry.config.scripts && moduleEntry.config.scripts.length > 0) {
         moduleEntry.state = ModuleState.LOADING;
-        console.log('⏳ Loading scripts for module:', name);
 
         await loadScripts(moduleEntry.config.scripts);
-
-        console.log('Scripts loaded for module:', name);
       }
 
       // Step 2: Mark as initializing
@@ -234,13 +215,9 @@ var ModuleRegistry = (function () {
       moduleEntry.state = ModuleState.INITIALIZED;
       _initialized.push(name);
 
-      console.log('Module initialized:', name);
-
     } catch (error) {
       moduleEntry.state = ModuleState.FAILED;
       _failed.push({ name: name, error: error.message });
-
-      console.error('Module initialization failed:', name, error);
       throw error;
     }
   }
@@ -253,7 +230,6 @@ var ModuleRegistry = (function () {
    */
   async function initByRoute(currentPath) {
     debugger;
-    console.log('🛣️ Initializing modules for route:', currentPath);
 
     for (var name in _modules) {
       if (_modules.hasOwnProperty(name)) {
@@ -263,12 +239,10 @@ var ModuleRegistry = (function () {
           var routePattern = new RegExp(moduleEntry.config.route);
 
           if (routePattern.test(currentPath)) {
-            console.log('Route matched for module:', name);
 
             try {
               await initModule(name);
             } catch (error) {
-              console.error('Failed to initialize module:', name, error);
             }
           }
         }
@@ -291,8 +265,6 @@ var ModuleRegistry = (function () {
    * ]);
    */
   async function loadAndInitModule(name, scriptUrls) {
-    console.log('🔄 Loading and initializing module:', name);
-
     // Step 1: Load scripts
     if (scriptUrls && scriptUrls.length > 0) {
       await loadScripts(scriptUrls);
@@ -389,7 +361,6 @@ var ModuleRegistry = (function () {
         _initialized.splice(index, 1);
       }
 
-      console.log('🗑️ Module unloaded:', name);
     }
   }
 
@@ -400,7 +371,6 @@ var ModuleRegistry = (function () {
    * @returns {Promise<void>}
    */
   async function initAll() {
-    console.log('Initializing all auto-init modules...');
 
     for (var name in _modules) {
       if (_modules.hasOwnProperty(name)) {
@@ -448,5 +418,3 @@ var ModuleRegistry = (function () {
     initAll: initAll,// Initialize all auto-init modules
   };
 })();
-
-console.log('%c[ModuleRegistry] ✓ Loaded with Dynamic Loading Support', 'color: #4CAF50; font-weight: bold;');

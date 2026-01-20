@@ -31,7 +31,11 @@ var User = {
     tabStripId: 'tabstrip',
     userInfoTabId: 'divUserInfo',
     groupMembershipTabId: 'divInfo',
-    buttonPanelClass: 'btnDiv'
+    buttonPanelClass: 'btnDiv',
+
+    // btn html Id
+    btnSaveOrUpdate: 'btnUserSaveOrUpdate',
+    btnClear: 'btnclear',
   },
 
   /**
@@ -60,7 +64,6 @@ var User = {
         $("#tabstrip ul li").removeClass("k-state-active");
         $(e.item).addClass("k-state-active");
 
-        // ✅ tab switch এর পর content scrollbar re-init
         setTimeout(() => {
           this.initTabContentScrollbars();
         }, 0);
@@ -74,23 +77,6 @@ var User = {
       console.error("Kendo TabStrip is not initialized.");
     }
   },
-
-  //initTab: function () {
-  //  $("#tabstrip").kendoTabStrip({
-  //    select: function (e) {
-  //      // Ensure only one tab has the 'k-state-active' class
-  //      $("#tabstrip ul li").removeClass("k-state-active");
-  //      $(e.item).addClass("k-state-active");
-  //    }
-  //  });
-
-  //  var tabStrip = $("#tabstrip").data("kendoTabStrip");
-  //  if (tabStrip) {
-  //    tabStrip.select(0); // Ensure the first tab is selected by default
-  //  } else {
-  //    console.error("Kendo TabStrip is not initialized.");
-  //  }
-  //},
 
   /**
    * Initialize Kendo Grid
@@ -279,6 +265,9 @@ var User = {
     }
   },
 
+ /**
+ * Load companies for dropdowns
+ */
   populateCompanyComboForDetails: async function () {
     try {
       const combo = $('#' + this.config.companyComboId).data('kendoComboBox');
@@ -357,7 +346,6 @@ var User = {
   /**
    * Load groups for group membership
    */
-  // Existing loadGroups - no changes needed
   loadGroups: async function () {
     try {
       const groups = await UserService.getGroups();
@@ -393,7 +381,6 @@ var User = {
       console.error('Error loading groups:', error);
     }
   },
-
 
   initTabContentScrollbars: function () {
     const $windowElement = $("#" + this.config.modalId);
@@ -458,43 +445,13 @@ var User = {
     }
   },
 
-  //initSimpleBarForTab: function (tabId, contentHeight) {
-  //  const tabElement = $("#" + tabId);
-  //  if (tabElement.length === 0) return;
-
-  //  // Wrap content if not already wrapped
-  //  if (!tabElement.find('.tab-scroll-container').length) {
-  //    tabElement.wrapInner('<div class="tab-scroll-container" data-simplebar></div>');
-  //  }
-
-  //  const scrollContainer = tabElement.find('.tab-scroll-container');
-  //  scrollContainer.css({
-  //    'max-height': contentHeight + 'px',
-  //    'height': contentHeight + 'px'
-  //  });
-
-  //  // Initialize SimpleBar
-  //  const scrollElement = scrollContainer[0];
-  //  if (scrollElement && typeof SimpleBar !== 'undefined') {
-  //    // Destroy existing instance if any
-  //    if (scrollElement.SimpleBar) {
-  //      scrollElement.SimpleBar.unMount();
-  //    }
-  //    new SimpleBar(scrollElement, {
-  //      autoHide: true,
-  //      scrollbarMaxSize: 50
-  //    });
-  //  }
-  //},
-
-
   /**
    * Open modal for creating new user
    */
   // Updated openCreateModal with callback
   openCreateModal: function () {
-    this.clearForm();
     debugger;
+    this.clearForm();
     // Pass callback function to FormHelper
     FormHelper.openKendoWindow( this.config.modalId, 'Create New User', '80%', '100%', 'default', true,
       // Callback function
@@ -505,13 +462,6 @@ var User = {
 
     this.setFormMode('create');
   },
-
-  //openCreateModal: function () {
-  //  debugger;
-  //  this.clearForm();
-  //  FormHelper.openKendoWindow(this.config.modalId, 'Create New User', '80%', '100px', "default", true);
-  //  this.setFormMode('create');
-  //},
 
   view: async function (userId) {
     if (!userId || userId <= 0) {
@@ -525,16 +475,20 @@ var User = {
       const grid = $('#' + this.config.gridId).data('kendoGrid');
       const dataItem = grid.dataSource.get(userId);
       if (dataItem) {
+        //FormHelper.openKendoWindow(this.config.modalId, 'View User Details', '80%', '100%', 'default', true);
+        FormHelper.openKendoWindow(this.config.modalId, 'View User Details', '80%', '100%', 'default', true,
+          // Callback function
+          () => {
+            this.initTabContentScrollbars();
+          }
+        );
         await this.populateForm(dataItem);
-        FormHelper.openKendoWindow(this.config.modalId, 'View User Details', '80%', '90%');
         this.setFormMode('view');
       }
     } catch (error) {
       console.error('Error loading menu:', error);
     }
   },
-
-
 
   /**
    * Edit user
@@ -545,12 +499,19 @@ var User = {
       return;
     }
 
-    try {
+    try { 
+      this.clearForm();
       const grid = $('#' + this.config.gridId).data('kendoGrid');
       const dataItem = grid.dataSource.get(userId);
       if (dataItem) {
+        /*FormHelper.openKendoWindow(this.config.modalId, 'Update User Details', '80%', '100%', 'default', true);*/
+        FormHelper.openKendoWindow(this.config.modalId, 'Update User Details', '80%', '100%', 'default', true,
+          // Callback function
+          () => {
+            this.initTabContentScrollbars();
+          }
+        );
         await this.populateForm(dataItem);
-        FormHelper.openKendoWindow(this.config.modalId, 'Edit User', '80%', '90%');
         this.setFormMode('edit');
       }
     } catch (error) {
@@ -589,6 +550,7 @@ var User = {
    * Save or update user
    */
   saveOrUpdate: async function () {
+    debugger;
     const userData = this.getFormData();
     const isCreate = !userData.UserId || userData.UserId === 0;
 
@@ -669,14 +631,17 @@ var User = {
    * Set form mode (create/edit/view)
    */
   setFormMode: function (mode) {
-    const saveBtn = $('#btnSave'); // Assuming the save button has this ID
+    const saveBtn = FormHelper.makeValidSelector( this.config.btnSaveOrUpdate); //$('#btnUserSaveOrUpdate');
+    const saveClear = FormHelper.makeValidSelector( this.config.btnClear); // Assuming the save button has this ID
 
     if (mode === 'view') {
       FormHelper.makeFormReadOnly('#' + this.config.formId);
       saveBtn.hide();
+      saveClear.hide();
     } else {
       FormHelper.makeFormEditable('#' + this.config.formId);
       saveBtn.show();
+      saveClear.show();
 
       if (mode === 'create') {
         saveBtn.html('<span class="k-icon k-i-plus"></span> Add User');
@@ -803,7 +768,7 @@ var User = {
         GroupName: $(this).data('group-name')
       });
     });
-
+    formData.UserId = $('#hdnUserId').val();
     return formData;
   },
 

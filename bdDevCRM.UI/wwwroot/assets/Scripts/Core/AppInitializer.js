@@ -54,7 +54,6 @@ var AppInitializer = (function () {
   // ============================================
 
   async function _initCoreSystems() {
-    //console.log('Step 1: Initializing core systems...');
 
     // Initialize EventBus
     if (typeof EventBus !== 'undefined' && EventBus.init) {
@@ -69,16 +68,12 @@ var AppInitializer = (function () {
     // Start token auto-refresh
     if (AppConfig.isAuthenticated()) {
       TokenManager.startAutoRefresh();
-      //console.log('Token auto-refresh started');
     }
-
-    //console.log('Core systems initialized');
   }
 
   async function _loadMenu() {
-    //console.log('Step 2: Loading menu.. .');
     //// Debug: Check authentication
-    //console.log('🔐 Authentication check:');
+    //console.log(' Authentication check:');
     //console.log('  - isAuthenticated:', AppConfig.isAuthenticated());
     //console.log('  - Token exists:', !!AppConfig.getToken());
 
@@ -94,12 +89,10 @@ var AppInitializer = (function () {
 
       if (typeof StorageManager !== 'undefined' && StorageManager.getCachedMenu) {
         cachedMenu = StorageManager.getCachedMenu();
-        console.log('Cache check result:', cachedMenu ? cachedMenu.length + ' items found' : 'No cache');
       }
 
       if (cachedMenu && cachedMenu.length > 0) {
         // FAST PATH: Use cached menu (no skeleton needed)
-        console.log('Using cached menu - instant load! ');
 
         if (typeof SidebarMenu !== 'undefined' && SidebarMenu.renderFromCache) {
           SidebarMenu.renderFromCache(cachedMenu);
@@ -109,22 +102,18 @@ var AppInitializer = (function () {
           _renderSidebarMenu(cachedMenu);
         }
 
-        console.log('Menu loaded from cache');
+        // console.log('Menu loaded from cache');
         return;
       }
 
       // Step 2: No cache - show skeleton and fetch from API
-      console.log('No cache found - fetching from API.. .');
       _showMenuSkeleton();
 
       if (typeof SidebarMenu !== 'undefined' && SidebarMenu.GetMenuInformation) {
         await SidebarMenu.GetMenuInformation();
-        console.log('Menu loaded via SidebarMenu');
       }  else {
         throw new Error('No menu loader found (SidebarMenu or MenuHelper)');
       }
-
-      console.log('Menu loaded from API and cached');
 
     } catch (error) {
       console.error('Menu load error:', error);
@@ -170,37 +159,27 @@ var AppInitializer = (function () {
 
   async function _initRouteModules() {
     debugger;
-    console.log('Step 3: Initializing route-specific modules...');
-
     var currentPath = window.location.pathname;
     await ModuleRegistry.initByRoute(currentPath);
-
-    console.log('Route modules initialized');
   }
 
   async function _initAutoModules() {
-    console.log('Step 4: Initializing auto-init modules...');
     await ModuleRegistry.initAll();
-    console.log('Auto-init modules initialized');
   }
 
   async function _postInit() {
-    console.log('Step 5: Running post-initialization tasks...');
 
     // Subscribe to auth events
     if (typeof EventBus !== 'undefined') {
       EventBus.subscribe('auth:logout', function () {
-        console.log('🔴 Logout event received');
         TokenManager.stopAutoRefresh();
         StorageManager.clearAll();
       });
 
       EventBus.subscribe('token:refreshed', function (data) {
-        console.log('🔄 Token refreshed event received');
       });
     }
 
-    console.log('Post-init tasks completed');
   }
 
   // ============================================
@@ -241,7 +220,6 @@ var AppInitializer = (function () {
 
     _state.initStartTime = Date.now();
 
-    console.log('%c🚀 Initializing bdDevCRM Application...', 'color: #2196F3; font-weight: bold; font-size: 16px;');
 
     try {
       if (typeof MessageManager !== 'undefined') {
@@ -265,8 +243,7 @@ var AppInitializer = (function () {
         throw new Error(errorMsg);
       }
 
-      console.log('All core dependencies loaded');
-      console.table(dependancyCheck.status);
+      //console.table(dependancyCheck.status);
 
       // Step 1-5: Initialize in sequence
       await _initCoreSystems();
@@ -279,8 +256,6 @@ var AppInitializer = (function () {
       _state.initEndTime = Date.now();
 
       var initTime = _state.initEndTime - _state.initStartTime;
-
-      console.log('%cApplication initialized successfully in ' + initTime + 'ms', 'color: #4CAF50; font-weight: bold; font-size: 14px;');
 
       if (typeof MessageManager !== 'undefined') {
         MessageManager.loading.hide();
@@ -325,4 +300,4 @@ var AppInitializer = (function () {
   };
 })();
 
-console.log('%c[AppInitializer] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');
+//console.log('%c[AppInitializer] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');

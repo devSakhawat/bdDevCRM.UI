@@ -68,15 +68,11 @@ var SidebarMenu = (function () {
     _state.isLoading = true;
 
     try {
-      console.log('🔄 Loading menu information...');
-
       _showSkeletonLoader();
 
       // Step 1: Check cache first
       var cacheSource = (typeof StorageManager !== 'undefined') ? 'StorageManager' : 'localStorage';
       var cachedMenu = _getCachedMenu();
-      console.log('Cached menu source:', cacheSource);
-      console.log('Cached menu value:', cachedMenu);
 
       // Detect cached ParseError object (some code may have cached the full response/error accidentally)
       if (cachedMenu && typeof cachedMenu === 'object' && cachedMenu.IsSuccess === false && cachedMenu.ErrorType === 'ParseError') {
@@ -87,12 +83,12 @@ var SidebarMenu = (function () {
 
       // If cachedMenu is a wrapper object (unexpected), try to extract Data
       if (cachedMenu && !Array.isArray(cachedMenu) && cachedMenu.Data && Array.isArray(cachedMenu.Data)) {
-        console.log('Cached menu was wrapped, extracting Data property');
+       //// console.log('Cached menu was wrapped, extracting Data property');
         cachedMenu = cachedMenu.Data;
       }
 
       if (cachedMenu && Array.isArray(cachedMenu) && cachedMenu.length > 0) {
-        console.log('Menu loaded from cache');
+       // console.log('Menu loaded from cache');
         _renderMenu(cachedMenu);
         _state.menuData = cachedMenu;
         _initSearchFunctionality();
@@ -118,10 +114,7 @@ var SidebarMenu = (function () {
       _renderMenu(menus);
       _initSearchFunctionality();
 
-      console.log('Menu loaded successfully');
-
     } catch (error) {
-      console.error('Failed to load menu:', error);
       _handleMenuLoadError(error);
 
     } finally {
@@ -149,33 +142,21 @@ var SidebarMenu = (function () {
         }
       );
 
-      // Debug logging
-      console.log('📥 Menu API Response:', response);
-      console.log('📋 Is Array?', Array.isArray(response));
-
       // Validate response
       if (!response) {
-        console.error('Response is null or undefined');
         return [];
       }
 
-      // Response is already unwrapped (response.Data)
       if (Array.isArray(response)) {
         return response;
       }
 
-      // Double-wrapped case (shouldn't happen but handle it)
       if (response.Data && Array.isArray(response.Data)) {
         return response.Data;
       }
-
-      // Unexpected format
-      console.error('Unexpected response format. Expected array, got:', typeof response);
-      console.error('Response:', response);
       return [];
 
     } catch (error) {
-      console.error('API call failed:', error);
       throw error;
     }
   }
@@ -199,7 +180,7 @@ var SidebarMenu = (function () {
 
       var cacheKey = _config.cacheKeyPrefix + userInfo.UserId;
       var cached = localStorage.getItem(cacheKey);
-      console.log(cached);
+     // console.log(cached);
       if (!cached) return null;
 
       var cacheData = JSON.parse(cached);
@@ -216,7 +197,7 @@ var SidebarMenu = (function () {
       return cacheData.data;
 
     } catch (error) {
-      console.error('Error reading menu cache:', error);
+      // console.log('Error reading menu cache:', error);
       return null;
     }
   }
@@ -242,10 +223,9 @@ var SidebarMenu = (function () {
       };
 
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-      console.log('Menu cached successfully');
 
     } catch (error) {
-      console.error('Error caching menu:', error);
+
     }
   }
 
@@ -265,10 +245,8 @@ var SidebarMenu = (function () {
 
       var cacheKey = _config.cacheKeyPrefix + userInfo.UserId;
       localStorage.removeItem(cacheKey);
-      console.log('Menu cache cleared');
 
     } catch (error) {
-      console.error('Error clearing menu cache:', error);
     }
   }
 
@@ -278,19 +256,11 @@ var SidebarMenu = (function () {
 
   /**
    * Render menu in sidebar
-   * Sidebar এ menu render করা
-   * 
-   * Supports:
-   * - Nested menus (unlimited levels)
-   * - Icons
-   * - Active states
-   * - Collapsible submenus
    */
   function _renderMenu(menus) {
     var $sidebar = $('#' + _config.sidebarId);
 
     if ($sidebar.length === 0) {
-      console.error('Sidebar element not found:', _config.sidebarId);
       return;
     }
 
@@ -311,8 +281,6 @@ var SidebarMenu = (function () {
 
     // Bind events
     _bindMenuEvents();
-
-    console.log('Menu rendered successfully');
   }
 
   /**
@@ -436,7 +404,7 @@ var SidebarMenu = (function () {
   }
 
   /**
- * Check if menu is active (IMPROVED VERSION)
+ * Check if menu is active 
  * check Menu is active or not.
  */
   function _isMenuActive(menu, currentPath) {
@@ -468,7 +436,7 @@ var SidebarMenu = (function () {
   }
 
   /**
-   * Check if any child menu is active (IMPROVED VERSION)
+   * Check if any child menu is active 
    * check child menu is active or not.
    */
   function _hasActiveChild(childMenus, currentPath) {
@@ -499,7 +467,6 @@ var SidebarMenu = (function () {
         var fullUrl = new URL(menuUrl, AppConfig.getUiUrl());
         return fullUrl.href;
       } catch (e) {
-        console.error('Error constructing URL:', e);
         // Fallback to string concatenation if URL fails
       }
     }
@@ -525,13 +492,13 @@ var SidebarMenu = (function () {
    * Bind menu events
    */
   // ============================================
-  // PRIVATE - Event Handlers (NO ACCORDION)
+  // PRIVATE - Event Handlers
   // ============================================
 
   function _bindMenuEvents() {
     var $sidebar = $('#' + _config.sidebarId);
 
-    //Arrow rotation on toggle (NO AUTO-CLOSE)
+    //Arrow rotation on toggle
     $sidebar.find('[data-bs-toggle="collapse"]').on('click', function (e) {
       e.preventDefault();
 
@@ -618,7 +585,7 @@ var SidebarMenu = (function () {
     //Create debounced search function (1 second delay)
     var debouncedSearch = _debounce(function (searchTerm) {
       if (searchTerm.length >= _config.minSearchLength) {
-        console.log('🔍 Auto search triggered (1 sec after typing stopped)');
+       // console.log('🔍 Auto search triggered (1 sec after typing stopped)');
         _filterMenus(searchTerm);
       } else {
         _clearSearch();
@@ -652,7 +619,6 @@ var SidebarMenu = (function () {
         var searchTerm = $(this).val().trim();
 
         if (searchTerm.length > 0) {
-          console.log('🔍 Enter key search triggered');
           _showSearchLoading();
           _filterMenus(searchTerm);
         }
@@ -666,7 +632,7 @@ var SidebarMenu = (function () {
         var searchTerm = $searchInput.val().trim();
 
         if (searchTerm.length > 0) {
-          console.log('🔍 Search icon clicked');
+         // console.log('🔍 Search icon clicked');
           _showSearchLoading();
           _filterMenus(searchTerm);
         }
@@ -681,18 +647,13 @@ var SidebarMenu = (function () {
       _hideSearchLoading();
       $(this).hide();
     });
-
-    console.log('Search functionality initialized');
-    console.log('   ↳ Auto search: 1 second after typing stops');
-    console.log('   ↳ Enter key: Instant search');
-    console.log('   ↳ Search icon: Instant search');
   }
 
   /**
- * Filter menus (OPTIMIZED for 500+ menus)
+ * Filter menus 
  */
   function _filterMenus(searchTerm) {
-    var startTime = performance.now(); // Performance tracking
+    var startTime = performance.now(); 
 
     var $sidebar = $('#' + _config.sidebarId);
     var $noResults = $('#' + _config.noResultsId);
@@ -777,7 +738,6 @@ var SidebarMenu = (function () {
 
     // Performance logging
     var endTime = performance.now();
-    console.log('🔍 Search completed in ' + (endTime - startTime).toFixed(2) + 'ms (' + visibleCount + ' results)');
   }
 
   /**
@@ -797,7 +757,6 @@ var SidebarMenu = (function () {
 
   /**
    * Show search loading indicator
-   * Search loading indicator দেখানো
    */
   function _showSearchLoading() {
     var $searchInput = $('#' + _config.searchInputId);
@@ -816,7 +775,6 @@ var SidebarMenu = (function () {
 
   /**
    * Hide search loading indicator
-   * Search loading indicator লুকানো
    */
   function _hideSearchLoading() {
     var $searchInput = $('#' + _config.searchInputId);
@@ -865,7 +823,7 @@ var SidebarMenu = (function () {
     $sidebar.show();
     _state.searchTerm = '';
 
-    console.log('Search cleared');
+   // console.log('Search cleared');
   }
 
   // ============================================
@@ -986,8 +944,6 @@ var SidebarMenu = (function () {
       return;
     }
 
-    console.log('🔄 Retrying menu load (attempt ' + _state.retryCount + ')...');
-
     // Clear cache before retry
     _clearMenuCache();
 
@@ -1034,7 +990,6 @@ var SidebarMenu = (function () {
    * Refresh menu (clear cache and reload)
    */
   async function refreshMenu() {
-    console.log('🔄 Refreshing menu...');
     _clearMenuCache();
     _state.retryCount = 0;
     await GetMenuInformation();
@@ -1111,8 +1066,6 @@ var SidebarMenu = (function () {
           navContainer.scrollTop = linkTop - (containerHeight / 2) + (linkHeight / 2);
         }
       }
-
-      console.log('Active menu set:', url);
     }
   }
 
@@ -1148,8 +1101,6 @@ var SidebarMenu = (function () {
     if (!currentPath) {
       currentPath = window.location.pathname;
     }
-
-    console.log('Highlighting active menu for path:', currentPath);
 
     var $sidebar = $('#' + _config.sidebarId);
 
@@ -1195,9 +1146,8 @@ var SidebarMenu = (function () {
     // Step 4: Apply active state to best match
     if ($activeLink && bestMatchScore > 0) {
       _applyActiveState($activeLink);
-      console.log('Active menu set:', $activeLink.text().trim());
     } else {
-      console.log('No matching menu item found for:', currentPath);
+
     }
   }
 
@@ -1228,7 +1178,7 @@ var SidebarMenu = (function () {
 
       return path;
     } catch (error) {
-      console.error('Error normalizing path:', error);
+      // console.log('Error normalizing path:', error);
       return path.toLowerCase();
     }
   }
@@ -1290,8 +1240,6 @@ var SidebarMenu = (function () {
   function _applyActiveState($link) {
     if (!$link || $link.length === 0) return;
 
-    console.log('🎯 Applying active state:', $link.text().trim());
-
     // ═══════════════════════════════════════════════════════════
     // STEP 1: Child (clicked item) 
     // ═══════════════════════════════════════════════════════════
@@ -1314,19 +1262,17 @@ var SidebarMenu = (function () {
       var $parentSubmenu = $current.parent('.submenu, .collapse');
 
       if ($parentSubmenu.length === 0) {
-        console.log('🔝 Reached top level - no more parents');
         break;
       }
 
       var submenuId = $parentSubmenu.attr('id');
-      console.log('📂 Found parent submenu:', submenuId);
 
       // ─────────────────────────────────────────────────────────
       // 2b: expand Parent submenu
       // ─────────────────────────────────────────────────────────
       if (!$parentSubmenu.hasClass('show')) {
         $parentSubmenu.addClass('show');
-        console.log('🔓 Expanded submenu:', submenuId);
+
       }
 
       // ─────────────────────────────────────────────────────────
@@ -1339,7 +1285,7 @@ var SidebarMenu = (function () {
           $toggleLink.removeClass('collapsed');
           $toggleLink.attr('aria-expanded', 'true');
           $toggleLink.find('.submenu-arrow').addClass('rotate-down');
-          console.log('🔗 Updated toggle for:', submenuId);
+
         }
       }
 
@@ -1351,7 +1297,6 @@ var SidebarMenu = (function () {
       //var $parentNavLink = $parentNavItem.find('> .nav-link');
       if ($parentNavLink.length > 0 && !$parentNavLink.hasClass('active')) {
         $parentNavLink.addClass('active');
-        console.log('Parent nav-item activated:', $parentNavItem.find('> a').first().text().trim());
       }
 
       // ─────────────────────────────────────────────────────────
@@ -1360,7 +1305,6 @@ var SidebarMenu = (function () {
       $current = $parentNavItem;  //Move to parent nav-item
 
       if ($current.length === 0) {
-        console.log('No parent nav-item found, stopping traversal');
         break;
       }
     }
@@ -1368,8 +1312,6 @@ var SidebarMenu = (function () {
     if (iteration >= maxIterations) {
       console.warn('Max iterations reached, possible infinite loop prevented');
     }
-
-    console.log('🎉 All parents activated and expanded!');
 
     // Scroll active item into view
     _scrollActiveIntoView($link);
@@ -1450,11 +1392,9 @@ var SidebarMenu = (function () {
         console.warn('No menu data to render');
         return;
       }
-      console.log('🎨 Rendering menu from cache:', menuData.length, 'items');
       // Store in state
       _state.menuData = menuData;
 
-      // Render menu + _bindMenuEvents executed into _renderMenu
       _renderMenu(menuData);
 
       // Initialize search
@@ -1464,11 +1404,6 @@ var SidebarMenu = (function () {
 
       //Highlight active menu
       _highlightActiveMenu();
-      console.log('Menu rendered from cache');
-
-      //// Highlight active item
-      //var currentPath = window.location.pathname;
-      //_highlightActiveMenu(currentPath);
     },
 
     // Check if cache exists
@@ -1479,9 +1414,8 @@ var SidebarMenu = (function () {
 
     //Force refresh (clear cache + reload)
     forceRefresh: function () {
-      console.log('🔄 Force refreshing menu.. .');
       _clearMenuCache();
-      return GetMenuInformation();  //GetMenuInformation কল করবে
+      return GetMenuInformation();
     },
 
     //Clear cache
@@ -1502,6 +1436,3 @@ var SidebarMenu = (function () {
 
   };
 })();
-
-// Auto-log
-console.log('%c[MenuHelper] ✓ Loaded', 'color: #4CAF50; font-weight: bold;');

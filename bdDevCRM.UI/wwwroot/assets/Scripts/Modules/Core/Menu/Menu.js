@@ -42,7 +42,7 @@ var MenuModule = {
     this.initModal();
     this.initForm();
 
-    console.log('Menu Module initialized successfully');
+    // console.log('Menu Module initialized successfully');
   },
 
   /**
@@ -287,7 +287,7 @@ var MenuModule = {
   saveOrUpdate: async function () {
     //(Type-safe)
     const menuData = this.getFormData();
-    console.log(menuData);
+    // console.log(menuData);
 
     //const menuData = this.getFormData();
     const isCreate = !menuData.MenuId || menuData.MenuId === 0;
@@ -491,7 +491,7 @@ if (typeof ModuleRegistry !== 'undefined') {
     route: AppConfig.getFrontendRoute("intMenu")  // Only initialize when on Menu pages
   });
 
-  console.log('MenuModule registered');
+  // console.log('MenuModule registered');
 } else {
   console.error('ModuleRegistry not loaded!  Cannot register MenuModule');
 }

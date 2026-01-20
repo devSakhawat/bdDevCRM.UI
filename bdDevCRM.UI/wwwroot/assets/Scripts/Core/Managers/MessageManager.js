@@ -1,9 +1,4 @@
 ﻿
-
-
-
-
-
 /*=========================================================
  * Message Manager (Standalone)
  * File: MessageManager.js
@@ -1304,18 +1299,18 @@ var MessageManager = (function () {
 // ============================================
 // AUTO-INITIALIZATION
 // ============================================
-(function () {
-  if (typeof console !== 'undefined' && console.log) {
-    console.log(
-      '%c[MessageManager] ✓ Loaded (Standalone - Zero Dependencies)',
-      'color: #4CAF50; font-weight: bold; font-size: 12px;'
-    );
+//(function () {
+//  if (typeof console !== 'undefined' && console.log) {
+//    //console.log(
+//    //  '%c[MessageManager] ✓ Loaded (Standalone - Zero Dependencies)',
+//    //  'color: #4CAF50; font-weight: bold; font-size: 12px;'
+//    //);
 
-    if (console.table) {
-      console.table(MessageManager.getInfo());
-    }
-  }
-})();
+//    if (console.table) {
+//      console.table(MessageManager.getInfo());
+//    }
+//  }
+//})();
 
 
 // ============================================

@@ -7,7 +7,6 @@
 =========================================================*/
 
 if (typeof GridHelper !== 'undefined') {
-  console.log('GridHelper already loaded, skipping...');
 } else {
 
   var GridHelper = {
@@ -118,8 +117,8 @@ if (typeof GridHelper !== 'undefined') {
     },
 
     /**
-       * Initialize generic grid with FIXED height (will update after data loads)
-       */
+    * Initialize generic grid with FIXED height (will update after data loads)
+    */
     loadGrid: function (gridId, columns, dataSource = [], options = {}) {
       const selector = gridId.startsWith('#') ? gridId : '#' + gridId;
       const $grid = $(selector);
@@ -137,8 +136,29 @@ if (typeof GridHelper !== 'undefined') {
         return sum + width;
       }, 0);
 
-      //Use calculated width if columns fit, otherwise use 100%
-      const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
+      // //Use calculated width if columns fit, otherwise use 100%
+      // const gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
+
+      // if caller provide widthvalue then don't calculate the value.
+      let gridWidth;
+
+      if (options.width) {
+        let w = options.width.toString().trim();
+
+        if (w.includes('%')) {
+          // already percentage
+          gridWidth = w;
+        } else if (w.toLowerCase().includes('px')) {
+          // already px
+          gridWidth = w;
+        } else {
+          // no unit → assume percentage
+          gridWidth = w + '%';
+        }
+
+      } else {
+        gridWidth = totalColumnsWidth > containerWidth ? '100%' : totalColumnsWidth + 'px';
+      }
 
       //Better height calculation
       const initialHeight = this.calculateGridHeight({
@@ -235,8 +255,6 @@ if (typeof GridHelper !== 'undefined') {
               const contentHeight = optimalHeight - headerHeight - pagerHeight - toolbarHeight;
               content.height(contentHeight);
             }
-
-            console.log('Grid height adjusted:', optimalHeight + 'px', 'for', rowCount, 'rows');
           }
         });
       }

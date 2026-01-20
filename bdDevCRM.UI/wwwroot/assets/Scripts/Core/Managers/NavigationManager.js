@@ -30,9 +30,6 @@ var NavigationManager = (function () {
   // ============================================
 
   function init() {
-    
-    console.log('🚀 NavigationManager initializing...');
-
     // 1. Bind Click Events (Event Delegation)
     _bindNavigationEvents();
 
@@ -45,8 +42,6 @@ var NavigationManager = (function () {
     if (typeof ModuleRegistry !== 'undefined') {
       ModuleRegistry.initByRoute(window.location.pathname);
     }
-
-    console.log('NavigationManager initialized');
   }
 
   // ============================================
@@ -111,8 +106,6 @@ var NavigationManager = (function () {
     _state.isNavigating = true;
     _state.currentUrl = url;
 
-    console.log('🔄 SPA Navigation to:', url);
-
     //// 1. Notify App (Start)
     //if (typeof EventBus !== 'undefined') {
     //  EventBus.emit('navigation:start', { url: url });
@@ -124,7 +117,6 @@ var NavigationManager = (function () {
     //}
 
     try {
-      console.log('🔄 Navigating to:', url);
 
       //// Show loading
       //if (typeof MessageManager !== 'undefined') {
@@ -185,7 +177,6 @@ var NavigationManager = (function () {
       ////Step 6: Highlight active menu item
       //_highlightActiveMenuItem(url);
 
-      console.log('SPA Navigation complete');
 
       //// 4. Inject Content
       //var $container = $('#' + _config.contentContainerId);
@@ -204,7 +195,6 @@ var NavigationManager = (function () {
       //});
 
     } catch (error) {
-      console.error('SPA Navigation failed:', error);
       // Fallback:  Full page reload
       window.location.href = url;
     } finally {
@@ -233,15 +223,12 @@ var NavigationManager = (function () {
     var hasMenuItems = $sidebar.find('.nav-item[data-menu-id]').length > 0;
 
     if (!hasMenuItems) {
-      console.log('Sidebar empty, loading from cache.. .');
 
       // Try cache first
       if (typeof StorageManager !== 'undefined') {
         var cachedMenu = StorageManager.getCachedMenu();
 
         if (cachedMenu && cachedMenu.length > 0) {
-          console.log('Rendering menu from cache:', cachedMenu.length, 'items');
-
           if (typeof SidebarMenu !== 'undefined' && SidebarMenu.renderFromCache) {
             SidebarMenu.renderFromCache(cachedMenu);
             return;
@@ -250,7 +237,6 @@ var NavigationManager = (function () {
       }
 
       // No cache - fetch from API
-      console.log('No cache, fetching menu from API...');
       if (typeof SidebarMenu !== 'undefined' && SidebarMenu.GetMenuInformation) {
         await SidebarMenu.GetMenuInformation();
       }

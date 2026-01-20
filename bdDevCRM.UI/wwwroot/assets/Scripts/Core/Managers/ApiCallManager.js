@@ -67,7 +67,6 @@ var ApiCallManager = (function () {
       },
       schema: {
         data: function (response) {
-          console.log('Grid DataSource Response:', response);
 
           //NULL check
           if (!response) {
@@ -85,7 +84,6 @@ var ApiCallManager = (function () {
           //Extract data
           if (response && response.IsSuccess && response.Data) {
             const items = response.Data.Items || [];
-            console.log('Grid data loaded:', items.length, 'items');
             return items;
           }
 
@@ -357,7 +355,6 @@ var ApiCallManager = (function () {
 
         if (attempt < maxRetries) {
           const delay = _config.retryDelay * Math.pow(2, attempt); // Exponential backoff
-          console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms...`);
           await _sleep(delay);
         }
       }
@@ -951,7 +948,6 @@ var ApiCallManager = (function () {
       // Check if token refresh is needed (and not skipped)
       if (!options.skipTokenRefresh && typeof StorageManager !== 'undefined') {
         if (StorageManager.isAccessTokenExpired() && !StorageManager.isRefreshTokenExpired()) {
-          console.log('🔄 Access token expired, refreshing before request...');
 
           if (typeof TokenManager !== 'undefined') {
             var refreshSuccess = await TokenManager.refreshToken();
@@ -969,14 +965,12 @@ var ApiCallManager = (function () {
     } catch (error) {
       // If 401 Unauthorized, try to refresh token
       if (error.status === 401 && !options.skipTokenRefresh) {
-        console.log('🔄 Got 401, attempting token refresh...');
 
         if (typeof TokenManager !== 'undefined') {
           var refreshSuccess = await TokenManager.refreshToken();
 
           if (refreshSuccess) {
             // Retry the original request
-            console.log('🔄 Retrying request with new token...');
             return await apiCall();
           }
         }
@@ -1033,20 +1027,20 @@ var ApiCallManager = (function () {
 // ============================================
 // Auto-initialization Check
 // ============================================
-(function () {
-  if (!ApiCallManager.isReady()) {
-    console.error(
-      '%c[ApiCallManager] ERROR: Base API URL not configured!',
-      'color: red; font-weight: bold; font-size: 14px;'
-    );
-  } else {
-    console.log(
-      '%c[ApiCallManager] ✓ Loaded successfully',
-      'color: #4CAF50; font-weight: bold; font-size: 12px;'
-    );
+//(function () {
+//  if (!ApiCallManager.isReady()) {
+//    console.error(
+//      '%c[ApiCallManager] ERROR: Base API URL not configured!',
+//      'color: red; font-weight: bold; font-size: 14px;'
+//    );
+//  } else {
+//    console.log(
+//      '%c[ApiCallManager] ✓ Loaded successfully',
+//      'color: #4CAF50; font-weight: bold; font-size: 12px;'
+//    );
 
-    if (typeof console !== 'undefined' && console.table) {
-      console.table(ApiCallManager.getInfo());
-    }
-  }
-})();
+//    if (typeof console !== 'undefined' && console.table) {
+//      console.table(ApiCallManager.getInfo());
+//    }
+//  }
+//})();

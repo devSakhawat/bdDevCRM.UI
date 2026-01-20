@@ -235,7 +235,7 @@ var Module = {
     debugger;
     const moduleData = this.getFormData();
     const isCreate = !moduleData.ModuleId || moduleData.ModuleId === 0;
-    console.log(moduleData);
+    // console.log(moduleData);
     if (!ModuleService.validateModule(moduleData, isCreate)) {
       throw new Error('Invalid module data');
     }
@@ -344,7 +344,7 @@ if (typeof ModuleRegistry !== 'undefined') {
     route: AppConfig.getFrontendRoute("intModule")
   });
 
-  console.log('Module registered');
+  // console.log('Module registered');
 } else {
   console.error('ModuleRegistry not loaded!  Cannot register Module');
 }

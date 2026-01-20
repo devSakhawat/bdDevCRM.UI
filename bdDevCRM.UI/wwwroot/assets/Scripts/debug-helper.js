@@ -25,28 +25,28 @@
 
     var module = App.getModule('Group');
     if (!module) {
-      console.error('Group module not found');
+      /*console.error('Group module not found');*/
       return null;
     }
 
-    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #9C27B0');
-    console.log('%c   Group Module Information', 'color: #9C27B0; font-size: 14px; font-weight: bold');
-    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #9C27B0');
+    //console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #9C27B0');
+    //console.log('%c   Group Module Information', 'color: #9C27B0; font-size: 14px; font-weight: bold');
+    //console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #9C27B0');
 
-    console.log('Name:', module.config.name);
-    console.log('Version:', module.config.version);
-    console.log('Author:', module.config.author);
-    console.log('Initialized:', module.isInitialized());
+    //console.log('Name:', module.config.name);
+    //console.log('Version:', module.config.version);
+    //console.log('Author:', module.config.author);
+    //console.log('Initialized:', module.isInitialized());
 
-    console.log('\nComponents:');
-    console.log('  - Summary:', module.getComponent('summary'));
-    console.log('  - Details:', module.getComponent('details'));
-    console.log('  - Info:', module.getComponent('info'));
+    //console.log('\nComponents:');
+    //console.log('  - Summary:', module.getComponent('summary'));
+    //console.log('  - Details:', module.getComponent('details'));
+    //console.log('  - Info:', module.getComponent('info'));
 
-    console.log('\n🎮 Controller:');
-    console.log(module.getController());
+    //console.log('\n🎮 Controller:');
+    //console.log(module.getController());
 
-    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #9C27B0');
+    //console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #9C27B0');
 
     return module;
   };
@@ -55,7 +55,7 @@
    * Test Group Module
    */
   window.testGroupModule = function () {
-    console.log('%c🧪 Testing Group Module...', 'color: #FF9800; font-size: 12px');
+    // console.log('%c🧪 Testing Group Module...', 'color: #FF9800; font-size: 12px');
 
     var module = App.getModule('Group');
     if (!module) {
@@ -63,42 +63,42 @@
       return;
     }
 
-    console.log('Module found');
-    console.log('Initialized:', module.isInitialized());
+    // console.log('Module found');
+    // console.log('Initialized:', module.isInitialized());
 
     // Test components
     var summary = module.getComponent('summary');
     var details = module.getComponent('details');
     var info = module.getComponent('info');
 
-    console.log('Summary component:', summary ? 'OK' : 'MISSING');
-    console.log('Details component:', details ? 'OK' : 'MISSING');
-    console.log('Info component:', info ? 'OK' : 'MISSING');
+    // console.log('Summary component:', summary ? 'OK' : 'MISSING');
+    // console.log('Details component:', details ? 'OK' : 'MISSING');
+    // console.log('Info component:', info ? 'OK' : 'MISSING');
 
     // Test controller
     var controller = module.getController();
-    console.log('Controller:', controller ? 'OK' : 'MISSING');
+    // console.log('Controller:', controller ? 'OK' : 'MISSING');
 
     // Test events
-    console.log('\nTesting EventBus...');
+    // console.log('\nTesting EventBus...');
     var testEventReceived = false;
 
     App.EventBus.on('test:group', function (data) {
       testEventReceived = true;
-      console.log('Event received:', data);
+      // console.log('Event received:', data);
     });
 
     App.EventBus.emit('test:group', { message: 'Test from Group Module' });
 
     if (testEventReceived) {
-      console.log('EventBus working');
+      // console.log('EventBus working');
     } else {
       console.error('EventBus not working');
     }
 
     App.EventBus.off('test:group');
 
-    console.log('%c🧪 Test Complete!', 'color: #FF9800; font-size: 12px');
+    // console.log('%c🧪 Test Complete!', 'color: #FF9800; font-size: 12px');
   };
 
   /**
@@ -118,7 +118,7 @@
     }
 
     var currentGroup = controller.getCurrentGroup();
-    console.log('Current Group:', currentGroup);
+    // console.log('Current Group:', currentGroup);
     return currentGroup;
   };
 
@@ -135,7 +135,7 @@
     var controller = module.getController();
     if (controller) {
       controller.clearGroup();
-      console.log('Group form cleared');
+      // console.log('Group form cleared');
     }
   };
 
@@ -156,12 +156,12 @@
     }
 
     var formData = infoComponent.getFormData();
-    console.log('Form Data:', formData);
+    // console.log('Form Data:', formData);
 
     var controller = module.getController();
     if (controller) {
       controller.saveGroup(formData).then(function (result) {
-        console.log('Save test complete:', result);
+        // console.log('Save test complete:', result);
       }).catch(function (error) {
         console.error('Save test failed:', error);
       });
@@ -169,15 +169,15 @@
   };
 
   // Log available debug commands
-  console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00BCD4');
-  console.log('%c   🐛 Debug Helper Loaded', 'color: #00BCD4; font-size: 12px; font-weight: bold');
-  console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00BCD4');
-  console.log('%cAvailable commands:', 'color: #00BCD4; font-weight: bold');
-  console.log('  • getGroupModule()    - Get module info');
-  console.log('  • testGroupModule()   - Test module functionality');
-  console.log('  • getCurrentGroup()   - Get current group data');
-  console.log('  • clearGroupForm()    - Clear group form');
-  console.log('  • testGroupSave()     - Test group save');
-  console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00BCD4');
+  // console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00BCD4');
+  // console.log('%c   🐛 Debug Helper Loaded', 'color: #00BCD4; font-size: 12px; font-weight: bold');
+  // console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00BCD4');
+  // console.log('%cAvailable commands:', 'color: #00BCD4; font-weight: bold');
+  // console.log('  • getGroupModule()    - Get module info');
+  // console.log('  • testGroupModule()   - Test module functionality');
+  // console.log('  • getCurrentGroup()   - Get current group data');
+  // console.log('  • clearGroupForm()    - Clear group form');
+  // console.log('  • testGroupSave()     - Test group save');
+  // console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #00BCD4');
 
 })();

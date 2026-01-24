@@ -78,6 +78,7 @@ var AppConfig = (function () {
       // Group
       group: '/Group',
       groupSummary: '/group-summary',
+      groupPermissions: '/grouppermission',
       groupPermission: '/grouppermission/key/',
 
       // ========================================

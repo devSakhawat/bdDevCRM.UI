@@ -191,9 +191,7 @@ var Groups = {
    */
   initModuleCheckboxes: async function () {
     try {
-      debugger;
       const modules = await GroupService.getModules();
-
       this.allModuleArray = modules; // Store for reference
 
       let html = "<div class='row'>";
@@ -316,6 +314,7 @@ var Groups = {
    */
   onModuleComboSelect: async function (e) {
     try {
+      debugger;
       const dataItem = this.dataItem(e.item.index());
       const moduleId = dataItem.ModuleId;
 
@@ -1445,6 +1444,7 @@ var Groups = {
   edit: async function (groupId) {
     try {
       console.log('Editing group:', groupId);
+      debugger;
 
       // First clear the form
       this.clearForm();
@@ -1495,7 +1495,6 @@ var Groups = {
 
   /**
    * Populate Existing Modules
-   * Edit mode এ modules restore করা
    */
   populateExistingModules: async function (groupPermissions) {
     // Filter module permissions
@@ -1552,7 +1551,7 @@ var Groups = {
 
   /**
    * Save Group
-   * Form submit করা (Create/Update)
+   * Form submit (Create/Update)
    */
   save: async function () {
     try {
@@ -1616,7 +1615,7 @@ var Groups = {
 
   /**
    * Validate Form
-   * Form validation করা
+   * Form validation
    */
   validateForm: function () {
     // Group name validation
@@ -1652,7 +1651,6 @@ var Groups = {
 
   /**
    * Prepare Group Data
-   * সব array থেকে data collect করে final object তৈরি করা
    */
   prepareGroupData: function () {
     const groupData = {
@@ -1676,7 +1674,7 @@ var Groups = {
 
   /**
    * Clear Form
-   * Complete form clear এবং reset করা
+   * Complete form clear and reset
    */
   clearForm: function () {
     try {
@@ -1733,13 +1731,10 @@ var Groups = {
       }
 
       // Clear validation messages
-      $("#" + this.config.detailsDivId).find(". k-tooltip-validation").hide();
-      $("#" + this.config.detailsDivId).find(".field-validation-error")
-        .removeClass("field-validation-error")
-        .addClass("field-validation-valid");
+      $("#" + this.config.detailsDivId).find(".k-tooltip-validation").hide();
+      $("#" + this.config.detailsDivId).find(".field-validation-error").removeClass("field-validation-error").addClass("field-validation-valid");
 
       console.log('Form cleared successfully');
-
     } catch (error) {
       console.error('Error clearing form:', error);
     }

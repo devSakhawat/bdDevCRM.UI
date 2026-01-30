@@ -298,7 +298,7 @@ var GroupService = {
   getAccessControls: async function () {
     try {
       console.log('Fetching access controls...');
-      const endpoint = AppConfig.endpoints.accessControls || '/getaccess';
+      const endpoint = AppConfig.endpoints.access || '/getaccess';
       const data = await ApiCallManager.get(endpoint, {
         showLoadingIndicator: false,
         showErrorNotifications: true

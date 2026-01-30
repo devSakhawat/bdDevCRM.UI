@@ -82,7 +82,7 @@ var AppConfig = (function () {
       groupPermission: '/grouppermission/key/',
 
       // ========================================
-      // MODULE ENDPOINTS (From Screenshot)
+      // MODULE ENDPOINTS 
       // ========================================
       modules: '/modules',                          // GET - Get all modules
       moduleSummary: '/module-summary',             // POST - Get module summary grid
@@ -91,7 +91,7 @@ var AppConfig = (function () {
       moduleDelete: '/module',                      // DELETE - Delete module /{key}
 
       // ========================================
-      // MENU ENDPOINTS (From Screenshot)
+      // MENU ENDPOINTS
       // ========================================
       menus: '/menus',                              // GET - Get all menus
       menusByModuleId: '/menus-by-moduleId',        // GET - Get menus by module /{moduleId}
@@ -104,7 +104,7 @@ var AppConfig = (function () {
       menuDDL: '/menus-4-ddl',
 
       // =======================================================================================
-      // AccessControl ENDPOINTS (From Screenshot)
+      // AccessControl ENDPOINTS 
       // =======================================================================================
       accessControlSummary: '/access-control-summary', // POST - Get access control summary grid
       accessControls: '/access-controls',              // GET - Get all access controls
@@ -138,7 +138,7 @@ var AppConfig = (function () {
       userImport: "/user/import",                                    // Endpoint to trigger the import process after upload
 
       // =======================================================================================
-      // AccessControl ENDPOINTS (From Screenshot)
+      // AccessControl ENDPOINTS 
       // =======================================================================================
       // Access Control
       access: '/getaccess',

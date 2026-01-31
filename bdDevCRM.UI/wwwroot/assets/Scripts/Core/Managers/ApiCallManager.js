@@ -1,10 +1,15 @@
 ﻿/*=========================================================
- * API Call Manager
+ * API Call Manager (Updated with Interceptor Support)
  * File: ApiCallManager.js
- * Description: Unified API call manager matching backend ResponseHelper pattern
- * Backend Pattern: ResponseHelper.cs (Success/Error responses)
+ * Description: Centralized HTTP request manager with interceptor
  * Author: devSakhawat
- * Date: 2025-01-13
+ * Date: 2026-01-30
+ * 
+ * Updates:
+ * - Integrated HttpInterceptor
+ * - Automatic token attachment
+ * - 401 error handling
+ * - Cookie support
 =========================================================*/
 
 var ApiCallManager = (function () {
@@ -21,6 +26,10 @@ var ApiCallManager = (function () {
     showErrorNotifications: true,
     showLoadingForRequests: false
   };
+
+  // ============================================================================
+  // PRIVATE HELPER METHODS
+  // ============================================================================
 
   // ============================================
   // PRIVATE - Helper Functions
@@ -160,6 +169,18 @@ var ApiCallManager = (function () {
   }
 
   /**
+ * Get API base URL
+ * @private
+ */
+  function _getApiBaseUrl() {
+    if (typeof AppConfig !== 'undefined' && AppConfig.getApiUrl) {
+      return AppConfig.getApiUrl();
+    }
+    return typeof baseApi !== 'undefined' ? baseApi : '';
+  }
+
+
+  /**
    * Get JWT Token
    */
   function _getToken() {
@@ -178,54 +199,6 @@ var ApiCallManager = (function () {
    */
   function _sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Handle HTTP Response (matching backend ResponseHelper pattern)
-   * @param {Response} response - Fetch API response
-   * @returns {Promise<object>}
-   */
-  async function _handleHttpResponse(response) {
-    let data;
-
-    try {
-      data = await response.json();
-      console.log(data);
-    } catch (e) {
-      // If JSON parsing fails, create error object
-      data = {
-        IsSuccess: false,
-        StatusCode: response.status,
-        Message: response.statusText || 'Unknown error',
-        ErrorType: 'ParseError'
-      };
-    }
-
-    // Success responses (200-299)
-    if (response.ok) {
-      // Backend always returns { IsSuccess, StatusCode, Message, Data }
-      if (data.IsSuccess === true) {
-        return data; // Return full response for flexibility
-      }
-      // Fallback if backend doesn't follow standard
-      return {
-        IsSuccess: true,
-        StatusCode: response.status,
-        Message: 'Success',
-        Data: data
-      };
-    }
-
-    // Error responses (400+)
-    throw {
-      IsSuccess: false,
-      StatusCode: data.StatusCode || response.status,
-      Message: data.Message || response.statusText,
-      ErrorType: data.ErrorType || _getErrorType(response.status),
-      Details: data.Details || null,
-      ValidationErrors: data.ValidationErrors || null,
-      CorrelationId: data.CorrelationId || null
-    };
   }
 
   /**
@@ -363,6 +336,55 @@ var ApiCallManager = (function () {
     throw lastError;
   }
 
+  /**
+  * Handle HTTP Response (matching backend ResponseHelper pattern)
+  * @param {Response} response - Fetch API response
+  * @returns {Promise<object>}
+  */
+  async function _handleHttpResponse(response) {
+    let data;
+
+    try {
+      data = await response.json();
+      console.log(data);
+    } catch (e) {
+      // If JSON parsing fails, create error object
+      data = {
+        IsSuccess: false,
+        StatusCode: response.status,
+        Message: response.statusText || 'Unknown error',
+        ErrorType: 'ParseError'
+      };
+    }
+
+    // Success responses (200-299)
+    if (response.ok) {
+      // Backend always returns { IsSuccess, StatusCode, Message, Data }
+      if (data.IsSuccess === true) {
+        return data; // Return full response for flexibility
+      }
+      // Fallback if backend doesn't follow standard
+      return {
+        IsSuccess: true,
+        StatusCode: response.status,
+        Message: 'Success',
+        Data: data
+      };
+    }
+
+    // Error responses (400+)
+    throw {
+      IsSuccess: false,
+      StatusCode: data.StatusCode || response.status,
+      Message: data.Message || response.statusText,
+      ErrorType: data.ErrorType || _getErrorType(response.status),
+      Details: data.Details || null,
+      ValidationErrors: data.ValidationErrors || null,
+      CorrelationId: data.CorrelationId || null
+    };
+  }
+
+
   // ============================================
   // PRIVATE - Request Builder
   // ============================================
@@ -380,7 +402,9 @@ var ApiCallManager = (function () {
       headers: {
         'Authorization': token ? 'Bearer ' + token : ''
       },
-      signal: options?.signal
+      signal: options?.signal,
+      // enable cookies
+      credentials: 'include'
     };
 
     // Handle body data

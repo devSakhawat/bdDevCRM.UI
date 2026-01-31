@@ -23,7 +23,7 @@ var AppConfig = (function () {
       timeout: 30000,
 
       // Retry attempts for failed requests
-      retryAttempts: 2
+      retryAttempts: 1
     },
 
     // UI Configuration
@@ -70,10 +70,14 @@ var AppConfig = (function () {
 
     // API Endpoints
     endpoints: {
+
       // Authentication
       login: '/login',
-      logout: '/logout',
       refreshToken: '/refresh-token',
+      logout: '/logout',
+      revokeToken: '/revoke-token',
+      getUserInfo: '/user-info',
+      verifyToken: '/verify-token',
 
       // Group
       group: '/Group',
@@ -176,8 +180,39 @@ var AppConfig = (function () {
       branch: '/branchddl'
     },
 
+    // Token configuration (add this section)
+    token: {
+      accessTokenKey: 'access_token',
+      accessTokenExpiryMinutes: 15,
+      refreshTokenExpiryDays: 7,
+      autoRefreshEnabled: true,
+      refreshBeforeExpirySeconds: 60 // Refresh 1 min before expiry
+    },
+
+    // Cookie configuration (add this section)
+    cookie: {
+      enabled: true,
+      sameSite: 'Strict',
+      secure: true, // HTTPS only
+      httpOnly: true // Backend-managed
+    },
+
+    // Interceptor configuration (add this section)
+    interceptor: {
+      enabled: true,
+      excludedUrls: [
+        '/login',
+        '/refresh-token',
+        '/logout'
+      ],
+      retryAttempts: 1,
+      retryDelay: 500
+    },
+
     // Front-end page init endpoints
     frontendRoutes: {
+      login: '/Login/Index',
+      home: '/Home/Index',
       dashboard: '/dashboard',
       settings: '/settings',
       reportViewer: '/report-viewer',
@@ -201,11 +236,21 @@ var AppConfig = (function () {
       intGroup: '/Core/GroupSettings',
     },
 
+    // Frontend routes (add this section)
+    routes: {
+      login: '/Login/Index',
+      home: '/Home/Index',
+      dashboard: '/Home/Dashboard'
+    },
+
 
   };
 
   // Public API
   return {
+
+    // Add helper methods if not already present:
+
     /**
      * Check if running in development environment
      * @returns {boolean}

@@ -7,16 +7,28 @@
   Layout = "~/Views/Shared/ControlPanel.cshtml";
 }
 
+<!-- jQuery (required) -->
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
+<!-- Core Configuration -->
 <script src="~/assets/scripts/core/api/appconfig.js"></script>
-<script src="~/assets/scripts/core/api/authapiclient.js"></script>
-<script src="~/assets/scripts/core/helpers/tokenhelper.js"></script>
-<script src="~/assets/scripts/core/managers/tokenmanager.js"></script>
+
+<!-- Token Management (Phase 1) -->
 <script src="~/assets/scripts/core/storage/tokenstorage.js"></script>
+<script src="~/assets/scripts/core/helpers/tokenhelper.js"></script>
+<script src="~/assets/scripts/core/api/authapiclient.js"></script>
+
+<!-- Authentication (Phase 2) -->
 <script src="~/assets/scripts/core/managers/authmanager.js"></script>
 <script src="~/assets/scripts/services/authentication/authenticationservice.js"></script>
-<script src="~/assets/scripts/users/login/login.js"></script>
+
+<!-- Message/Ajax Helpers (your existing) -->
+<script src="~/assets/scripts/core/managers/messagemanager.js"></script>
+
+<!-- Cache Manager -->
 <script src="~/assets/scripts/core/cache/cachemanager.js"></script>
+
+<script src="~/assets/scripts/users/login/login.js"></script>
 
 <!-- Login Content -->
 <div class="row align-items-center justify-content-center g-0

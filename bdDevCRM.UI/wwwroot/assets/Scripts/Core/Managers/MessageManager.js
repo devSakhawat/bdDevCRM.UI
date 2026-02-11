@@ -80,7 +80,7 @@ var MessageManager = (function () {
   }
 
   /**
-   * Inject CSS styles
+   * CSS styles
    */
   function _injectStyles() {
     if (document.getElementById('messagemanager-styles')) return;
@@ -1123,6 +1123,110 @@ var MessageManager = (function () {
   // ============================================
 
   var confirm = {
+
+    // ****** Use of functions
+    //// Save confirmation
+    //const saveConfirmed = await MessageManager.confirm.saveAsync();
+
+    //// Update confirmation
+    //const updateConfirmed = await MessageManager.confirm.updateAsync();
+
+    //// Delete confirmation
+    //const deleteConfirmed = await MessageManager.confirm.deleteAsync('Course ABC');
+
+    //// Custom message with options
+    //const confirmed = await MessageManager.confirm.show(
+    //  'Are you sure you want to proceed?',
+    //  'Custom Title',
+    //  {
+    //    confirmText: 'Yes, Proceed',
+    //    cancelText: 'No, Go Back',
+    //    type: 'warning'
+    //  }
+    //);
+
+
+    /**
+     * Promise-based confirmation dialog
+     * Usage: const confirmed = await MessageManager.confirm.show('Are you sure?');
+     * @param {string} message - Confirmation message
+     * @param {string} title - Optional title
+     * @param {object} options - Optional { confirmText, cancelText, type }
+     * @returns {Promise<boolean>}
+     */
+    show: function (message, title, options) {
+      options = options || {};
+      var modalType = options.type || 'question';
+
+      return new Promise((resolve) => {
+        _showModal(modalType, title || 'Confirmation', message, [
+          {
+            text: options.cancelText || 'Cancel',
+            className: 'mm-modal-btn-secondary',
+            onClick: function () {
+              resolve(false);
+            }
+          },
+          {
+            text: options.confirmText || 'Confirm',
+            className: options.confirmClass || 'mm-modal-btn-primary',
+            onClick: function () {
+              resolve(true);
+            }
+          }
+        ]);
+      });
+    },
+
+    /**
+     * Promise-based save confirmation
+     * Usage: const confirmed = await MessageManager.confirm.saveAsync();
+     * @returns {Promise<boolean>}
+     */
+    saveAsync: function (message) {
+      return this.show(
+        message || 'Do you want to save changes?',
+        'Save Confirmation',
+        { confirmText: 'Yes, Save', cancelText: 'Cancel' }
+      );
+    },
+
+    /**
+     * Promise-based update confirmation
+     * Usage: const confirmed = await MessageManager.confirm.updateAsync();
+     * @returns {Promise<boolean>}
+     */
+    updateAsync: function (message) {
+      return this.show(
+        message || 'Do you want to update this record?',
+        'Update Confirmation',
+        { confirmText: 'Yes, Update', cancelText: 'Cancel' }
+      );
+    },
+
+    /**
+     * Promise-based delete confirmation
+     * Usage: const confirmed = await MessageManager.confirm.deleteAsync('User');
+     * @param {string} itemName - Name of item to delete
+     * @returns {Promise<boolean>}
+     */
+    deleteAsync: function (itemName) {
+      var message = 'Are you sure you want to delete ' +
+        (itemName ? '<strong>' + _escapeHtml(itemName) + '</strong>' : 'this item') +
+        '?<br><br>This action cannot be undone.';
+
+      return this.show(
+        message,
+        'Delete Confirmation',
+        {
+          confirmText: 'Delete',
+          cancelText: 'Cancel',
+          type: 'warning',
+          confirmClass: 'mm-modal-btn-danger'
+        }
+      );
+    },
+
     /**
      * Generic confirmation
      */

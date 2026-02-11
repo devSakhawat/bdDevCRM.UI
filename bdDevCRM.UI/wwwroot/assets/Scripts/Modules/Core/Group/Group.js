@@ -1,4 +1,9 @@
-﻿/*=========================================================
+﻿/// <reference path="../../../core/helpers/formhelper.js" />
+/// <reference path="../../../core/managers/messagemanager.js" />
+/// <reference path="../../../core/managers/gridmanager.js" />
+
+
+/*=========================================================
 * Group Settings Screen (Complete CRUD with FormHelper)
 * File: Group.js
 * Author: devSakhawat
@@ -315,11 +320,19 @@ var Groups = {
   onModuleComboSelect: async function (e) {
     try {
       debugger;
-      const dataItem = this.dataItem(e.item.index());
+      const comboBox = e.sender;
+      const dataItem = comboBox.dataItem(e.item.index());
+      // Null check for safety
+      if (!dataItem) {
+        //console.warn('No data item selected');
+        MessageManager.notify.error('No data item selected');
+        return;
+      }
+
       const moduleId = dataItem.ModuleId;
 
       console.log('Module selected from combo:', moduleId);
-
+      // Load menu tree and access control in parallel
       await Promise.all([
         this.loadMenuTreeByModuleId(moduleId),
         this.loadAccessControlByModuleId(moduleId)
@@ -461,31 +474,45 @@ var Groups = {
 
   /**
    * On Menu Check Event Handler
+   * @param {Object} e - Kendo TreeView check event object
+   * @description Handles menu checkbox selection in TreeView
    */
   onMenuCheck: async function (e) {
-    const treeView = e.sender;
-    const dataItem = treeView.dataItem(e.node);
-    const menuId = dataItem.id;
-    const isChecked = e.node.find('> . k-checkbox-wrapper > input[type=checkbox]').is(':checked');
+    try {
+      const treeView = e.sender;
+      const dataItem = treeView.dataItem(e.node);
 
-    console.log('Menu check event:', menuId, isChecked);
+      // Null check for dataItem
+      if (!dataItem) {
+        console.warn('No data item found for the selected node');
+        return;
+      }
 
-    if (isChecked) {
-      // Menu checked হলে
-      await this.addMenuToArray(menuId);
+      const menuId = dataItem.id;
+      // e.node is a DOM Element in newer Kendo versions, not a jQuery object
+      const $node = $(e.node);
 
-      this.checkParentMenus(menuId);
+      // Also using Kendo's recommended checkbox selector pattern
+      const isChecked = $node.find('input[type="checkbox"]').first().is(':checked');
 
-      this.addChildMenusToArray(menuId);
+      console.log('Menu check event - MenuId:', menuId, 'Checked:', isChecked);
 
-      await this.loadStatesByMenuId(menuId);
+      if (isChecked) {
+        // Menu checked
+        await this.addMenuToArray(menuId);
+        this.checkParentMenus(menuId);
+        this.addChildMenusToArray(menuId);
+        await this.loadStatesByMenuId(menuId);
+      } else {
+        // Menu unchecked
+        this.removeMenuFromArray(menuId);
+        this.removeChildMenusFromArray(menuId);
+        this.removeStatesByMenuId(menuId);
+      }
 
-    } else {
-      this.removeMenuFromArray(menuId);
-
-      this.removeChildMenusFromArray(menuId);
-
-      this.removeStatesByMenuId(menuId);
+    } catch (error) {
+      console.error('Error in menu check handler:', error);
+      //MessageManager.notify.error('Failed to process menu selection');
     }
   },
 
@@ -998,7 +1025,7 @@ var Groups = {
     // Filter out states belonging to this menu
     this.statePermissionArray = this.statePermissionArray.filter(item => {
       if (item.ParentPermission === menuId) {
-        // Actions ও remove করা
+        // Actions ও remove
         this.removeActionsByStatusId(item.ReferenceID);
         return false;
       }
@@ -1555,6 +1582,7 @@ var Groups = {
    */
   save: async function () {
     try {
+      debugger;
       // Validate form
       if (!this.validateForm()) {
         return;
@@ -1563,49 +1591,62 @@ var Groups = {
       // Prepare data object
       const groupData = this.prepareGroupData();
 
-      console.log('Saving group data:', groupData);
+      console.log('Saving / Updating group data:', groupData);
 
       // Get group ID
       const groupId = $("#" + this.config.hiddenGroupIdId).val();
       const isUpdate = groupId && groupId !== '0';
+
+      // Confirmation title and message
+      const confirmTitle = isUpdate ? 'Update Confirmation' : 'Save Confirmation';
 
       // Confirmation message
       const confirmMsg = isUpdate ?
         'Do you want to update this group?' :
         'Do you want to create this group?';
 
-      // Show confirmation dialog
-      const confirmed = await MessageManager.confirm.show(confirmMsg);
+      //// Show confirmation dialog
+      //const confirmed = await MessageManager.confirm.show(confirmMsg);
 
-      if (!confirmed) {
-        return;
-      }
+      //if (!confirmed) {
+      //  return;
+      //}
 
-      // Call API
-      let result;
-      if (isUpdate) {
-        result = await GroupService.update(groupId, groupData);
-      } else {
-        result = await GroupService.create(groupData);
-      }
+      MessageManager.confirm.ask(
+        confirmTitle, confirmMsg,
+        async () => {
+          try {
+            let result;
+            if (isUpdate) {
+              result = await GroupService.update(groupId, groupData);
+            }
+            else {
+              result = await GroupService.create(groupData);
+            }
 
-      // Success message
-      const successMsg = isUpdate ?
-        'Group updated successfully' :
-        'Group created successfully';
+            const successMsg = isUpdate ? 'Group update successfully' : 'Group created successfylly';
+            MessageManager.notify.success(successMsg);
 
-      MessageManager.notify.success(successMsg);
+            // grid refresh
+            const grid = $(FormHelper.makeValidSelector(this.config.groupGridId)).data("kendoGrid");
+            if (grid) {
+              grid.dataSource.read();
+            }
 
-      // Refresh grid
-      const grid = $("#" + this.config.groupGridId).data("kendoGrid");
-      if (grid) {
-        grid.dataSource.read();
-      }
+            // form clear
+            this.clearForm();
+          } catch (e) {
+            console.error(confirmTitle, error);
+            MessageManager.notify.error(confirmTitle + " : " + error);
+          }
+        },
+        () => {
+          // User clicked NO : no active need.
+          console.log('Save cancelled by user');
+        }
+      );
 
-      // Clear form
-      this.clearForm();
-
-      console.log('Group saved successfully');
+      
 
     } catch (error) {
       console.error('Error saving group:', error);

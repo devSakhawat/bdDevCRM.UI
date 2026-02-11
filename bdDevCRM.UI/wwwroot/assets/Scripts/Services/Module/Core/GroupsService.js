@@ -1,4 +1,6 @@
-﻿/*=========================================================
+﻿/// <reference path="../../../core/api/appconfig.js" />
+
+/*=========================================================
  * Group Service
  * File: GroupService.js
  * Description: Centralized API service for Group Settings module
@@ -327,6 +329,7 @@ var GroupService = {
 
     try {
       console.log('Fetching states for menu:', menuId);
+      console.log(AppConfig.endpoints.statusByMenu);
       const endpoint = `${AppConfig.endpoints.statusByMenu || '/status/key'}/${menuId}`;
       const data = await ApiCallManager.get(endpoint, {
         showLoadingIndicator: false,

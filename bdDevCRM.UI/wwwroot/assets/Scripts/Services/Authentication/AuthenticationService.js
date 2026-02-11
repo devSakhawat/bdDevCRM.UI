@@ -158,11 +158,11 @@ var AuthenticationService = (function () {
      * @param {string} password - User password
      * @returns {Promise} Promise resolving to authentication result
      */
-    authenticate: function (loginId, password) {
+    authenticate: function (loginId, password, isRememberMe) {
       console.log('[AuthenticationService] Starting authentication for:', loginId);
-
+      debugger;
       // Use AuthManager for login
-      return AuthManager.login(loginId, password)
+      return AuthManager.login(loginId, password, isRememberMe)
         .then(function (loginResult) {
           console.log('[AuthenticationService] Login successful');
 

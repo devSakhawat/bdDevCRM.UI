@@ -42,38 +42,125 @@ var AuthApiClient = (function () {
    */
   function _getEndpoint(path) {
     var baseUrl = _getApiBaseUrl();
-    return baseUrl + path;
+    var fullUrl = baseUrl + path;
+
+    console.log('[AuthApiClient] Base URL:', baseUrl);
+    console.log('[AuthApiClient] Path:', path);
+    console.log('[AuthApiClient] Full URL:', fullUrl);
+
+    return fullUrl;
   }
 
   /**
    * Make HTTP request with error handling
    * @private
    */
+  //function _makeRequest(options) {
+  //  return new Promise(function (resolve, reject) {
+  //    $.ajax({
+  //      url: options.url,
+  //      type: options.method || 'GET',
+  //      contentType: options.contentType || 'application/json',
+  //      data: options.data,
+  //      headers: options.headers || {},
+  //      xhrFields: {
+  //        withCredentials: true // Critical: Enable cookies
+  //      },
+  //      success: function (response) {
+  //        resolve(response);
+  //      },
+  //      error: function (xhr, status, error) {
+  //        var errorResponse = {
+  //          status: xhr.status,
+  //          statusText: xhr.statusText,
+  //          message: error,
+  //          response: xhr.responseJSON || null,
+  //          xhr: xhr
+  //        };
+  //        reject(errorResponse);
+  //      }
+  //    });
+  //  });
+  //}
+
   function _makeRequest(options) {
+    console.group('[AuthApiClient] Request Details');
+    console.log('URL:', options.url);
+    console.log('Method:', options.method);
+    console.log('Content-Type:', options.contentType);
+    console.log('Data:', options.data);
+    console.log('Headers:', options.headers);
+    console.groupEnd();
+
     return new Promise(function (resolve, reject) {
-      $.ajax({
+      var ajaxConfig = {
         url: options.url,
-        type: options.method || 'GET',
+        type: options.method || 'POST',
         contentType: options.contentType || 'application/json',
         data: options.data,
         headers: options.headers || {},
         xhrFields: {
-          withCredentials: true // ✅ Critical: Enable cookies
+          withCredentials: true
         },
-        success: function (response) {
+        beforeSend: function (xhr, settings) {
+          console.log('[AuthApiClient] Before Send - Method:', settings.type);
+          console.log('[AuthApiClient] Before Send - URL:', settings.url);
+          console.log('[AuthApiClient] Before Send - Data:', settings.data);
+        },
+        success: function (response, textStatus, xhr) {
+          console.group('[AuthApiClient] Success');
+          console.log('Status:', xhr.status);
+          console.log('Response:', response);
+          console.groupEnd();
           resolve(response);
         },
-        error: function (xhr, status, error) {
+        error: function (xhr, textStatus, errorThrown) {
+          console.group('[AuthApiClient] Error');
+          console.log('Status:', xhr.status);
+          console.log('Status Text:', xhr.statusText);
+          console.log('Ready State:', xhr.readyState);
+          console.log('Response Text:', xhr.responseText);
+          console.log('Text Status:', textStatus);
+          console.log('Error Thrown:', errorThrown);
+          console.log('All Response Headers:', xhr.getAllResponseHeaders());
+          console.groupEnd();
+
           var errorResponse = {
             status: xhr.status,
             statusText: xhr.statusText,
-            message: error,
-            response: xhr.responseJSON || null,
+            message: errorThrown || textStatus || 'Request failed',
+            response: null,
             xhr: xhr
           };
+
+          // Try to parse response
+          try {
+            if (xhr.responseText) {
+              errorResponse.response = JSON.parse(xhr.responseText);
+            }
+          } catch (e) {
+            errorResponse.response = xhr.responseText;
+          }
+
+          // Enhanced error messages
+          if (xhr.status === 0) {
+            errorResponse.message = 'Network Error - Possible causes:\n' +
+              '1. Backend is not running\n' +
+              '2. CORS is blocking the request\n' +
+              '3. SSL certificate issue\n' +
+              '4. URL is incorrect';
+          } else if (xhr.status === 405) {
+            errorResponse.message = 'Method Not Allowed (405) - Backend expects different method';
+          } else if (xhr.status >= 500) {
+            errorResponse.message = 'Server Error (' + xhr.status + ')';
+          }
+
           reject(errorResponse);
         }
-      });
+      };
+
+      console.log('[AuthApiClient] Sending AJAX request with config:', ajaxConfig);
+      $.ajax(ajaxConfig);
     });
   }
 
@@ -88,7 +175,7 @@ var AuthApiClient = (function () {
      * @param {string} password - User password
      * @returns {Promise} Promise resolving to login response
      */
-    login: function (loginId, password) {
+    login: function (loginId, password, isRememberMe) {
       console.log('[AuthApiClient] Attempting login for user:', loginId);
 
       if (!loginId || !password) {
@@ -100,9 +187,10 @@ var AuthApiClient = (function () {
 
       var payload = {
         LoginId: loginId,
-        Password: password
+        Password: password,
+        IsRememberMe: isRememberMe
       };
-
+      debugger;
       return _makeRequest({
         url: _getEndpoint('/login'),
         method: 'POST',
@@ -112,6 +200,7 @@ var AuthApiClient = (function () {
         console.log('[AuthApiClient] Login successful');
         return response;
       }).catch(function (error) {
+        console.error('[AuthApiClient] Login failed:', error);
         console.error('[AuthApiClient] Login failed:', error.message);
         throw error;
       });

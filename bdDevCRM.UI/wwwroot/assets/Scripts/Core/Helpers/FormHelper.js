@@ -549,7 +549,7 @@ var FormHelper = {
     kendowWindowheight = "50%",
     animationType = "default",
     animateOpacity = true,
-    onOpenCallback = null  // Generic callback parameter
+    onOpenCallback = null 
   ) {
     const selector = windowSelector.startsWith('#') ? windowSelector : '#' + windowSelector;
     var popUp = $(selector).data("kendoWindow");

@@ -268,7 +268,7 @@ var AuthManager = (function () {
      * @param {string} password - User password
      * @returns {Promise} Promise resolving to login result
      */
-    login: function (loginId, password) {
+    login: function (loginId, password, isRememberMe) {
       console.log('[AuthManager] Login initiated for:', loginId);
 
       // Validate credentials
@@ -282,7 +282,7 @@ var AuthManager = (function () {
       }
 
       // Call API
-      return AuthApiClient.login(loginId, password)
+      return AuthApiClient.login(loginId, password, isRememberMe)
         .then(function (response) {
           console.log('[AuthManager] Login API successful');
 

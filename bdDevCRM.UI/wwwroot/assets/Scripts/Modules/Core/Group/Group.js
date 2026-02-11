@@ -406,7 +406,10 @@ var Groups = {
           template: "<input type='checkbox' id='chkMenu#= item.id #' />"
         },
         dataSource: treeData,
+        // check event for when user click the checkbox
         check: this.onMenuCheck.bind(this),
+        // select event for when user th
+        select: this.onMenuSelect.bind(this),
         expand: function (e) {
           // Auto expand functionality
         },
@@ -514,6 +517,26 @@ var Groups = {
       console.error('Error in menu check handler:', error);
       //MessageManager.notify.error('Failed to process menu selection');
     }
+  },
+
+  /**
+   * On Menu Select Event Handler
+   * Function will be fire when menu item will be click
+   * Only Status Load, no checkbox check/uncheck
+   */
+  onMenuSelect: async function (e) {
+    const treeView = e.sender;
+    const dataItem = treeView.dataItem(e.node);
+    if (!dataItem) {
+      console.warn('No data item found for the selected node');
+      return;
+    }
+
+    const menuId = dataItem.id;
+    console.log('Menu item selected (name clicked):', menuId);
+
+    // only Status load
+    await this.loadStatesByMenuId(menuId);
   },
 
   /**
@@ -926,11 +949,11 @@ var Groups = {
         .on('change', (e) => {
           const stateId = $(e.target).data('state-id');
           const menuId = $(e.target).data('menu-id');
-          this.onStateCheckboxChange(stateId, menuId);
+           this.onStateCheckboxChange(stateId, menuId);
         });
 
       // Existing state selection restore
-      this.restoreStateSelection(menuId);
+      await this.restoreStateSelection(menuId);
 
       console.log('States loaded successfully for menu:', menuId);
 
@@ -1122,8 +1145,8 @@ var Groups = {
               <div class="d-flex align-items-center">
                 <input type="checkbox" 
                        class="form-check-input me-2" 
-                       id="chkAction${action.WfactionId}" 
-                       data-action-id="${action.WfactionId}"
+                       id="chkAction${action.WfActionId}" 
+                       data-action-id="${action.WfActionId}"
                        data-action-name="${action.ActionName}"
                        data-status-id="${statusId}" />
                 <span>${action.ActionName}</span>

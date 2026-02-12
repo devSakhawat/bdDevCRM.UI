@@ -70,9 +70,14 @@ var SidebarMenu = (function () {
     try {
       _showSkeletonLoader();
 
+      var cachedMenu;
+      if (typeof StorageManager !== 'undefined' && TokenStorage.getAccessToken()) {
+        cachedMenu = _getCachedMenu();
+      }
+      // var token = TokenStorage.getAccessToken();
       // Step 1: Check cache first
-      var cacheSource = (typeof StorageManager !== 'undefined') ? 'StorageManager' : 'localStorage';
-      var cachedMenu = _getCachedMenu();
+      // var cacheSource = (typeof StorageManager !== 'undefined') ? 'StorageManager' : 'localStorage';
+      // cachedMenu = _getCachedMenu();
 
       // Detect cached ParseError object (some code may have cached the full response/error accidentally)
       if (cachedMenu && typeof cachedMenu === 'object' && cachedMenu.IsSuccess === false && cachedMenu.ErrorType === 'ParseError') {

@@ -331,7 +331,7 @@ var AuthenticationService = (function () {
      * Logout user (complete logout flow)
      * @returns {Promise} Promise resolving when logout complete
      */
-    logout: function () {
+    logout2: function () {
       console.log('[AuthenticationService] Starting logout...');
 
       return AuthManager.logout()
@@ -359,6 +359,31 @@ var AuthenticationService = (function () {
             message: 'Logged out (with errors)'
           };
         });
+    },
+    logout: async function () {
+
+      try {
+        const endpoint = AppConfig.endpoints.logout || '/logout';
+        const result = await ApiCallManager.post(endpoint, '', {
+          showLoadingIndicator: true,
+          showSuccessNotification: false, // We'll show custom message
+          showErrorNotifications: true
+        });
+
+        if (typeof TokenManager !== 'undefined') {
+          TokenManager.clearSession();
+          TokenManager.redirectToLogin();
+        } else {
+          window.location.href = (typeof baseUI !== 'undefined' ? baseUI : '') + '/Home/Login';
+        }
+
+        console.log('Successfully Logout');
+        return result;
+      } catch (error) {
+        console.error('Error creating group:', error);
+        MessageManager.notify.error('Failed to create group');
+        throw error;
+      }
     },
 
     /**

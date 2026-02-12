@@ -15,7 +15,9 @@ var LoginModule = (function () {
     passwordField: 'txtPassword',
     rememberMeField: 'chkRememberMe',
     loginButton: 'btnLogin',
-    dashboardUrl: '/Home/Index'
+    dashboardUrl: '/Home/Index',
+    //login: '/Home/Login',
+    //logout: '/Home/Logout'
   };
 
   var _state = {
@@ -93,7 +95,7 @@ var LoginModule = (function () {
       // Call login API
       var response = await ApiCallManager.post(
         AppConfig.getApiUrl(),
-        '/login',
+        AppConfig.endpoints.login || '/login',
         validation.credentials,
         { retry: false, showErrorNotifications: false }
       );
@@ -102,14 +104,14 @@ var LoginModule = (function () {
         throw new Error('Invalid login response');
       }
 
-      var tokenResponse = response.Data;
+      var tokenResponse = response.Data || response.data || response;
 
       // Store tokens using StorageManager
       StorageManager.setTokens(tokenResponse);
       console.log('Tokens stored');
 
       // Get user info
-      var userInfoResponse = await ApiCallManager.get(AppConfig.getApiUrl(), '/user-info');
+      var userInfoResponse = await ApiCallManager.get(AppConfig.getApiUrl(), AppConfig.endpoints.getUserInfo || '/user-info');
 
       if (!userInfoResponse) {
         throw new Error('Failed to get user info');

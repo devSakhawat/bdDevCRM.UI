@@ -191,7 +191,7 @@ var ApiCallManager = (function () {
         }
       }
     }
-    return localStorage.getItem('jwtToken') || '';
+    return localStorage.getItem('access_token') || '';
   }
 
   /**

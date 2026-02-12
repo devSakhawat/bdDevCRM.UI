@@ -44,7 +44,7 @@ var AppConfig = (function () {
 
     // Storage keys for localStorage/sessionStorage
     storage: {
-      tokenKey: 'jwtToken',
+      tokenKey: 'access_token',
       userInfoKey: 'userInfo',
       themeKey: 'appTheme',
       languageKey: 'appLanguage',
@@ -211,7 +211,7 @@ var AppConfig = (function () {
 
     // Front-end page init endpoints
     frontendRoutes: {
-      login: '/Login/Index',
+      login: '/Home/Login',
       home: '/Home/Index',
       dashboard: '/dashboard',
       settings: '/settings',

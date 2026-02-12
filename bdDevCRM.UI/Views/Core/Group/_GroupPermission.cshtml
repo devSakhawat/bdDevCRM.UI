@@ -1,45 +1,79 @@
-﻿@* @model bdDevCRM.UI.Models.ErrorViewModel
+﻿@* 
+<div id="divGroupPermision" style="overflow-y: auto; overflow-x: hidden;">
+  <div style="position: relative">
+    <!-- Application DDL  -->
+    <div class="col-12 mb-2">
+      <div class="d-flex justify-content-start align-items-center  pb-01">
+        <span for="ApplicationName" class="w-40">Application</span>
+        <input id="cmbApplicationForModule" name="ApplicationName" placeholder="Application name" class="w-60" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-5 me-2">
+        <partial name="Group/_AccessControlPermission" />
+      </div>
+      <div class="col-6">
+        <partial name="Group/_ReportPermission" />
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-4 me5">
+        <partial name="Group/_MenuPermission" />
+      </div>
+      <div class="col-4 me5 ">
+        <partial name="Group/_StatePermission" />
+      </div>
+      <div class="col-3">
+        <partial name="Group/_ActionPermission" />
+      </div>
+    </div>
+  </div>
+</div>
  *@
 
-@* <script src="~/assets/scripts/modules/core/group/grouppermission.js"></script> *@
 
 <div id="divGroupPermision" style="position:relative">
 
   <!-- Application DDL  -->
-  <div class="col-12 mb-2">
+  <div class="col-12 mb-2" id="ddlApplicationRow">
     <div class="d-flex justify-content-start align-items-center  pb-01">
       <span for="ApplicationName" class="w-40">Application</span>
       <input id="cmbApplicationForModule" name="ApplicationName" placeholder="Application name" class="w-60" />
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-5 me-2">
-      <partial name="Group/_AccessControlPermission" />
-    </div>
-    <div class="col-6">
-      <partial name="Group/_ReportPermission" />
-    </div>
-  </div>
-  
-  <div class="row mt-3">
-    <div class="col-4 me5">
-      <partial name="Group/_MenuPermission" />
-    </div>
-    <div class="col-4 me5 ">
-      <partial name="Group/_StatePermission" />
-    </div>
-    <div class="col-3">
-      <partial name="Group/_ActionPermission" />
-    </div>
-  </div>
+  <div id="permissionRowsWrapper">
 
+    <!-- Row 1: Access + Report = 50% -->
+    <div class="permission-row" id="permissionRow1">
+      <div class="row h-100">
+        <div class="col-5 me-2 h-100">
+          <partial name="Group/_AccessControlPermission" />
+        </div>
+        <div class="col-6 h-100">
+          <partial name="Group/_ReportPermission" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Menu + State + Action = 50% -->
+    <div class="permission-row" id="permissionRow2">
+      <div class="row h-100">
+        <div class="col-4 me5 h-100">
+          <partial name="Group/_MenuPermission" />
+        </div>
+        <div class="col-4 me5 h-100">
+          <partial name="Group/_StatePermission" />
+        </div>
+        <div class="col-3 h-100">
+          <partial name="Group/_ActionPermission" />
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 
-
-@* 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
- *@

@@ -1,9 +1,4 @@
-﻿@* @model bdDevCRM.UI.Models.ErrorViewModel *@
-
-@* <script src="~/assets/scripts/modules/core/group/menupermission.js"></script> *@
-
-
-
+﻿@* 
 <div id="divMenuPermission" class="menuPermission widthSize100_per">
   <!-- Loader Container -->
   <div id="menuSectionLoader"> </div>
@@ -31,12 +26,27 @@
     margin-bottom: 0;
     cursor: pointer;
   }
-
-
 </style>
-
-@* 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
  *@
+
+
+<div id="divMenuPermission" class="permission-section">
+  <div id="menuSectionLoader"> </div>
+  <div class="mb-2">
+    <h4 class="k-header mb-3 mb-2">Menu Permission</h4>
+    <div id="menuContent" class="permission-scroll-content">
+      <div id="treeview" class="mb-1"> </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #menuSectionLoader {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 16.67%;
+    margin-left: -40px !important;
+    margin-top: -45px !important;
+  }
+</style>

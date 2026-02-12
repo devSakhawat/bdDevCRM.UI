@@ -1,4 +1,5 @@
-﻿
+﻿/// <reference path="appconfig.js" />
+
 
 /*=========================================================
  * Authentication API Client

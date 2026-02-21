@@ -83,30 +83,26 @@ var loginHelper = {
    */
   isAlreadyLoggedIn: function () {
    /* var token = localStorage.getItem("access_token");*/
+    
+    if (typeof TokenStorage !== 'undefined' ) {
+      var token = TokenStorage.getAccessToken();
 
-    var token;
-    if (typeof StorageManager !== 'undefined' ) {
-      token = TokenStorage.getAccessToken();
+      if (!token) {
+        return false;
+      }
+
+      // Check if token is expired using TokenStorage
+      return !TokenStorage.hasValidToken(token)
     }
-
-    if (!token) {
-      return false;
-    }
-
-    // Check if token is expired using TokenStorage
-    if (typeof TokenStorage !== 'undefined') {
-      return !TokenStorage.hasValidToken(token);
-    }
-
-    // Fallback: assume logged in if token exists
-    return true;
+    return false;
   },
 
   /**
    * Get logged in user info after successful login
    */
   getLoggedInUserInfo: function () {
-    var token = localStorage.getItem("access_token");
+    //var token = localStorage.getItem("access_token");
+    var token = StorageManager.getAccessToken();
     if (!token) {
       console.error('[Login] No token found after login');
       alert("Login failed. Please try again.");
@@ -211,8 +207,8 @@ var loginManager = {
 
     // Prepare payload (lowercase to match backend DTO)
     var payload = {
-      loginId: logonId,      // lowercase
-      password: pass,        // lowercase
+      loginId: logonId,
+      password: pass,
       isRememberMe: $("#chkRememberMe").is(':checked') || false
     };
 
@@ -230,35 +226,66 @@ var loginManager = {
         withCredentials: true // Critical: Enable cookies for refresh token
       },
       success: function (response) {
+        debugger;
         console.log('[Login] Login successful:', response);
 
-        // Extract access token from nested response
-        var tokenData = response.Data || response.data || response;
-        var accessToken = tokenData.AccessToken || tokenData.accessToken;
-        var expiresIn = tokenData.ExpiresIn || tokenData.expiresIn || 900;
+        var responseData = response.Data || response.data || response;
 
-        if (!accessToken) {
-          console.error('[Login] No access token in response');
-          Message.ErrorWithHeaderText('Login Failed',
-            'Invalid response from server. Please try again.', null);
-          $btnLogin.prop('disabled', false).val('Sign in');
-          return;
+        // Single function call - handle all
+        if (typeof TokenManager !== 'undefined') {
+          var success = TokenManager.handleLoginResponse(responseData);
+
+          if (!success) {
+            console.error('[Login] Failed to process login');
+            Message.ErrorWithHeaderText('Login Error',
+              'Failed to process login. Please try again.', null);
+            $("#btnLogin").prop('disabled', false).val('Sign in');
+            return;
+          }
         }
 
-        //// Store access token
-        //localStorage.setItem("access_token", accessToken);
-
-        // Store token expiry (optional but useful)
-        if (typeof TokenStorage !== 'undefined') {
-          //TokenStorage.setAccessToken(accessToken, expiresIn);
-          TokenStorage.setAccessToken(accessToken, expiresIn);
+        // Success message
+        if (typeof MessageManager !== 'undefined') {
+          MessageManager.notify.success('Login successful!');
+        } else if (typeof Message !== 'undefined') {
+          Message.Success('Login successful! Redirecting...');
         }
 
-        console.log('[Login] Access token stored');
-
-        // Get user info and redirect
-        loginHelper.getLoggedInUserInfo();
+        // Redirect
+        setTimeout(function () {
+          window.location.href = AppConfig.getUiUrl() + "Home/Index";
+        }, 500);
       },
+      //success: function (response) {
+      //  console.log('[Login] Login successful:', response);
+
+      //  // Extract access token from nested response
+      //  var tokenData = response.Data || response.data || response;
+      //  var accessToken = tokenData.AccessToken || tokenData.accessToken;
+      //  var expiresIn = tokenData.ExpiresIn || tokenData.expiresIn || 900;
+
+      //  if (!accessToken) {
+      //    console.error('[Login] No access token in response');
+      //    Message.ErrorWithHeaderText('Login Failed',
+      //      'Invalid response from server. Please try again.', null);
+      //    $btnLogin.prop('disabled', false).val('Sign in');
+      //    return;
+      //  }
+
+      //  //// Store access token
+      //  //localStorage.setItem("access_token", accessToken);
+
+      //  // Store token expiry (optional but useful)
+      //  if (typeof TokenStorage !== 'undefined') {
+      //    //TokenStorage.setAccessToken(accessToken, expiresIn);
+      //    TokenStorage.setAccessToken(accessToken, expiresIn);
+      //  }
+
+      //  console.log('[Login] Access token stored');
+
+      //  // Get user info and redirect
+      //  loginHelper.getLoggedInUserInfo();
+      //},
       error: function (xhr, status, error) {
         console.error('[Login] Login failed');
         console.error('[Login] Status:', xhr.status);

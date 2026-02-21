@@ -344,40 +344,40 @@ var AppConfig = (function () {
       return JSON.parse(JSON.stringify(_config));
     },
 
-    // Token Management
+    //// Token Management
 
-    /**
-     * Get JWT token from storage
-     * @returns {string|null}
-     */
-    getToken: function () {
-      return localStorage.getItem(_config.storage.tokenKey);
-    },
+    ///**
+    // * Get JWT token from storage
+    // * @returns {string|null}
+    // */
+    //getToken: function () {
+    //  return localStorage.getItem(_config.storage.tokenKey);
+    //},
 
-    /**
-     * Set JWT token to storage
-     * @param {string} token
-     */
-    setToken: function (token) {
-      if (token) {
-        localStorage.setItem(_config.storage.tokenKey, token);
-      }
-    },
+    ///**
+    // * Set JWT token to storage
+    // * @param {string} token
+    // */
+    //setToken: function (token) {
+    //  if (token) {
+    //    localStorage.setItem(_config.storage.tokenKey, token);
+    //  }
+    //},
 
-    /**
-     * Remove JWT token from storage
-     */
-    removeToken: function () {
-      localStorage.removeItem(_config.storage.tokenKey);
-    },
+    ///**
+    // * Remove JWT token from storage
+    // */
+    //removeToken: function () {
+    //  localStorage.removeItem(_config.storage.tokenKey);
+    //},
 
-    /**
-     * Check if user is authenticated
-     * @returns {boolean}
-     */
-    isAuthenticated: function () {
-      return !!this.getToken();
-    },
+    ///**
+    // * Check if user is authenticated
+    // * @returns {boolean}
+    // */
+    //isAuthenticated: function () {
+    //  return !!this.getToken();
+    //},
 
     /**
      * Get user info from storage

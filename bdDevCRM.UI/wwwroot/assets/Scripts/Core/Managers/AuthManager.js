@@ -1,4 +1,6 @@
-﻿/*=========================================================
+﻿/// <reference path="StorageManager.js" />
+
+/*=========================================================
  * Authentication Manager
  * File: AuthManager.js
  * Description: Central authentication orchestration layer
@@ -399,7 +401,7 @@ var AuthManager = (function () {
      * @returns {boolean} True if authenticated
      */
     isAuthenticated: function () {
-      return TokenStorage.hasValidToken();
+      return StorageManager.hasValidToken();
     },
 
     /**

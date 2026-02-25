@@ -253,7 +253,7 @@ var loginManager = {
 
         // Redirect
         setTimeout(function () {
-          window.location.href = AppConfig.getUiUrl() + "Home/Index";
+          window.location.href = AppConfig.getUiUrl() + "/Home/Index";
         }, 500);
       },
       //success: function (response) {

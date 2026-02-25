@@ -138,7 +138,8 @@ var StorageManager = (function () {
     var expiryTime = parseInt(expiry, 10);
     var now = new Date().getTime();
 
-    return now >= expiryTime;
+    var result = now >= expiryTime;
+    return result;
   }
 
   // ============================================================================
@@ -197,7 +198,8 @@ var StorageManager = (function () {
         return null;
       }
 
-      return _safeGetItem(STORAGE_KEYS.ACCESS_TOKEN);
+      var tokenData = _safeGetItem(STORAGE_KEYS.ACCESS_TOKEN);
+      return tokenData;
     },
 
     /**
@@ -221,7 +223,14 @@ var StorageManager = (function () {
     * @returns {boolean}
     */
     isAccessTokenExpired: function () {
-      return !_isTokenExpired() && this.getAccessToken() !== null;
+      debugger;
+      var isTokenExpire = _isTokenExpired();
+      var hasAccessToken = this.getAccessToken();
+      //var response = false;
+      if (_isTokenExpired() == false && (this.getAccessToken() !== null || this.getAccessToken() !== undefined || this.getAccessToken() != "")) {
+       return false;
+      }
+      return true;
     },
 
     /**

@@ -78,28 +78,6 @@ var TokenManager = (function () {
           return false;
         }
 
-        var baseUrl = AppConfig.getApiUrl();
-
-        // Cookie will be sent automatically
-        var response = await fetch(baseUrl + '/auth/refresh-token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          throw new Error('Token refresh failed');
-        }
-
-        var data = await response.json();
-
-        if (!data.IsSuccess || !data.Data) {
-          throw new Error('Invalid refresh response');
-        }
-
-        // Store new access token
-        StorageManager.setTokens(data.Data);
-
         console.log('[TokenManager] Token refreshed successfully');
         return true;
 

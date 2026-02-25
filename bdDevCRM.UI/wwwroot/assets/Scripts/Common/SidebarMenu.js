@@ -71,7 +71,7 @@ var SidebarMenu = (function () {
       _showSkeletonLoader();
 
       var cachedMenu;
-      if (typeof StorageManager !== 'undefined' && TokenStorage.getAccessToken()) {
+      if (typeof StorageManager !== 'undefined' && StorageManager.getAccessToken()) {
         cachedMenu = _getCachedMenu();
       }
       // var token = TokenStorage.getAccessToken();

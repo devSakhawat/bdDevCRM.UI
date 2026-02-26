@@ -331,8 +331,8 @@ var WorkFlowService = {
   getMenusForDropdown: async function () {
     try {
       console.log('Fetching menus for dropdown...');
-      const endpoint = AppConfig.endpoints.menusForDDL || '/menus-4-ddl';
-      const data = await ApiCallManager.get(endpoint, {
+      const endpoint = AppConfig.endpoints.menuDDL || '/menus-4-ddl';
+      const data = await ApiCallManager.getWithRefreshToken(endpoint, {
         showLoadingIndicator: false,
         showErrorNotifications: true
       });

@@ -169,8 +169,20 @@ if (typeof GridHelper !== 'undefined') {
         pagerHeight: 50
       });
 
+      // New to handle toolbar
       const defaultExports = ["excel", "pdf"];
-      const finalToolbar = Array.isArray(options.toolbar) ? options.toolbar.concat(defaultExports) : defaultExports;
+      let finalToolbar;
+
+      if (options.toolbar === false) {
+        finalToolbar = null;                    // No toolbar 
+      } else if (Array.isArray(options.toolbar) && options.toolbar.length > 0) {
+        finalToolbar = options.toolbar;         // only custom toolbar, no default 
+      } else {
+        finalToolbar = defaultExports;          // if there are no toolbar default excel+pdf
+      }
+      // end to handle toolbar
+      //const defaultExports = ["excel", "pdf"];
+      //const finalToolbar = Array.isArray(options.toolbar) ? options.toolbar.concat(defaultExports) : defaultExports;
 
       const defaultOptions = {
         pdf: {
@@ -195,13 +207,19 @@ if (typeof GridHelper !== 'undefined') {
           buttonCount: 5,
           numeric: true
         },
-        toolbar: finalToolbar || ["pdf", "excel"],
+        // toolbar: finalToolbar,
+        // or
+        //...(finalToolbar ? { toolbar: finalToolbar } : {}),
+        // or after object created.
         height: initialHeight,
         width: gridWidth,
         editable: false,
         selectable: 'row',
         autoBind: true
       };
+      if (finalToolbar) {
+        defaultOptions.toolbar = finalToolbar;
+      }
 
       const finalOptions = $.extend(true, {}, defaultOptions, options);
       delete finalOptions.heightConfig;

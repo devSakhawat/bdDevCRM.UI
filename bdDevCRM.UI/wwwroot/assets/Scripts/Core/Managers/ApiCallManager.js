@@ -410,7 +410,7 @@ var ApiCallManager = (function () {
    * const users = await ApiCallManager.get('/crm-course-ddl');
    * const filtered = await ApiCallManager.get('/users', { params: { status: 'active' } });
    */
-  async function getWithRefreshToken(baseUrl, endpoint, options) {
+  async function getWithRefreshToken(endpoint, options) {
     options = _prepareRequestOptions(options);
 
     return await _executeWithTokenRefresh(async function () {
@@ -984,7 +984,7 @@ var ApiCallManager = (function () {
       timeout: 30000,
       showLoadingIndicator: false,
       showErrorNotifications: true,
-      skipTokenRefresh: false, // 🆕 New option
+      skipTokenRefresh: false,
       params: {}
     };
 

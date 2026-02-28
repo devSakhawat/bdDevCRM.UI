@@ -12,6 +12,8 @@
  * - Cookie support
 =========================================================*/
 
+const { debug } = require("node:console");
+
 var ApiCallManager = (function () {
   'use strict';
 
@@ -30,10 +32,6 @@ var ApiCallManager = (function () {
   // ============================================================================
   // PRIVATE HELPER METHODS
   // ============================================================================
-
-  // ============================================
-  // PRIVATE - Helper Functions
-  // ============================================
 
   /**
    * Create Grid DataSource
@@ -179,20 +177,25 @@ var ApiCallManager = (function () {
     return typeof baseApi !== 'undefined' ? baseApi : '';
   }
 
-
   /**
    * Get JWT Token
    */
   function _getToken() {
-    if (typeof TokenManager !== 'undefined' && TokenManager.hasToken) {
-      if (TokenManager.hasToken()) {
-        if (typeof AppConfig !== 'undefined' && AppConfig.getToken) {
-          return AppConfig.getToken();
-        }
-      }
+    if (typeof StorageManager !== 'undefined') {
+      return StorageManager.getAccessToken();
     }
-    return localStorage.getItem('jwtToken') || '';
+    return '';
   }
+  //function _getToken() {
+  //  if (typeof TokenManager !== 'undefined' && TokenManager.hasToken) {
+  //    if (TokenManager.hasToken()) {
+  //      if (typeof AppConfig !== 'undefined' && AppConfig.getToken) {
+  //        return AppConfig.getToken();
+  //      }
+  //    }
+  //  }
+  //  return localStorage.getItem('access_token') || '';
+  //}
 
   /**
    * Sleep helper for retry delay
@@ -381,8 +384,9 @@ var ApiCallManager = (function () {
   * @returns {Promise<object>}
   */
   async function _handleHttpResponse(response) {
+    debugger;
     let data;
-
+    console.log(response);
     try {
       data = await response.json();
       console.log(data);
@@ -428,69 +432,6 @@ var ApiCallManager = (function () {
   // PRIVATE - Request Builder
   // ============================================
 
-  /**
-   * Build fetch request
-   */
-  async function _buildRequest(method, endpoint, data, options) {
-    const baseUrl = _getBaseUrl();
-    const url = baseUrl + endpoint;
-    const token = _getToken();
-
-    const requestOptions = {
-      method: method.toUpperCase(),
-      headers: {
-        'Authorization': token ? 'Bearer ' + token : ''
-      },
-      signal: options?.signal,
-      // enable cookies
-      credentials: 'include'
-    };
-
-    // Handle body data
-    if (data) {
-      if (data instanceof FormData) {
-        // For FormData, don't set Content-Type (browser will set it with boundary)
-        requestOptions.body = data;
-      } else {
-        // For JSON
-        requestOptions.headers['Content-Type'] = 'application/json';
-        requestOptions.body = JSON.stringify(data);
-      }
-    }
-
-    // Merge custom headers
-    if (options?.headers) {
-      Object.assign(requestOptions.headers, options.headers);
-    }
-
-    return { url, requestOptions };
-  }
-
-  /**
-   * Execute request with retry and loading
-   */
-  async function _executeRequest(method, endpoint, data, options) {
-    const requestFn = async () => {
-      const { url, requestOptions } = await _buildRequest(method, endpoint, data, options);
-      const response = await fetch(url, requestOptions);
-      return await _handleHttpResponse(response);
-    };
-
-    // Wrap with retry if enabled
-    const executeWithRetry = options?.retry !== false
-      ? () => _withRetry(requestFn, options?.maxRetries)
-      : requestFn;
-
-    // Wrap with loading indicator if enabled
-    if (_config.showLoadingForRequests && typeof MessageManager !== 'undefined') {
-      return await MessageManager.loading.wrap(
-        executeWithRetry(),
-        options?.loadingMessage || 'Processing...'
-      );
-    }
-
-    return await executeWithRetry();
-  }
 
   // ============================================
   // PUBLIC - Core HTTP Methods
@@ -511,7 +452,7 @@ var ApiCallManager = (function () {
    * const users = await ApiCallManager.get('/crm-course-ddl');
    * const filtered = await ApiCallManager.get('/users', { params: { status: 'active' } });
    */
-  async function getWithRefreshToken(baseUrl, endpoint, options) {
+  async function getWithRefreshToken(endpoint, options) {
     options = _prepareRequestOptions(options);
 
     return await _executeWithTokenRefresh(async function () {
@@ -624,6 +565,60 @@ var ApiCallManager = (function () {
     }, options);
   }
 
+
+
+  /**
+     * Refresh access token using refresh token cookie
+     * @returns {Promise<boolean>} Success status
+     */
+  async function refreshToken() {
+    try {
+      debugger;
+      console.log('[ApiCallManager]  Refreshing token...');
+
+      // Check if refresh token expired
+      if (typeof StorageManager !== 'undefined') {
+        if (StorageManager.isRefreshTokenExpired()) {
+          console.error('[ApiCallManager]  Refresh token expired');
+          return false;
+        }
+      }
+
+      // Use existing _executeRequest infrastructure
+      var response = await _executeRequest(
+        'POST',
+        AppConfig.endpoints.refreshToken || '/refresh-token',
+        null,  // No body needed
+        {
+          retry: false,  // Don't retry refresh calls
+          skipTokenRefresh: true  // CRITICAL: Prevent infinite loop!
+        }
+      );
+
+      // Response format: { IsSuccess: true, Data: { AccessToken, ExpiresIn, ... } }
+      if (!response.Data) {
+        throw new Error('Invalid refresh response');
+      }
+
+      // Store new access token
+      if (typeof StorageManager !== 'undefined') {
+        StorageManager.setTokens(response.Data);
+      }
+
+      console.log('[ApiCallManager] Token refreshed successfully');
+      return true;
+
+    } catch (error) {
+      console.error('[ApiCallManager] Token refresh failed:', error);
+
+      // Don't call _handleError here to avoid showing error to user
+      // Let the caller handle it
+      return false;
+    }
+  }
+
+
+
   /**
    * GET Request
    * @param {string} endpoint - API endpoint
@@ -733,6 +728,7 @@ var ApiCallManager = (function () {
     }
   }
 
+
   // ================================================================
   // PUBLIC - Grid-Specific Method (matching CRMGridOptions)
   // ================================================================
@@ -752,7 +748,7 @@ var ApiCallManager = (function () {
    *   filter: null
    * });
    */
-  async function postForGrid(endpoint, gridOptions) {
+   async function postForGrid(endpoint, gridOptions) {
     try {
       const requestPayload = {
         Skip: gridOptions.skip || 0,
@@ -790,7 +786,7 @@ var ApiCallManager = (function () {
    *   category: 'documents'
    * });
    */
-  async function uploadFile(endpoint, file, additionalData, options) {
+   async function uploadFile(endpoint, file, additionalData, options) {
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -974,11 +970,48 @@ var ApiCallManager = (function () {
     };
   }
 
-
-
   // ============================================
   // PRIVATE - Request Interceptor (Updated)
   // ============================================
+
+
+  /**
+   * Build fetch request
+   */
+  async function _buildRequest(method, endpoint, data, options) {
+    const baseUrl = _getBaseUrl();
+    const url = baseUrl + endpoint;
+    const token = _getToken();
+
+    const requestOptions = {
+      method: method.toUpperCase(),
+      headers: {
+        'Authorization': token ? 'Bearer ' + token : ''
+      },
+      signal: options?.signal,
+      // enable cookies
+      credentials: 'include'
+    };
+
+    // Handle body data
+    if (data) {
+      if (data instanceof FormData) {
+        // For FormData, don't set Content-Type (browser will set it with boundary)
+        requestOptions.body = data;
+      } else {
+        // For JSON
+        requestOptions.headers['Content-Type'] = 'application/json';
+        requestOptions.body = JSON.stringify(data);
+      }
+    }
+
+    // Merge custom headers
+    if (options?.headers) {
+      Object.assign(requestOptions.headers, options.headers);
+    }
+
+    return { url, requestOptions };
+  }
 
   /**
    * Prepare request options
@@ -993,7 +1026,7 @@ var ApiCallManager = (function () {
       timeout: 30000,
       showLoadingIndicator: false,
       showErrorNotifications: true,
-      skipTokenRefresh: false, // 🆕 New option
+      skipTokenRefresh: false,
       params: {}
     };
 
@@ -1001,47 +1034,225 @@ var ApiCallManager = (function () {
   }
 
   /**
- * Execute API call with token refresh support
+ * Execute request with retry and loading
+ */
+  async function _executeRequest(method, endpoint, data, options) {
+    const requestFn = async () => {
+      const { url, requestOptions } = await _buildRequest(method, endpoint, data, options);
+      const response = await fetch(url, requestOptions);
+      return await _handleHttpResponse(response);
+    };
+
+    // Wrap with retry if enabled
+    const executeWithRetry = options?.retry !== false
+      ? () => _withRetry(requestFn, options?.maxRetries)
+      : requestFn;
+
+    // Wrap with loading indicator if enabled
+    if (_config.showLoadingForRequests && typeof MessageManager !== 'undefined') {
+      return await MessageManager.loading.wrap(
+        executeWithRetry(),
+        options?.loadingMessage || 'Processing...'
+      );
+    }
+
+    return await executeWithRetry();
+  }
+
+
+  /**
+ * Execute API call with automatic token refresh
+ * 
+ * Flow:
+ * 1. Check if token is expired or expiring soon
+ * 2. If yes, refresh token first
+ * 3. Execute API call
+ * 4. If 401 error, refresh and retry once
+ * 5. Handle refresh failures gracefully
+ * 
  * @param {Function} apiCall - The actual API call function
  * @param {object} options - Request options
+ * @param {boolean} options.skipTokenRefresh - Skip token refresh logic
  * @returns {Promise}
  */
   async function _executeWithTokenRefresh(apiCall, options) {
+    // Skip if disabled
+    if (options.skipTokenRefresh) {
+      return await apiCall();
+    }
+
+    // Check dependencies
+    if (typeof StorageManager === 'undefined' || typeof TokenManager === 'undefined') {
+      return await apiCall();
+    }
+
     try {
-      // Check if token refresh is needed (and not skipped)
-      if (!options.skipTokenRefresh && typeof StorageManager !== 'undefined') {
-        if (StorageManager.isAccessTokenExpired() && !StorageManager.isRefreshTokenExpired()) {
+      // ============================================
+      // PHASE 1: Pre-flight Check
+      // ============================================
 
-          if (typeof TokenManager !== 'undefined') {
-            var refreshSuccess = await TokenManager.refreshToken();
+      var isExpired = StorageManager.isAccessTokenExpired();
+      var shouldRefresh = StorageManager.shouldRefreshAccessToken(60);
 
-            if (!refreshSuccess) {
-              throw new Error('Token refresh failed');
-            }
-          }
+      if (isExpired || shouldRefresh) {
+        console.log('[ApiCallManager] Token expired/expiring, refreshing...');
+
+        // Check if refresh token (cookie) is still valid
+        if (StorageManager.isRefreshTokenExpired()) {
+          console.error('[ApiCallManager] Refresh token expired');
+          _handleSessionExpired();
+          throw new Error('Session expired');
         }
+
+        // Call refresh endpoint
+        // → Browser automatically sends refresh token cookie
+        // → Backend validates cookie
+        // → Returns new access token
+        // → StorageManager stores new access token
+        var refreshSuccess = await TokenManager.refreshToken();
+
+        if (!refreshSuccess) {
+          console.error('[ApiCallManager] Refresh failed');
+          throw new Error('Token refresh failed');
+        }
+
+        console.log('[ApiCallManager] Token refreshed');
       }
 
-      // Execute the API call
+      // ============================================
+      // PHASE 2: Execute API Call
+      // ============================================
+
       return await apiCall();
 
     } catch (error) {
-      // If 401 Unauthorized, try to refresh token
-      if (error.status === 401 && !options.skipTokenRefresh) {
+      // ============================================
+      // PHASE 3: Handle 401 Error
+      // ============================================
 
-        if (typeof TokenManager !== 'undefined') {
-          var refreshSuccess = await TokenManager.refreshToken();
+      var is401Error = (
+        error.StatusCode === 401 ||
+        error.statusCode === 401 ||
+        error.status === 401
+      );
 
-          if (refreshSuccess) {
-            // Retry the original request
-            return await apiCall();
-          }
+      if (is401Error && !options.skipTokenRefresh && !options._retryAttempted) {
+        console.log('[ApiCallManager] Got 401, refreshing token...');
+
+        // Check if refresh token cookie is still valid
+        if (StorageManager.isRefreshTokenExpired()) {
+          console.error('[ApiCallManager] Refresh token expired');
+          _handleSessionExpired();
+          throw error;
+        }
+
+        // Attempt refresh
+        // → Hit /auth/refresh-token
+        // → Cookie sent automatically
+        var refreshSuccess = await TokenManager.refreshToken();
+
+        if (refreshSuccess) {
+          console.log('[ApiCallManager]  Refreshed, retrying...');
+
+          // Retry with new token
+          var retryOptions = Object.assign({}, options, { _retryAttempted: true });
+          return await _executeWithTokenRefresh(apiCall, retryOptions);
+        } else {
+          _handleSessionExpired();
         }
       }
 
       throw error;
     }
   }
+
+  /**
+   * Handle session expiry
+   * @private
+   */
+  function _handleSessionExpired() {
+    console.error('[ApiCallManager] Session expired, cleaning up...');
+
+    // Stop auto-refresh
+    if (typeof TokenManager !== 'undefined') {
+      TokenManager.stopAutoRefresh();
+    }
+
+    // Clear storage
+    if (typeof StorageManager !== 'undefined') {
+      StorageManager.clearAll();
+    }
+
+    // Notify user
+    if (typeof MessageManager !== 'undefined') {
+      MessageManager.alert.warning(
+        'Session Expired',
+        'Your session has expired. Please log in again.',
+        function () {
+          _redirectToLogin();
+        }
+      );
+    } else {
+      alert('Session Expired\n\nYour session has expired. Please log in again.');
+      _redirectToLogin();
+    }
+  }
+
+
+  /**
+   * Redirect to login page
+   * @private
+   */
+  function _redirectToLogin() {
+    var loginUrl = (typeof AppConfig !== 'undefined' && AppConfig.getUiUrl)
+      ? AppConfig.getUiUrl() + '/Home/Login'
+      : (typeof baseUI !== 'undefined' ? baseUI + '/Home/Login' : '/Home/Login');
+
+    window.location.href = loginUrl;
+  }
+
+ // /**
+ //* Execute API call with token refresh support
+ //* @param {Function} apiCall - The actual API call function
+ //* @param {object} options - Request options
+ //* @returns {Promise}
+ //*/
+ // async function _executeWithTokenRefresh(apiCall, options) {
+ //   try {
+ //     // Check if token refresh is needed (and not skipped)
+ //     if (!options.skipTokenRefresh && typeof StorageManager !== 'undefined') {
+ //       if (StorageManager.isAccessTokenExpired() && !StorageManager.isRefreshTokenExpired()) {
+
+ //         if (typeof TokenManager !== 'undefined') {
+ //           var refreshSuccess = await TokenManager.refreshToken();
+
+ //           if (!refreshSuccess) {
+ //             throw new Error('Token refresh failed');
+ //           }
+ //         }
+ //       }
+ //     }
+
+ //     // Execute the API call
+ //     return await apiCall();
+
+ //   } catch (error) {
+ //     // If 401 Unauthorized, try to refresh token
+ //     if (error.status === 401 && !options.skipTokenRefresh) {
+
+ //       if (typeof TokenManager !== 'undefined') {
+ //         var refreshSuccess = await TokenManager.refreshToken();
+
+ //         if (refreshSuccess) {
+ //           // Retry the original request
+ //           return await apiCall();
+ //         }
+ //       }
+ //     }
+
+ //     throw error;
+ //   }
+ // }
 
 
   // ============================================
@@ -1067,6 +1278,9 @@ var ApiCallManager = (function () {
     postForGrid: postForGrid,
     createGridDataSource: createGridDataSource,
 
+    // Refresh token method
+    refreshToken: refreshToken,
+
     // Specialized Methods
     uploadFile: uploadFile,
     convertToFormData: convertToFormData,
@@ -1086,6 +1300,7 @@ var ApiCallManager = (function () {
     //handleError: _handleError
   };
 })();
+
 
 // ============================================
 // Auto-initialization Check

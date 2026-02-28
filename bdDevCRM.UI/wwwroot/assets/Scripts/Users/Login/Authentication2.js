@@ -1,7 +1,7 @@
 ﻿
 /*=========================================================
  * Login Page with Refresh Token Support
- * File: Login.js
+ * File: Authentication.js
  * Author: devSakhawat
  * Date: 2026-01-31
  * 
@@ -26,10 +26,10 @@ $(document).ready(function () {
     });
   }
 
-  loginHelper.initiateLoginPage();
+  loginHelper2.initiateLoginPage();
 });
 
-var loginHelper = {
+var loginHelper2 = {
   initiateLoginPage: function () {
     // Check if already logged in
     if (this.isAlreadyLoggedIn()) {
@@ -40,14 +40,14 @@ var loginHelper = {
 
     // Login button click
     $("#btnLogin").click(function () {
-      loginManager.LogInToSystem();
+      loginManager2.LogInToSystem();
     });
 
     // Password field - Enter key
     $("#txtPassword").keypress(function (event) {
       if (event.keyCode == 13) {
         event.preventDefault();
-        loginManager.LogInToSystem();
+        loginManager2.LogInToSystem();
       } else {
         isEncryptedPass = false;
       }
@@ -62,7 +62,7 @@ var loginHelper = {
       if (event.keyCode == 13) {
         event.preventDefault();
         if (isSocialLoginEnable == 1) {
-          loginManager.loginIdVerifying();
+          loginManager2.loginIdVerifying();
         } else {
           // Move to password field
           $("#txtPassword").focus();
@@ -82,7 +82,7 @@ var loginHelper = {
    * Check if user is already logged in
    */
   isAlreadyLoggedIn: function () {
-    var token = localStorage.getItem("jwtToken");
+    var token = localStorage.getItem("access_token");
     if (!token) {
       return false;
     }
@@ -100,7 +100,7 @@ var loginHelper = {
    * Get logged in user info after successful login
    */
   getLoggedInUserInfo: function () {
-    var token = localStorage.getItem("jwtToken");
+    var token = localStorage.getItem("access_token");
     if (!token) {
       console.error('[Login] No token found after login');
       alert("Login failed. Please try again.");
@@ -153,13 +153,13 @@ var loginHelper = {
         Message.ErrorWithHeaderText('Login Failed', errorMessage, null);
 
         // Clear invalid token
-        localStorage.removeItem("jwtToken");
+        localStorage.removeItem("access_token");
       }
     });
   }
 };
 
-var loginManager = {
+var loginManager2 = {
   /**
    * Main login function
    */
@@ -240,7 +240,7 @@ var loginManager = {
         }
 
         // Store access token
-        localStorage.setItem("jwtToken", accessToken);
+        localStorage.setItem("access_token", accessToken);
 
         // Store token expiry (optional but useful)
         if (typeof TokenStorage !== 'undefined') {
@@ -250,7 +250,7 @@ var loginManager = {
         console.log('[Login] Access token stored');
 
         // Get user info and redirect
-        loginHelper.getLoggedInUserInfo();
+        loginHelper2.getLoggedInUserInfo();
       },
       error: function (xhr, status, error) {
         console.error('[Login] Login failed');
@@ -727,15 +727,15 @@ console.log('%c[Login] ✓ Login page loaded', 'color: #4CAF50; font-weight: bol
 //var baseApi = "https://localhost:7290/bdDevs-crm";
 
 //$(document).ready(function () {
-//	loginHelper.initiateLoginPage();    
+//	loginHelper2.initiateLoginPage();    
 //});
 
-//var loginHelper2 = {
+//var loginHelper22 = {
 //	initiateLoginPage: function () {
-//		$("#btnLogin").click(function () { loginManager.LogInToSystem(); });
+//		$("#btnLogin").click(function () { loginManager2.LogInToSystem(); });
 //		$("#txtPassword").keypress(function (event) {
 //			if (event.keyCode == 13) {
-//				loginManager.LogInToSystem();
+//				loginManager2.LogInToSystem();
 //			} else {
 //				isEncryptedPass = false;
 //			}
@@ -749,8 +749,8 @@ console.log('%c[Login] ✓ Login page loaded', 'color: #4CAF50; font-weight: bol
 //			if (event.keyCode == 13) {
 
 //				if (isSocialLoginEnable == 1) {
-//					loginManager.loginIdVerifying();
-//				} else { loginManager.LogInToSystem(); }
+//					loginManager2.loginIdVerifying();
+//				} else { loginManager2.LogInToSystem(); }
 
 //				//
 //			} else {
@@ -758,10 +758,10 @@ console.log('%c[Login] ✓ Login page loaded', 'color: #4CAF50; font-weight: bol
 //			}
 //		});
 //		$("#txtLoginId").change(function (event) {
-//			//loginManager.GetRememberData();
+//			//loginManager2.GetRememberData();
 //		});
 
-//		//loginManager.GetRememberData();
+//		//loginManager2.GetRememberData();
 
 
 //		if (isSocialLoginEnable == 1) {
@@ -770,13 +770,13 @@ console.log('%c[Login] ✓ Login page loaded', 'color: #4CAF50; font-weight: bol
 //			//if(jsonData!=null) {
 //			//	//$("#txtLoginId").val(user.OfficialEmail);
 //			//	//$("#txtName").val(user.UserName);
-//			//	loginManager.LoginOnSuccess(jsonData);
+//			//	loginManager2.LoginOnSuccess(jsonData);
 //			//}
 //		}
 //  },
 
 //	getLoggedInUserInfo: function () {
-//		var token = localStorage.getItem("jwtToken");
+//		var token = localStorage.getItem("access_token");
 //		if (!token) {
 //			alert("Please log in first!");
 //			return;
@@ -805,7 +805,7 @@ console.log('%c[Login] ✓ Login page loaded', 'color: #4CAF50; font-weight: bol
 //	}
 //};
 
-//var loginManager = {
+//var loginManager2 = {
 
 //	LogInToSystem: function () {
 //		debugger;
@@ -854,8 +854,8 @@ console.log('%c[Login] ✓ Login page loaded', 'color: #4CAF50; font-weight: bol
 //			data: JSON.stringify(obj),
 //			success: function (response) {
 //				debugger;
-//				localStorage.setItem("jwtToken", response.Data.AccessToken);
-//				loginHelper.getLoggedInUserInfo();
+//				localStorage.setItem("access_token", response.Data.AccessToken);
+//				loginHelper2.getLoggedInUserInfo();
 //			},
 //			error: function (xhr, status, error) {
 //				// null for message delay time

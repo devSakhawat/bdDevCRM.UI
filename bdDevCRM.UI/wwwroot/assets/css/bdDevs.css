@@ -14,6 +14,11 @@ input[type="button"] {
   cursor: pointer !important;
 }
 
+.form-check-input {
+
+  margin-top: .0em;
+}
+
 button{
   cursor: pointer !important;
 }

@@ -105,16 +105,17 @@ var WorkFlow = {
       resizable: true,
       scrollable: true,
       selectable: 'row',
-      toolbar: ["excel", "pdf"],
+      toolbar: false,
+      //toolbar: ["excel"],
       excel: {
         fileName: "WorkflowList_" + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + ".xlsx",
         filterable: true,
         allPages: true
       },
-      pdf: {
-        fileName: "Workflow_" + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + ".pdf",
-        allPages: true
-      },
+      //pdf: {
+      //  fileName: "Workflow_" + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + ".pdf",
+      //  allPages: true
+      //},
       dataBound: () => {
         this.adjustGridForMobile();
       }
@@ -330,10 +331,10 @@ var WorkFlow = {
       scrollable: true,
       resizable: true,
       selectable: 'row',
-      toolbar: ["excel"],
-      excel: {
-        fileName: "ActionList_" + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + ".xlsx"
-      },
+      //toolbar: ["excel"],
+      //excel: {
+      //  fileName: "ActionList_" + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + ".xlsx"
+      //},
       dataBound: (e) => {
         this.adjustActionGridHeight(e);
       },

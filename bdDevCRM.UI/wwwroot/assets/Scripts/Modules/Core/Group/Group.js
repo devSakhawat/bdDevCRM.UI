@@ -375,6 +375,7 @@ var Groups = {
       // Loader show
       $("#" + this.config.menuContentId).css("min-height", "50px");
       loaderContainer.show();
+
       loader.show();
 
       // Previous tree remove
@@ -926,14 +927,14 @@ var Groups = {
       states.forEach(state => {
         html += `
           <div class="col-12 mb-1">
-            <div class="d-flex justify-content-start align-items-center">
+            <div class="d-flex justify-content-start align-items-center permission-item" data-state-id="${state.WfStateId}" >
               <input type="checkbox" 
                      class="form-check-input" 
                      id="chkStatus${state.WfStateId}" 
                      data-state-id="${state.WfStateId}"
                      data-state-name="${state.StateName}"
                      data-menu-id="${menuId}" />
-              <label for="chkStatus${state.WfStateId}" class="tree-label ms-2">
+              <label class="permission-item-text tree-label ms-2">
                 ${state.StateName}
               </label>
             </div>
@@ -945,12 +946,32 @@ var Groups = {
       $("#" + this.config.stateCheckboxContainerId).html(html);
 
       // Event listeners attach
-      $("#" + this.config.stateCheckboxContainerId).find('input[type="checkbox"]')
-        .on('change', (e) => {
-          const stateId = $(e.target).data('state-id');
-          const menuId = $(e.target).data('menu-id');
-           this.onStateCheckboxChange(stateId, menuId);
-        });
+      $("#" + this.config.stateCheckboxContainerId).find('input[type="checkbox"]').on('change', (e) => {
+        e.stopPropagation(); // prevent parent click
+        const stateId = $(e.target).data('state-id');
+        const menuId = $(e.target).data('menu-id');
+        /*          const parentItem = $(e.target).closest('.permission-item');*/
+
+        this.onStateCheckboxChange(stateId, menuId);
+      });
+
+      $("#" + this.config.stateCheckboxContainerId).find('.permission-item-text').on('click', (e) => {
+        e.preventDefault();  // Stop Browser default behavior
+        e.stopPropagation(); // prevent parent click
+        // For getting stateId (Solution 1)
+        const parentItem = $(e.target).closest('.permission-item');
+        const stateId = parentItem.data('state-id');
+
+        // For getting StateId (Solution 2)
+        const forAttr = $(e.target).attr('for');
+        const checkbox = $(`#${forAttr}`);
+        const stateIdFromInput = checkbox.data('state-id');
+
+        this.loadActionsByStatusId(stateId);
+      }
+
+      );
+
 
       // Existing state selection restore
       await this.restoreStateSelection(menuId);
@@ -1024,8 +1045,8 @@ var Groups = {
   },
 
   /**
-   * Restore State Selection
-   */
+ * Restore State Selection
+ */
   restoreStateSelection: function (menuId) {
     this.statePermissionArray.forEach(item => {
       if (item.ParentPermission === menuId && item.PermissionTableName === "Status") {

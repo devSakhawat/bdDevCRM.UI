@@ -50,7 +50,8 @@ var NavigationManager = (function () {
 
   function _bindNavigationEvents() {
     // Listen to clicks on the Sidebar and any specific internal links
-    $(document).on('click', 'a', function (e) {
+    //$(document).on('click', 'a', function (e) {
+    $('#SidebarMenuMainDiv').on('click', 'a', function (e) {
       
       var $link = $(this);
       var url = $link.attr('href');

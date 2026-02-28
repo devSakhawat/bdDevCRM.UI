@@ -1,4 +1,5 @@
 ﻿/// <reference path="storagemanager.js" />
+
 /*=========================================================
  * Token Manager
  * File: TokenManager.js
@@ -15,6 +16,7 @@ var TokenManager = (function () {
   // ============================================
   var _state = {
     refreshInterval: null,
+    refreshPromise : null,
     isRefreshing: false
   };
 
@@ -52,69 +54,110 @@ var TokenManager = (function () {
   }
 
   async function refreshToken() {
-    if (_state.isRefreshing) {
-      console.warn('Token refresh already in progress');
-      return false;
+    debugger;
+    if (_state.isRefreshing && _state.refreshPromise) {
+      return _state.refreshPromise; // Prevent duplicate
     }
 
     _state.isRefreshing = true;
 
-    try {
+    _state.refreshPromise = (async function () {
+      try {
 
-      var refreshTokenValue = StorageManager.getRefreshToken();
+        // Simply call ApiCallManager's method
+        var success = await ApiCallManager.refreshToken();
 
-      if (!refreshTokenValue) {
-        console.error('No refresh token found');
-        _handleRefreshFailure();
-        return false;
-      }
-
-      if (StorageManager.isRefreshTokenExpired()) {
-        console.error('Refresh token expired');
-        _handleRefreshFailure();
-        return false;
-      }
-
-      var response = await ApiCallManager.post(
-        AppConfig.getApiUrl(),
-        '/refresh-token',
-        { RefreshToken: refreshTokenValue },
-        {
-          retry: false,
-          showErrorNotifications: false,
-          skipTokenRefresh: true
+        if (!success) {
+          _handleRefreshFailure();
+          return false;
         }
-      );
 
-      if (!response || !response.Data) {
-        throw new Error('Invalid refresh token response');
+        if (StorageManager.isRefreshTokenExpired()) {
+          console.error('[TokenManager] Refresh token expired');
+          _handleRefreshFailure();
+          return false;
+        }
+
+        console.log('[TokenManager] Token refreshed successfully');
+        return true;
+
+      } catch (error) {
+        console.error('[TokenManager] Refresh failed:', error);
+        _handleRefreshFailure();
+        return false;
+
+      } finally {
+        _state.isRefreshing = false;
+        _state.refreshPromise = null;
       }
+    })();
 
-      StorageManager.setTokens(response.Data);
-      console.log('Token refreshed successfully');
-
-      if (typeof EventBus !== 'undefined') {
-        EventBus.publish('token:refreshed', response.Data);
-      }
-
-      return true;
-
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      _handleRefreshFailure();
-      return false;
-
-    } finally {
-      _state.isRefreshing = false;
-    }
+    return _state.refreshPromise;
   }
+
+  //async function refreshToken() {
+  //  if (_state.isRefreshing) {
+  //    console.warn('Token refresh already in progress');
+  //    return false;
+  //  }
+
+  //  _state.isRefreshing = true;
+
+  //  try {
+
+  //    //var refreshTokenValue = StorageManager.getRefreshToken();
+
+  //    //if (!refreshTokenValue) {
+  //    //  console.error('No refresh token found');
+  //    //  _handleRefreshFailure();
+  //    //  return false;
+  //    //}
+
+  //    if (StorageManager.isRefreshTokenExpired()) {
+  //      console.error('Refresh token expired');
+  //      _handleRefreshFailure();
+  //      return false;
+  //    }
+
+  //    var response = await ApiCallManager.post(
+  //      AppConfig.getApiUrl(),
+  //      AppConfig.endpoints.refreshToken ||  '/refresh-token',
+  //      {
+  //        retry: false,
+  //        showErrorNotifications: false,
+  //        skipTokenRefresh: true
+  //      }
+  //    );
+
+  //    if (!response.Data || !response.data || response) {
+  //      throw new Error('Invalid refresh token response');
+  //    }
+
+  //    StorageManager.setTokens(response.Data || response.data || response);
+  //    console.log('Token refreshed successfully');
+
+  //    if (typeof EventBus !== 'undefined') {
+  //      EventBus.publish('token:refreshed', response.Data);
+  //    }
+
+  //    return true;
+
+  //  } catch (error) {
+  //    console.error('Token refresh failed:', error);
+  //    _handleRefreshFailure();
+  //    return false;
+
+  //  } finally {
+  //    _state.isRefreshing = false;
+  //  }
+  //}
 
   // ============================================
   // PRIVATE - Helper Functions
   // ============================================
 
   async function _checkAndRefreshToken() {
-    if (!AppConfig.isAuthenticated()) {
+    if (!StorageManager.hasValidToken()) {
       return;
     }
 
@@ -157,7 +200,7 @@ var TokenManager = (function () {
   function getTokenStatus() {
     return {
       hasAccessToken: !!StorageManager.getAccessToken(),
-      hasRefreshToken: !!StorageManager.getRefreshToken(),
+      //hasRefreshToken: !!StorageManager.getRefreshToken(),
       isAccessTokenExpired: StorageManager.isAccessTokenExpired(),
       isRefreshTokenExpired: StorageManager.isRefreshTokenExpired(),
       accessTokenExpiry: StorageManager.getAccessTokenExpiry(),
@@ -165,9 +208,9 @@ var TokenManager = (function () {
     };
   }
 
-  function hasToken() {
-    return !!StorageManager.getAccessToken();
-  }
+  //function hasToken() {
+  //  return !!StorageManager.getAccessToken();
+  //}
 
   function clearSession() {
     stopAutoRefresh();
@@ -186,6 +229,68 @@ var TokenManager = (function () {
     await _checkAndRefreshToken();
   }
 
+  /**
+     * Handle login response
+     * Stores tokens, user info, and starts auto-refresh
+     * 
+     * @param {object} loginData - Response from login API
+     * @param {string} loginData.AccessToken - JWT access token
+     * @param {string} loginData.AccessTokenExpiry - ISO date string
+     * @param {number} loginData.ExpiresIn - Seconds until expiry
+     * @param {string} loginData.RefreshTokenExpiry - ISO date string (optional)
+     * @param {object} loginData.UserSession - User session data (optional)
+     * @returns {boolean} Success status
+     */
+  function handleLoginResponse(loginData) {
+    if (!loginData) {
+      console.error('[TokenManager] Invalid login data provided');
+      return false;
+    }
+
+    console.log('[TokenManager] Processing login response...');
+
+    try {
+      // 1. Store tokens
+      if (typeof StorageManager !== 'undefined') {
+        var tokensStored = StorageManager.setTokens(loginData);
+        if (!tokensStored) {
+          console.error('[TokenManager] Failed to store tokens');
+          return false;
+        }
+      } else {
+        console.error('[TokenManager] StorageManager not available');
+        return false;
+      }
+
+      // 2. Store user session/info if available
+      if (loginData.UserSession) {
+        if (typeof StorageManager !== 'undefined') {
+          StorageManager.setUserInfo(loginData.UserSession);
+          console.log('[TokenManager] User session stored');
+        }
+      }
+
+      // 3. Start auto-refresh mechanism
+      startAutoRefresh();
+      console.log('[TokenManager] Auto-refresh started');
+
+      // 4. Publish event (if EventBus available)
+      if (typeof EventBus !== 'undefined') {
+        EventBus.publish('auth:login', {
+          userId: loginData.UserSession?.UserId,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      console.log('[TokenManager] Login handled successfully');
+      return true;
+
+    } catch (error) {
+      console.error('[TokenManager] Error handling login response:', error);
+      return false;
+    }
+  }
+
   // ============================================
   // PUBLIC API
   // ============================================
@@ -194,10 +299,11 @@ var TokenManager = (function () {
     stopAutoRefresh: stopAutoRefresh,
     refreshToken: refreshToken,
     getTokenStatus: getTokenStatus,
-    hasToken: hasToken,
+    //hasToken: hasToken,
     clearSession: clearSession,
     redirectToLogin: redirectToLogin,
-    checkAndRefresh: checkAndRefresh
+    checkAndRefresh: checkAndRefresh,
+    handleLoginResponse: handleLoginResponse
   };
 })();
 

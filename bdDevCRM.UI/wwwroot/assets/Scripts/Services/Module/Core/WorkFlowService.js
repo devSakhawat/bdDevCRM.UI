@@ -45,7 +45,7 @@ var WorkFlowService = {
 
     try {
       console.log('Fetching workflow state by ID:', stateId);
-      const endpoint = `${AppConfig.endpoints.workflow || '/workflow'}/${stateId}`;
+      const endpoint = `${AppConfig.endpoints.status || '/status/key/'}/${stateId}`;
       const data = await ApiCallManager.get(endpoint);
       console.log('Workflow state fetched successfully:', data);
       return data;
@@ -331,8 +331,8 @@ var WorkFlowService = {
   getMenusForDropdown: async function () {
     try {
       console.log('Fetching menus for dropdown...');
-      const endpoint = AppConfig.endpoints.menusForDDL || '/menus-4-ddl';
-      const data = await ApiCallManager.get(endpoint, {
+      const endpoint = AppConfig.endpoints.menuDDL || '/menus-4-ddl';
+      const data = await ApiCallManager.getWithRefreshToken(endpoint, {
         showLoadingIndicator: false,
         showErrorNotifications: true
       });

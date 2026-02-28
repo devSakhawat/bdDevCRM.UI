@@ -1,6 +1,6 @@
 ﻿@* <script src="~/assets/scripts/modules/core/group/groupdetails.js"></script> *@
 
-<div id="divdetailsForDetails">
+@* <div id="divdetailsForDetails" >
 
   <div id="tabstripGroups">
     <ul id="tabStripDiv">
@@ -14,11 +14,154 @@
 
 
   <div class="d-flex justify-content-start mt-3 ms-5">
-@*     <button type="button" class="btn btn-primary me-2" onclick="GroupDetailsHelper.SaveInformation()" id="btnSave">+ Save </button>
-    <button type="button" class="btn btn-secondary me-2" onclick="GroupDetailsHelper.clearGroupForm()" id="btnClearAll">Clear</button> *@
     <button type="button" class="btn btn-primary me-2" onclick="Groups.save()" id="btnSave">+ Save </button>
     <button type="button" class="btn btn-secondary me-2" onclick="Groups.clearForm()" id="btnClearAll">Clear</button>
   </div>
 
+</div> *@
+
+
+<div id="divdetailsForDetails">
+
+  <div id="tabstripGroups">
+    <ul id="tabStripDiv">
+      <li> Group Info </li>
+      <li> Group Permission </li>
+    </ul>
+    <div> <partial name="Group/_GroupInfo" /> </div>
+    <div> <partial name="Group/_GroupPermission" /> </div>
+  </div>
+  <div class="group-button-panel d-flex justify-content-start mt-0 ms-2">
+    <button type="button" class="btn btn-primary me-2" onclick="Groups.save()" id="btnSave">+ Save </button>
+    <button type="button" class="btn btn-secondary" onclick="Groups.clearForm()" id="btnClearAll">Clear</button>
+  </div>
+
 </div>
 
+
+<style>
+  /* ============================================
+       Group Settings — Flex Height Control
+    ============================================ */
+
+  /* 1. Main container: flex column */
+  #divdetailsForDetails {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* parent নিজে scroll করবে না */
+  }
+
+  /* 2. TabStrip: flex grow to fill space */
+  #tabstripGroups {
+    flex: 1 1 auto;
+    min-height: 0; /* flex overflow control এর জন্য গুরুত্বপূর্ণ */
+    display: flex;
+    flex-direction: column;
+  }
+
+    /* 3. Tab header (ul) — fixed height */
+    #tabstripGroups > ul {
+      flex: 0 0 auto;
+    }
+
+    /* 4. Tab content (.k-content) — fill remaining, scroll */
+    #tabstripGroups > .k-content {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: auto;
+      overflow-y: auto;
+    }
+
+  /* 5. Save/Clear button panel — fixed at bottom */
+  .group-button-panel {
+    flex: 0 0 auto;
+    padding: 5px 0px 10px 0px;
+    /* background: #fff;
+      border-top: 1px solid #e2e8f0; */
+    z-index: 5;
+  }
+
+  /* ============================================
+       Group Permission Tab — 50/50 Split
+    ============================================ */
+
+  /* 6. Permission container: fill parent tab content */
+  #divGroupPermision {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* 7. DDL row — fixed height */
+  #ddlApplicationRow {
+    flex: 0 0 auto;
+  }
+
+  /* 8. Permission rows wrapper — fill remaining space */
+  #permissionRowsWrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* 9. Each permission row = exactly 50% */
+  .permission-row {
+    flex: 1 1 50%;
+    min-height: 0; /* shrink হতে দিবে */
+    overflow: hidden;
+  }
+
+  /* ============================================
+       Permission Section — Individual Panels
+    ============================================ */
+
+  /* 10. প্রতিটি permission section (Access, Report, Menu, State, Action) */
+  .permission-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px;
+  }
+
+    .permission-section > .mb-2 {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 11. Header (h4) — fixed */
+    .permission-section h4 {
+      flex: 0 0 auto;
+      margin-bottom: 8px !important;
+    }
+
+  /* 12. Scroll content — fill remaining + scrollbar */
+  .permission-scroll-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+
+  /* ============================================
+       Override old fixed heights
+    ============================================ */
+  /* পুরাতন CSS এ divAccessControl, divReportPermission এ
+       fixed height: 300px ছিল — সেগুলো override */
+  #divAccessControl {
+    height: 100% !important;
+    overflow: visible !important;
+  }
+
+  #divReportPermission {
+    height: 100% !important;
+    overflow: visible !important;
+  }
+</style>

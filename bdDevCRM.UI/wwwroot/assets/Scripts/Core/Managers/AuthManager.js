@@ -1,4 +1,6 @@
-﻿/*=========================================================
+﻿/// <reference path="StorageManager.js" />
+
+/*=========================================================
  * Authentication Manager
  * File: AuthManager.js
  * Description: Central authentication orchestration layer
@@ -335,17 +337,28 @@ var AuthManager = (function () {
      * @returns {Promise} Promise resolving when logout complete
      */
     logout: function () {
+      debugger;
       console.log('[AuthManager] Logout initiated');
+      /*var accessToken = TokenStorage.getAccessToken();*/
 
-      var accessToken = TokenStorage.getAccessToken();
+      var token;
+      if (typeof StorageManager !== 'undefined') {
+        token = TokenStorage.getAccessToken();
+      }
 
-      // Stop auto-refresh
-      _stopAutoRefreshTimer();
+      if (!token) {
+        TokenManager.clearSession();
+        TokenManager.redirectToLogin();
+      }
+
+      //// Stop auto-refresh
+      //_stopAutoRefreshTimer();
 
       // Call logout API
-      return AuthApiClient.logout(accessToken)
+      return AuthenticationService.logout()
         .then(function (response) {
           console.log('[AuthManager] Logout API successful');
+          debugger;
 
           // Clear local tokens
           TokenStorage.clearTokens();
@@ -388,7 +401,7 @@ var AuthManager = (function () {
      * @returns {boolean} True if authenticated
      */
     isAuthenticated: function () {
-      return TokenStorage.hasValidToken();
+      return StorageManager.hasValidToken();
     },
 
     /**

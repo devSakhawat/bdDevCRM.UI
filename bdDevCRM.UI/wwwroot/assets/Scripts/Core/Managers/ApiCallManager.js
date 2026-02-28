@@ -221,7 +221,22 @@ var ApiCallManager = (function () {
   /**
    * Handle and display errors (with MessageManager integration)
    */
-  function _handleError(error) {
+  /**
+   * Handle API error with enterprise-level error handler
+   * @param {object} error - Error object
+   * @param {object} options - Optional error handling options
+   * @returns {object} Parsed error object
+   */
+  function _handleError(error, options) {
+    // Use ApiErrorHandler if available (enterprise-level error handling)
+    if (typeof ApiErrorHandler !== 'undefined') {
+      return ApiErrorHandler.handleError(error, {
+        showNotification: _config.showErrorNotifications,
+        ...options
+      });
+    }
+
+    // Fallback to basic error handling if ApiErrorHandler not loaded
     console.error('[ApiCallManager Error]', error);
 
     if (!_config.showErrorNotifications) return;
@@ -309,7 +324,10 @@ var ApiCallManager = (function () {
   }
 
   /**
-   * Retry logic with exponential backoff
+   * Retry logic with exponential backoff (enterprise-level)
+   * @param {function} requestFn - Request function to retry
+   * @param {number} retries - Number of retries
+   * @returns {Promise<any>} Request result
    */
   async function _withRetry(requestFn, retries) {
     const maxRetries = retries !== undefined ? retries : _config.maxRetries;
@@ -321,18 +339,39 @@ var ApiCallManager = (function () {
       } catch (error) {
         lastError = error;
 
-        // Don't retry on client errors (4xx)
-        if (error.StatusCode >= 400 && error.StatusCode < 500) {
-          throw error;
-        }
+        // Use ApiErrorHandler to check if error is retryable
+        if (typeof ApiErrorHandler !== 'undefined') {
+          const errorType = ApiErrorHandler.getErrorType(error);
+          const isRetryable = ApiErrorHandler.isRetryable(errorType);
 
-        if (attempt < maxRetries) {
-          const delay = _config.retryDelay * Math.pow(2, attempt); // Exponential backoff
-          await _sleep(delay);
+          if (!isRetryable) {
+            console.log(`[ApiCallManager] Error type ${errorType} is not retryable, throwing immediately`);
+            throw error;
+          }
+
+          if (attempt < maxRetries) {
+            const delay = ApiErrorHandler.getRetryDelay(attempt + 1);
+            console.log(`[ApiCallManager] Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms for error type ${errorType}`);
+            await _sleep(delay);
+          }
+        } else {
+          // Fallback: Don't retry on client errors (4xx)
+          const statusCode = error.StatusCode || error.statusCode || 0;
+          if (statusCode >= 400 && statusCode < 500) {
+            console.log(`[ApiCallManager] Client error ${statusCode}, not retrying`);
+            throw error;
+          }
+
+          if (attempt < maxRetries) {
+            const delay = _config.retryDelay * Math.pow(2, attempt); // Exponential backoff
+            console.log(`[ApiCallManager] Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`);
+            await _sleep(delay);
+          }
         }
       }
     }
 
+    console.error(`[ApiCallManager] All ${maxRetries} retry attempts failed`);
     throw lastError;
   }
 

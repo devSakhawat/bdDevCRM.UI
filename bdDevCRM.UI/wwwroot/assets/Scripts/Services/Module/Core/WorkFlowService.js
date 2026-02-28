@@ -45,7 +45,7 @@ var WorkFlowService = {
 
     try {
       console.log('Fetching workflow state by ID:', stateId);
-      const endpoint = `${AppConfig.endpoints.workflow || '/workflow'}/${stateId}`;
+      const endpoint = `${AppConfig.endpoints.status || '/status/key/'}/${stateId}`;
       const data = await ApiCallManager.get(endpoint);
       console.log('Workflow state fetched successfully:', data);
       return data;

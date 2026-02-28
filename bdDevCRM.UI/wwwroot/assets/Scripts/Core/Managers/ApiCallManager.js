@@ -12,6 +12,8 @@
  * - Cookie support
 =========================================================*/
 
+const { debug } = require("node:console");
+
 var ApiCallManager = (function () {
   'use strict';
 
@@ -343,8 +345,9 @@ var ApiCallManager = (function () {
   * @returns {Promise<object>}
   */
   async function _handleHttpResponse(response) {
+    debugger;
     let data;
-
+    console.log(response);
     try {
       data = await response.json();
       console.log(data);
